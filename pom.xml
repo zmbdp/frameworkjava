@@ -12,13 +12,16 @@
 
     <groupId>com.zmbdp</groupId>
     <artifactId>frameworkjava</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
     <packaging>pom</packaging>
+
     <modules>
         <module>zmbdp-mstemplate</module>
         <module>zmbdp-gateway</module>
         <module>zmbdp-common</module>
     </modules>
-    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

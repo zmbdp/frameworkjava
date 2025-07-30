@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.zmbdp</groupId>
-    <artifactId>zmbdp-common-core</artifactId>
+    <artifactId>zmbdp-common-security</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -19,38 +19,44 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+
     <dependencies>
 
-        <!-- lombok -->
+        <!-- Spring Web -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
 
-        <!-- json -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-json</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- junit5 -->
+        <!-- SpringCloud Loadbalancer -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- apache commons -->
+
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>zmbdp-common-domain</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- apache commons -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>zmbdp-common-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.zmbdp</groupId>-->
+<!--            <artifactId>zmbdp-common-redis</artifactId>-->
+<!--            <version>1.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 
