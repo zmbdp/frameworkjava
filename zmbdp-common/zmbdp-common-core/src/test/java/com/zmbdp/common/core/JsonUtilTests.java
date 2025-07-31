@@ -93,8 +93,8 @@ public class JsonUtilTests {
         list.add(map);
         // 先转换成 json
         String json = JsonUtil.classToJson(list);
-        List<Map<String, TestRegion>> list1 =
-                JsonUtil.jsonToClass(json, new TypeReference<List<Map<String, TestRegion>>>() {});
+        List<Map<String, TestRegion>> list1 = JsonUtil
+                .jsonToClass(json, new TypeReference<List<Map<String, TestRegion>>>() {});
         System.out.println(list1);
     }
 }

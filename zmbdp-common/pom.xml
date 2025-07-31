@@ -18,6 +18,7 @@
         <module>zmbdp-common-core</module>
         <module>zmbdp-common-domain</module>
         <module>zmbdp-common-security</module>
+        <module>zmbdp-common-redis</module>
     </modules>
 
     <properties>

@@ -68,18 +68,18 @@ public class JsonUtil {
     /**
      * 对象转 json
      *
-     * @param object 需要转成 json 的对象
+     * @param clazz 需要转成 json 的对象
      * @param <T>    泛型
      * @return 转换好的 json 字符串
      */
-    public static <T> String classToJson(T object) {
-        if (object == null || object instanceof String) {
-            return (String) object;
+    public static <T> String classToJson(T clazz) {
+        if (clazz == null || clazz instanceof String) {
+            return (String) clazz;
         }
         try {
-            return OBJECT_MAPPER.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(clazz);
         } catch (JsonProcessingException e) {
-            log.warn("JsonUtil.objToString Object to String error; 对象转 json 异常 {}", e.getMessage());
+            log.warn("JsonUtil.classToJson Class to JSON error: {}", e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -88,19 +88,19 @@ public class JsonUtil {
     /**
      * 对象转 Json 格式字符串(格式化的 Json 字符串, 调整缩进美化一下)
      *
-     * @param object 需要转 json 的对象
+     * @param clazz 需要转 json 的对象
      * @param <T>    对象类型
      * @return 美化后的 Json 格式字符串
      */
-    public static <T> String classToJsonPretty(T object) {
-        if (object == null || object instanceof String) {
-            return (String) object;
+    public static <T> String classToJsonPretty(T clazz) {
+        if (clazz == null || clazz instanceof String) {
+            return (String) clazz;
         }
         try {
             // writerWithDefaultPrettyPrinter(): 调整缩进格式的方法
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(clazz);
         } catch (JsonProcessingException e) {
-            log.warn("JsonUtil.classToJsonPretty Class to JSON error : {}", e.getMessage());
+            log.warn("JsonUtil.classToJsonPretty Class to JSON error: {}", e.getMessage());
             return null;
         }
     }
@@ -123,14 +123,14 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, clazz);
         } catch (Exception e) {
-            log.warn("JsonUtil.jsonToClass JSON to Class error; json 转对象异常 : {}", e.getMessage());
+            log.warn("JsonUtil.jsonToClass JSON to Class error: {}", e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
 
     /**
-     * json 转换为自定义对象,支持复杂的泛型嵌套
+     * json 转换为自定义对象, 支持复杂的泛型嵌套
      *
      * @param json         需要转换的 json 字符串
      * @param valueTypeRef 自定义对象类型
@@ -144,7 +144,7 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, valueTypeRef);
         } catch (Exception e) {
-            log.warn("JsonUtil.jsonToClass JSON to Class error; json 转 自定义类型异常 : {}", e.getMessage());
+            log.warn("JsonUtil.jsonToClass JSON to custom Class error: {}", e.getMessage());
             return null;
         }
     }
@@ -166,7 +166,7 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, javaType);
         } catch (JsonProcessingException e) {
-            log.warn("JsonUtil.jsonToList json to List error; json 转 List 异常 : {}", e.getMessage());
+            log.warn("JsonUtil.jsonToList JSON to List error: {}", e.getMessage());
             return null;
         }
     }
@@ -188,7 +188,7 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, javaType);
         } catch (JsonProcessingException e) {
-            log.warn("JsonUtil.jsonToMap json to Map error; json 转 Map 异常 : {}", e.getMessage());
+            log.warn("JsonUtil.jsonToMap JSON to Map error: {}", e.getMessage());
             return null;
         }
     }

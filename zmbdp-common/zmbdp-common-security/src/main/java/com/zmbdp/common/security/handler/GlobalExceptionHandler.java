@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 全局异常处理
+ * 全局异常处理工具类
  *
  * @author 稚名不带撇
  */
