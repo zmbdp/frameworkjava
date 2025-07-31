@@ -3,6 +3,7 @@ package com.zmbdp.gateway.handler;
 import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.annotation.Configuration;
@@ -18,13 +19,13 @@ import reactor.core.publisher.Mono;
 
 
 /**
- * 网关异常处理
+ * 网关异常处理器
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @Order(-1)
 @Configuration
-@Slf4j
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
@@ -51,6 +52,10 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
         if (ex instanceof NoResourceFoundException) {
             retCode = ResultCode.SERVICE_NOT_FOUND.getCode();
             errMsg = ResultCode.SERVICE_NOT_FOUND.getErrMsg();
+        } else if (ex instanceof ServiceException) {
+            // 如果是自定义异常，直接返回业务异常信息
+            retCode = ((ServiceException) ex).getCode();
+            errMsg = ex.getMessage();
         }
         // 按照统一状态码的特点，前三位是 http 状态码。从中截取 http 状态码
         int httpCode = Integer.parseInt(String.valueOf(retCode).substring(0,3));

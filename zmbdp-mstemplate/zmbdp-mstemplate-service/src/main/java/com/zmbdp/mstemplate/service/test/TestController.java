@@ -2,6 +2,7 @@ package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.mstemplate.service.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,5 +36,19 @@ public class TestController {
         user.setAge(50);
         user.setName("张三");
         return Result.success(user);
+    }
+
+    @GetMapping("/exception")
+    public Result<Void> exception(int id) {
+        if (id < 0) {
+            throw new ServiceException(ResultCode.INVALID_CODE);
+        }
+        if (id == 1) {
+            throw new ServiceException("id不能为1");
+        }
+        if (id == 1000) {
+            throw new ServiceException("id不能为1000", ResultCode.ERROR_PHONE_FORMAT.getCode());
+        }
+        return Result.success();
     }
 }
