@@ -34,12 +34,12 @@ public class TestRedisController {
 //            return Result.fail(ResultCode.FAILED.getCode(), ResultCode.FAILED.getErrMsg());
 //        }
 
-//        User user = new User();
-//        user.setName("张三");
-//        user.setAge(11);
-//        redisService.setCacheObject("userKey", user);
-//        User userKey = redisService.getCacheObject("userKey", User.class);
-//        log.info("userKey: {}", userKey);
+        User user = new User();
+        user.setName("张三");
+        user.setAge(11);
+        redisService.setCacheObject("userKey", user);
+        User userKey = redisService.getCacheObject("userKey", User.class);
+        log.info("userKey: {}", userKey);
 
 //        redisService.incr("testCountKey");
 //        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
@@ -48,18 +48,22 @@ public class TestRedisController {
 //        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
 //
 //
-//        RegionTest testRegion = new RegionTest();
-//        testRegion.setId(1L);
-//        testRegion.setName("北京");
-//        testRegion.setFullName("北京市");
-//        testRegion.setCode("110000");
-//
-//        List<Map<String, RegionTest>> list = new ArrayList<>();
-//        Map<String, RegionTest> map = new LinkedHashMap<>();
-//        map.put("beijing", testRegion);
-//        list.add(map);
-//
-//        redisService.setCacheObject("testList",list);
+        RegionTest testRegion = new RegionTest();
+        testRegion.setId(1L);
+        testRegion.setName("北京");
+        testRegion.setFullName("北京市");
+        testRegion.setCode("110000");
+
+        List<Map<String, RegionTest>> list = new ArrayList<>();
+        Map<String, RegionTest> map = new LinkedHashMap<>();
+        map.put("beijing", testRegion);
+        list.add(map);
+        list.add(map);
+        list.add(map);
+        list.add(map);
+        list.add(map);
+
+        redisService.setCacheObject("testList",list);
 
         return Result.success();
     }
