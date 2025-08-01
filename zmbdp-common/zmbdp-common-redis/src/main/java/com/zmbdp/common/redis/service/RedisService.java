@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -489,7 +490,7 @@ public class RedisService {
     }
 
     /**
-     * 根据范围获取 List（支持复杂的泛型嵌套 ）
+     * 根据范围获取 List（支持复杂的泛型嵌套）
      *
      * @param key           key
      * @param start         开始下标 (0 表示第一个下标, 1 表示第二个下标, 2 表示第三个下标, 以此类推)
@@ -521,6 +522,183 @@ public class RedisService {
         } catch (Exception e) {
             log.warn("RedisService.getCacheListSize get list size error: {}", e.getMessage());
             return 0L;
+        }
+    }
+
+    /*=============================================    Set    =============================================*/
+
+    /**
+     * Set 添加元素 (批量添加或添加单个元素)
+     *
+     * @param key    key
+     * @param member 元素信息
+     * @return 添加的元素个数
+     */
+    public Long addMember(final String key, Object... member) {
+        try {
+            Long add = redisTemplate.opsForSet().add(key, member);
+            return add == null ? 0L : add;
+        } catch (Exception e) {
+            log.warn("RedisService.addMember add member error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 删除元素
+     *
+     * @param key    key
+     * @param member 元素信息
+     * @return 删除的元素个数
+     */
+    public Long deleteMember(final String key, Object... member) {
+        try {
+            Long remove = redisTemplate.opsForSet().remove(key, member);
+            return remove == null ? 0L : remove;
+        } catch (Exception e) {
+            log.warn("RedisService.deleteMember delete member error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 检查元素是否存在
+     *
+     * @param key    缓存 key
+     * @param member 缓存元素
+     * @return 是否存在
+     */
+    public Boolean isMember(final String key, Object member) {
+        try {
+            return redisTemplate.opsForSet().isMember(key, member);
+        } catch (Exception e) {
+            log.warn("RedisService.isMember check member error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+
+    /**
+     * 获取 Set 中所有元素
+     *
+     * @param key   键值
+     * @param clazz 数据类型
+     * @param <T>   泛型
+     * @return Set<T>
+     */
+    public <T> Set<T> getCacheSet(final String key, Class<T> clazz) {
+        try {
+            // 需要适当的转换逻辑
+            Set<T> members = (Set<T>) redisTemplate.opsForSet().members(key);
+            return members;
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheSet get set data error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Set 中所有元素（支持复杂的泛型嵌套）
+     *
+     * @param key           key
+     * @param typeReference 类型模板
+     * @param <T>           类型信息
+     * @return set数据
+     */
+    public <T> Set<T> getCacheSet(final String key, TypeReference<Set<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForSet().members(key);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheSet get complex set data error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Set 缓存元素个数
+     *
+     * @param key 缓存 key
+     * @return 缓存元素个数
+     */
+    public Long getCacheSetSize(final String key) {
+        try {
+            Long size = redisTemplate.opsForSet().size(key);
+            return size == null ? 0L : size;
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheSetSize get set size error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 获取两个集合的交集
+     *
+     * @param setKey1  第一个集合的 key
+     * @param setKey2  第二个集合的 key
+     * @param clazz 元素类型
+     * @param <T>   泛型类型
+     * @return 交集结果
+     */
+    public <T> Set<T> intersectToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+        try {
+            return (Set<T>) redisTemplate.opsForSet().intersect(setKey1, setKey2);
+        } catch (Exception e) {
+            log.warn("RedisService.intersect set intersect error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取两个集合的并集
+     *
+     * @param setKey1  第一个集合的key
+     * @param setKey2  第二个集合的key
+     * @param clazz 元素类型
+     * @param <T>   泛型类型
+     * @return 并集结果
+     */
+    public <T> Set<T> unionToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+        try {
+            return (Set<T>) redisTemplate.opsForSet().union(setKey1, setKey2);
+        } catch (Exception e) {
+            log.warn("RedisService.union set union error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取两个集合的差集 (key1 - key2)
+     *
+     * @param setKey1  第一个集合的key
+     * @param setKey2  第二个集合的key
+     * @param clazz 元素类型
+     * @param <T>   泛型类型
+     * @return 差集结果
+     */
+    public <T> Set<T> differenceToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+        try {
+            return (Set<T>) redisTemplate.opsForSet().difference(setKey1, setKey2);
+        } catch (Exception e) {
+            log.warn("RedisService.difference set difference error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将元素从 sourceKey 集合移动到 destinationKey 集合
+     *
+     * @param sourceKey      源集合key
+     * @param destinationKey 目标集合key
+     * @param member         要移动的元素
+     * @return 移动成功返回true，否则返回false
+     */
+    public Boolean moveMemberCacheSet(final String sourceKey, final String destinationKey, Object member) {
+        try {
+            return redisTemplate.opsForSet().move(sourceKey, member, destinationKey);
+        } catch (Exception e) {
+            log.warn("RedisService.moveMember move member error: {}", e.getMessage());
+            return false;
         }
     }
 }
