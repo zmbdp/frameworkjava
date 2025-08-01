@@ -299,6 +299,7 @@ public class RedisService {
      */
     public <T> Long removeLeftForList(final String key, final T value) {
         try {
+            // count: 等于正数的时候从左往右删
             Long remove = redisTemplate.opsForList().remove(key, 1L, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
@@ -318,6 +319,7 @@ public class RedisService {
      */
     public <T> Long removeLeftForList(final String key, final T value, final long k) {
         try {
+            // count: 等于正数的时候从左往右删
             Long remove = redisTemplate.opsForList().remove(key, k, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
@@ -336,6 +338,7 @@ public class RedisService {
      */
     public <T> Long removeRightForList(final String key, final T value) {
         try {
+            // count: 等于负数的时候从右往左删
             Long remove = redisTemplate.opsForList().remove(key, -1L, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
@@ -355,6 +358,7 @@ public class RedisService {
      */
     public <T> Long removeRightForList(final String key, final T value, final long k) {
         try {
+            // count: 等于负数的时候从右往左删
             Long remove = redisTemplate.opsForList().remove(key, -k, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
@@ -364,7 +368,7 @@ public class RedisService {
     }
 
     /**
-     * 移除 List 中匹配的所有列表元素
+     * 移除 List 中所有匹配的元素
      *
      * @param key   key
      * @param value 值
@@ -373,6 +377,7 @@ public class RedisService {
      */
     public <T> Long removeAllForList(final String key, final T value) {
         try {
+            // count: 等于 0 的时候全部删除
             Long remove = redisTemplate.opsForList().remove(key, 0, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
@@ -388,6 +393,7 @@ public class RedisService {
      */
     public void removeForAllList(final String key) {
         try {
+            // 当 start(下标) > end(下标) 时, 删除所有元素
             redisTemplate.opsForList().trim(key, -1, 0);
         } catch (Exception e) {
             log.warn("RedisService.removeForAllList remove redis error: {}", e.getMessage());
@@ -395,17 +401,17 @@ public class RedisService {
     }
 
     /**
-     * 移除列表中的指定范围的元素
+     * 保留指定范围内的元素
      *
      * @param key   key
-     * @param start 开始下标
+     * @param start 开始下标 (0 表示第一个下标, 1 表示第二个下标, 2 表示第三个下标, 以此类推)
      * @param end   结束下标 (特殊的: -1 表示最后一个下标，-2 表示倒数第二个下标，以此类推)
      */
-    public void removeForAllList(final String key, final long start, final long end) {
+    public void retainListRange(final String key, final long start, final long end) {
         try {
             redisTemplate.opsForList().trim(key, start, end);
         } catch (Exception e) {
-            log.warn("RedisService.removeForAllList remove scope redis error: {}", e.getMessage());
+            log.warn("RedisService.retainListRange redis error: {}", e.getMessage());
         }
     }
 
@@ -426,7 +432,7 @@ public class RedisService {
     }
 
     /**
-     * 获得缓存的 list 对象
+     * 获得缓存的 List 对象
      *
      * @param key   key 缓存的键值
      * @param clazz 对象的类
@@ -445,12 +451,12 @@ public class RedisService {
     }
 
     /**
-     * 获得缓存的 list 对象 （支持复杂的泛型嵌套）
+     * 获得缓存的 List 对象 （支持复杂的泛型嵌套）
      *
      * @param key           key信息
      * @param typeReference 类型模板
      * @param <T>           对象类型
-     * @return list 对象
+     * @return List 对象
      */
     public <T> List<T> getCacheList(final String key, TypeReference<List<T>> typeReference) {
         try {
@@ -470,7 +476,7 @@ public class RedisService {
      * @param end   结束下标 (特殊的: -1 表示最后一个下标, -2 倒数第二个下标, -3 倒数第三个下标, 以此类推)
      * @param clazz 类信息
      * @param <T>   类型
-     * @return List列表
+     * @return List 列表 (如果 start(下标) > end(下标) 则返回null)
      */
     public <T> List<T> getCacheListByRange(final String key, long start, long end, Class<T> clazz) {
         try {
@@ -490,7 +496,7 @@ public class RedisService {
      * @param end           结束下标 (特殊的: -1 表示最后一个下标, -2 倒数第二个下标, -3 倒数第三个下标, 以此类推)
      * @param typeReference 类型模板
      * @param <T>           类型信息
-     * @return list列表
+     * @return List 列表
      */
     public <T> List<T> getCacheListByRange(final String key, long start, long end, TypeReference<List<T>> typeReference) {
         try {
@@ -517,5 +523,4 @@ public class RedisService {
             return 0L;
         }
     }
-
 }
