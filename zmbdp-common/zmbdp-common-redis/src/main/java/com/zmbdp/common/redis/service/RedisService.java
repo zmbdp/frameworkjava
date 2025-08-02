@@ -25,6 +25,131 @@ public class RedisService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    /*=============================================    通用方法    =============================================*/
+
+    /**
+     * 设置有效时间
+     * @param key Redis 键
+     * @param timeout 有效时间 (秒)
+     * @return true - 设置成功; false - 设置失败
+     */
+    public Boolean expire(final String key, final long timeout) {
+        try {
+            return redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.warn("RedisService.expire set ttl error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+
+    /**
+     * 设置有效时间 (并指定时间单位)
+     * @param key Redis 键
+     * @param timeout 有效时间
+     * @param timeUnit 时间单位
+     * @return true - 设置成功; false - 设置失败
+     */
+    public Boolean expire(final String key, final long timeout, final TimeUnit timeUnit) {
+        try {
+            return redisTemplate.expire(key, timeout, timeUnit);
+        } catch (Exception e) {
+            log.warn("RedisService.expire set ttl error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 获取有效时间
+     *
+     * @param key Redis键
+     * @return 有效时间, -2 - 不存在
+     */
+    public Long getExpire(final String key) {
+        try {
+            return redisTemplate.getExpire(key);
+        } catch (Exception e) {
+            log.warn("RedisService.getExpire get ttl error: {}", e.getMessage());
+            return -2L;
+        }
+    }
+
+    /**
+     * 判断 key是否存在
+     *
+     * @param key 键
+     * @return true - 存在; false - 不存在
+     */
+    public Boolean hasKey(final String key) {
+        try {
+            return redisTemplate.hasKey(key);
+        } catch (Exception e) {
+            log.warn("RedisService.hasKey error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 根据提供的键模式查找 Redis 中匹配的键
+     *
+     * @param pattern 要查找的键的模式
+     * @return 键列表
+     */
+    public Collection<String> keys(final String pattern) {
+        try {
+            return redisTemplate.keys(pattern);
+        } catch (Exception e) {
+            log.warn("RedisService.keys error: {}", e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+
+    /**
+     * 重命名key
+     *
+     * @param oldKey 原来 key
+     * @param newKey 新 key
+     */
+    public void renameKey(String oldKey, String newKey) {
+        try {
+            redisTemplate.rename(oldKey, newKey);
+        } catch (Exception e) {
+            log.warn("RedisService.renameKey error: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 删除单个数据
+     *
+     * @param key 缓存的键值
+     * @return 是否成功  true - 删除成功; false - 删除失败
+     */
+    public Boolean deleteObject(final String key) {
+        try {
+            return redisTemplate.delete(key);
+        } catch (Exception e) {
+            log.warn("RedisService.deleteObject error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 删除多个数据
+     *
+     * @param collection 多个数据对应的缓存的键值
+     * @return 是否删除了对象 true - 删除成功; false - 删除失败
+     */
+    public Long deleteObject(final Collection collection) {
+        try {
+            Long delete = redisTemplate.delete(collection);
+            return delete == null ? 0 : delete;
+        } catch (Exception e) {
+            log.warn("RedisService.deleteObject error: {}", e.getMessage());
+            return null;
+        }
+    }
+
     /*=============================================    String    =============================================*/
 
     /**
@@ -305,7 +430,7 @@ public class RedisService {
             Long remove = redisTemplate.opsForList().remove(key, 1L, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
-            log.warn("RedisService.removeForList remove left redis error: {}", e.getMessage());
+            log.warn("RedisService.removeLeftForList remove left redis error: {}", e.getMessage());
             return -1L;
         }
     }
@@ -325,7 +450,7 @@ public class RedisService {
             Long remove = redisTemplate.opsForList().remove(key, k, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
-            log.warn("RedisService.removeForList remove k left redis error: {}", e.getMessage());
+            log.warn("RedisService.removeLeftForList remove k left redis error: {}", e.getMessage());
             return -1L;
         }
     }
@@ -344,7 +469,7 @@ public class RedisService {
             Long remove = redisTemplate.opsForList().remove(key, -1L, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
-            log.warn("RedisService.removeForList remove right redis error: {}", e.getMessage());
+            log.warn("RedisService.removeRightForList remove right redis error: {}", e.getMessage());
             return -1L;
         }
     }
@@ -364,7 +489,7 @@ public class RedisService {
             Long remove = redisTemplate.opsForList().remove(key, -k, value);
             return remove == null ? -1 : remove;
         } catch (Exception e) {
-            log.warn("RedisService.removeForList remove k right redis error: {}", e.getMessage());
+            log.warn("RedisService.removeRightForList remove k right redis error: {}", e.getMessage());
             return -1L;
         }
     }
@@ -966,7 +1091,7 @@ public class RedisService {
     }
 
     /**
-     * 往 Hash 中存入单个数据
+     * 往 Hash 中存入单个数据（如果key不存在，则创建key添加map中的数据）
      *
      * @param key   Redis 键
      * @param hKey  Hash 键
@@ -1110,7 +1235,7 @@ public class RedisService {
     }
 
     /**
-     * 获取 Hash 中的多个数据（支持复杂泛型嵌套）
+     * 获取 Hash 中的多个数据 Map 版（支持复杂泛型嵌套）
      *
      * @param key           Redis键
      * @param hKeys         Hash键集合
@@ -1118,12 +1243,57 @@ public class RedisService {
      * @param <T>           对象类型
      * @return 获取的多个数据的集合
      */
-    public <T> List<T> getMultiCacheMapValue(final String key, final Collection<String> hKeys, TypeReference<List<T>> typeReference) {
+    public <T> Map<String, T> getMultiCacheMapValue(final String key, final Collection<String> hKeys, TypeReference<Map<String, T>> typeReference) {
+        try {
+            List<Object> data = redisTemplate.opsForHash().multiGet(key, hKeys);
+            Map<String, Object> resultMap = new HashMap<>();
+            Iterator<String> keyIterator = hKeys.iterator();
+            for (Object value : data) {
+                if (keyIterator.hasNext()) {
+                    resultMap.put(keyIterator.next(), value);
+                }
+            }
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(resultMap), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getMultiCacheMapValue complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Hash 中的多个数据 List 版（支持复杂泛型嵌套）
+     *
+     * @param key           Redis键
+     * @param hKeys         Hash键集合
+     * @param typeReference 对象模板
+     * @param <T>           对象类型
+     * @return 获取的多个数据的集合
+     */
+    public <T> List<T> getMultiCacheListValue(final String key, final Collection<String> hKeys, TypeReference<List<T>> typeReference) {
         try {
             List data = redisTemplate.opsForHash().multiGet(key, hKeys);
             return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
         } catch (Exception e) {
-            log.warn("RedisService.getMultiCacheMapValue complex error: {}", e.getMessage());
+            log.warn("RedisService.getMultiCacheListValue complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Hash 中的多个数据 List 版（支持复杂泛型嵌套）
+     *
+     * @param key           Redis键
+     * @param hKeys         Hash键集合
+     * @param typeReference 对象模板
+     * @param <T>           对象类型
+     * @return 获取的多个数据的集合
+     */
+    public <T> Set<T> getMultiCacheSetValue(final String key, final Collection<String> hKeys, TypeReference<Set<T>> typeReference) {
+        try {
+            List data = redisTemplate.opsForHash().multiGet(key, hKeys);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getMultiCacheSetValue complex error: {}", e.getMessage());
             return null;
         }
     }
