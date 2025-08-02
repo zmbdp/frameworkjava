@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author 稚名不带撇
  */
-
 @Configuration
 public class CaffeineConfig {
 

@@ -17,7 +17,7 @@ public class ClothServiceImpl implements IClothService {
     private RedisService redisService;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private Cache<String, Object> caffeineCache;
 
 
     // proId 商品的主键 Id
@@ -25,7 +25,7 @@ public class ClothServiceImpl implements IClothService {
     public Integer clothPriceGet(Long proId) {
 //        String key = CacheConstants.CLOTH_KEY + proId;
         String key = "c:"+ proId;
-        Integer price = CacheUtil.getL2Cache(redisService, key, new TypeReference<Integer>() {}, cache);
+        Integer price = CacheUtil.getL2Cache(redisService, key, new TypeReference<Integer>() {}, caffeineCache);
         if (price != null) {
             return price;
         }
@@ -38,7 +38,7 @@ public class ClothServiceImpl implements IClothService {
         Integer price = 100;  // 通过 sql 从数据库中查出指定商品在一年之间的平均售卖价格
         //String key = CacheConstants.CLOTH_KEY + proId;
         String key = "c:"+ proId;
-        CacheUtil.setL2Cache(redisService, key, price, cache, 600L, TimeUnit.SECONDS);
+        CacheUtil.setL2Cache(redisService, key, price, caffeineCache, 600L, TimeUnit.SECONDS);
         return price;
     }
 }
