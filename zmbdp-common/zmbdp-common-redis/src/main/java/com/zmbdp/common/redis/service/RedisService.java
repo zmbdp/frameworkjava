@@ -29,7 +29,8 @@ public class RedisService {
 
     /**
      * 设置有效时间
-     * @param key Redis 键
+     *
+     * @param key     Redis 键
      * @param timeout 有效时间 (秒)
      * @return true - 设置成功; false - 设置失败
      */
@@ -45,8 +46,9 @@ public class RedisService {
 
     /**
      * 设置有效时间 (并指定时间单位)
-     * @param key Redis 键
-     * @param timeout 有效时间
+     *
+     * @param key      Redis 键
+     * @param timeout  有效时间
      * @param timeUnit 时间单位
      * @return true - 设置成功; false - 设置失败
      */
@@ -54,7 +56,7 @@ public class RedisService {
         try {
             return redisTemplate.expire(key, timeout, timeUnit);
         } catch (Exception e) {
-            log.warn("RedisService.expire set ttl error: {}", e.getMessage());
+            log.warn("RedisService.expire set custom ttl error: {}", e.getMessage());
             return false;
         }
     }
@@ -145,7 +147,7 @@ public class RedisService {
             Long delete = redisTemplate.delete(collection);
             return delete == null ? 0 : delete;
         } catch (Exception e) {
-            log.warn("RedisService.deleteObject error: {}", e.getMessage());
+            log.warn("RedisService.deleteObject multiple error: {}", e.getMessage());
             return null;
         }
     }
@@ -231,9 +233,6 @@ public class RedisService {
     public <T> T getCacheObject(final String key, Class<T> clazz) {
         try {
             Object o = redisTemplate.opsForValue().get(key);
-            if (o == null) {
-                return null;
-            }
             // 缓存对象先转换成 json
             String jsonStr = JsonUtil.classToJson(o);
             // 再转换成对象
@@ -1418,13 +1417,14 @@ public class RedisService {
     /*=============================================    LUA脚本    =============================================*/
 
     /**
-     * 删除指定值对应的 Redis 中的键值（compare and delete）
-     *
+     * 删除指定值对应的 Redis 中的键值（Compare And Delete）
+     * 先对 value 进行比较，成功了再进行删除（所有的操作通过 lua 脚本原子性实现）
      * @param key   缓存 key
-     * @param value value
-     * @return 是否完成了比较并删除
+     * @param value 期望的值
+     * @return 是否完成了删除操作，true - 表示删除成功; false - 表示删除失败
      */
-    public boolean cad(String key, String value) {
+    public boolean compareAndDelete(String key, String value) {
+        // 验证 key 和 value 中不能包含空格
         if (key.contains(StringUtils.SPACE) || value.contains(StringUtils.SPACE)) {
             return false;
         }
@@ -1433,8 +1433,9 @@ public class RedisService {
 
         // 通过 lua 脚本原子验证令牌和删除令牌
         Long result = (Long) redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
-                Collections.singletonList(key),
-                value);
+                Collections.singletonList(key), // KEYS[1]
+                value); // ARGV[1]
+        // 如果返回结果为 0 行, 则说明删除失败
         return !Objects.equals(result, 0L);
     }
 }

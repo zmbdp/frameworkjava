@@ -1,2 +1,3 @@
-com.zmbdp.common.redis.service.RedisService
 com.zmbdp.common.redis.config.RedisConfig
+com.zmbdp.common.redis.service.RedisService
+com.zmbdp.common.redis.service.RedissonLockService

@@ -21,6 +21,7 @@ spring:
             # 可以这么拿到环境变量的值, 还有下面一种方法也可以
 #          - data-id: share-redis-${RUN_ENV}.yaml
           - data-id: share-redis-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - data-id: share-caffeine-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
 # 这⼀配置用于定义应用在控制台输出日志时所遵循的格式规则
 logging:
   pattern:

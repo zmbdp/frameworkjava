@@ -2,6 +2,7 @@ package com.zmbdp.mstemplate.service.test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.mstemplate.service.domain.RegionTest;
 import com.zmbdp.mstemplate.service.domain.User;
@@ -25,13 +26,13 @@ public class TestRedisController {
 
     @PostMapping("/add")
     public Result<Void> add() {
-//        redisService.setCacheObject("test", "abc");
-//        redisService.setCacheObject("testABC", "abc", 15l, TimeUnit.SECONDS);
-//
-//        Boolean aBoolean = redisService.setCacheObjectIfAbsent("demoefg", "efg", 15l, TimeUnit.SECONDS);
-//        if (!aBoolean) {
-//            return Result.fail(ResultCode.FAILED.getCode(), ResultCode.FAILED.getErrMsg());
-//        }
+        redisService.setCacheObject("test", "abc");
+        redisService.setCacheObject("testABC", "abc", 15l, TimeUnit.SECONDS);
+
+        Boolean aBoolean = redisService.setCacheObjectIfAbsent("demoefg", "efg", 15l, TimeUnit.SECONDS);
+        if (!aBoolean) {
+            return Result.fail(ResultCode.FAILED.getCode(), ResultCode.FAILED.getErrMsg());
+        }
 
         User user = new User();
         user.setName("张三");
@@ -40,13 +41,13 @@ public class TestRedisController {
         User userKey = redisService.getCacheObject("userKey", User.class);
         log.info("userKey: {}", userKey);
 
-//        redisService.incr("testCountKey");
-//        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
-//
-//        redisService.decr("testCountKey");
-//        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
-//
-//
+        redisService.incr("testCountKey");
+        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
+
+        redisService.decr("testCountKey");
+        log.info("testCountKey: {}", redisService.getCacheObject("testCountKey", Long.class));
+
+
         RegionTest testRegion = new RegionTest();
         testRegion.setId(1L);
         testRegion.setName("北京");
@@ -63,18 +64,19 @@ public class TestRedisController {
         list.add(map);
 
         redisService.setCacheObject("testList", list);
+        redisService.setCacheObject("testKey", list);
 
         return Result.success();
     }
 
     @GetMapping("/get")
     public Result<Void> get() {
-//        String str = redisService.getCacheObject("test", String.class);
-//        log.info(str);
-//        User user = redisService.getCacheObject("userKey", User.class);
-//        log.info("user:{}", user);
+        String str = redisService.getCacheObject("test", String.class);
+        log.info(str);
+        User user = redisService.getCacheObject("userKey", User.class);
+        log.info("user:{}", user);
 
-        //将redis中的数据获取出来  对象的类型不会产生泛型擦除问题
+        // 将 redis 中的数据获取出来  对象的类型不会产生泛型擦除问题
         List<Map<String, RegionTest>> testList = redisService.getCacheObject("testList", new TypeReference<List<Map<String, RegionTest>>>() {
         });
         System.out.println(testList);
