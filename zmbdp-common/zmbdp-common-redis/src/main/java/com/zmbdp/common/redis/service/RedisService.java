@@ -3,13 +3,14 @@ package com.zmbdp.common.redis.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.zmbdp.common.core.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -150,7 +151,7 @@ public class RedisService {
      * @return 递增后的值（失败返回 -1）
      */
     public Long incr(final String key) {
-        if (!StringUtils.hasText(key)) {
+        if (StringUtils.isEmpty(key)) {
             return -1L;
         }
         try {
@@ -168,7 +169,7 @@ public class RedisService {
      * @return 递减后的值（失败返回 -1）
      */
     public Long decr(final String key) {
-        if (!StringUtils.hasText(key)) {
+        if (StringUtils.isEmpty(key)) {
             return -1L;
         }
         try {
@@ -454,7 +455,7 @@ public class RedisService {
     /**
      * 获得缓存的 List 对象 （支持复杂的泛型嵌套）
      *
-     * @param key           key信息
+     * @param key           key 信息
      * @param typeReference 类型模板
      * @param <T>           对象类型
      * @return List 对象
@@ -534,7 +535,7 @@ public class RedisService {
      * @param member 元素信息
      * @return 添加的元素个数
      */
-    public Long addMember(final String key, Object... member) {
+    public Long addMember(final String key, final Object... member) {
         try {
             Long add = redisTemplate.opsForSet().add(key, member);
             return add == null ? 0L : add;
@@ -551,7 +552,7 @@ public class RedisService {
      * @param member 元素信息
      * @return 删除的元素个数
      */
-    public Long deleteMember(final String key, Object... member) {
+    public Long deleteMember(final String key, final Object... member) {
         try {
             Long remove = redisTemplate.opsForSet().remove(key, member);
             return remove == null ? 0L : remove;
@@ -562,38 +563,19 @@ public class RedisService {
     }
 
     /**
-     * 检查元素是否存在
+     * 检查 Set 中的某个元素是否存在
      *
      * @param key    缓存 key
      * @param member 缓存元素
      * @return 是否存在
      */
-    public Boolean isMember(final String key, Object member) {
+    public boolean isMember(final String key, final Object member) {
         try {
-            return redisTemplate.opsForSet().isMember(key, member);
+            Boolean flag = redisTemplate.opsForSet().isMember(key, member);
+            return flag != null && flag;
         } catch (Exception e) {
             log.warn("RedisService.isMember check member error: {}", e.getMessage());
             return false;
-        }
-    }
-
-
-    /**
-     * 获取 Set 中所有元素
-     *
-     * @param key   键值
-     * @param clazz 数据类型
-     * @param <T>   泛型
-     * @return Set<T>
-     */
-    public <T> Set<T> getCacheSet(final String key, Class<T> clazz) {
-        try {
-            // 需要适当的转换逻辑
-            Set<T> members = (Set<T>) redisTemplate.opsForSet().members(key);
-            return members;
-        } catch (Exception e) {
-            log.warn("RedisService.getCacheSet get set data error: {}", e.getMessage());
-            return null;
         }
     }
 
@@ -632,17 +614,21 @@ public class RedisService {
     }
 
     /**
-     * 获取两个集合的交集
+     * 获取两个集合的交集（支持复杂泛型嵌套）
      *
-     * @param setKey1  第一个集合的 key
-     * @param setKey2  第二个集合的 key
-     * @param clazz 元素类型
-     * @param <T>   泛型类型
+     * @param setKey1       第一个集合的 key
+     * @param setKey2       第二个集合的 key
+     * @param typeReference 类型模板
+     * @param <T>           泛型类型
      * @return 交集结果
      */
-    public <T> Set<T> intersectToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+    public <T> Set<T> intersectToCacheSet(final String setKey1, final String setKey2, TypeReference<Set<T>> typeReference) {
         try {
-            return (Set<T>) redisTemplate.opsForSet().intersect(setKey1, setKey2);
+            Set<?> intersectSet = redisTemplate.opsForSet().intersect(setKey1, setKey2);
+            if (intersectSet == null) {
+                return Collections.emptySet();
+            }
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(intersectSet), typeReference);
         } catch (Exception e) {
             log.warn("RedisService.intersect set intersect error: {}", e.getMessage());
             return null;
@@ -650,35 +636,44 @@ public class RedisService {
     }
 
     /**
-     * 获取两个集合的并集
+     * 获取两个集合的并集（支持复杂泛型嵌套）
      *
-     * @param setKey1  第一个集合的key
-     * @param setKey2  第二个集合的key
-     * @param clazz 元素类型
-     * @param <T>   泛型类型
+     * @param setKey1       第一个集合的 key
+     * @param setKey2       第二个集合的 key
+     * @param typeReference 类型模板
+     * @param <T>           泛型类型
      * @return 并集结果
      */
-    public <T> Set<T> unionToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+    public <T> Set<T> unionToCacheSet(final String setKey1, final String setKey2, TypeReference<Set<T>> typeReference) {
         try {
-            return (Set<T>) redisTemplate.opsForSet().union(setKey1, setKey2);
+            Set<?> unionSet = redisTemplate.opsForSet().union(setKey1, setKey2);
+            if (unionSet == null) {
+                return Collections.emptySet();
+            }
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(unionSet), typeReference);
         } catch (Exception e) {
             log.warn("RedisService.union set union error: {}", e.getMessage());
             return null;
         }
     }
 
+
     /**
-     * 获取两个集合的差集 (key1 - key2)
+     * 获取两个集合的差集（支持复杂泛型嵌套）
      *
-     * @param setKey1  第一个集合的key
-     * @param setKey2  第二个集合的key
-     * @param clazz 元素类型
-     * @param <T>   泛型类型
+     * @param setKey1       第一个集合的 key
+     * @param setKey2       第二个集合的 key
+     * @param typeReference 类型模板
+     * @param <T>           泛型类型
      * @return 差集结果
      */
-    public <T> Set<T> differenceToCacheSet(final String setKey1, final String setKey2, Class<T> clazz) {
+    public <T> Set<T> differenceToCacheSet(final String setKey1, final String setKey2, TypeReference<Set<T>> typeReference) {
         try {
-            return (Set<T>) redisTemplate.opsForSet().difference(setKey1, setKey2);
+            Set<?> differenceSet = redisTemplate.opsForSet().difference(setKey1, setKey2);
+            if (differenceSet == null) {
+                return Collections.emptySet();
+            }
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(differenceSet), typeReference);
         } catch (Exception e) {
             log.warn("RedisService.difference set difference error: {}", e.getMessage());
             return null;
@@ -688,10 +683,10 @@ public class RedisService {
     /**
      * 将元素从 sourceKey 集合移动到 destinationKey 集合
      *
-     * @param sourceKey      源集合key
-     * @param destinationKey 目标集合key
+     * @param sourceKey      源集合 key
+     * @param destinationKey 目标集合 key
      * @param member         要移动的元素
-     * @return 移动成功返回true，否则返回false
+     * @return 移动成功返回true，否则返回 false
      */
     public Boolean moveMemberCacheSet(final String sourceKey, final String destinationKey, Object member) {
         try {
@@ -700,5 +695,576 @@ public class RedisService {
             log.warn("RedisService.moveMember move member error: {}", e.getMessage());
             return false;
         }
+    }
+
+    /*=============================================    ZSet    =============================================*/
+
+    /**
+     * 添加元素
+     *
+     * @param key   key
+     * @param value 值
+     * @param seqNo 分数
+     */
+    public Boolean addMemberZSet(final String key, final Object value, final double seqNo) {
+        try {
+            return redisTemplate.opsForZSet().add(key, value, seqNo);
+        } catch (Exception e) {
+            log.warn("RedisService.addMemberZSet add member error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 删除元素
+     *
+     * @param key   key
+     * @param value 值
+     */
+    public Long delMemberZSet(final String key, final Object value) {
+        try {
+            Long remove = redisTemplate.opsForZSet().remove(key, value);
+            return remove == null ? 0L : remove;
+        } catch (Exception e) {
+            log.warn("RedisService.delMemberZSet del member error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 按范围获取元素（升序，支持复杂的泛型嵌套）
+     *
+     * @param key           缓存 key
+     * @param start         起始索引
+     * @param end           结束索引
+     * @param typeReference 类型模板
+     * @param <T>           对象类型
+     * @return 缓存对象集合
+     */
+    public <T> Set<T> getZSetRange(final String key, final long start, final long end, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().range(key, start, end);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetRange complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 获取所有有序集合数据（升序，支持复杂的泛型嵌套）
+     *
+     * @param key           key 信息
+     * @param typeReference 类型模板
+     * @param <T>           对象类型
+     * @return 有序集合
+     */
+    public <T> Set<T> getCacheZSet(final String key, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().range(key, 0, -1);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheZSet error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 按范围获取元素（降序，支持复杂的泛型嵌套）
+     *
+     * @param key           缓存 key
+     * @param start         起始索引
+     * @param end           结束索引
+     * @param typeReference 类型模板
+     * @param <T>           对象类型
+     * @return 缓存对象集合
+     */
+    public <T> Set<T> getZSetRangeDesc(final String key, final long start, final long end, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().reverseRange(key, start, end);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetRangeDesc complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取所有有序集合（降序，支持复杂的泛型嵌套）
+     *
+     * @param key           key 信息
+     * @param typeReference 类型模板
+     * @param <T>           对象类型信息
+     * @return 降序的有序集合
+     */
+    public <T> Set<T> getCacheZSetDesc(final String key, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().reverseRange(key, 0, -1);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheZSetDesc complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取集合大小
+     *
+     * @param key 键值
+     * @return 集合大小
+     */
+    public Long getZSetSize(final String key) {
+        try {
+            Long size = redisTemplate.opsForZSet().size(key);
+            return size == null ? 0L : size;
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetSize error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 增加元素的分数，如果元素存在则添加分数，如果不存在就添加元素设置分数
+     *
+     * @param key    key
+     * @param member 元素值
+     * @param delta  增加的分数
+     * @return 新的分数
+     */
+    public Double incrementZSetScore(final String key, final Object member, final double delta) {
+        try {
+            return redisTemplate.opsForZSet().incrementScore(key, member, delta);
+        } catch (Exception e) {
+            log.warn("RedisService.incrementZSetScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取元素的分数
+     *
+     * @param key   key
+     * @param value 元素值
+     * @return 分数
+     */
+    public Double getZSetScore(final String key, final Object value) {
+        try {
+            return redisTemplate.opsForZSet().score(key, value);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetScore error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取元素的排名（升序）
+     *
+     * @param key    key
+     * @param member 元素值
+     * @return 排名（从0开始），如果元素不存在返回null
+     */
+    public Long getZSetRank(final String key, final Object member) {
+        try {
+            return redisTemplate.opsForZSet().rank(key, member);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetRank error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取元素的排名（降序）
+     *
+     * @param key    key
+     * @param member 元素值
+     * @return 排名（从0开始），如果元素不存在返回null
+     */
+    public Long getZSetReverseRank(final String key, final Object member) {
+        try {
+            return redisTemplate.opsForZSet().reverseRank(key, member);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetReverseRank error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 按分数范围获取元素（升序，支持复杂泛型）
+     *
+     * @param key           key
+     * @param minScore      最小分数
+     * @param maxScore      最大分数
+     * @param typeReference 类型模板
+     * @param <T>           泛型类型
+     * @return 元素集合
+     */
+    public <T> Set<T> getZSetRangeByScore(final String key, final double minScore, final double maxScore, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().rangeByScore(key, minScore, maxScore);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetRangeByScore complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 按分数范围获取元素（降序，支持复杂泛型）
+     *
+     * @param key           key
+     * @param minScore      最小分数
+     * @param maxScore      最大分数
+     * @param typeReference 类型模板
+     * @param <T>           泛型类型
+     * @return 元素集合
+     */
+    public <T> Set<T> getZSetReverseRangeByScore(final String key, final double minScore, final double maxScore, TypeReference<LinkedHashSet<T>> typeReference) {
+        try {
+            Set data = redisTemplate.opsForZSet().reverseRangeByScore(key, minScore, maxScore);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getZSetReverseRangeByScore complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 根据排序分值删除
+     *
+     * @param key      key
+     * @param minScore 最小分
+     * @param maxScore 最大分
+     */
+    public Long removeZSetByScore(final String key, final double minScore, final double maxScore) {
+        try {
+            Long l = redisTemplate.opsForZSet().removeRangeByScore(key, minScore, maxScore);
+            return l == null ? 0L : l;
+        } catch (Exception e) {
+            log.warn("RedisService.removeZSetByScore del member error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /*=============================================    Hash    =============================================*/
+
+    /**
+     * 缓存 Map 数据
+     *
+     * @param key     key
+     * @param dataMap map
+     * @param <T>     对象类型
+     */
+    public <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
+        if (dataMap != null) {
+            try {
+                redisTemplate.opsForHash().putAll(key, dataMap);
+            } catch (Exception e) {
+                log.warn("RedisService.setCacheMap set cache error: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 往 Hash 中存入单个数据
+     *
+     * @param key   Redis 键
+     * @param hKey  Hash 键
+     * @param value 值
+     * @param <T>   对象类型
+     */
+    public <T> void setCacheMapValue(final String key, final String hKey, final T value) {
+        try {
+            redisTemplate.opsForHash().put(key, hKey, value);
+        } catch (Exception e) {
+            log.warn("RedisService.setCacheMapValue set cache error: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 删除 Hash 中的某条数据
+     *
+     * @param key  Redis 键
+     * @param hKey Hash 键
+     * @return 是否成功
+     */
+    public boolean deleteCacheMapValue(final String key, final String hKey) {
+        try {
+            return redisTemplate.opsForHash().delete(key, hKey) > 0;
+        } catch (Exception e) {
+            log.warn("RedisService.deleteCacheMapValue delete cache error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 删除 Hash 中的多个字段
+     *
+     * @param key   Redis 键
+     * @param hKeys Hash 键集合
+     * @return 删除的字段数量
+     */
+    public Long deleteCacheMapValues(final String key, final Object... hKeys) {
+        try {
+            Long deleted = redisTemplate.opsForHash().delete(key, hKeys);
+            return deleted == null ? 0L : deleted;
+        } catch (Exception e) {
+            log.warn("RedisService.deleteCacheMapValues delete cache error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 获取缓存的 map 数据
+     *
+     * @param key   key
+     * @param clazz 值的类型
+     * @param <T>   对象类型
+     * @return hash 对应的 map
+     */
+    public <T> Map<String, T> getCacheMap(final String key, Class<T> clazz) {
+        try {
+            Map data = redisTemplate.opsForHash().entries(key);
+            return JsonUtil.jsonToMap(JsonUtil.classToJson(data), clazz);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMap error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 获取缓存的 map 数据（支持复杂的泛型嵌套）
+     *
+     * @param key           key
+     * @param typeReference 类型模板
+     * @param <T>           对象类型
+     * @return hash 对应的 map
+     */
+    public <T> Map<String, T> getCacheMap(final String key, TypeReference<Map<String, T>> typeReference) {
+        try {
+            Map data = redisTemplate.opsForHash().entries(key);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMap complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Hash 中的单个数据
+     *
+     * @param key  Redis 键
+     * @param hKey Hash 键
+     * @param <T>  对象类型
+     * @return Hash中的对象
+     */
+    public <T> T getCacheMapValue(final String key, final String hKey) {
+        try {
+            HashOperations<String, String, T> opsForHash = redisTemplate.opsForHash();
+            return opsForHash.get(key, hKey);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMapValue error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 获取 Hash 中的单个数据（支持复杂的泛型嵌套）
+     *
+     * @param key           Redis 键
+     * @param hKey          Hash 键
+     * @param typeReference 对象模板
+     * @param <T>           对象类型
+     * @return Hash中的对象
+     */
+    public <T> T getCacheMapValue(final String key, final String hKey, TypeReference<T> typeReference) {
+        try {
+            Object value = redisTemplate.opsForHash().get(key, hKey);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(value), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMapValue complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+
+    /**
+     * 获取 Hash 中的多个数据
+     *
+     * @param key   Redis键
+     * @param hKeys Hash键集合
+     * @param clazz 值的类型
+     * @param <T>   对象类型
+     * @return 获取的多个数据的集合
+     */
+    public <T> List<T> getMultiCacheMapValue(final String key, final Collection<String> hKeys, Class<T> clazz) {
+        try {
+            List list = redisTemplate.opsForHash().multiGet(key, hKeys);
+            return JsonUtil.jsonToList(JsonUtil.classToJson(list), clazz);
+        } catch (Exception e) {
+            log.warn("RedisService.getMultiCacheMapValue error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Hash 中的多个数据（支持复杂泛型嵌套）
+     *
+     * @param key           Redis键
+     * @param hKeys         Hash键集合
+     * @param typeReference 对象模板
+     * @param <T>           对象类型
+     * @return 获取的多个数据的集合
+     */
+    public <T> List<T> getMultiCacheMapValue(final String key, final Collection<String> hKeys, TypeReference<List<T>> typeReference) {
+        try {
+            List data = redisTemplate.opsForHash().multiGet(key, hKeys);
+            return JsonUtil.jsonToClass(JsonUtil.classToJson(data), typeReference);
+        } catch (Exception e) {
+            log.warn("RedisService.getMultiCacheMapValue complex error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取 Hash 中字段的数量
+     *
+     * @param key Redis 键
+     * @return 字段数量
+     */
+    public Long getCacheMapSize(final String key) {
+        try {
+            Long size = redisTemplate.opsForHash().size(key);
+            return size == null ? 0L : size;
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMapSize error: {}", e.getMessage());
+            return 0L;
+        }
+    }
+
+    /**
+     * 获取 Hash 中的所有 key
+     *
+     * @param key Redis 键
+     * @return Hash 中的所有 key 集合
+     */
+    public Set<String> getCacheMapKeys(final String key) {
+        try {
+            Set<String> keys = redisTemplate.opsForHash().keys(key);
+            return keys == null ? Collections.emptySet() : keys;
+        } catch (Exception e) {
+            log.warn("RedisService.getCacheMapKeys error: {}", e.getMessage());
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * 为 Hash 中的值增加指定数值（整型）
+     *
+     * @param key   Redis 键
+     * @param hKey  Hash 键
+     * @param delta 增加的数值
+     * @return 增加后的数值
+     */
+    public Long incrementCacheMapValue(final String key, final String hKey, final long delta) {
+        try {
+            return redisTemplate.opsForHash().increment(key, hKey, delta);
+        } catch (Exception e) {
+            // 如果直接increment失败，尝试获取当前值并手动转换后计算
+            try {
+                Object currentValue = redisTemplate.opsForHash().get(key, hKey);
+                if (currentValue == null) {
+                    // 如果字段不存在，直接设置delta值
+                    redisTemplate.opsForHash().put(key, hKey, String.valueOf(delta));
+                    return delta;
+                }
+
+                // 尝试将当前值转换为Long
+                Long currentLongValue;
+                if (currentValue instanceof String) {
+                    currentLongValue = Long.parseLong((String) currentValue);
+                } else if (currentValue instanceof Number) {
+                    currentLongValue = ((Number) currentValue).longValue();
+                } else {
+                    throw new IllegalArgumentException("Cannot convert " + currentValue.getClass() + " to Long");
+                }
+
+                // 计算新值并存储
+                Long newValue = currentLongValue + delta;
+                redisTemplate.opsForHash().put(key, hKey, String.valueOf(newValue));
+                return newValue;
+            } catch (Exception parseException) {
+                log.warn("RedisService.incrementCacheMapValue Integer error: {}", parseException.getMessage());
+                return 0L;
+            }
+        }
+    }
+
+    /**
+     * 为 Hash 中的值增加指定数值（浮点型）
+     *
+     * @param key   Redis 键
+     * @param hKey  Hash 键
+     * @param delta 增加的数值
+     * @return 增加后的数值
+     */
+    public Double incrementCacheMapValue(final String key, final String hKey, final double delta) {
+        try {
+            return redisTemplate.opsForHash().increment(key, hKey, delta);
+        } catch (Exception e) {
+            // 如果直接 increment 失败，尝试获取当前值并手动转换后计算
+            try {
+                Object currentValue = redisTemplate.opsForHash().get(key, hKey);
+                if (currentValue == null) {
+                    // 如果字段不存在，直接设置delta值
+                    redisTemplate.opsForHash().put(key, hKey, String.valueOf(delta));
+                    return delta;
+                }
+
+                // 尝试将当前值转换为 Double
+                Double currentDoubleValue;
+                if (currentValue instanceof String) {
+                    currentDoubleValue = Double.parseDouble((String) currentValue);
+                } else if (currentValue instanceof Number) {
+                    currentDoubleValue = ((Number) currentValue).doubleValue();
+                } else {
+                    throw new IllegalArgumentException("Cannot convert " + currentValue.getClass() + " to Double");
+                }
+
+                // 计算新值并存储
+                Double newValue = currentDoubleValue + delta;
+                redisTemplate.opsForHash().put(key, hKey, String.valueOf(newValue));
+                return newValue;
+            } catch (Exception parseException) {
+                log.warn("RedisService.incrementCacheMapValue Double error: {}", parseException.getMessage());
+                return 0.0;
+            }
+        }
+    }
+
+
+    /*=============================================    LUA脚本    =============================================*/
+
+    /**
+     * 删除指定值对应的 Redis 中的键值（compare and delete）
+     *
+     * @param key   缓存 key
+     * @param value value
+     * @return 是否完成了比较并删除
+     */
+    public boolean cad(String key, String value) {
+        if (key.contains(StringUtils.SPACE) || value.contains(StringUtils.SPACE)) {
+            return false;
+        }
+
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+
+        // 通过 lua 脚本原子验证令牌和删除令牌
+        Long result = (Long) redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                Collections.singletonList(key),
+                value);
+        return !Objects.equals(result, 0L);
     }
 }
