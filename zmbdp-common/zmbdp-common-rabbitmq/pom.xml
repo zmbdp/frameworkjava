@@ -5,28 +5,28 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.zmbdp</groupId>
-        <artifactId>frameworkjava</artifactId>
+        <artifactId>zmbdp-common</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.zmbdp</groupId>
-    <artifactId>zmbdp-common</artifactId>
+    <artifactId>zmbdp-common-rabbitmq</artifactId>
     <version>1.0-SNAPSHOT</version>
-
-    <packaging>pom</packaging>
-    <modules>
-        <module>zmbdp-common-core</module>
-        <module>zmbdp-common-domain</module>
-        <module>zmbdp-common-security</module>
-        <module>zmbdp-common-redis</module>
-        <module>zmbdp-common-cache</module>
-        <module>zmbdp-common-rabbitmq</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+
+        <!--rabbitmq-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>
