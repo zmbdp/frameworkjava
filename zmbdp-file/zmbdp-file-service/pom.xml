@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.zmbdp</groupId>
-        <artifactId>zmbdp-mstemplate</artifactId>
+        <artifactId>zmbdp-file</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.zmbdp</groupId>
-    <artifactId>zmbdp-mstemplate-service</artifactId>
+    <artifactId>zmbdp-file-service</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -20,37 +20,6 @@
     </properties>
 
     <dependencies>
-
-        <!-- SpringCloud -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
-
-        <!-- SpringBoot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- tomcat -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-        </dependency>
-
-        <!-- SpringBoot测试 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
 
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
@@ -64,9 +33,40 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
+        <!-- SpringCloud Bootstrap -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- SpringBoot Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- SpringBoot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 阿里云OSS-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-domain</artifactId>
+            <artifactId>zmbdp-common-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -78,25 +78,7 @@
 
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-redis</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-cache</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-rabbitmq</artifactId>
+            <artifactId>zmbdp-file-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -119,4 +101,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -97,9 +97,9 @@ services:
       retries: 10
   frameworkjava-rabbitmq:
     image: rabbitmq:3.12.6-management
-    container_name: frameworkjava-rabbitmq
+    container_name: frameworkjava-rabbit
     restart: always
-    hostname: frameworkjava-rabbitmq
+    hostname: frameworkjava-rabbit
     environment:
       # 用户名
       RABBITMQ_DEFAULT_USER: zmbdp
@@ -109,8 +109,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     volumes:
-      - ../data/frameworkjavadata/rabbitmq/log:/var/log/rabbitmq
-      - ../data/frameworkjavadata/rabbitmq/data:/var/lib/rabbitmq
+      - ../data/frameworkjavadata/rabbit/log:/var/log/rabbit
+      - ../data/frameworkjavadata/rabbit/data:/var/lib/rabbit
     networks:
       - frameworkjava_network
     healthcheck:

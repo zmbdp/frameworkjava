@@ -21,6 +21,7 @@
         <module>zmbdp-mstemplate</module>
         <module>zmbdp-gateway</module>
         <module>zmbdp-common</module>
+        <module>zmbdp-file</module>
     </modules>
 
     <properties>
