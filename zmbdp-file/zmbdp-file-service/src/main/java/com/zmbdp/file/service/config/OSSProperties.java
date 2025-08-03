@@ -69,18 +69,18 @@ public class OSSProperties  {
 
 
     /**
-     * 获取访问URL
+     * 获取外网访问的 URL
      *
-     * @return url信息
+     * @return 外网访问的 URL 信息
      */
     public String getBaseUrl() {
         return "https://" + bucketName + "." + endpoint + "/";
     }
 
     /**
-     * 获取内部访问URL
+     * 获取内网访问的 URL
      *
-     * @return 内部访问URL
+     * @return 内网访问的 URL 信息
      */
     public String getInternalBaseUrl() {
         return "http://" + bucketName + "." + intEndpoint + "/";

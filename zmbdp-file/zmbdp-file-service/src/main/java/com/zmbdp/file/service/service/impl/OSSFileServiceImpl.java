@@ -54,16 +54,16 @@ public class OSSFileServiceImpl implements IFileService {
             String originalFilename = file.getOriginalFilename();
             String extName = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
             //在 oss 中存储名字就是 UUID + 文件的后缀名
-            String objectName = ossProperties.getPathPrefix() + UUID.randomUUID()+"."+extName;
+            String objectName = ossProperties.getPathPrefix() + UUID.randomUUID() + "."+extName;
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            // set public read
+            // set public read 设置文件名权限为公共读
             objectMetadata.setObjectAcl(CannedAccessControlList.PublicRead);
 
-            // 创建 PutObjectRequest 对象。
+            // 创建 PutObjectRequest 对象
             PutObjectRequest putObjectRequest = new PutObjectRequest(ossProperties.getBucketName(), objectName, inputStream, objectMetadata);
 
-            // 创建 PutObject 请求。
+            // 创建 PutObject 请求
             PutObjectResult putObjectResult = ossClient.putObject(putObjectRequest);
 
             if (putObjectResult == null || StringUtils.isBlank(putObjectResult.getRequestId())) {
@@ -98,7 +98,7 @@ public class OSSFileServiceImpl implements IFileService {
             signDTO.setHost(ossProperties.getBaseUrl());
             signDTO.setPathPrefix(ossProperties.getPathPrefix());
 
-            // 步骤 1：创建 policy。
+            // 步骤 1：创建 policy
             ObjectMapper mapper = new ObjectMapper();
 
             Map<String, Object> policy = new HashMap<>();
@@ -146,17 +146,17 @@ public class OSSFileServiceImpl implements IFileService {
 
             String jsonPolicy = mapper.writeValueAsString(policy);
 
-            // 步骤 2：构造待签名字符串（StringToSign）。
+            // 步骤 2：构造待签名字符串（StringToSign）
             String policyBase64 = new String(Base64.encodeBase64(jsonPolicy.getBytes()));
             signDTO.setPolicy(policyBase64);
 
-            // 步骤 3：计算 SigningKey。
+            // 步骤 3：计算 SigningKey
             byte[] dateKey = hmacSha256(("aliyun_v4" + accesskeysecret).getBytes(), dateStr);
             byte[] dateRegionKey = hmacSha256(dateKey, ossProperties.getRegion());
             byte[] dateRegionServiceKey = hmacSha256(dateRegionKey, "oss");
             byte[] signingKey = hmacSha256(dateRegionServiceKey, "aliyun_v4_request");
 
-            // 步骤 4：计算 Signature。
+            // 步骤 4：计算 Signature
             byte[] result = hmacSha256(signingKey, policyBase64);
             String signature = BinaryUtil.toHex(result);
             signDTO.setSignature(signature);
@@ -176,15 +176,15 @@ public class OSSFileServiceImpl implements IFileService {
      */
     public static byte[] hmacSha256(byte[] key, String data) {
         try {
-            // 初始化 HMAC 密钥规格，指定算法为 HMAC-SHA256 并使用提供的密钥。
+            // 初始化 HMAC 密钥规格，指定算法为 HMAC-SHA256 并使用提供的密钥
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
 
-            // 获取 Mac 实例，并通过 getInstance 方法指定使用HMAC-SHA256算法。
+            // 获取 Mac 实例，并通过 getInstance 方法指定使用HMAC-SHA256算法
             Mac mac = Mac.getInstance("HmacSHA256");
-            // 使用密钥初始化 Mac 对象。
+            // 使用密钥初始化 Mac 对象
             mac.init(secretKeySpec);
 
-            // 执行 HMAC 计算，通过 doFinal 方法接收需要计算的数据并返回计算结果的数组。
+            // 执行 HMAC 计算，通过 doFinal 方法接收需要计算的数据并返回计算结果的数组
             byte[] hmacBytes = mac.doFinal(data.getBytes());
 
             return hmacBytes;

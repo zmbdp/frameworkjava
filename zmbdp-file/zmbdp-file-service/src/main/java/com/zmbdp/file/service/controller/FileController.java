@@ -35,7 +35,7 @@ public class FileController implements FileServiceApi {
      * @return 访问文件的地址信息
      */
     @Override
-    public Result<FileVO> upload(@RequestBody MultipartFile file) {
+    public Result<FileVO> upload(MultipartFile file) {
         FileDTO fileDTO = fileService.upload(file);
         FileVO fileVO = new FileVO();
         BeanCopyUtil.copyProperties(fileDTO, fileVO);

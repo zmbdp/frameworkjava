@@ -131,7 +131,7 @@ public enum ResultCode {
     /**
      * 上传oss异常，请稍后重试
      */
-    OSS_UPLOAD_FAILED(500004, "上传oss异常，请稍后重试"),
+    OSS_UPLOAD_FAILED(500004, "上传 oss 异常，请稍后重试"),
 
     /**
      * 获取地图数据失败，请稍后重试

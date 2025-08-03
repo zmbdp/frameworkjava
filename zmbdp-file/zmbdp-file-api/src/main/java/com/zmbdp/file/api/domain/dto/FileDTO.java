@@ -1,6 +1,5 @@
 package com.zmbdp.file.api.domain.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
