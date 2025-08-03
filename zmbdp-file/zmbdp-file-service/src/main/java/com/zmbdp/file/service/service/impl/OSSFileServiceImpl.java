@@ -50,7 +50,7 @@ public class OSSFileServiceImpl implements IFileService {
     public FileDTO upload(MultipartFile file) {
         try {
             InputStream inputStream = file.getInputStream();
-            //获取原始的文件名
+            // 获取原始的文件名
             String originalFilename = file.getOriginalFilename();
             String extName = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
             //在 oss 中存储名字就是 UUID + 文件的后缀名
@@ -67,7 +67,7 @@ public class OSSFileServiceImpl implements IFileService {
             PutObjectResult putObjectResult = ossClient.putObject(putObjectRequest);
 
             if (putObjectResult == null || StringUtils.isBlank(putObjectResult.getRequestId())) {
-                log.error("上传oss异常putObjectResult未正常返回: {}", putObjectRequest);
+                log.error("上传 oss 异常 putObjectResult 未正常返回: {}", putObjectRequest);
                 throw new ServiceException(ResultCode.OSS_UPLOAD_FAILED);
             }
             FileDTO sysFileDTO = new FileDTO();
@@ -76,7 +76,7 @@ public class OSSFileServiceImpl implements IFileService {
             sysFileDTO.setName(new File(objectName).getName());
             return sysFileDTO;
         } catch (Exception e) {
-            log.error("上传oss异常: {}", e.getMessage(), e);
+            log.error("上传 oss 异常: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.OSS_UPLOAD_FAILED);
         }
     }
@@ -88,12 +88,12 @@ public class OSSFileServiceImpl implements IFileService {
     @Override
     public SignDTO getSign() {
         try {
-            //获取 ak sk
+            // 获取 ak sk
             String accesskeyid = ossProperties.getAccessKeyId();
             String accesskeysecret = ossProperties.getAccessKeySecret();
             // 获取当前时间
             Instant now = Instant.now();
-            //构建返回数据
+            // 构建返回数据
             SignDTO signDTO = new SignDTO();
             signDTO.setHost(ossProperties.getBaseUrl());
             signDTO.setPathPrefix(ossProperties.getPathPrefix());
@@ -162,7 +162,7 @@ public class OSSFileServiceImpl implements IFileService {
             signDTO.setSignature(signature);
             return signDTO;
         } catch (Exception e) {
-            log.error("生成直传签名失败", e);
+            log.error("生成直传签名失败: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);
         }
     }
@@ -189,7 +189,7 @@ public class OSSFileServiceImpl implements IFileService {
 
             return hmacBytes;
         } catch (Exception e) {
-            log.error("生成直传签名失败", e);
+            log.error("生成直传签名失败: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);
         }
     }
