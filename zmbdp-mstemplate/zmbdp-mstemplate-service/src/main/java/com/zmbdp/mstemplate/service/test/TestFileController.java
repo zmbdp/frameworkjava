@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.common.domain.domain.Result;
-import com.zmbdp.file.api.FileServiceApi;
+import com.zmbdp.file.api.feign.FileServiceApi;
 import com.zmbdp.file.api.domain.vo.FileVO;
 import com.zmbdp.file.api.domain.vo.SignVO;
 import org.springframework.beans.factory.annotation.Autowired;

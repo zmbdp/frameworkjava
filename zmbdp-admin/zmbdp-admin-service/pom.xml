@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.zmbdp</groupId>
-        <artifactId>zmbdp-mstemplate</artifactId>
+        <artifactId>zmbdp-admin</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.zmbdp</groupId>
-    <artifactId>zmbdp-mstemplate-service</artifactId>
+    <artifactId>zmbdp-admin-service</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -20,39 +20,7 @@
     </properties>
 
     <dependencies>
-
-        <!-- SpringCloud -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
-
-        <!-- SpringBoot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <!-- tomcat -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-        </dependency>
-
-        <!-- SpringBoot测试 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <!-- SpringCloud Alibaba Nacos -->
+        <!-- SpringCloud Alibaba Nacos discovery -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -64,15 +32,62 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
+        <!--是 Spring Cloud 提供的一个引导模块 配置文件的早期加载、配置中心集成-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <!--    启动web项目    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--   内置 servlet 服务器是 tomcat     -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!--    测试   -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--   mybatis-plus     -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!--    mysql连接器    -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-domain</artifactId>
+            <artifactId>zmbdp-common-cache</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-security</artifactId>
+            <artifactId>zmbdp-admin-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -90,7 +105,7 @@
 
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-cache</artifactId>
+            <artifactId>zmbdp-common-security</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -100,20 +115,7 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-file-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-admin-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
     </dependencies>
-
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -131,4 +133,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

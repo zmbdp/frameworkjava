@@ -3,6 +3,10 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-admin/zmbdp-admin-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-admin/zmbdp-admin-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-cache/src/main/java" charset="UTF-8" />

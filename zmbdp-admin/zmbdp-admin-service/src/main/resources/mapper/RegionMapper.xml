@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmbdp.admin.service.map.mapper.RegionMapper">
+    <!--查询全量地图信息-->
+    <select id="selectAllRegion" resultType="com.zmbdp.admin.service.map.domain.entity.SysRegion">
+        select id, code, parent_code, parent_id, name, full_name, pinyin, level, longitude, latitude
+        from sys_region order by pinyin
+    </select>
+
+</mapper>
