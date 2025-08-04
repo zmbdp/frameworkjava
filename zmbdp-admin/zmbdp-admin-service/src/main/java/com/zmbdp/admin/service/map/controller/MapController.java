@@ -2,12 +2,15 @@ package com.zmbdp.admin.service.map.controller;
 
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
+import com.zmbdp.admin.service.map.domain.dto.SuggestSearchDTO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;
 import com.zmbdp.admin.service.map.service.IMapService;
+import com.zmbdp.admin.service.map.service.impl.QQMapServiceImpl;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

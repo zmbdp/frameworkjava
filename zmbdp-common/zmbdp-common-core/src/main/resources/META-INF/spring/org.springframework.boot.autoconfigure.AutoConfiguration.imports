@@ -1,1 +1,2 @@
 com.zmbdp.common.core.config.ThreadPoolConfig
+com.zmbdp.common.core.config.RestTemplateConfig
