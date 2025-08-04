@@ -4,6 +4,7 @@ import com.zmbdp.admin.api.map.domain.vo.RegionVO;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.common.domain.domain.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,13 +18,44 @@ public class TestMapController {
     @Autowired
     private MapServiceApi mapServiceApi;
 
+    /**
+     * 获取全量城市列表
+     *
+     * @return 城市列表
+     */
     @RequestMapping("/city_list")
     public Result<List<RegionVO>> city_list() {
         return mapServiceApi.getCityList();
     }
 
+    /**
+     * 根据城市拼音归类的查询
+     *
+     * @return 城市字母与城市列表的哈希
+     */
     @RequestMapping("/city_pinyin_list")
     public Result<Map<String, List<RegionVO>>> city_pinyin_list() {
         return mapServiceApi.getCityPyList();
+    }
+
+    /**
+     * 根据父级区域 ID 获取子集区域列表
+     *
+     * @param parentId 父级区域 ID
+     * @return 子集区域列表
+     */
+    @RequestMapping("/region_children_list")
+    public Result<List<RegionVO>> region_children_list(Long parentId) {
+        return mapServiceApi.regionChildren(parentId);
+    }
+
+    /**
+     * 获取热门城市列表
+     *
+     * @return 城市列表
+     */
+    @GetMapping("/city_hot_list")
+    Result<List<RegionVO>> getHotCityList() {
+        return mapServiceApi.getHotCityList();
     }
 }

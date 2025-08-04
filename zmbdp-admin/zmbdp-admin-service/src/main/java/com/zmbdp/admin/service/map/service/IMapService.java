@@ -33,5 +33,12 @@ public interface IMapService {
      * @param parentId 父级区域 ID
      * @return 子集区域列表
      */
-    List<RegionVO> regionChildren(Long parentId);
+    List<SysRegionDTO> getRegionChildren(Long parentId);
+
+    /**
+     * 获取热门城市列表
+     *
+     * @return 城市列表
+     */
+    List<SysRegionDTO> getHotCityList();
 }

@@ -67,8 +67,20 @@ public class MapController implements MapServiceApi {
      */
     @Override
     public Result<List<RegionVO>> regionChildren(Long parentId) {
-        List<RegionVO> regionVOS = mapService.regionChildren(parentId);
-        List<RegionVO> regionVO = BeanCopyUtil.copyListProperties(regionVOS, RegionVO::new);
+        List<SysRegionDTO> regionDTOS = mapService.getRegionChildren(parentId);
+        List<RegionVO> regionVO = BeanCopyUtil.copyListProperties(regionDTOS, RegionVO::new);
+        return Result.success(regionVO);
+    }
+
+    /**
+     * 获取热门城市列表
+     *
+     * @return 城市列表
+     */
+    @Override
+    public Result<List<RegionVO>> getHotCityList() {
+        List<SysRegionDTO> hotCityListDTO = mapService.getHotCityList();
+        List<RegionVO> regionVO = BeanCopyUtil.copyListProperties(hotCityListDTO, RegionVO::new);
         return Result.success(regionVO);
     }
 }

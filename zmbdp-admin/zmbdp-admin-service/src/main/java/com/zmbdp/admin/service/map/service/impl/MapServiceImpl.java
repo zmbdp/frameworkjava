@@ -3,7 +3,6 @@ package com.zmbdp.admin.service.map.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.zmbdp.admin.api.map.constants.MapConstants;
-import com.zmbdp.admin.api.map.domain.vo.RegionVO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;
 import com.zmbdp.admin.service.map.domain.entity.SysRegion;
 import com.zmbdp.admin.service.map.mapper.RegionMapper;
@@ -13,13 +12,11 @@ import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.redis.service.RedisService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,6 +56,8 @@ public class MapServiceImpl implements IMapService {
         loadCityInfo(cityList);
         // 3 在服务启动期间，缓存城市归类列表
         loadCityPinyinInfo(cityList);
+        // 4 在服务启动期间，缓存城市热点列表
+        loadCityHotListInfo(cityList);
         log.info("缓存预热完成，一共有 {} 个城市", cityList.size());
     }
 
@@ -97,6 +96,32 @@ public class MapServiceImpl implements IMapService {
     }
 
     /**
+     * 加载热门城市列表
+     *
+     * @param cityList
+     */
+    private void loadCityHotListInfo(List<SysRegion> cityList) {
+        // 先获取热门城市数据
+        // 2 设置 9 个热门城市
+        String ids = "1,2,9,22,94,121,217,231,272";
+        // 3 获取热门城市数据
+        Set<Long> idList = new HashSet<>();
+        for (String id : ids.split(",")) {
+            idList.add(Long.valueOf(id));
+        }
+        List<SysRegion> sysRegionList = new ArrayList<>();
+        for (SysRegion sysRegion : cityList) {
+            // 如果是热门城市就存储
+            if (idList.contains(sysRegion.getId())) {
+                sysRegionList.add(sysRegion);
+            }
+        }
+        List<SysRegionDTO> hotCityList = BeanCopyUtil.copyListProperties(sysRegionList, SysRegionDTO::new);
+        // 4 设置缓存
+        CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, hotCityList, caffeineCache, 120L, TimeUnit.MINUTES);
+    }
+
+    /**
      * 获取城市列表 V1 版本，从 db 中查询
      *
      * @return 城市列表
@@ -112,7 +137,7 @@ public class MapServiceImpl implements IMapService {
         // 走到这里说明获取到锁了，但是还得判断一下缓存中是否有数据，如果说有的话，直接就返回
         List<SysRegionDTO> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
         }, caffeineCache);
-        if (resultDTO != null && !resultDTO.isEmpty()){
+        if (resultDTO != null && !resultDTO.isEmpty()) {
             return resultDTO;
         }
         // 查数据库
@@ -198,7 +223,60 @@ public class MapServiceImpl implements IMapService {
      * @return 子集区域列表
      */
     @Override
-    public List<RegionVO> regionChildren(Long parentId) {
-        return List.of();
+    public List<SysRegionDTO> getRegionChildren(Long parentId) {
+        // 先从缓存中拿取数据，然后根据 parentId 来判断是否需要返回
+        // 1 入参可以参与构建缓存的 key
+        String key = MapConstants.CACHE_MAP_CITY_CHILDREN_KEY + parentId;
+        // 2 查缓存
+        List<SysRegionDTO> resultRegions = CacheUtil.getL2Cache(redisService, key, new TypeReference<List<SysRegionDTO>>() {
+        }, caffeineCache);
+        if (resultRegions != null) {
+            return resultRegions;
+        }
+        // 3 如果说没查询到，则从数据库中查询
+        List<SysRegion> list = regionMapper.selectAllRegion();
+        List<SysRegionDTO> result = new ArrayList<>();
+        for (SysRegion sysRegion : list) {
+            // 判断父节点不为空，并且父节点是符合的才返回
+            if (sysRegion.getParentId() != null && sysRegion.getParentId().equals(parentId)) {
+                SysRegionDTO sysRegionDTO = new SysRegionDTO();
+                BeanUtils.copyProperties(sysRegion, sysRegionDTO);
+                result.add(sysRegionDTO);
+            }
+        }
+        // 4 设置缓存
+        CacheUtil.setL2Cache(redisService, key, result, caffeineCache, 120L, TimeUnit.MINUTES);
+        return result;
+    }
+
+    /**
+     * 获取热门城市列表
+     *
+     * @return 城市列表
+     */
+    @Override
+    public List<SysRegionDTO> getHotCityList() {
+        // 先查一下缓存，看看有没有数据, 没有的话就去数据库找
+        List<SysRegionDTO> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, new TypeReference<List<SysRegionDTO>>() {
+        }, caffeineCache);
+        if (resultDTO != null && !resultDTO.isEmpty()) {
+            return resultDTO;
+        }
+        // 2 设置 9 个热门城市
+        String ids = "1,2,9,22,94,121,217,231,272";
+        // 3 获取热门城市数据
+        List<Long> idList = new ArrayList<>();
+        resultDTO = new ArrayList<>();
+        for (String id : ids.split(",")) {
+            idList.add(Long.valueOf(id));
+        }
+        for (SysRegion sysRegion : regionMapper.selectBatchIds(idList)) {
+            SysRegionDTO sysRegionDTO = new SysRegionDTO();
+            BeanUtils.copyProperties(sysRegion, sysRegionDTO);
+            resultDTO.add(sysRegionDTO);
+        }
+        // 4 设置缓存
+        CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, resultDTO, caffeineCache, 120L, TimeUnit.MINUTES);
+        return resultDTO;
     }
 }
