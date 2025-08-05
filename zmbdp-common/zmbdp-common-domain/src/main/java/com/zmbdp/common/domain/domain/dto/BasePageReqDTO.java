@@ -3,13 +3,13 @@ package com.zmbdp.common.domain.domain.dto;
 import lombok.Data;
 
 /**
- * 分页查询基类DTO
+ * 分页查询基类 DTO
  */
 @Data
 public class BasePageReqDTO {
 
     /**
-     * 分页编码
+     * 第几页
      */
     private Integer pageNo = 1;
 

@@ -6,10 +6,12 @@ import java.util.List;
 
 /**
  * 分页 VO 基类
+ *
  * @param <T> 报文类型
  */
 @Data
 public class BasePageVO<T> {
+
     /**
      * 查询结果总数
      */
