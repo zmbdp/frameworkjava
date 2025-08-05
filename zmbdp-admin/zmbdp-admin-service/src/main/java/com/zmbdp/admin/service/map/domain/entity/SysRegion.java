@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * sys_region表对应的实体类
+ * sys_region 表对应的实体类，地图信息表
  */
 @Data
 @TableName("sys_region")

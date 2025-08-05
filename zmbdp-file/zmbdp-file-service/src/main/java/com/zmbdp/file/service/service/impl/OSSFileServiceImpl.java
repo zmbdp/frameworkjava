@@ -9,8 +9,8 @@ import com.aliyun.oss.model.PutObjectResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.file.api.domain.dto.FileDTO;
-import com.zmbdp.file.api.domain.dto.SignDTO;
+import com.zmbdp.file.api.domain.dto.FileReqDTO;
+import com.zmbdp.file.api.domain.dto.SignReqDTO;
 import com.zmbdp.file.service.config.OSSProperties;
 import com.zmbdp.file.service.constants.OSSCustomConstants;
 import com.zmbdp.file.service.service.IFileService;
@@ -47,7 +47,7 @@ public class OSSFileServiceImpl implements IFileService {
      * @return 文件上传后返回的DTO
      */
     @Override
-    public FileDTO upload(MultipartFile file) {
+    public FileReqDTO upload(MultipartFile file) {
         try {
             InputStream inputStream = file.getInputStream();
             // 获取原始的文件名
@@ -70,11 +70,11 @@ public class OSSFileServiceImpl implements IFileService {
                 log.error("上传 oss 异常 putObjectResult 未正常返回: {}", putObjectRequest);
                 throw new ServiceException(ResultCode.OSS_UPLOAD_FAILED);
             }
-            FileDTO sysFileDTO = new FileDTO();
-            sysFileDTO.setUrl(ossProperties.getBaseUrl() + objectName);
-            sysFileDTO.setKey(objectName);
-            sysFileDTO.setName(new File(objectName).getName());
-            return sysFileDTO;
+            FileReqDTO sysFileReqDTO = new FileReqDTO();
+            sysFileReqDTO.setUrl(ossProperties.getBaseUrl() + objectName);
+            sysFileReqDTO.setKey(objectName);
+            sysFileReqDTO.setName(new File(objectName).getName());
+            return sysFileReqDTO;
         } catch (Exception e) {
             log.error("上传 oss 异常: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.OSS_UPLOAD_FAILED);
@@ -86,7 +86,7 @@ public class OSSFileServiceImpl implements IFileService {
      * @return 获取到的签名信息
      */
     @Override
-    public SignDTO getSign() {
+    public SignReqDTO getSign() {
         try {
             // 获取 ak sk
             String accesskeyid = ossProperties.getAccessKeyId();
@@ -94,9 +94,9 @@ public class OSSFileServiceImpl implements IFileService {
             // 获取当前时间
             Instant now = Instant.now();
             // 构建返回数据
-            SignDTO signDTO = new SignDTO();
-            signDTO.setHost(ossProperties.getBaseUrl());
-            signDTO.setPathPrefix(ossProperties.getPathPrefix());
+            SignReqDTO signReqDTO = new SignReqDTO();
+            signReqDTO.setHost(ossProperties.getBaseUrl());
+            signReqDTO.setPathPrefix(ossProperties.getPathPrefix());
 
             // 步骤 1：创建 policy
             ObjectMapper mapper = new ObjectMapper();
@@ -122,7 +122,7 @@ public class OSSFileServiceImpl implements IFileService {
                     .withZone(java.time.ZoneOffset.UTC);
             String dateStr = formatter.format(now);
             String xOSSCredential = accesskeyid + "/" + dateStr + "/" + ossProperties.getRegion() + "/oss/aliyun_v4_request";
-            signDTO.setXOSSCredential(xOSSCredential);
+            signReqDTO.setXOSSCredential(xOSSCredential);
             credentialCondition.put("x-oss-credential", xOSSCredential); // 替换为实际的 access key id
             conditions.add(credentialCondition);
 
@@ -134,7 +134,7 @@ public class OSSFileServiceImpl implements IFileService {
 
             // 格式化时间
             String xOSSDate = formatter.format(now);
-            signDTO.setXOSSDate(xOSSDate);
+            signReqDTO.setXOSSDate(xOSSDate);
             dateCondition.put("x-oss-date", xOSSDate);
 
             conditions.add(dateCondition);
@@ -148,7 +148,7 @@ public class OSSFileServiceImpl implements IFileService {
 
             // 步骤 2：构造待签名字符串（StringToSign）
             String policyBase64 = new String(Base64.encodeBase64(jsonPolicy.getBytes()));
-            signDTO.setPolicy(policyBase64);
+            signReqDTO.setPolicy(policyBase64);
 
             // 步骤 3：计算 SigningKey
             byte[] dateKey = hmacSha256(("aliyun_v4" + accesskeysecret).getBytes(), dateStr);
@@ -159,8 +159,8 @@ public class OSSFileServiceImpl implements IFileService {
             // 步骤 4：计算 Signature
             byte[] result = hmacSha256(signingKey, policyBase64);
             String signature = BinaryUtil.toHex(result);
-            signDTO.setSignature(signature);
-            return signDTO;
+            signReqDTO.setSignature(signature);
+            return signReqDTO;
         } catch (Exception e) {
             log.error("生成直传签名失败: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);

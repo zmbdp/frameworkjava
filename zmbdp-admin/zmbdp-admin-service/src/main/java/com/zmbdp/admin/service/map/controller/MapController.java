@@ -14,7 +14,6 @@ import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +29,6 @@ import java.util.Map;
  *
  * @author 稚名不带撇
  */
-@Slf4j
 @RestController
 @RequestMapping("/map")
 public class MapController implements MapServiceApi {

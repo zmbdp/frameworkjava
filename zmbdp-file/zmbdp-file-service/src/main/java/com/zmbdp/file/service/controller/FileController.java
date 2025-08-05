@@ -2,15 +2,13 @@ package com.zmbdp.file.service.controller;
 
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
-import com.zmbdp.file.api.feign.FileServiceApi;
-import com.zmbdp.file.api.domain.dto.FileDTO;
-import com.zmbdp.file.api.domain.dto.SignDTO;
+import com.zmbdp.file.api.domain.dto.FileReqDTO;
+import com.zmbdp.file.api.domain.dto.SignReqDTO;
 import com.zmbdp.file.api.domain.vo.FileVO;
 import com.zmbdp.file.api.domain.vo.SignVO;
+import com.zmbdp.file.api.feign.FileServiceApi;
 import com.zmbdp.file.service.service.IFileService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author 稚名不带撇
  */
-@Slf4j
 @RestController
 @RequestMapping("/file")
 public class FileController implements FileServiceApi {
@@ -36,9 +33,9 @@ public class FileController implements FileServiceApi {
      */
     @Override
     public Result<FileVO> upload(MultipartFile file) {
-        FileDTO fileDTO = fileService.upload(file);
+        FileReqDTO fileReqDTO = fileService.upload(file);
         FileVO fileVO = new FileVO();
-        BeanCopyUtil.copyProperties(fileDTO, fileVO);
+        BeanCopyUtil.copyProperties(fileReqDTO, fileVO);
         return Result.success(fileVO);
     }
 
@@ -49,9 +46,9 @@ public class FileController implements FileServiceApi {
      */
     @Override
     public Result<SignVO> getSign() {
-        SignDTO signDTO = fileService.getSign();
+        SignReqDTO signReqDTO = fileService.getSign();
         SignVO signVO = new SignVO();
-        BeanCopyUtil.copyProperties(signDTO, signVO);
+        BeanCopyUtil.copyProperties(signReqDTO, signVO);
         return Result.success(signVO);
     }
 }
