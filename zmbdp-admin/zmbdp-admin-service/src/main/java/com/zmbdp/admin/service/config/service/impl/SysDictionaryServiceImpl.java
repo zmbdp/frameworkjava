@@ -28,7 +28,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      * 新增字典类型
      *
      * @param dictionaryTypeWriteReqDTO 新增字典类型 DTO
-     * @return Long
+     * @return 数据库的 id
      */
     @Override
     public Long addType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
