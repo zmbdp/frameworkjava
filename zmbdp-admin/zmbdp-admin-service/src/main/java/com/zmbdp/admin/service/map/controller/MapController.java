@@ -1,16 +1,23 @@
 package com.zmbdp.admin.service.map.controller;
 
+import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
+import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
+import com.zmbdp.admin.api.map.domain.vo.RegionCityVo;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
+import com.zmbdp.admin.api.map.domain.vo.SearchPoiVo;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
-import com.zmbdp.admin.service.map.domain.dto.SuggestSearchDTO;
+import com.zmbdp.admin.service.map.domain.dto.RegionCityDTO;
+import com.zmbdp.admin.service.map.domain.dto.SearchPoiDTO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;
 import com.zmbdp.admin.service.map.service.IMapService;
-import com.zmbdp.admin.service.map.service.impl.QQMapServiceImpl;
+import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,8 +48,8 @@ public class MapController implements MapServiceApi {
         // 先用 dto 接收
         List<SysRegionDTO> cityListDTO = mapService.getCityList();
         // 再 copy 成 vo
-        List<RegionVO> resultVO = BeanCopyUtil.copyListProperties(cityListDTO, RegionVO::new);
-        return Result.success(resultVO);
+        List<RegionVO> result = BeanCopyUtil.copyListProperties(cityListDTO, RegionVO::new);
+        return Result.success(result);
     }
 
     /**
@@ -55,11 +62,11 @@ public class MapController implements MapServiceApi {
         // 先用 dto 接收
         Map<String, List<SysRegionDTO>> pinyinList = mapService.getCityPylist();
         // 再 copy 成 vo
-        Map<String, List<RegionVO>> resultVO = new LinkedHashMap<>();
+        Map<String, List<RegionVO>> result = new LinkedHashMap<>();
         for (Map.Entry<String, List<SysRegionDTO>> entry : pinyinList.entrySet()) {
-            resultVO.put(entry.getKey(), BeanCopyUtil.copyListProperties(entry.getValue(), RegionVO::new));
+            result.put(entry.getKey(), BeanCopyUtil.copyListProperties(entry.getValue(), RegionVO::new));
         }
-        return Result.success(resultVO);
+        return Result.success(result);
     }
 
     /**
@@ -71,8 +78,8 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<List<RegionVO>> regionChildren(Long parentId) {
         List<SysRegionDTO> regionDTOS = mapService.getRegionChildren(parentId);
-        List<RegionVO> regionVO = BeanCopyUtil.copyListProperties(regionDTOS, RegionVO::new);
-        return Result.success(regionVO);
+        List<RegionVO> result = BeanCopyUtil.copyListProperties(regionDTOS, RegionVO::new);
+        return Result.success(result);
     }
 
     /**
@@ -83,7 +90,35 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<List<RegionVO>> getHotCityList() {
         List<SysRegionDTO> hotCityListDTO = mapService.getHotCityList();
-        List<RegionVO> regionVO = BeanCopyUtil.copyListProperties(hotCityListDTO, RegionVO::new);
-        return Result.success(regionVO);
+        List<RegionVO> result = BeanCopyUtil.copyListProperties(hotCityListDTO, RegionVO::new);
+        return Result.success(result);
+    }
+
+    /**
+     * 根据关键词搜索
+     *
+     * @param placeSearchReqDTO 搜索条件
+     * @return 搜索结果
+     */
+    @Override
+    public Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@Validated PlaceSearchReqDTO placeSearchReqDTO) {
+        BasePageDTO<SearchPoiDTO> basePageReqDTO = mapService.searchSuggestOnMap(placeSearchReqDTO);
+        BasePageVO<SearchPoiVo> result = new BasePageVO<>();
+        BeanUtils.copyProperties(basePageReqDTO, result);
+        return Result.success(result);
+    }
+
+    /**
+     * 根据经纬度获取城市的信息
+     *
+     * @param locationReqDTO 经纬度信息
+     * @return 城市信息
+     */
+    @Override
+    public Result<RegionCityVo> locateCityByLocation(@Validated LocationReqDTO locationReqDTO) {
+        RegionCityDTO regionCityDTO = mapService.getCityByLocation(locationReqDTO);
+        RegionCityVo result = new RegionCityVo();
+        BeanUtils.copyProperties(regionCityDTO, result);
+        return Result.success(result);
     }
 }

@@ -1,12 +1,15 @@
 package com.zmbdp.mstemplate.service.test;
 
+import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
+import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
+import com.zmbdp.admin.api.map.domain.vo.RegionCityVo;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
+import com.zmbdp.admin.api.map.domain.vo.SearchPoiVo;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -57,5 +60,27 @@ public class TestMapController {
     @GetMapping("/city_hot_list")
     Result<List<RegionVO>> getHotCityList() {
         return mapServiceApi.getHotCityList();
+    }
+
+    /**
+     * 根据关键词搜索
+     *
+     * @param placeSearchReqDTO 搜索条件
+     * @return 搜索结果
+     */
+    @PostMapping("/search")
+    Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@RequestBody PlaceSearchReqDTO placeSearchReqDTO) {
+        return mapServiceApi.searchSuggestOnMap(placeSearchReqDTO);
+    }
+
+    /**
+     * 根据经纬度获取城市的信息
+     *
+     * @param locationReqDTO 经纬度信息
+     * @return 城市信息
+     */
+    @PostMapping("/locate_city_by_location")
+    Result<RegionCityVo> locateCityByLocation(@RequestBody LocationReqDTO locationReqDTO) {
+        return mapServiceApi.locateCityByLocation(locationReqDTO);
     }
 }

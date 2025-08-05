@@ -63,7 +63,7 @@ public class QQMapServiceImpl implements IMapProvider {
         ResponseEntity<PoiListDTO> response = restTemplate.getForEntity(url, PoiListDTO.class);
         // 判断结果
         if (!response.getStatusCode().is2xxSuccessful()) {
-            // 假设说这个验证码不是以 2 开头的，那么一定是错误的
+            // 假设说这个响应码不是以 2 开头的，那么一定是错误的
             log.error("[QQMapServiceImpl.searchQQMapPlaceByRegion 获取关键词查询结果服务]请求失败，返回结果: {}", response.getBody());
             throw new ServiceException(ResultCode.QQMAP_QUERY_FAILED);
         }

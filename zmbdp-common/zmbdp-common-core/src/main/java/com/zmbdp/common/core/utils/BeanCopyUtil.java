@@ -14,11 +14,12 @@ import java.util.function.Supplier;
 public class BeanCopyUtil extends BeanUtils {
     /**
      * 批量拷贝集合类型里面的元素
+     *
      * @param source 待拷贝的数据
      * @param target 拷贝之后的目标对象
+     * @param <S>    源类型
+     * @param <T>    目标对象类型
      * @return 目标对象集合
-     * @param <S> 源类型
-     * @param <T> 目标对象类型
      */
     public static <S, T> List<T> copyListProperties(List<S> source, Supplier<T> target) {
         List<T> list = new ArrayList<>(source.size());

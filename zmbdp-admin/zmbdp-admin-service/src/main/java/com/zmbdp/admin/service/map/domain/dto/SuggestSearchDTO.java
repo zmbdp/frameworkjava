@@ -19,7 +19,8 @@ public class SuggestSearchDTO {
     private String id;
 
     /**
-     * 限制是否仅在当前城市中搜索 0 - 否; 1 - 是
+     * 0：[默认] 不限制当前城市，会召回其他城市的 poi
+     * 1：仅限制在当前城市
      */
     private String regionFix;
 

@@ -1,7 +1,12 @@
 package com.zmbdp.admin.service.map.service;
 
+import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
+import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
+import com.zmbdp.admin.service.map.domain.dto.RegionCityDTO;
+import com.zmbdp.admin.service.map.domain.dto.SearchPoiDTO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;
+import com.zmbdp.common.core.domain.dto.BasePageDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -41,4 +46,21 @@ public interface IMapService {
      * @return 城市列表
      */
     List<SysRegionDTO> getHotCityList();
+
+    /**
+     * 根据关键词搜索
+     *
+     * @param placeSearchReqDTO 搜索条件
+     * @return 搜索结果
+     */
+    BasePageDTO<SearchPoiDTO> searchSuggestOnMap(PlaceSearchReqDTO placeSearchReqDTO);
+
+
+    /**
+     * 根据经纬度获取城市的信息
+     *
+     * @param locationReqDTO 经纬度信息
+     * @return 城市信息
+     */
+    RegionCityDTO getCityByLocation(LocationReqDTO locationReqDTO);
 }
