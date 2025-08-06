@@ -1,6 +1,6 @@
 package com.zmbdp.admin.service.config.comtroller;
 
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
@@ -29,7 +29,7 @@ public class DictionaryController implements DictionaryFeignClient {
      * @param dictionaryTypeWriteReqDTO 新增字典类型 DTO
      * @return 数据库的 id
      */
-    @PostMapping("/add")
+    @PostMapping("/addType")
     public Result<Long> addType(@RequestBody @Validated DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
         return Result.success(sysDictionaryService.addType(dictionaryTypeWriteReqDTO));
     }
@@ -40,8 +40,30 @@ public class DictionaryController implements DictionaryFeignClient {
      * @param dictionaryTypeListReqDTO 字典数据列表 DTO
      * @return 符合条件的字典类型列表
      */
-    @GetMapping("/list")
+    @GetMapping("/listType")
     public Result<BasePageVO<DictionaryTypeVO>> listType(@Validated DictionaryTypeListReqDTO dictionaryTypeListReqDTO) {
         return Result.success(sysDictionaryService.listType(dictionaryTypeListReqDTO));
+    }
+
+    /**
+     * 修改字典类型
+     *
+     * @param dictionaryTypeWriteReqDTO 修改字典类型 DTO
+     * @return 数据库的 id
+     */
+    @PostMapping("/editType")
+    public Result<Long> editType(@RequestBody @Validated DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
+        return Result.success(sysDictionaryService.editType(dictionaryTypeWriteReqDTO));
+    }
+
+    /**
+     * 新增字典数据
+     *
+     * @param dictionaryDataAddReqDTO 新增字典数据 DTO
+     * @return 数据库的 id
+     */
+    @PostMapping("/addData")
+    public Result<Long> addData(@RequestBody @Validated DictionaryDataAddReqDTO dictionaryDataAddReqDTO) {
+        return Result.success(sysDictionaryService.addData(dictionaryDataAddReqDTO));
     }
 }

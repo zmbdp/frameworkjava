@@ -1,5 +1,6 @@
 package com.zmbdp.admin.service.config.service;
 
+import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
@@ -28,4 +29,20 @@ public interface ISysDictionaryService {
      * @return 字典类型列表
      */
     BasePageVO<DictionaryTypeVO> listType(DictionaryTypeListReqDTO dictionaryTypeListReqDTO);
+
+    /**
+     * 修改字典类型
+     *
+     * @param dictionaryTypeWriteReqDTO 修改字典类型 DTO
+     * @return 数据库的 id
+     */
+    Long editType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO);
+
+    /**
+     * 新增字典数据
+     *
+     * @param dictionaryDataAddReqDTO 新增字典数据 DTO
+     * @return 数据库的 id
+     */
+    Long addData(DictionaryDataAddReqDTO dictionaryDataAddReqDTO);
 }

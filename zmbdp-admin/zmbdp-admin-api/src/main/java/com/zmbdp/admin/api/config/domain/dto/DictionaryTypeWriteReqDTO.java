@@ -1,6 +1,6 @@
 package com.zmbdp.admin.api.config.domain.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -12,13 +12,13 @@ public class DictionaryTypeWriteReqDTO {
     /**
      * 字典类型键
      */
-    @NotNull(message = "字典类型键不能为空")
+    @NotBlank(message = "字典类型键不能为空")
     private String typeKey;
 
     /**
      * 字典类型值
      */
-    @NotNull(message = "字典类型值不能为空")
+    @NotBlank(message = "字典类型值不能为空")
     private String value;
 
     /**

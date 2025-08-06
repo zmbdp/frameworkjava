@@ -2,10 +2,13 @@ package com.zmbdp.admin.service.config.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
+import com.zmbdp.admin.service.config.domain.entity.SysDictionaryData;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryType;
+import com.zmbdp.admin.service.config.mapper.SysDictionaryDataMapper;
 import com.zmbdp.admin.service.config.mapper.SysDictionaryTypeMapper;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
@@ -27,8 +30,17 @@ import java.util.List;
 @Service
 public class SysDictionaryServiceImpl implements ISysDictionaryService {
 
+    /**
+     * 字典类型表 mapper
+     */
     @Autowired
     private SysDictionaryTypeMapper sysDictionaryTypeMapper;
+
+    /**
+     * 字典数据表 mapper
+     */
+    @Autowired
+    private SysDictionaryDataMapper sysDictionaryDataMapper;
 
     /**
      * 新增字典类型
@@ -90,5 +102,77 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         // 插入返回对象返回
         result.setList(list);
         return result;
+    }
+
+    /**
+     * 修改字典类型
+     *
+     * @param dictionaryTypeWriteReqDTO 修改字典类型 DTO
+     * @return 数据库的 id
+     */
+    @Override
+    public Long editType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
+        // 查询数据库中是否存在
+        SysDictionaryType sysDictionaryType = sysDictionaryTypeMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryType>()
+                        .eq(SysDictionaryType::getTypeKey,
+                                dictionaryTypeWriteReqDTO.getTypeKey())
+        );
+        if (sysDictionaryType == null) {
+            log.warn("SysDictionaryServiceImpl.editType: [字典类型不存在: {} ]", dictionaryTypeWriteReqDTO);
+            throw new ServiceException("字典类型不存在");
+        }
+        // 存在的话就判断字典类型的键是否存在一致的, 如果说，键不一样，但是值一样了，那么就返回字典类型已存在,
+        // 因为键不允许修改，添加的时候也不允许重复，所以说键肯定不会相同
+        if (sysDictionaryTypeMapper.selectOne(new LambdaQueryWrapper<SysDictionaryType>()
+                // 查出不一样的键
+                .ne(SysDictionaryType::getTypeKey, dictionaryTypeWriteReqDTO.getTypeKey())
+                // 查出一样的值
+                .eq(SysDictionaryType::getValue, dictionaryTypeWriteReqDTO.getValue())
+        ) != null) {
+            log.warn("SysDictionaryServiceImpl.editType: [字典类型值已存在: {} ]", dictionaryTypeWriteReqDTO);
+            throw new ServiceException("字典类型的值已存在");
+        }
+        // 说明是符合要求的，直接改就行了
+        BeanCopyUtil.copyProperties(dictionaryTypeWriteReqDTO, sysDictionaryType);
+        sysDictionaryTypeMapper.updateById(sysDictionaryType);
+        return sysDictionaryType.getId();
+    }
+
+    /**
+     * 新增字典数据
+     *
+     * @param dictionaryDataAddReqDTO 新增字典数据 DTO
+     * @return 数据库的 id
+     */
+    @Override
+    public Long addData(DictionaryDataAddReqDTO dictionaryDataAddReqDTO) {
+        // 先查 字典类型 key 是否存在，只有存在才能加
+        if (
+                sysDictionaryTypeMapper.selectOne(
+                        new LambdaQueryWrapper<SysDictionaryType>()
+                                // 看看 字典类型的 key 是否存在，不存在的话就不能加
+                                .eq(SysDictionaryType::getTypeKey, dictionaryDataAddReqDTO.getTypeKey()
+                        )) == null
+        ) {
+            log.warn("SysDictionaryServiceImpl.addData: [字典类型不存在: {} ]", dictionaryDataAddReqDTO);
+            throw new ServiceException("字典类型不存在");
+        }
+        // 再看字典数据的 key 和 value 是否重复，不重复才能加
+        SysDictionaryData sysDictionaryData = sysDictionaryDataMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .eq(SysDictionaryData::getDataKey, dictionaryDataAddReqDTO.getDataKey())
+                        .or()
+                        .eq(SysDictionaryData::getValue, dictionaryDataAddReqDTO.getValue())
+        );
+        if (sysDictionaryData != null) {
+            log.warn("SysDictionaryServiceImpl.addData: [字典数据键或值已存在: {} ]", dictionaryDataAddReqDTO);
+            throw new ServiceException("字典数据键或值已存在");
+        }
+        // 说明没查到，那就插入
+        sysDictionaryData = new SysDictionaryData();
+        BeanCopyUtil.copyProperties(dictionaryDataAddReqDTO, sysDictionaryData);
+        sysDictionaryDataMapper.insert(sysDictionaryData);
+        return sysDictionaryData.getId();
     }
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 public class DictionaryTypeListReqDTO extends BasePageReqDTO {
 
     /**
-     * 字典类型键
+     * 字典类型业务主键
      */
     private String typeKey;
 
