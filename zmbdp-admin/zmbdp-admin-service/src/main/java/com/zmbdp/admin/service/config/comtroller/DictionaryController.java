@@ -1,12 +1,9 @@
 package com.zmbdp.admin.service.config.comtroller;
 
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.*;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
-import com.zmbdp.admin.api.config.frign.DictionaryFeignClient;
+import com.zmbdp.admin.api.config.frign.DictionaryServiceApi;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
@@ -14,16 +11,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 字典服务
  *
  * @author 稚名不带撇
  */
 @RestController
-@RequestMapping("/dictionary_type")
-public class DictionaryController implements DictionaryFeignClient {
+@RequestMapping("/dictionary")
+public class DictionaryController implements DictionaryServiceApi {
     @Autowired
     private ISysDictionaryService sysDictionaryService;
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 新增字典类型
@@ -37,10 +39,10 @@ public class DictionaryController implements DictionaryFeignClient {
     }
 
     /**
-     * 查询字典数据列表
+     * 查询字典类型列表
      *
-     * @param dictionaryTypeListReqDTO 字典数据列表 DTO
-     * @return 符合条件的字典类型列表
+     * @param dictionaryTypeListReqDTO 查询字典类型列表 DTO
+     * @return 字典类型列表
      */
     @GetMapping("/listType")
     public Result<BasePageVO<DictionaryTypeVO>> listType(@Validated DictionaryTypeListReqDTO dictionaryTypeListReqDTO) {
@@ -78,5 +80,40 @@ public class DictionaryController implements DictionaryFeignClient {
     @GetMapping("/listData")
     public Result<BasePageVO<DictionaryDataVo>> listData(@Validated DictionaryDataListReqDTO dictionaryDataListReqDTO) {
         return Result.success(sysDictionaryService.listData(dictionaryDataListReqDTO));
+    }
+
+    /**
+     * 编辑字典数据
+     *
+     * @param dictionaryDataEditReqDTO 编辑字典数据 DTO
+     * @return 数据库的 id
+     */
+    @PostMapping("/editData")
+    public Result<Long> editData(@RequestBody @Validated DictionaryDataEditReqDTO dictionaryDataEditReqDTO) {
+        return Result.success(sysDictionaryService.editData(dictionaryDataEditReqDTO));
+    }
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 获取某个字典类型下的所有字典数据
+     *
+     * @param typeKey 字典类型键
+     * @return 字典数据列表
+     */
+    @Override
+    public List<DictionaryDataDTO> selectDictDataByType(String typeKey) {
+        return sysDictionaryService.selectDictDataByType(typeKey);
+    }
+
+    /**
+     * 获取多个字典类型下的所有字典数据
+     *
+     * @param typeKeys 字典类型键列表
+     * @return 字典数据列表，哈希  字典类型键 -> 字典数据列表
+     */
+    @Override
+    public Map<String, List<DictionaryDataDTO>> selectDictDataByTypes(List<String> typeKeys) {
+        return sysDictionaryService.selectDictDataByTypes(typeKeys);
     }
 }

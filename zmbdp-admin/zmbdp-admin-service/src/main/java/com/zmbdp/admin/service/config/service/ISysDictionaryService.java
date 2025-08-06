@@ -1,12 +1,12 @@
 package com.zmbdp.admin.service.config.service;
 
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.*;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 字典服务层的接口
@@ -14,6 +14,8 @@ import com.zmbdp.common.domain.domain.vo.BasePageVO;
  * @author 稚名不带撇
  */
 public interface ISysDictionaryService {
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 新增字典类型
@@ -24,7 +26,7 @@ public interface ISysDictionaryService {
     Long addType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO);
 
     /**
-     * 查询字典数据列表
+     * 查询字典类型列表
      *
      * @param dictionaryTypeListReqDTO 查询字典类型列表 DTO
      * @return 字典类型列表
@@ -54,4 +56,31 @@ public interface ISysDictionaryService {
      * @return 符合要求的字典数据列表数据
      */
     BasePageVO<DictionaryDataVo> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO);
+
+    /**
+     * 编辑字典数据
+     *
+     * @param dictionaryDataEditReqDTO 编辑字典数据 DTO
+     * @return 数据库的 id
+     */
+    Long editData(DictionaryDataEditReqDTO dictionaryDataEditReqDTO);
+
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 获取某个字典类型下的所有字典数据
+     *
+     * @param typeKey 字典类型键
+     * @return 字典数据列表
+     */
+    List<DictionaryDataDTO> selectDictDataByType(String typeKey);
+
+    /**
+     * 获取多个字典类型下的所有字典数据
+     *
+     * @param typeKeys 字典类型键列表
+     * @return 字典数据列表，哈希  字典类型键 -> 字典数据列表
+     */
+    Map<String, List<DictionaryDataDTO>> selectDictDataByTypes(List<String> typeKeys);
 }

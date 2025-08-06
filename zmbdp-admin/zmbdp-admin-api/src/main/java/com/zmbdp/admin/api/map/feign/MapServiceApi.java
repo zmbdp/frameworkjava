@@ -21,7 +21,7 @@ import java.util.Map;
  *
  * @author 稚名不带撇
  */
-@FeignClient(name = "zmbdp-admin-service", path = "/map")
+@FeignClient(contextId = "mapServiceApi", name = "zmbdp-admin-service", path = "/map")
 public interface MapServiceApi {
 
     /**

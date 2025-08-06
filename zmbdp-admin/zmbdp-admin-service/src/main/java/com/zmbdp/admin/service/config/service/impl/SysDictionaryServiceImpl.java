@@ -2,10 +2,7 @@ package com.zmbdp.admin.service.config.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
-import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.*;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryData;
@@ -21,7 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 字典服务实现类
@@ -43,6 +43,8 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      */
     @Autowired
     private SysDictionaryDataMapper sysDictionaryDataMapper;
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 新增字典类型
@@ -73,7 +75,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
     }
 
     /**
-     * 查询字典数据列表
+     * 查询字典类型列表
      *
      * @param dictionaryTypeListReqDTO 查询字典类型列表 DTO
      * @return 字典类型列表
@@ -139,7 +141,10 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
             throw new ServiceException("字典类型的值已存在");
         }
         // 说明是符合要求的，直接改就行了
-        BeanCopyUtil.copyProperties(dictionaryTypeWriteReqDTO, sysDictionaryType);
+        sysDictionaryType.setValue(dictionaryTypeWriteReqDTO.getValue());
+        if (StringUtils.isNotBlank(dictionaryTypeWriteReqDTO.getRemark())) {
+            dictionaryTypeWriteReqDTO.setRemark(dictionaryTypeWriteReqDTO.getRemark());
+        }
         sysDictionaryTypeMapper.updateById(sysDictionaryType);
         return sysDictionaryType.getId();
     }
@@ -193,12 +198,12 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<>();
         // 构建查询条件
         queryWrapper.eq(SysDictionaryData::getTypeKey, dictionaryDataListReqDTO.getTypeKey());
-        if (StringUtils.isNotBlank(dictionaryDataListReqDTO.getValue())){
+        if (StringUtils.isNotBlank(dictionaryDataListReqDTO.getValue())) {
             queryWrapper.like(SysDictionaryData::getValue, dictionaryDataListReqDTO.getValue());
         }
         // 根据排序字段升序排序
         queryWrapper.orderByAsc(SysDictionaryData::getSort);
-        // 根据 id 升序
+        // 如果说排序字段一样，就根据 id 升序排序
         queryWrapper.orderByAsc(SysDictionaryData::getId);
         // 开始查询数据
         Page<SysDictionaryData> page = sysDictionaryDataMapper.selectPage(
@@ -215,4 +220,90 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         result.setList(list);
         return result;
     }
+
+    /**
+     * 编辑字典数据
+     *
+     * @param dictionaryDataEditReqDTO 编辑字典数据 DTO
+     * @return 数据库的 id
+     */
+    @Override
+    public Long editData(DictionaryDataEditReqDTO dictionaryDataEditReqDTO) {
+        // 根据字典数据 key 来查
+        // 先判断是否存在
+        SysDictionaryData sysDictionaryData = sysDictionaryDataMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .eq(SysDictionaryData::getDataKey, dictionaryDataEditReqDTO.getDataKey())
+        );
+        // 如果说不存在就抛异常
+        if (sysDictionaryData == null) {
+            log.warn("SysDictionaryServiceImpl.editData: [字典数据不存在: {} ]", dictionaryDataEditReqDTO);
+            throw new ServiceException("字典数据不存在");
+        }
+        // 然后再看字典数据的 value 是否已经存在
+        if (sysDictionaryDataMapper.selectOne(new LambdaQueryWrapper<SysDictionaryData>()
+                // 如果说字典数据 key 不一样的情况下，value 一样了，就说明字典数据 value 已经存在了，就抛异常
+                .ne(SysDictionaryData::getDataKey, dictionaryDataEditReqDTO.getDataKey())
+                .eq(SysDictionaryData::getValue, dictionaryDataEditReqDTO.getValue())) != null
+        ) {
+            log.warn("SysDictionaryServiceImpl.editData: [字典数据值已存在: {} ]", dictionaryDataEditReqDTO);
+            throw new ServiceException("字典数据值已存在");
+        }
+        // 说明符合要求，可以修改，然后构建数据，直接执行就行了
+        sysDictionaryData.setValue(dictionaryDataEditReqDTO.getValue());
+        if (dictionaryDataEditReqDTO.getSort() != null) {
+            sysDictionaryData.setSort(dictionaryDataEditReqDTO.getSort());
+        }
+        if (StringUtils.isNotBlank(dictionaryDataEditReqDTO.getRemark())) {
+            sysDictionaryData.setRemark(dictionaryDataEditReqDTO.getRemark());
+        }
+        sysDictionaryDataMapper.updateById(sysDictionaryData);
+        return sysDictionaryData.getId();
+    }
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 获取某个字典类型下的所有字典数据
+     *
+     * @param typeKey 字典类型键
+     * @return 字典数据列表
+     */
+    @Override
+    public List<DictionaryDataDTO> selectDictDataByType(String typeKey) {
+        // 先获取到表里符合要求的数据
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
+                .eq(SysDictionaryData::getTypeKey, typeKey)
+        );
+        // 然后直接 BeanCopy 转换
+        List<DictionaryDataDTO> result = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        return result;
+    }
+
+    /**
+     * 获取多个字典类型下的所有字典数据
+     *
+     * @param typeKeys 字典类型键列表
+     * @return 字典数据列表，哈希  字典类型键 -> 字典数据列表
+     */
+    @Override
+    public Map<String, List<DictionaryDataDTO>> selectDictDataByTypes(List<String> typeKeys) {
+        // 根据传过来的字典类型 key 获取数据
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
+                .in(SysDictionaryData::getTypeKey, typeKeys)
+        );
+        List<DictionaryDataDTO> dtoList = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        Map<String, List<DictionaryDataDTO>> result = new LinkedHashMap<>();
+        // 然后再循环分组
+        for (DictionaryDataDTO dictionaryDataDTO : dtoList) {
+            // 先拿到字典类型 key
+            String typeKey = dictionaryDataDTO.getTypeKey();
+            if (!result.containsKey(typeKey)) {
+                result.put(typeKey, new ArrayList<>());
+            }
+            result.get(typeKey).add(dictionaryDataDTO);
+        }
+        return result;
+    }
+
 }
