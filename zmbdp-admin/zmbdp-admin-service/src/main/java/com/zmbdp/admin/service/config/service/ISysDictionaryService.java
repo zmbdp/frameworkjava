@@ -4,6 +4,7 @@ import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 
@@ -45,4 +46,12 @@ public interface ISysDictionaryService {
      * @return 数据库的 id
      */
     Long addData(DictionaryDataAddReqDTO dictionaryDataAddReqDTO);
+
+    /**
+     * 关键词搜索字典数据列表
+     *
+     * @param dictionaryDataListReqDTO 字典数据列表 DTO
+     * @return 符合要求的字典数据列表数据
+     */
+    BasePageVO<DictionaryDataVo> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO);
 }

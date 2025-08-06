@@ -1,8 +1,10 @@
 package com.zmbdp.admin.service.config.comtroller;
 
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.admin.api.config.frign.DictionaryFeignClient;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
@@ -65,5 +67,16 @@ public class DictionaryController implements DictionaryFeignClient {
     @PostMapping("/addData")
     public Result<Long> addData(@RequestBody @Validated DictionaryDataAddReqDTO dictionaryDataAddReqDTO) {
         return Result.success(sysDictionaryService.addData(dictionaryDataAddReqDTO));
+    }
+
+    /**
+     * 关键词搜索字典数据列表
+     *
+     * @param dictionaryDataListReqDTO 字典数据列表 DTO
+     * @return 符合要求的字典数据列表数据
+     */
+    @GetMapping("/listData")
+    public Result<BasePageVO<DictionaryDataVo>> listData(@Validated DictionaryDataListReqDTO dictionaryDataListReqDTO) {
+        return Result.success(sysDictionaryService.listData(dictionaryDataListReqDTO));
     }
 }

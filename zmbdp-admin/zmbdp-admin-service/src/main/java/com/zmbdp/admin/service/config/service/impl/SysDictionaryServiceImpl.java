@@ -3,8 +3,10 @@ package com.zmbdp.admin.service.config.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.DictionaryDataListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeListReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.DictionaryTypeWriteReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryData;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryType;
@@ -94,11 +96,14 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 queryWrapper // 查询语句
         );
         // 类型转换成返回的数据
-        // 外面的公共数据先 set 进去
-        result.setTotals(Integer.parseInt(String.valueOf(page.getTotal())));
-        result.setTotalPages(Integer.parseInt(String.valueOf(page.getPages())));
-        // 然后拷贝 data 里面的数据
+        // 先拷贝 data 里面的数据
         List<DictionaryTypeVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryTypeVO::new);
+        // 然后外面的公共数据先 set 进去
+        result.setTotals(list.size());
+        result.setTotalPages(list.size() % dictionaryTypeListReqDTO.getPageSize() == 0 ?
+                (list.size() / dictionaryTypeListReqDTO.getPageSize()) :
+                (list.size() / dictionaryTypeListReqDTO.getPageSize() + 1)
+        );
         // 插入返回对象返回
         result.setList(list);
         return result;
@@ -153,7 +158,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                         new LambdaQueryWrapper<SysDictionaryType>()
                                 // 看看 字典类型的 key 是否存在，不存在的话就不能加
                                 .eq(SysDictionaryType::getTypeKey, dictionaryDataAddReqDTO.getTypeKey()
-                        )) == null
+                                )) == null
         ) {
             log.warn("SysDictionaryServiceImpl.addData: [字典类型不存在: {} ]", dictionaryDataAddReqDTO);
             throw new ServiceException("字典类型不存在");
@@ -174,5 +179,40 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         BeanCopyUtil.copyProperties(dictionaryDataAddReqDTO, sysDictionaryData);
         sysDictionaryDataMapper.insert(sysDictionaryData);
         return sysDictionaryData.getId();
+    }
+
+    /**
+     * 关键词搜索字典数据列表
+     *
+     * @param dictionaryDataListReqDTO 字典数据列表 DTO
+     * @return 符合要求的字典数据列表数据
+     */
+    @Override
+    public BasePageVO<DictionaryDataVo> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO) {
+        BasePageVO<DictionaryDataVo> result = new BasePageVO<>();
+        LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<>();
+        // 构建查询条件
+        queryWrapper.eq(SysDictionaryData::getTypeKey, dictionaryDataListReqDTO.getTypeKey());
+        if (StringUtils.isNotBlank(dictionaryDataListReqDTO.getValue())){
+            queryWrapper.like(SysDictionaryData::getValue, dictionaryDataListReqDTO.getValue());
+        }
+        // 根据排序字段升序排序
+        queryWrapper.orderByAsc(SysDictionaryData::getSort);
+        // 根据 id 升序
+        queryWrapper.orderByAsc(SysDictionaryData::getId);
+        // 开始查询数据
+        Page<SysDictionaryData> page = sysDictionaryDataMapper.selectPage(
+                new Page<>(dictionaryDataListReqDTO.getPageNo().longValue(), dictionaryDataListReqDTO.getPageSize().longValue()),
+                queryWrapper
+        );
+        // 然后再构建返回参数
+        List<DictionaryDataVo> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVo::new);
+        result.setTotals(list.size());
+        result.setTotalPages(list.size() % dictionaryDataListReqDTO.getPageSize() == 0 ?
+                (list.size() / dictionaryDataListReqDTO.getPageSize()) :
+                (list.size() / dictionaryDataListReqDTO.getPageSize() + 1)
+        );
+        result.setList(list);
+        return result;
     }
 }
