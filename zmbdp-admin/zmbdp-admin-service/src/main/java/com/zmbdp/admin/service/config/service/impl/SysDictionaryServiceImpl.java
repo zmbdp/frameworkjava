@@ -9,16 +9,13 @@ import com.zmbdp.admin.service.config.domain.entity.SysDictionaryType;
 import com.zmbdp.admin.service.config.mapper.SysDictionaryTypeMapper;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
-import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,7 +75,10 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
             queryWrapper.eq(SysDictionaryType::getTypeKey, dictionaryTypeListReqDTO.getTypeKey());
         }
         Page<SysDictionaryType> page = sysDictionaryTypeMapper.selectPage(
-                new Page<>(dictionaryTypeListReqDTO.getPageNo().longValue(), dictionaryTypeListReqDTO.getPageSize().longValue()),
+                new Page<>(
+                        // 传入第几页一页几条，就会查询记录并翻页
+                        dictionaryTypeListReqDTO.getPageNo().longValue(),
+                        dictionaryTypeListReqDTO.getPageSize().longValue()),
                 queryWrapper // 查询语句
         );
         // 类型转换成返回的数据

@@ -37,8 +37,8 @@ public class DictionaryController implements DictionaryFeignClient {
     /**
      * 查询字典数据列表
      *
-     * @param dictionaryTypeListReqDTO 字典数据列表DTO
-     * @return BasePageVO
+     * @param dictionaryTypeListReqDTO 字典数据列表 DTO
+     * @return 符合条件的字典类型列表
      */
     @GetMapping("/list")
     public Result<BasePageVO<DictionaryTypeVO>> listType(@Validated DictionaryTypeListReqDTO dictionaryTypeListReqDTO) {
