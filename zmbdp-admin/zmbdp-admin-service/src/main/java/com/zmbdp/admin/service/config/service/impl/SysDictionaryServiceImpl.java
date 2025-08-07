@@ -306,4 +306,39 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         return result;
     }
 
+    /**
+     * 根据字典数据业务主键获取字典数据对象
+     *
+     * @param dataKey 字典数据业务主键
+     * @return 该字典数据的对象
+     */
+    @Override
+    public DictionaryDataDTO getDicDataByKey(String dataKey) {
+        // 根据字典数据业务主键获取字典数据对象
+        SysDictionaryData dictionaryData = sysDictionaryDataMapper.selectOne(new LambdaQueryWrapper<SysDictionaryData>()
+                .eq(SysDictionaryData::getDataKey, dataKey)
+        );
+        // 对象转换
+        DictionaryDataDTO result = new DictionaryDataDTO();
+        BeanCopyUtil.copyProperties(dictionaryData, result);
+        return result;
+    }
+
+    /**
+     * 根据多个字典数据业务主键获取多个字典数据对象
+     *
+     * @param dataKeys 多个字典数据业务主键
+     * @return 字典数据列表
+     */
+    @Override
+    public List<DictionaryDataDTO> getDicDataByKeys(List<String> dataKeys) {
+        // 获取符合要求的所有数据
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
+                .in(SysDictionaryData::getDataKey, dataKeys)
+        );
+        // 然后直接转换对象
+        List<DictionaryDataDTO> result = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        return result;
+    }
+
 }

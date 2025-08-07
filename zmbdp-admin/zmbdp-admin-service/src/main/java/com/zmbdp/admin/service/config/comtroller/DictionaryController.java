@@ -116,4 +116,26 @@ public class DictionaryController implements DictionaryServiceApi {
     public Map<String, List<DictionaryDataDTO>> selectDictDataByTypes(List<String> typeKeys) {
         return sysDictionaryService.selectDictDataByTypes(typeKeys);
     }
+
+    /**
+     * 根据字典数据业务主键获取字典数据对象
+     *
+     * @param dataKey 字典数据业务主键
+     * @return 该字典数据的对象
+     */
+    @Override
+    public DictionaryDataDTO getDicDataByKey(String dataKey) {
+        return sysDictionaryService.getDicDataByKey(dataKey);
+    }
+
+    /**
+     * 根据多个字典数据业务主键获取多个字典数据对象
+     *
+     * @param dataKeys 多个字典数据业务主键
+     * @return 字典数据列表
+     */
+    @Override
+    public List<DictionaryDataDTO> getDicDataByKeys(List<String> dataKeys) {
+        return sysDictionaryService.getDicDataByKeys(dataKeys);
+    }
 }
