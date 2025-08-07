@@ -22,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/dictionary")
 public class DictionaryController implements DictionaryServiceApi {
+
     @Autowired
     private ISysDictionaryService sysDictionaryService;
 
