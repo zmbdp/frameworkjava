@@ -1,6 +1,7 @@
 package com.zmbdp.admin.service.config.comtroller;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
@@ -11,6 +12,8 @@ import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 参数服务
@@ -23,6 +26,8 @@ public class ArgumentController implements ArgumentServiceApi {
 
     @Autowired
     private IArgumentService argumentService;
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 新增参数
@@ -55,5 +60,29 @@ public class ArgumentController implements ArgumentServiceApi {
     @PostMapping("/edit")
     public Result<Long> editArgument(@RequestBody @Validated ArgumentEditReqDTO argumentEditReqDTO) {
         return Result.success(argumentService.editArgument(argumentEditReqDTO));
+    }
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 根据参数键查询参数对象
+     *
+     * @param configKey 参数键
+     * @return 参数对象
+     */
+    @Override
+    public ArgumentDTO getByConfigKey(String configKey) {
+        return argumentService.getByConfigKey(configKey);
+    }
+
+    /**
+     * 根据多个参数键查询多个参数对象
+     *
+     * @param configKeys 多个参数键
+     * @return 多个参数对象
+     */
+    @Override
+    public List<ArgumentDTO> getByConfigKeys(List<String> configKeys) {
+        return argumentService.getByConfigKeys(configKeys);
     }
 }

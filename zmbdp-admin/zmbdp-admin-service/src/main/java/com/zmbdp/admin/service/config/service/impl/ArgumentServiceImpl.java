@@ -3,6 +3,7 @@ package com.zmbdp.admin.service.config.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
@@ -17,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,6 +33,8 @@ public class ArgumentServiceImpl implements IArgumentService {
 
     @Autowired
     private SysArgumentMapper sysArgumentMapper;
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 新增参数
@@ -118,4 +123,44 @@ public class ArgumentServiceImpl implements IArgumentService {
         sysArgumentMapper.updateById(sysArgument);
         return sysArgument.getId();
     }
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 根据参数键查询参数对象
+     *
+     * @param configKey 参数键
+     * @return 参数对象
+     */
+    @Override
+    public ArgumentDTO getByConfigKey(String configKey) {
+        // 直接查数据库就好了
+        SysArgument sysArgument = sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
+                .eq(SysArgument::getConfigKey, configKey)
+        );
+        ArgumentDTO argumentDTO = new ArgumentDTO();
+        if (sysArgument != null){
+            BeanCopyUtil.copyProperties(sysArgument, argumentDTO);
+        }
+        return argumentDTO;
+    }
+
+    /**
+     * 根据多个参数键查询多个参数对象
+     *
+     * @param configKeys 多个参数键
+     * @return 多个参数对象
+     */
+    @Override
+    public List<ArgumentDTO> getByConfigKeys(List<String> configKeys) {
+        if (configKeys == null || configKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<SysArgument> sysArguments = sysArgumentMapper.selectList(new LambdaQueryWrapper<SysArgument>()
+                .in(SysArgument::getConfigKey, configKeys)
+        );
+        List<ArgumentDTO> result = BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
+        return result;
+    }
+
 }

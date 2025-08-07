@@ -1,10 +1,13 @@
 package com.zmbdp.admin.service.config.service;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
+
+import java.util.List;
 
 /**
  * 参数服务接口
@@ -12,6 +15,9 @@ import com.zmbdp.common.domain.domain.vo.BasePageVO;
  * @author 稚名不带撇
  */
 public interface IArgumentService {
+
+    /*=============================================    前端调用    =============================================*/
+
     /**
      * 新增参数
      *
@@ -35,4 +41,22 @@ public interface IArgumentService {
      * @return 数据库 id
      */
     Long editArgument(ArgumentEditReqDTO argumentEditReqDTO);
+
+    /*=============================================    远程调用    =============================================*/
+
+    /**
+     * 根据参数键查询参数对象
+     *
+     * @param configKey 参数键
+     * @return 参数对象
+     */
+    ArgumentDTO getByConfigKey(String configKey);
+
+    /**
+     * 根据多个参数键查询多个参数对象
+     *
+     * @param configKeys 多个参数键
+     * @return 多个参数对象
+     */
+    List<ArgumentDTO> getByConfigKeys(List<String> configKeys);
 }

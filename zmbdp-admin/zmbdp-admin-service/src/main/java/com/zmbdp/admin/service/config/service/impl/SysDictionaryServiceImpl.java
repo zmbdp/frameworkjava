@@ -18,10 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 字典服务实现类
@@ -282,6 +279,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      */
     @Override
     public Map<String, List<DictionaryDataDTO>> selectDictDataByTypes(List<String> typeKeys) {
+        if (typeKeys == null || typeKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
         // 根据传过来的字典类型 key 获取数据
         List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
                 .in(SysDictionaryData::getTypeKey, typeKeys)
@@ -326,6 +326,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      */
     @Override
     public List<DictionaryDataDTO> getDicDataByKeys(List<String> dataKeys) {
+        if (dataKeys == null || dataKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
         // 获取符合要求的所有数据
         List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
                 .in(SysDictionaryData::getDataKey, dataKeys)
