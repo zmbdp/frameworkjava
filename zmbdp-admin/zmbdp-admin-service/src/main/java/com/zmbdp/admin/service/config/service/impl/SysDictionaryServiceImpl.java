@@ -101,11 +101,8 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         // 先拷贝 data 里面的数据
         List<DictionaryTypeVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryTypeVO::new);
         // 然后外面的公共数据先 set 进去
-        result.setTotals(list.size());
-        result.setTotalPages(list.size() % dictionaryTypeListReqDTO.getPageSize() == 0 ?
-                (list.size() / dictionaryTypeListReqDTO.getPageSize()) :
-                (list.size() / dictionaryTypeListReqDTO.getPageSize() + 1)
-        );
+        result.setTotals((int) page.getTotal());
+        result.setTotalPages((int) page.getPages());
         // 插入返回对象返回
         result.setList(list);
         return result;
@@ -212,11 +209,8 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         );
         // 然后再构建返回参数
         List<DictionaryDataVo> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVo::new);
-        result.setTotals(list.size());
-        result.setTotalPages(list.size() % dictionaryDataListReqDTO.getPageSize() == 0 ?
-                (list.size() / dictionaryDataListReqDTO.getPageSize()) :
-                (list.size() / dictionaryDataListReqDTO.getPageSize() + 1)
-        );
+        result.setTotals((int) page.getTotal());
+        result.setTotalPages((int) page.getPages());
         result.setList(list);
         return result;
     }

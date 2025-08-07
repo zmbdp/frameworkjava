@@ -1,15 +1,16 @@
 package com.zmbdp.admin.service.config.comtroller;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.api.config.frign.ArgumentServiceApi;
 import com.zmbdp.admin.service.config.service.IArgumentService;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 参数服务
@@ -27,10 +28,32 @@ public class ArgumentController implements ArgumentServiceApi {
      * 新增参数
      *
      * @param argumentAddReqDTO 新增参数请求 DTO
-     * @return 数据库的 id
+     * @return 数据库 id
      */
     @PostMapping("/add")
     public Result<Long> addArgument(@RequestBody @Validated ArgumentAddReqDTO argumentAddReqDTO) {
         return Result.success(argumentService.addArgument(argumentAddReqDTO));
     }
+
+    /**
+     * 获取参数列表, 模糊查询 name
+     *
+     * @param argumentListReqDTO 查看参数 DTO
+     * @return 符合要求的参数列表
+     */
+    @GetMapping("/list")
+    public Result<BasePageVO<ArgumentVO>> listArgument(@Validated ArgumentListReqDTO argumentListReqDTO) {
+        return Result.success(argumentService.listArgument(argumentListReqDTO));
+    }
+
+//    /**
+//     * 编辑参数
+//     *
+//     * @param argumentEditReqDTO 编辑参数DTO
+//     * @return 数据库 id
+//     */
+//    @PostMapping("/edit")
+//    public Result<Long> editArgument(@RequestBody @Validated ArgumentEditReqDTO argumentEditReqDTO) {
+//        return Result.success(argumentService.editArgument(argumentEditReqDTO));
+//    }
 }

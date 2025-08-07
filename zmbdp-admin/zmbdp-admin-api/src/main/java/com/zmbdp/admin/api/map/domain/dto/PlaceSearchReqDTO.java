@@ -23,7 +23,7 @@ public class PlaceSearchReqDTO extends BasePageReqDTO {
     private Long id;
 
     /**
-     * 0：[默认] 不限制当前城市，会召回其他城市的poi
+     * 0：[默认] 不限制当前城市，会召回其他城市的 poi
      * 1：仅限制在当前城市
      */
     @NotNull(message = "请求区域限制不能为空")

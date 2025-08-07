@@ -1,15 +1,22 @@
 package com.zmbdp.admin.service.config.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.service.config.domain.entity.SysArgument;
 import com.zmbdp.admin.service.config.mapper.SysArgumentMapper;
 import com.zmbdp.admin.service.config.service.IArgumentService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 参数服务实现类
@@ -46,5 +53,34 @@ public class ArgumentServiceImpl implements IArgumentService {
         BeanCopyUtil.copyProperties(argumentAddReqDTO, sysArgument);
         sysArgumentMapper.insert(sysArgument);
         return sysArgument.getId();
+    }
+
+    /**
+     * 获取参数列表, 模糊查询 name
+     *
+     * @param argumentListReqDTO 查看参数 DTO
+     * @return 符合要求的参数列表
+     */
+    @Override
+    public BasePageVO<ArgumentVO> listArgument(ArgumentListReqDTO argumentListReqDTO) {
+        // 查询数据库，查出所有符合的参数列表
+        LambdaQueryWrapper<SysArgument> queryWrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(argumentListReqDTO.getConfigKey())) {
+            queryWrapper.eq(SysArgument::getConfigKey, argumentListReqDTO.getConfigKey());
+        }
+        if (StringUtils.isNotBlank(argumentListReqDTO.getName())) {
+            queryWrapper.like(SysArgument::getName, argumentListReqDTO.getName());
+        }
+        Page<SysArgument> page = sysArgumentMapper.selectPage(
+                new Page<>(argumentListReqDTO.getPageNo().longValue(), argumentListReqDTO.getPageSize().longValue()),
+                queryWrapper
+        );
+        // 转换对象设置参数返回
+        List<ArgumentVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), ArgumentVO::new);
+        BasePageVO<ArgumentVO> result = new BasePageVO<>();
+        result.setTotals((int) page.getTotal());
+        result.setTotalPages((int) page.getPages());
+        result.setList(list);
+        return result;
     }
 }

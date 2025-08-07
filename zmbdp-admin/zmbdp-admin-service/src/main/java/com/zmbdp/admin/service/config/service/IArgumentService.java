@@ -1,6 +1,9 @@
 package com.zmbdp.admin.service.config.service;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
+import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 
 /**
  * 参数服务接口
@@ -15,4 +18,12 @@ public interface IArgumentService {
      * @return 数据库的 id
      */
     Long addArgument(ArgumentAddReqDTO argumentAddReqDTO);
+
+    /**
+     * 获取参数列表, 模糊查询 name
+     *
+     * @param argumentListReqDTO 查看参数 DTO
+     * @return 符合要求的参数列表
+     */
+    BasePageVO<ArgumentVO> listArgument(ArgumentListReqDTO argumentListReqDTO);
 }
