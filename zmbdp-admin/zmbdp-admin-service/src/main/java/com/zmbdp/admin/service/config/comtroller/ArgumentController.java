@@ -6,7 +6,7 @@ import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.api.config.frign.ArgumentServiceApi;
-import com.zmbdp.admin.service.config.service.IArgumentService;
+import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ArgumentController implements ArgumentServiceApi {
 
     @Autowired
-    private IArgumentService argumentService;
+    private ISysArgumentServiceImpl argumentService;
 
     /*=============================================    前端调用    =============================================*/
 

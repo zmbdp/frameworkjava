@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.zmbdp.admin.api.map.constants.MapConstants;
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
+import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
 import com.zmbdp.admin.service.map.domain.dto.*;
 import com.zmbdp.admin.service.map.domain.entity.SysRegion;
 import com.zmbdp.admin.service.map.mapper.RegionMapper;
@@ -38,6 +39,12 @@ public class MapServiceImpl implements IMapService {
      */
     @Autowired
     private RegionMapper regionMapper;
+
+    /**
+     * 参数服务对象
+     */
+    @Autowired
+    private ISysArgumentServiceImpl sysArgumentService;
 
     /**
      * redis 服务对象
@@ -113,9 +120,9 @@ public class MapServiceImpl implements IMapService {
      */
     private void loadCityHotListInfo(List<SysRegion> cityList) {
         // 先获取热门城市数据
-        // 2 设置 9 个热门城市
-        String ids = "1,2,9,22,94,121,217,231,272";
-        // 3 获取热门城市数据
+        // 从数据库获取 9 个热门城市字符串
+        String ids = sysArgumentService.getByConfigKey(MapConstants.CONFIG_KEY).getValue();
+        // 获取热门城市数据
         Set<Long> idList = new HashSet<>();
         for (String id : ids.split(",")) {
             idList.add(Long.valueOf(id));
@@ -128,7 +135,7 @@ public class MapServiceImpl implements IMapService {
             }
         }
         List<SysRegionDTO> hotCityList = BeanCopyUtil.copyListProperties(sysRegionList, SysRegionDTO::new);
-        // 4 设置缓存
+        // 设置缓存
         CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, hotCityList, caffeineCache, 120L, TimeUnit.MINUTES);
     }
 
@@ -273,9 +280,9 @@ public class MapServiceImpl implements IMapService {
         if (resultDTO != null && !resultDTO.isEmpty()) {
             return resultDTO;
         }
-        // 2 设置 9 个热门城市
-        String ids = "1,2,9,22,94,121,217,231,272";
-        // 3 获取热门城市数据
+        // 从数据库获取 9 个热门城市的字符串
+        String ids = sysArgumentService.getByConfigKey(MapConstants.CONFIG_KEY).getValue();
+        // 获取热门城市数据
         List<Long> idList = new ArrayList<>();
         resultDTO = new ArrayList<>();
         for (String id : ids.split(",")) {
@@ -286,7 +293,7 @@ public class MapServiceImpl implements IMapService {
             BeanUtils.copyProperties(sysRegion, sysRegionDTO);
             resultDTO.add(sysRegionDTO);
         }
-        // 4 设置缓存
+        // 设置缓存
         CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, resultDTO, caffeineCache, 120L, TimeUnit.MINUTES);
         return resultDTO;
     }
