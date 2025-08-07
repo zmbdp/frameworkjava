@@ -46,14 +46,14 @@ public class ArgumentController implements ArgumentServiceApi {
         return Result.success(argumentService.listArgument(argumentListReqDTO));
     }
 
-//    /**
-//     * 编辑参数
-//     *
-//     * @param argumentEditReqDTO 编辑参数DTO
-//     * @return 数据库 id
-//     */
-//    @PostMapping("/edit")
-//    public Result<Long> editArgument(@RequestBody @Validated ArgumentEditReqDTO argumentEditReqDTO) {
-//        return Result.success(argumentService.editArgument(argumentEditReqDTO));
-//    }
+    /**
+     * 编辑参数
+     *
+     * @param argumentEditReqDTO 编辑参数 DTO
+     * @return 数据库 id
+     */
+    @PostMapping("/edit")
+    public Result<Long> editArgument(@RequestBody @Validated ArgumentEditReqDTO argumentEditReqDTO) {
+        return Result.success(argumentService.editArgument(argumentEditReqDTO));
+    }
 }

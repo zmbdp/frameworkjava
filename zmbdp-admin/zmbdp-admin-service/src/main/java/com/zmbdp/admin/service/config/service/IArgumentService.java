@@ -1,6 +1,7 @@
 package com.zmbdp.admin.service.config.service;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
@@ -26,4 +27,12 @@ public interface IArgumentService {
      * @return 符合要求的参数列表
      */
     BasePageVO<ArgumentVO> listArgument(ArgumentListReqDTO argumentListReqDTO);
+
+    /**
+     * 编辑参数
+     *
+     * @param argumentEditReqDTO 编辑参数 DTO
+     * @return 数据库 id
+     */
+    Long editArgument(ArgumentEditReqDTO argumentEditReqDTO);
 }

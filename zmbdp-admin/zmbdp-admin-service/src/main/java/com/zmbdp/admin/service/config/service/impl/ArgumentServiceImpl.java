@@ -3,6 +3,7 @@ package com.zmbdp.admin.service.config.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentAddReqDTO;
+import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.service.config.domain.entity.SysArgument;
@@ -82,5 +83,39 @@ public class ArgumentServiceImpl implements IArgumentService {
         result.setTotalPages((int) page.getPages());
         result.setList(list);
         return result;
+    }
+
+    /**
+     * 编辑参数
+     *
+     * @param argumentEditReqDTO 编辑参数 DTO
+     * @return 数据库 id
+     */
+    @Override
+    public Long editArgument(ArgumentEditReqDTO argumentEditReqDTO) {
+        // 根据参数业务逐渐查询出信息
+        SysArgument sysArgument = sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
+                .eq(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
+        );
+        if (sysArgument == null) {
+            log.warn("ArgumentServiceImpl.editArgument: [参数业务主键不存在: {} ]", argumentEditReqDTO);
+            throw new ServiceException("参数业务主键不存在");
+        }
+        // 说明存在这个参数主键，但是名字不能重复，就是说再主键不同的情况下，name 相同了
+        if (sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
+                .ne(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
+                .eq(SysArgument::getName, argumentEditReqDTO.getName())) != null
+        ) {
+            log.warn("ArgumentServiceImpl.editArgument: [参数名称已存在: {} ]", argumentEditReqDTO);
+            throw new ServiceException("参数名称已存在");
+        }
+        // 这里就说明可以修改了
+        sysArgument.setName(argumentEditReqDTO.getName());
+        sysArgument.setValue(argumentEditReqDTO.getValue());
+        if (StringUtils.isNotBlank(argumentEditReqDTO.getRemark())) {
+            sysArgument.setRemark(argumentEditReqDTO.getRemark());
+        }
+        sysArgumentMapper.updateById(sysArgument);
+        return sysArgument.getId();
     }
 }
