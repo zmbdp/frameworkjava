@@ -4,11 +4,13 @@ import com.zmbdp.common.domain.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
+import javax.crypto.SecretKey;
 import java.util.Map;
 
 /**
- * Jwt工具类
+ * Jwt 工具类
  */
 public class JwtUtil {
 
@@ -20,7 +22,8 @@ public class JwtUtil {
      * @return 令牌
      */
     public static String createToken(Map<String, Object> claims, String secret) {
-        return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret).compact();
+        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        return Jwts.builder().setClaims(claims).signWith(key, SignatureAlgorithm.HS512).compact();
     }
 
     /**
@@ -31,7 +34,8 @@ public class JwtUtil {
      * @return 数据声明
      */
     public static Claims parseToken(String token, String secret) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 
     /**
@@ -61,7 +65,7 @@ public class JwtUtil {
      *
      * @param token  令牌
      * @param secret 密钥
-     * @return 用户ID
+     * @return 用户 ID
      */
     public static String getUserId(String token, String secret) {
         Claims claims = parseToken(token, secret);
@@ -69,10 +73,10 @@ public class JwtUtil {
     }
 
     /**
-     * 根据数据声明获取用户ID
+     * 根据数据声明获取用户 ID
      *
      * @param claims 数据声明
-     * @return 用户ID
+     * @return 用户 ID
      */
     public static String getUserId(Claims claims) {
         return getValue(claims, SecurityConstants.USER_ID);
@@ -121,7 +125,14 @@ public class JwtUtil {
         return getValue(claims, SecurityConstants.USER_FROM);
     }
 
-    public static String getValue(Claims claims, String key) {
+    /**
+     * 从令牌中获取各种各样的字段
+     *
+     * @param claims 数据声明
+     * @param key    键
+     * @return 值
+     */
+    private static String getValue(Claims claims, String key) {
         Object value = claims.get(key);
         if (value == null) {
             return "";

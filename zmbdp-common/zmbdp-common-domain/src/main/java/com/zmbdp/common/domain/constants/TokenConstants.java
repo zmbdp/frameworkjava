@@ -8,11 +8,6 @@ package com.zmbdp.common.domain.constants;
 public class TokenConstants {
 
     /**
-     * 令牌的秘钥
-     */
-//    public final static String SECRET = "biteabcdefghijklmnopqrstuvwxyz";
-
-    /**
      * 令牌前缀
      */
     public final static String PREFIX = "Bearer ";

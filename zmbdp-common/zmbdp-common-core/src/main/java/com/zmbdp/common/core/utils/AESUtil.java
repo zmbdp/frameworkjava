@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * AES 加密工具类
+ *
+ * @author 稚名不带撇
  */
 public class AESUtil {
 
@@ -17,6 +19,7 @@ public class AESUtil {
 
     /**
      * aes 加密
+     *
      * @param data 原始数据
      * @return 加密后的数据
      */
@@ -29,6 +32,7 @@ public class AESUtil {
 
     /**
      * aes 解密
+     *
      * @param data 加密后的数据
      * @return 原始数据
      */

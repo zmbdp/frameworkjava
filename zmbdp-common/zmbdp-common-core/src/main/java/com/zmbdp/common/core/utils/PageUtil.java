@@ -2,6 +2,8 @@ package com.zmbdp.common.core.utils;
 
 /**
  * 分页工具类
+ *
+ * @author 稚名不带撇
  */
 public class PageUtil {
 

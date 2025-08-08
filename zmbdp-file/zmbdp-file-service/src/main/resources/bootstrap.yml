@@ -17,11 +17,11 @@ spring:
         server-addr: ${NACOS_ADDR}
         file-extension: yaml
         # 配置共享的配置
-#        shared-configs:
+        shared-configs:
 #            # 可以这么拿到环境变量的值, 还有下面一种方法也可以
 ##          - data-id: share-redis-${RUN_ENV}.yaml
-#          - data-id: share-redis-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-#            refresh: true # 配置是否支持动态刷新
+          - data-id: share-redis-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true # 配置是否支持动态刷新
 #          - data-id: share-caffeine-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
 #            refresh: true # 配置是否支持动态刷新
 #          - data-id: share-rabbitmq-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}

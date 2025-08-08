@@ -3,6 +3,7 @@ package com.zmbdp.common.cache.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author 稚名不带撇
  */
+@RefreshScope
 @Configuration
 public class CaffeineConfig {
 

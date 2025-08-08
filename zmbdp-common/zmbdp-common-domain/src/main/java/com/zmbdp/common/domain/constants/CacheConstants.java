@@ -18,7 +18,7 @@ public class CacheConstants {
     public final static long EXPIRATION = 720;
 
     /**
-     * 缓存 token 的刷新时间，默认 120（分钟）
+     * 缓存 token 到多久就续期，默认 120（分钟）
      */
     public final static long REFRESH_TIME = 120;
 }

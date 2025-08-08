@@ -41,7 +41,7 @@
         <commons-collections4.version>4.4</commons-collections4.version>
         <aliyun.oss.version>3.17.4</aliyun.oss.version>
         <jakarta.version>4.0.0</jakarta.version>
-        <hutool.version>5.8.22</hutool.version>
+        <hutool.version>5.8.25</hutool.version>
         <jjwt.version>0.11.5</jjwt.version>
     </properties>
 
