@@ -2,13 +2,15 @@ package com.zmbdp.common.domain.constants;
 
 /**
  * token相关常量
+ *
+ * @author 稚名不带撇
  */
 public class TokenConstants {
 
     /**
      * 令牌的秘钥
      */
-    public final static String SECRET = "biteabcdefghijklmnopqrstuvwxyz";
+//    public final static String SECRET = "biteabcdefghijklmnopqrstuvwxyz";
 
     /**
      * 令牌前缀

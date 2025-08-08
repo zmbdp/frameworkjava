@@ -26,5 +26,8 @@ public class CommonConstants {
      */
     public final static String EMPTY_STR = "";
 
+    /**
+     * 异步线程池名字
+     */
     public final static String ASYNCHRONOUS_THREADS_BEAN_NAME = "threadPoolTaskExecutor";
 }

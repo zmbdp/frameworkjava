@@ -2,6 +2,8 @@ package com.zmbdp.common.domain.constants;
 
 /**
  * 缓存 token 的常量
+ *
+ * @author 稚名不带撇
  */
 public class CacheConstants {
     /**
