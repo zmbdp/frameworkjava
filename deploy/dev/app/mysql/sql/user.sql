@@ -1,3 +1,4 @@
+use frameworkjava_dev;
 drop table if exists `sys_user`;
 create table `sys_user`
 (
@@ -13,4 +14,4 @@ create table `sys_user`
 ) engine=innodb auto_increment=10000001 character set=utf8mb4 comment='管理端人员表';
 
 insert into `sys_user` (nick_name, phone_number, password, identity, remark, status) values
-('admin', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '20e3e65b9ddd1040352b53da81553d0c', 'super_admin', null, 'enable');
+('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '20e3e65b9ddd1040352b53da81553d0c', 'super_admin', null, 'enable');

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.StandardCharsets;
 
 /**
- * AES加密工具类
+ * AES 加密工具类
  */
 public class AESUtil {
 
@@ -16,7 +16,7 @@ public class AESUtil {
     private static final byte[] KEYS = "12345678abcdefgh".getBytes(StandardCharsets.UTF_8);
 
     /**
-     * aes加密
+     * aes 加密
      * @param data 原始数据
      * @return 加密后的数据
      */
@@ -28,7 +28,7 @@ public class AESUtil {
     }
 
     /**
-     * aes解密
+     * aes 解密
      * @param data 加密后的数据
      * @return 原始数据
      */
