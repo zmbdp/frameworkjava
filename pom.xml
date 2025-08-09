@@ -23,6 +23,7 @@
         <module>zmbdp-common</module>
         <module>zmbdp-file</module>
         <module>zmbdp-admin</module>
+        <module>zmbdp-portal</module>
     </modules>
 
     <properties>
