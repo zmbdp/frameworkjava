@@ -8,6 +8,7 @@ import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.VerifyUtil;
+import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
@@ -76,19 +77,19 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         // 然后再使用 DigestUtil.sha256Hex() 方法加密成不可逆的密码
         String passwordEncrypt = DigestUtil.sha256Hex(password);
-        // 最后和数据库的比较
+        // 和数据库的比较
         if (!passwordEncrypt.equals(sysUser.getPassword())) {
             throw new ServiceException("密码不正确", ResultCode.INVALID_PARA.getCode());
         }
         // 校验用户的状态
-        if (sysUser.getStatus().equals("disable")) {
+        if (sysUser.getStatus().equals(UserConstants.USER_DISABLE)) {
             throw new ServiceException(ResultCode.USER_DISABLE);
         }
         // 设置登录信息
         LoginUserDTO loginUserDTO = new LoginUserDTO();
         loginUserDTO.setUserId(sysUser.getId());
         loginUserDTO.setUserName(sysUser.getNickName());
-        loginUserDTO.setUserFrom("sys");
+        loginUserDTO.setUserFrom(UserConstants.USER_FROM_TU_B);
         // 都成功之后设置 token 返回
         return tokenService.createToken(loginUserDTO, secret);
     }

@@ -11,22 +11,22 @@ import lombok.Getter;
 public enum RejectType {
 
     /**
-     * AbortPolicy策略 枚举值：1
+     * AbortPolicy 策略 枚举值：1
      */
     AbortPolicy(1),
 
     /**
-     * CallerRunsPolicy策略 枚举值：2
+     * CallerRunsPolicy 策略 枚举值：2
      */
     CallerRunsPolicy(2),
 
     /**
-     * DiscardOldestPolicy策略 枚举值：3
+     * DiscardOldestPolicy 策略 枚举值：3
      */
     DiscardOldestPolicy(3),
 
     /**
-     * DiscardPolicy策略 枚举值：4
+     * DiscardPolicy 策略 枚举值：4
      */
     DiscardPolicy(4);
 
