@@ -1,12 +1,13 @@
 package com.zmbdp.admin.service.user.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.DigestUtil;
-import com.zmbdp.admin.service.user.domain.entity.SysUser;
-import com.zmbdp.common.core.utils.AESUtil;
+import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
+import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
+import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
+import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -48,6 +49,12 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Value("${jwt.token.secret}")
     private String secret;
+
+    /**
+     * 字典服务
+     */
+    @Autowired
+    private ISysDictionaryService sysDictionaryService;
 
     /**
      * B端用户登录
@@ -92,5 +99,67 @@ public class SysUserServiceImpl implements ISysUserService {
         loginUserDTO.setUserFrom(UserConstants.USER_FROM_TU_B);
         // 都成功之后设置 token 返回
         return tokenService.createToken(loginUserDTO, secret);
+    }
+
+    /**
+     * 新增或编辑用户
+     *
+     * @param sysUserDTO B端用户信息
+     * @return 用户 ID
+     */
+    @Override
+    public Long addOrEdit(SysUserDTO sysUserDTO) {
+        SysUser sysUser = new SysUser();
+        // 根据用户 ID 判断是新增还是编辑
+        if (sysUserDTO.getUserId() == null) {
+            // 说明是新增
+            // 先执行各种各样的校验
+            validateSysUser(sysUserDTO);
+            // 判断完成后，执行新增用户逻辑
+            sysUser.setPhoneNumber(
+                    // 加密手机号
+                    AESUtil.encryptHex(sysUserDTO.getPhoneNumber())
+            );
+            sysUser.setIdentity(sysUserDTO.getIdentity());
+        }
+        // 存储名字，密码，id 这些
+        sysUser.setId(sysUserDTO.getUserId());
+        sysUser.setNickName(sysUserDTO.getNickName());
+        // 密码要加密
+        sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
+        // 判断用户状态 是正常还是停用
+        if (sysDictionaryService.getDicDataByKey(sysUserDTO.getStatus()) == null) {
+            throw new ServiceException("用户状态错误", ResultCode.INVALID_PARA.getCode());
+        }
+        sysUser.setStatus(sysUserDTO.getStatus());
+        sysUser.setRemark(sysUserDTO.getRemark());
+        // 根据主键判断是更新还是新增，主键存在并且数据库中也存在就是更新，不存在就是新增
+        sysUserMapper.insertOrUpdate(sysUser);
+        // 踢人逻辑
+        // 表示如果这个用户在数据库中存在，并且要让他的状态变成停用，就是踢人
+        if (sysUserDTO.getUserId() != null && sysUserDTO.getStatus().equals(UserConstants.USER_DISABLE)) {
+            tokenService.delLoginUser(sysUserDTO.getUserId(), UserConstants.USER_FROM_TU_B);
+        }
+        return sysUser.getId();
+    }
+
+    private void validateSysUser(SysUserDTO sysUserDTO) {
+        // 先校验手机号
+        if (!VerifyUtil.checkPhone(sysUserDTO.getPhoneNumber())) {
+            throw new ServiceException("手机格式错误", ResultCode.INVALID_PARA.getCode());
+        }
+        // 校验密码
+        if (StringUtils.isEmpty(sysUserDTO.getPassword()) || !sysUserDTO.checkPassword()) {
+            throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
+        }
+        // 手机号唯一性判断
+        SysUser existSysUser = sysUserMapper.selectByPhoneNumber(AESUtil.encryptHex(sysUserDTO.getPhoneNumber()));
+        if (existSysUser != null) {
+            throw new ServiceException("当前手机号已注册", ResultCode.INVALID_PARA.getCode());
+        }
+        // 判断身份信息
+        if (StringUtils.isEmpty(sysUserDTO.getIdentity()) || sysDictionaryService.getDicDataByKey(sysUserDTO.getIdentity()) == null) {
+            throw new ServiceException("用户身份错误", ResultCode.INVALID_PARA.getCode());
+        }
     }
 }

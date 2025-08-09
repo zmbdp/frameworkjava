@@ -1,6 +1,7 @@
 package com.zmbdp.admin.service.user.controller;
 
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
+import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.TokenVO;
@@ -34,5 +35,16 @@ public class SysUserController {
     public Result<TokenVO> login(@Validated @RequestBody PasswordLoginDTO passwordLoginDTO) {
         TokenDTO tokenDTO = sysUserService.login(passwordLoginDTO);
         return Result.success(tokenDTO.convertToVo());
+    }
+
+    /**
+     * 新增或编辑用户
+     *
+     * @param sysUserDTO B端用户信息
+     * @return 用户 ID
+     */
+    @PostMapping("/add_edit")
+    public Result<Long> addOrEditUser(@RequestBody SysUserDTO sysUserDTO) {
+        return Result.success(sysUserService.addOrEdit(sysUserDTO));
     }
 }

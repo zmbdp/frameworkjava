@@ -1,4 +1,5 @@
 use frameworkjava_dev;
+drop table if exists `sys_argument`;
 create table `sys_argument`
 (
     `id`         bigint(20) unsigned not null auto_increment primary key comment '自增主键',

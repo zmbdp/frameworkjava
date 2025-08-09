@@ -1,4 +1,5 @@
 use frameworkjava_dev;
+drop table if exists `sys_dictionary_type`;
 create table `sys_dictionary_type`
 (
     `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
@@ -8,7 +9,11 @@ create table `sys_dictionary_type`
     `status`   tinyint(1) default 1 comment '字典类型状态 1正常 0停用',
     unique index idx_type_key (`type_key`)
 ) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '字典类型表';
+insert into `sys_dictionary_type` (type_key, value, remark, status)
+values ('admin', '管理员', '', 1),
+       ('common_status', '公共状态', '', 1);
 
+drop table if exists `sys_dictionary_data`;
 create table `sys_dictionary_data`
 (
     `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
@@ -21,3 +26,8 @@ create table `sys_dictionary_data`
     key        idx_type_key (`type_key`),
     unique index ui(`type_key`, `data_key`)
 ) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '字典数据表';
+insert into `sys_dictionary_data` (type_key, data_key, value, remark, sort, status)
+values ('admin', 'super_admin', '超级管理员', '', 1, 1),
+       ('admin', 'platform_admin', '平台管理员', '', 1, 1),
+       ('common_status', 'enable', '启用', '', 1, 1),
+       ('common_status', 'disable', '停用', '', 1, 1);

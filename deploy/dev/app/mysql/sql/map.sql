@@ -1,4 +1,5 @@
 use frameworkjava_dev;
+drop table if exists `sys_region`;
 create table `sys_region`
 (
     `id`          bigint(20) not null auto_increment comment '主键id',

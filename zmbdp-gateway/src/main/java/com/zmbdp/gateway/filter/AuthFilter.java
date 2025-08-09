@@ -2,8 +2,10 @@ package com.zmbdp.gateway.filter;
 
 import com.zmbdp.common.core.utils.ServletUtil;
 import com.zmbdp.common.core.utils.StringUtil;
+import com.zmbdp.common.domain.constants.HttpConstants;
 import com.zmbdp.common.domain.constants.SecurityConstants;
 import com.zmbdp.common.domain.constants.TokenConstants;
+import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.security.utils.JwtUtil;
@@ -91,10 +93,20 @@ public class AuthFilter implements GlobalFilter, Ordered {
             // 拿到令牌，但是用户信息为空，说明令牌已过期
             return unauthorizedResponse(exchange, ResultCode.LOGIN_STATUS_OVERTIME);
         }
+        // 再判断用户来源是否合法
+        String userFrom = JwtUtil.getUserFrom(claims);
+        // 如果路径是系统路径，但是用户不是系统来源的话
+        if (url.contains(HttpConstants.SYS_USER_PATH) && !UserConstants.USER_FROM_TU_B.equals(userFrom)) {
+            return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
+        }
+        // TODO: 验证用户权限
+        // 如果路径是非系统路径，但是用户是系统来源的话
+//        if (!url.contains(HttpConstants.APP_USER_PATH) && UserConstants.USER_FROM_TU_B.equals(userFrom)) {
+//            return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
+//        }
         // 根据令牌获取用户信息给下面的 controller 层
         String userId = JwtUtil.getUserId(claims);
         String userName = JwtUtil.getUserName(claims);
-        String userFrom = JwtUtil.getUserFrom(claims);
         if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
             return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
         }
@@ -130,7 +142,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
      * @return 无
      */
     private Mono<Void> unauthorizedResponse(ServerWebExchange exchange, ResultCode resultCode) {
-        log.error("[鉴权处理异常]请求路径: {}", exchange.getRequest().getPath());
+        log.error("AuthFilter.unauthorizedResponse err [鉴权处理异常] 请求路径: {}", exchange.getRequest().getPath());
         int retCode = Integer.parseInt(String.valueOf(resultCode.getCode()).substring(0, 3));
         return ServletUtil.webFluxResponseWriter(exchange.getResponse(), HttpStatus.valueOf(retCode), resultCode.getErrMsg(), resultCode.getCode());
     }
