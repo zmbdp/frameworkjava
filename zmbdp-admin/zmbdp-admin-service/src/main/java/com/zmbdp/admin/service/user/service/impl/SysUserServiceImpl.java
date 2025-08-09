@@ -9,6 +9,7 @@ import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.AESUtil;
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -18,12 +19,14 @@ import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * B端用户服务 service 层
@@ -180,6 +183,27 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public List<SysUserDTO> getUserList(SysUserListReqDTO sysUserListReqDTO) {
-
+        // 先转换成数据库的 DTO
+        SysUser searchSysUser = new SysUser();
+        BeanUtils.copyProperties(sysUserListReqDTO, searchSysUser);
+        searchSysUser.setPhoneNumber(
+                AESUtil.encryptHex(sysUserListReqDTO.getPhoneNumber())
+        );
+        // 然后根据数据库的 DTO 去查询数据
+        List<SysUser> sysUserList = sysUserMapper.selectList(searchSysUser);
+        // 最后封装结果
+        return sysUserList.stream()
+                .map(sysUser -> {
+                    SysUserDTO sysUserDTO = new SysUserDTO();
+                    sysUserDTO.setUserId(sysUser.getId());
+                    sysUserDTO.setPhoneNumber(
+                            AESUtil.decryptHex(sysUser.getPhoneNumber())
+                    );
+                    sysUserDTO.setNickName(sysUser.getNickName());
+                    sysUserDTO.setIdentity(sysUser.getIdentity());
+                    sysUserDTO.setStatus(sysUser.getStatus());
+                    sysUserDTO.setRemark(sysUser.getRemark());
+                    return sysUserDTO;
+                }).collect(Collectors.toList());
     }
 }

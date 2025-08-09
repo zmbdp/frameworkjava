@@ -16,12 +16,19 @@
             <if test = "id != null and id != ''">
                 and id = #{id}
             </if>
+            <if test = "identity != null and identity != ''">
+                and identity = #{identity}
+            </if>
             <if test = "phoneNumber != null and phoneNumber != ''">
                 and phone_number = #{phoneNumber}
+            </if>
+            <if test = "nickName != null and nickName != ''">
+                and nick_name = #{nickName}
             </if>
             <if test = "status != null and status != ''">
                 and status = #{status}
             </if>
         </where>
     </select>
+
 </mapper>
