@@ -27,7 +27,7 @@ public class BasePageDTO<T> {
     /**
      * 计算总页数
      *
-     * @param totals 总数量
+     * @param totals   总数量
      * @param pageSize 页大小
      * @return 页数
      */

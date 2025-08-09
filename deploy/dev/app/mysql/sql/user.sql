@@ -14,4 +14,4 @@ create table `sys_user`
 ) engine=innodb auto_increment=10000001 character set=utf8mb4 comment='管理端人员表';
 
 insert into `sys_user` (nick_name, phone_number, password, identity, remark, status) values
-('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225', 'super_admin', null, 'enable');
+('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', null, 'enable');
