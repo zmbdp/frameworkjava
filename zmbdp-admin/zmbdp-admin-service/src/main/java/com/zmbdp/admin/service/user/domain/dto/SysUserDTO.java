@@ -65,19 +65,4 @@ public class SysUserDTO {
         // 允许字母、数字和 !@#$%^&* 等特殊字符
         return this.password.matches("^[a-zA-Z0-9!@#$%^&*]+$");
     }
-
-    /**
-     * DTO转换 VO
-     * @return B端用户 VO
-     */
-    public SysUserVo convertToVO() {
-        SysUserVo sysUserVo = new SysUserVo();
-        sysUserVo.setUserId(this.userId);
-        sysUserVo.setIdentity(this.identity);
-        sysUserVo.setPhoneNumber(this.phoneNumber);
-        sysUserVo.setNickName(this.nickName);
-        sysUserVo.setStatus(this.status);
-        sysUserVo.setRemark(this.remark);
-        return sysUserVo;
-    }
 }

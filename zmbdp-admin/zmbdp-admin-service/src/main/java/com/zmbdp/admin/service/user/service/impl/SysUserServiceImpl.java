@@ -9,7 +9,6 @@ import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.AESUtil;
-import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -191,19 +190,18 @@ public class SysUserServiceImpl implements ISysUserService {
         );
         // 然后根据数据库的 DTO 去查询数据
         List<SysUser> sysUserList = sysUserMapper.selectList(searchSysUser);
-        // 最后封装结果
+        // 最后封装结果返回
         return sysUserList.stream()
                 .map(sysUser -> {
                     SysUserDTO sysUserDTO = new SysUserDTO();
+                    // 使用 Bean 拷贝工具拷贝大部分字段
+                    BeanUtils.copyProperties(sysUser, sysUserDTO);
+                    // 特殊处理需要解密的手机号
+                    sysUserDTO.setPhoneNumber(AESUtil.decryptHex(sysUser.getPhoneNumber()));
+                    // 特殊处理字段名称不一致的情况
                     sysUserDTO.setUserId(sysUser.getId());
-                    sysUserDTO.setPhoneNumber(
-                            AESUtil.decryptHex(sysUser.getPhoneNumber())
-                    );
-                    sysUserDTO.setNickName(sysUser.getNickName());
-                    sysUserDTO.setIdentity(sysUser.getIdentity());
-                    sysUserDTO.setStatus(sysUser.getStatus());
-                    sysUserDTO.setRemark(sysUser.getRemark());
                     return sysUserDTO;
                 }).collect(Collectors.toList());
+
     }
 }
