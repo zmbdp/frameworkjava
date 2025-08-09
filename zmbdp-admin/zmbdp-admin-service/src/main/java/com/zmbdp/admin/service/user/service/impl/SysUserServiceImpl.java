@@ -4,6 +4,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
+import com.zmbdp.admin.service.user.domain.dto.SysUserListReqDTO;
 import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
@@ -21,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * B端用户服务 service 层
@@ -143,6 +146,12 @@ public class SysUserServiceImpl implements ISysUserService {
         return sysUser.getId();
     }
 
+    /**
+     * 校验新增的用户信息
+     *
+     * @param sysUserDTO 用户信息
+     * @throws ServiceException 校验失败时抛出异常
+     */
     private void validateSysUser(SysUserDTO sysUserDTO) {
         // 先校验手机号
         if (!VerifyUtil.checkPhone(sysUserDTO.getPhoneNumber())) {
@@ -161,5 +170,16 @@ public class SysUserServiceImpl implements ISysUserService {
         if (StringUtils.isEmpty(sysUserDTO.getIdentity()) || sysDictionaryService.getDicDataByKey(sysUserDTO.getIdentity()) == null) {
             throw new ServiceException("用户身份错误", ResultCode.INVALID_PARA.getCode());
         }
+    }
+
+    /**
+     * 查询 B端用户
+     *
+     * @param sysUserListReqDTO 用户查询 DTO
+     * @return B端用户列表
+     */
+    @Override
+    public List<SysUserDTO> getUserList(SysUserListReqDTO sysUserListReqDTO) {
+
     }
 }
