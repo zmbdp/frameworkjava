@@ -1,14 +1,14 @@
-package com.zmbdp.admin.service.user.domain.vo;
+package com.zmbdp.admin.service.user.domain.dto;
 
 import lombok.Data;
 
 import java.io.Serializable;
 
 /**
- * B端用户查询VO
+ * B端用户查询DTO
  */
 @Data
-public class SysUserVo implements Serializable {
+public class SysUserListReqDTO implements Serializable {
 
     /**
      * 用户 ID
@@ -16,7 +16,7 @@ public class SysUserVo implements Serializable {
     private Long userId;
 
     /**
-     * 用户身份
+     * 身份
      */
     private String identity;
 
@@ -34,9 +34,4 @@ public class SysUserVo implements Serializable {
      * 状态
      */
     private String status;
-
-    /**
-     * 备注
-     */
-    private String remark;
 }

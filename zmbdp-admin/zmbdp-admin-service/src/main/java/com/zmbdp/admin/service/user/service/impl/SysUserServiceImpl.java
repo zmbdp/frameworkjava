@@ -127,7 +127,7 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setNickName(sysUserDTO.getNickName());
         // 密码要加密
         sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
-        // 判断用户状态 是正常还是停用
+        // 判断用户状态 这个状态在数据库中是否存在
         if (sysDictionaryService.getDicDataByKey(sysUserDTO.getStatus()) == null) {
             throw new ServiceException("用户状态错误", ResultCode.INVALID_PARA.getCode());
         }
@@ -136,7 +136,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 根据主键判断是更新还是新增，主键存在并且数据库中也存在就是更新，不存在就是新增
         sysUserMapper.insertOrUpdate(sysUser);
         // 踢人逻辑
-        // 表示如果这个用户在数据库中存在，并且要让他的状态变成停用，就是踢人
+        // 表示如果这个用户在数据库中存在，让他强制下线，这就是踢人
         if (sysUserDTO.getUserId() != null && sysUserDTO.getStatus().equals(UserConstants.USER_DISABLE)) {
             tokenService.delLoginUser(sysUserDTO.getUserId(), UserConstants.USER_FROM_TU_B);
         }

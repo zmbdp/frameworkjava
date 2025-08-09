@@ -7,12 +7,12 @@ package com.zmbdp.common.domain.constants;
  */
 public class UserConstants {
     /**
-     * 表示用户状态为禁用
+     * 表示用户状态为停用
      */
     public static final String USER_DISABLE = "disable";
 
     /**
-     * 表示用户状态为正常
+     * 表示用户状态为启用
      */
     public static final String USER_ENABLE = "enable";
 
