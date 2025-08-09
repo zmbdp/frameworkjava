@@ -34,4 +34,9 @@ public class SysUserListReqDTO implements Serializable {
      * 状态
      */
     private String status;
+
+    /**
+     * 备注
+     */
+    private String remark;
 }

@@ -9,6 +9,7 @@ import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.AESUtil;
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -188,6 +189,7 @@ public class SysUserServiceImpl implements ISysUserService {
         searchSysUser.setPhoneNumber(
                 AESUtil.encryptHex(sysUserListReqDTO.getPhoneNumber())
         );
+        searchSysUser.setId(sysUserListReqDTO.getUserId());
         // 然后根据数据库的 DTO 去查询数据
         List<SysUser> sysUserList = sysUserMapper.selectList(searchSysUser);
         // 最后封装结果返回

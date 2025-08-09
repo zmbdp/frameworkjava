@@ -6,29 +6,35 @@
 
     <select id="selectByPhoneNumber" parameterType="java.lang.String"
             resultType="com.zmbdp.admin.service.user.domain.entity.SysUser">
-        select * from sys_user where phone_number = #{phoneNumber}
+        select *
+        from sys_user
+        where phone_number = #{phoneNumber}
     </select>
 
     <select id="selectList" parameterType="com.zmbdp.admin.service.user.domain.entity.SysUser"
             resultType="com.zmbdp.admin.service.user.domain.entity.SysUser">
         select * from sys_user
         <where>
-            <if test = "id != null and id != ''">
+            <if test="id != null and id != ''">
                 and id = #{id}
             </if>
-            <if test = "identity != null and identity != ''">
+            <if test="identity != null and identity != ''">
                 and identity = #{identity}
             </if>
-            <if test = "phoneNumber != null and phoneNumber != ''">
+            <if test="phoneNumber != null and phoneNumber != ''">
                 and phone_number = #{phoneNumber}
             </if>
-            <if test = "nickName != null and nickName != ''">
+            <if test="nickName != null and nickName != ''">
                 and nick_name = #{nickName}
             </if>
-            <if test = "status != null and status != ''">
+            <if test="status != null and status != ''">
                 and status = #{status}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark like concat('%', #{remark}, '%')
             </if>
         </where>
     </select>
+
 
 </mapper>
