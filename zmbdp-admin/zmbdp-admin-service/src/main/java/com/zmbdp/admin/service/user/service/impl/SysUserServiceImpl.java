@@ -5,6 +5,7 @@ import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserListReqDTO;
+import com.zmbdp.admin.service.user.domain.dto.SysUserLoginDTO;
 import com.zmbdp.admin.service.user.domain.entity.SysUser;
 import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
@@ -205,5 +206,30 @@ public class SysUserServiceImpl implements ISysUserService {
                     return sysUserDTO;
                 }).collect(Collectors.toList());
 
+    }
+
+    /**
+     * 获取 B端登录用户信息
+     *
+     * @return B端用户信息 VO
+     */
+    @Override
+    public SysUserLoginDTO getLoginUser() {
+        // 直接从请求头中获取当前登录用户
+        LoginUserDTO loginUserDTO = tokenService.getLoginUser(secret);
+        // 然后再判断一下是否是正确的
+        if (loginUserDTO == null || loginUserDTO.getUserId() == null) {
+            throw new ServiceException("用户令牌有误", ResultCode.INVALID_PARA.getCode());
+        }
+        // 从数据库中获取用户信息
+        SysUser sysUser = sysUserMapper.selectById(loginUserDTO.getUserId());
+        if (sysUser == null) {
+            throw new ServiceException("用户不存在", ResultCode.INVALID_PARA.getCode());
+        }
+        // 封装结果返回
+        SysUserLoginDTO sysUserLoginDTO = new SysUserLoginDTO();
+        BeanUtils.copyProperties(loginUserDTO, sysUserLoginDTO);
+        BeanUtils.copyProperties(sysUser, sysUserLoginDTO);
+        return sysUserLoginDTO;
     }
 }

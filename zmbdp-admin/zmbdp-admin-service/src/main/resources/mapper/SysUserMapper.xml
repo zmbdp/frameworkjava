@@ -6,8 +6,7 @@
 
     <select id="selectByPhoneNumber" parameterType="java.lang.String"
             resultType="com.zmbdp.admin.service.user.domain.entity.SysUser">
-        select *
-        from sys_user
+        select * from sys_user
         where phone_number = #{phoneNumber}
     </select>
 

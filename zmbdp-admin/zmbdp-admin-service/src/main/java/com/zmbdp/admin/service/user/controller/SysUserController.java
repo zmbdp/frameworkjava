@@ -3,6 +3,7 @@ package com.zmbdp.admin.service.user.controller;
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserListReqDTO;
+import com.zmbdp.admin.service.user.domain.vo.SysUserLoginVO;
 import com.zmbdp.admin.service.user.domain.vo.SysUserVo;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
@@ -11,10 +12,7 @@ import com.zmbdp.common.domain.domain.vo.TokenVO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,5 +62,15 @@ public class SysUserController {
         List<SysUserDTO> sysUserDTOS = sysUserService.getUserList(sysUserListReqDTO);
         List<SysUserVo> result = BeanCopyUtil.copyListProperties(sysUserDTOS, SysUserVo::new);
         return Result.success(result);
+    }
+
+    /**
+     * 获取 B端登录用户信息
+     *
+     * @return B端用户信息 VO
+     */
+    @GetMapping("/login_info/get")
+    public Result<SysUserLoginVO> getLoginUser() {
+        return Result.success(sysUserService.getLoginUser().convertToVO());
     }
 }
