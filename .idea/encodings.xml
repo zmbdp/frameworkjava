@@ -24,5 +24,9 @@
     <file url="file://$PROJECT_DIR$/zmbdp-mstemplate/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-mstemplate/zmbdp-mstemplate-aip/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-mstemplate/zmbdp-mstemplate-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-portal/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-portal/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-portal/zmbdp-portal-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-portal/zmbdp-portal-service/src/main/java" charset="UTF-8" />
   </component>
 </project>

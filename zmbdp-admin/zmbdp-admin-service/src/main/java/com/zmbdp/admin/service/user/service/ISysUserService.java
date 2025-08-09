@@ -41,7 +41,7 @@ public interface ISysUserService {
     /**
      * 获取 B端登录用户信息
      *
-     * @return B端用户信息 VO
+     * @return B端用户信息 DTO
      */
     SysUserLoginDTO getLoginUser();
 }

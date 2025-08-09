@@ -48,7 +48,7 @@ public class SysUserController {
      * @return 用户 ID
      */
     @PostMapping("/add_edit")
-    public Result<Long> addOrEditUser(@RequestBody SysUserDTO sysUserDTO) {
+    public Result<Long> addOrEditUser(@Validated @RequestBody SysUserDTO sysUserDTO) {
         return Result.success(sysUserService.addOrEdit(sysUserDTO));
     }
 

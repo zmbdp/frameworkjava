@@ -211,7 +211,7 @@ public class SysUserServiceImpl implements ISysUserService {
     /**
      * 获取 B端登录用户信息
      *
-     * @return B端用户信息 VO
+     * @return B端用户信息 DTO
      */
     @Override
     public SysUserLoginDTO getLoginUser() {
@@ -228,7 +228,9 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         // 封装结果返回
         SysUserLoginDTO sysUserLoginDTO = new SysUserLoginDTO();
+        // 赋值 redis 的属性
         BeanUtils.copyProperties(loginUserDTO, sysUserLoginDTO);
+        // 赋值数据库的属性
         BeanUtils.copyProperties(sysUser, sysUserLoginDTO);
         return sysUserLoginDTO;
     }
