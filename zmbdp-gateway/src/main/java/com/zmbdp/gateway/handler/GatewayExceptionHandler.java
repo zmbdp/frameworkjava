@@ -29,10 +29,49 @@ import reactor.core.publisher.Mono;
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
     /**
+     * 响应式返回数据
+     *
+     * @param response 响应对象
+     * @param status   http 状态码
+     * @param value    响应内容
+     * @param code     响应码
+     * @return 无
+     */
+    private static Mono<Void> webFluxResponseWriter(
+            ServerHttpResponse response, HttpStatus status,
+            Object value, int code
+    ) {
+        // MediaType.APPLICATION_JSON_VALUE: 响应内容类型设置为 json
+        return webFluxResponseWriter(response, MediaType.APPLICATION_JSON_VALUE, status, value, code);
+    }
+
+    /**
+     * 响应式返回数据
+     *
+     * @param response    响应对象
+     * @param contentType 响应内容类型
+     * @param status      http 状态码
+     * @param value       响应内容
+     * @param code        响应码
+     * @return 无
+     */
+    private static Mono<Void> webFluxResponseWriter(
+            ServerHttpResponse response,
+            String contentType, HttpStatus status,
+            Object value, int code
+    ) {
+        response.setStatusCode(status); //设置 http 响应
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, contentType); //设置响应体内容类型为 json
+        Result<?> result = Result.fail(code, value.toString()); //按照约定响应数据结构，构建响应体内容
+        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.classToJson(result).getBytes());
+        return response.writeWith(Mono.just(dataBuffer)); //将响应体内容写入响应体
+    }
+
+    /**
      * 处理器
      *
      * @param exchange ServerWebExchange
-     * @param ex 异常的信息
+     * @param ex       异常的信息
      * @return 无
      */
     @Override
@@ -58,48 +97,9 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
             errMsg = ex.getMessage();
         }
         // 按照统一状态码的特点，前三位是 http 状态码。从中截取 http 状态码
-        int httpCode = Integer.parseInt(String.valueOf(retCode).substring(0,3));
+        int httpCode = Integer.parseInt(String.valueOf(retCode).substring(0, 3));
         log.error("[网关异常处理]请求路径: {},异常信息: {}, 服务未找到", exchange.getRequest().getPath(), ex.getMessage());
         // 拼接响应体内容
-        return webFluxResponseWriter(response, HttpStatus.valueOf(httpCode),errMsg, retCode);
-    }
-
-    /**
-     * 响应式返回数据
-     *
-     * @param response 响应对象
-     * @param status http 状态码
-     * @param value 响应内容
-     * @param code 响应码
-     * @return 无
-     */
-    private static Mono<Void> webFluxResponseWriter(
-            ServerHttpResponse response, HttpStatus status,
-            Object value, int code
-    ) {
-        // MediaType.APPLICATION_JSON_VALUE: 响应内容类型设置为 json
-        return webFluxResponseWriter(response, MediaType.APPLICATION_JSON_VALUE, status, value, code);
-    }
-
-    /**
-     * 响应式返回数据
-     *
-     * @param response 响应对象
-     * @param contentType 响应内容类型
-     * @param status http 状态码
-     * @param value 响应内容
-     * @param code 响应码
-     * @return 无
-     */
-    private static Mono<Void> webFluxResponseWriter(
-            ServerHttpResponse response,
-            String contentType, HttpStatus status,
-            Object value, int code
-    ) {
-        response.setStatusCode(status); //设置 http 响应
-        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, contentType); //设置响应体内容类型为 json
-        Result<?> result = Result.fail(code, value.toString()); //按照约定响应数据结构，构建响应体内容
-        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.classToJson(result).getBytes());
-        return response.writeWith(Mono.just(dataBuffer)); //将响应体内容写入响应体
+        return webFluxResponseWriter(response, HttpStatus.valueOf(httpCode), errMsg, retCode);
     }
 }
