@@ -2,7 +2,10 @@ package com.zmbdp.admin.service.user.service;
 
 import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
+import com.zmbdp.admin.service.user.domain.dto.SysUserListReqDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
+
+import java.util.List;
 
 /**
  * B端用户服务接口
@@ -25,4 +28,11 @@ public interface ISysUserService {
      * @return 用户 ID
      */
     Long addOrEdit(SysUserDTO sysUserDTO);
+
+    /**
+     * 查询 B端用户
+     * @param sysUserListReqDTO 用户查询 DTO
+     * @return B端用户列表
+     */
+    List<SysUserDTO> getUserList(SysUserListReqDTO sysUserListReqDTO);
 }
