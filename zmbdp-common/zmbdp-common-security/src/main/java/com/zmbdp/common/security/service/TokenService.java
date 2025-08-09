@@ -83,7 +83,7 @@ public class TokenService {
         // 创建令牌返回
         TokenDTO tokenDTO = new TokenDTO();
         tokenDTO.setAccessToken(JwtUtil.createToken(claimsMap, secret));
-        tokenDTO.setExpires(tokenDTO.getExpires());
+        tokenDTO.setExpires(EXPIRE_TIME);
         return tokenDTO;
     }
 
