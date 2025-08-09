@@ -7,7 +7,7 @@ import org.springframework.beans.BeanUtils;
 import java.io.Serializable;
 
 /**
- * C端用户DTO
+ * C端用户 DTO
  */
 @Data
 public class AppUserDTO implements Serializable {
@@ -38,8 +38,8 @@ public class AppUserDTO implements Serializable {
     private String avatar;
 
     /**
-     * DTO对象转换VO对象
-     * @return VO对象
+     * DTO 对象转换 VO 对象
+     * @return VO 对象
      */
     public AppUserVo convertToVO() {
         AppUserVo appUserVo = new AppUserVo();

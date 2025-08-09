@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmbdp.admin.service.user.mapper.AppUserMapper">
+    <select id="selectByOpenId" parameterType="java.lang.String" resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
+        select *from app_user where open_id = #{openId}
+    </select>
+
+    <select id="selectByPhoneNumber" parameterType="java.lang.String"  resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
+        select *
+        from app_user
+        where phone_number = #{phoneNumber}
+    </select>
+
+    <select id="selectCount"
+            parameterType="com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO"
+            resultType="java.lang.Long">
+        select count(1) from app_user
+        <where>
+            <if test="userId != null and userId !='' ">
+                and id = #{userId}
+            </if>
+            <if test="phoneNumber != null and phoneNumber !='' ">
+                and phone_number = #{phoneNumber}
+            </if>
+            <if test="openId != null and openId !='' ">
+                and open_id  = #{openId}
+            </if>
+            <if test="nickName != null and nickName !='' ">
+                and nick_name like concat('%', #{nickName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPage"
+            parameterType="com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO"
+            resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
+        select * from app_user
+        <where>
+            <if test="userId != null and userId !='' ">
+                and id = #{userId}
+            </if>
+            <if test="phoneNumber != null and phoneNumber !='' ">
+                and phone_number = #{phoneNumber}
+            </if>
+            <if test="openId != null and openId !='' ">
+                and open_id  = #{openId}
+            </if>
+            <if test="nickName != null and nickName !='' ">
+                and nick_name like concat('%', #{nickName}, '%')
+            </if>
+        </where>
+        order by id desc
+        limit #{offset}, #{pageSize}
+    </select>
+</mapper>

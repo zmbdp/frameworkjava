@@ -2,7 +2,7 @@ package com.zmbdp.admin.service.user.controller;
 
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
-import com.zmbdp.admin.api.appuser.feign.AppUserFeignApi;
+import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.admin.service.user.service.IAppUserService;
 import com.zmbdp.common.domain.domain.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * C端用户服务
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @RequestMapping("/app_user")
-public class AppUserController implements AppUserFeignApi {
+public class AppUserController implements AppUserApi {
 
     /**
      * 用户服务 service

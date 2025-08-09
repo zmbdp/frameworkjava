@@ -14,7 +14,6 @@ import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -102,7 +101,7 @@ public class MapController implements MapServiceApi {
     public Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@Validated PlaceSearchReqDTO placeSearchReqDTO) {
         BasePageDTO<SearchPoiDTO> basePageReqDTO = mapService.searchSuggestOnMap(placeSearchReqDTO);
         BasePageVO<SearchPoiVo> result = new BasePageVO<>();
-        BeanUtils.copyProperties(basePageReqDTO, result);
+        BeanCopyUtil.copyProperties(basePageReqDTO, result);
         return Result.success(result);
     }
 
@@ -116,7 +115,7 @@ public class MapController implements MapServiceApi {
     public Result<RegionCityVo> locateCityByLocation(@Validated LocationReqDTO locationReqDTO) {
         RegionCityDTO regionCityDTO = mapService.getCityByLocation(locationReqDTO);
         RegionCityVo result = new RegionCityVo();
-        BeanUtils.copyProperties(regionCityDTO, result);
+        BeanCopyUtil.copyProperties(regionCityDTO, result);
         return Result.success(result);
     }
 }

@@ -42,7 +42,4 @@ public class AESUtil {
         }
         return null;
     }
-    public static void main(String[] args) {
-        System.out.println(encryptHex("Hf@173503494"));
-    }
 }

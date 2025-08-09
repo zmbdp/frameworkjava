@@ -18,7 +18,6 @@ import com.zmbdp.common.core.utils.PageUtil;
 import com.zmbdp.common.redis.service.RedisService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -258,7 +257,7 @@ public class MapServiceImpl implements IMapService {
             // 判断父节点不为空，并且父节点是符合的才返回
             if (sysRegion.getParentId() != null && sysRegion.getParentId().equals(parentId)) {
                 SysRegionDTO sysRegionDTO = new SysRegionDTO();
-                BeanUtils.copyProperties(sysRegion, sysRegionDTO);
+                BeanCopyUtil.copyProperties(sysRegion, sysRegionDTO);
                 result.add(sysRegionDTO);
             }
         }
@@ -290,7 +289,7 @@ public class MapServiceImpl implements IMapService {
         }
         for (SysRegion sysRegion : regionMapper.selectBatchIds(idList)) {
             SysRegionDTO sysRegionDTO = new SysRegionDTO();
-            BeanUtils.copyProperties(sysRegion, sysRegionDTO);
+            BeanCopyUtil.copyProperties(sysRegion, sysRegionDTO);
             resultDTO.add(sysRegionDTO);
         }
         // 设置缓存
@@ -308,7 +307,7 @@ public class MapServiceImpl implements IMapService {
     public BasePageDTO<SearchPoiDTO> searchSuggestOnMap(PlaceSearchReqDTO placeSearchReqDTO) {
         // 构建腾讯地图根据地点搜锁请求参数
         SuggestSearchDTO suggestSearchDTO = new SuggestSearchDTO();
-        BeanUtils.copyProperties(placeSearchReqDTO, suggestSearchDTO);
+        BeanCopyUtil.copyProperties(placeSearchReqDTO, suggestSearchDTO);
         suggestSearchDTO.setPageIndex(placeSearchReqDTO.getPageNo());
         suggestSearchDTO.setId(String.valueOf(placeSearchReqDTO.getId()));
         // 调用腾讯地图接口根据地点搜索
@@ -323,7 +322,7 @@ public class MapServiceImpl implements IMapService {
         List<SearchPoiDTO> pageRes = new ArrayList<>();
         for (PoiDTO poiDTO : poiDTOList) {
             SearchPoiDTO searchPoiDTO = new SearchPoiDTO();
-            BeanUtils.copyProperties(poiDTO, searchPoiDTO);
+            BeanCopyUtil.copyProperties(poiDTO, searchPoiDTO);
             searchPoiDTO.setLongitude(poiDTO.getLocation().getLng());
             searchPoiDTO.setLatitude(poiDTO.getLocation().getLat());
             pageRes.add(searchPoiDTO);
@@ -342,7 +341,7 @@ public class MapServiceImpl implements IMapService {
     public RegionCityDTO getCityByLocation(LocationReqDTO locationReqDTO) {
         // 构建腾讯地图经纬度请求参数
         LocationDTO locationDTO = new LocationDTO();
-        BeanUtils.copyProperties(locationReqDTO, locationDTO);
+        BeanCopyUtil.copyProperties(locationReqDTO, locationDTO);
         // 调用腾讯地图接口
         GeoResultDTO geoResultDTO = iMapProvider.getQQMapDistrictByLonLat(locationDTO);
         RegionCityDTO result = new RegionCityDTO();
@@ -358,7 +357,7 @@ public class MapServiceImpl implements IMapService {
                 for (SysRegionDTO sysRegionDTO : cacheCityS) {
                     // 然后比较
                     if (sysRegionDTO.getFullName().equals(cityName)) {
-                        BeanUtils.copyProperties(sysRegionDTO, result);
+                        BeanCopyUtil.copyProperties(sysRegionDTO, result);
                         return result;
                     }
                 }

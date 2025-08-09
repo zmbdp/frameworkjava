@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * B端用户查询DTO
+ * B端用户查询 DTO
  */
 @Data
 public class SysUserListReqDTO implements Serializable {

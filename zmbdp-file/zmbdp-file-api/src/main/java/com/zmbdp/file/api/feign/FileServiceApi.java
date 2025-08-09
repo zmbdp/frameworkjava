@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 文件服务接口
+ * 文件服务远程调用 Api
  *
  * @author 稚名不带撇
  */

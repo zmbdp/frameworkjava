@@ -1,8 +1,8 @@
 package com.zmbdp.admin.service.user.domain.vo;
 
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.vo.LoginUserVO;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 /**
  * B端用户登录信息
@@ -24,13 +24,15 @@ public class SysUserLoginVO extends LoginUserVO {
      * 状态
      */
     private String status;
+
     /**
      * B端用户 登录信息 DTO 转 VO
+     *
      * @return B端用户 登录信息 VO
      */
     public SysUserLoginVO convertToVO() {
         SysUserLoginVO sysUserLoginVO = new SysUserLoginVO();
-        BeanUtils.copyProperties(this, sysUserLoginVO);
+        BeanCopyUtil.copyProperties(this, sysUserLoginVO);
         return sysUserLoginVO;
     }
 }

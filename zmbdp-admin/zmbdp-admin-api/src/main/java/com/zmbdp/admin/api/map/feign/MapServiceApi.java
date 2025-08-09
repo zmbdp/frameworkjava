@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 地图服务
+ * 地图服务远程调用 Api
  *
  * @author 稚名不带撇
  */

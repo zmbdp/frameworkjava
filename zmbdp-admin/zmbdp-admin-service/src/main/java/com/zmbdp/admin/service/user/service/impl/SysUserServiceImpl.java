@@ -20,7 +20,6 @@ import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -186,7 +185,7 @@ public class SysUserServiceImpl implements ISysUserService {
     public List<SysUserDTO> getUserList(SysUserListReqDTO sysUserListReqDTO) {
         // 先转换成数据库的 DTO
         SysUser searchSysUser = new SysUser();
-        BeanUtils.copyProperties(sysUserListReqDTO, searchSysUser);
+        BeanCopyUtil.copyProperties(sysUserListReqDTO, searchSysUser);
         searchSysUser.setPhoneNumber(
                 AESUtil.encryptHex(sysUserListReqDTO.getPhoneNumber())
         );
@@ -198,7 +197,7 @@ public class SysUserServiceImpl implements ISysUserService {
                 .map(sysUser -> {
                     SysUserDTO sysUserDTO = new SysUserDTO();
                     // 使用 Bean 拷贝工具拷贝大部分字段
-                    BeanUtils.copyProperties(sysUser, sysUserDTO);
+                    BeanCopyUtil.copyProperties(sysUser, sysUserDTO);
                     // 特殊处理需要解密的手机号
                     sysUserDTO.setPhoneNumber(AESUtil.decryptHex(sysUser.getPhoneNumber()));
                     // 特殊处理字段名称不一致的情况
@@ -229,9 +228,9 @@ public class SysUserServiceImpl implements ISysUserService {
         // 封装结果返回
         SysUserLoginDTO sysUserLoginDTO = new SysUserLoginDTO();
         // 赋值 redis 的属性
-        BeanUtils.copyProperties(loginUserDTO, sysUserLoginDTO);
+        BeanCopyUtil.copyProperties(loginUserDTO, sysUserLoginDTO);
         // 赋值数据库的属性
-        BeanUtils.copyProperties(sysUser, sysUserLoginDTO);
+        BeanCopyUtil.copyProperties(sysUser, sysUserLoginDTO);
         return sysUserLoginDTO;
     }
 }

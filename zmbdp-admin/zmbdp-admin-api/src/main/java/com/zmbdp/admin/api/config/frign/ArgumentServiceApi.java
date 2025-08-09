@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+/**
+ * 参数服务远程调用 Api
+ *
+ * @author 稚名不带撇
+ */
 @FeignClient(contextId = "argumentServiceApi", name = "zmbdp-admin-service", path = "/argument")
 public interface ArgumentServiceApi {
 
