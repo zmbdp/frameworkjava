@@ -15,6 +15,7 @@ import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.portal.service.user.entity.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
+import com.zmbdp.portal.service.user.entity.dto.UserDTO;
 import com.zmbdp.portal.service.user.entity.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -193,5 +194,15 @@ public class UserServiceImpl implements IUserService {
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode()) {
             throw new ServiceException("修改用户失败");
         }
+    }
+
+    /**
+     * 获取用户登录信息
+     *
+     * @return 用户信息 DTO
+     */
+    @Override
+    public UserDTO getLoginUser() {
+        appUserApi
     }
 }

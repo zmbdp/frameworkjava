@@ -3,6 +3,7 @@ package com.zmbdp.portal.service.user.service;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
+import com.zmbdp.portal.service.user.entity.dto.UserDTO;
 
 /**
  * 门户服务
@@ -33,4 +34,11 @@ public interface IUserService {
      * @param userEditReqDTO C端用户编辑 DTO
      */
     void edit(UserEditReqDTO userEditReqDTO);
+
+    /**
+     * 获取用户登录信息
+     *
+     * @return 用户信息 DTO
+     */
+    UserDTO getLoginUser();
 }
