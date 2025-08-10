@@ -15,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * B端用户服务
@@ -54,6 +53,7 @@ public class SysUserController {
 
     /**
      * 查询 B端用户
+     *
      * @param sysUserListReqDTO 用户查询 DTO
      * @return B端用户列表
      */
