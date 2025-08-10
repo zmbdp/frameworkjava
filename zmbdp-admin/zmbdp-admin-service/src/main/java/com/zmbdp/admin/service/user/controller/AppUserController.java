@@ -46,7 +46,7 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> findByOpenId(String openId) {
-        AppUserDTO appUserDTO = appUserService.findByPhone(openId);
+        AppUserDTO appUserDTO = appUserService.findByOpenId(openId);
         if (appUserDTO == null) {
             return Result.success();
         }
@@ -61,7 +61,11 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> findByPhone(String phoneNumber) {
-        return null;
+        AppUserDTO appUserDTO = appUserService.findByPhone(phoneNumber);
+        if (appUserDTO == null) {
+            return Result.success();
+        }
+        return Result.success(appUserDTO.convertToVO());
     }
 
     /**
@@ -72,7 +76,7 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> registerByPhone(String phoneNumber) {
-        return null;
+        return Result.success(appUserService.registerByOpenId(openId).convertToVO());
     }
 
     /**

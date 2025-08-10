@@ -45,14 +45,14 @@ public class CaptchaService {
     /**
      * 用来判断是否发送随机验证码
      */
-    @Value("${sms.send-message:false}")
+    @Value("${sms.send-message:true}")
     private boolean sendMessage;
 
     /**
      * 判断生成什么难度的验证码
      */
     @Value("${captcha.type:2}")
-    private int captChaType;
+    private Integer captChaType;
 
     /**
      * 阿里云短信服务
@@ -85,7 +85,7 @@ public class CaptchaService {
         }
 
         // 然后生成验证码
-        // 判断 nacos 上是否开启生成验证码设置了
+        // 判断 nacos 上是否开启生成验证码设置了, 不开启默认就是 123456
         String verifyCode = sendMessage ? VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_SMS_LENGTH, captChaType) : MessageConstants.DEFAULT_SMS_CODE;
 
         // 发送线上短信

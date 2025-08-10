@@ -69,8 +69,8 @@ public class AppUserServiceImpl implements IAppUserService {
      * @return C端用户 DTO
      */
     @Override
-    public AppUserDTO findByPhone(String openId) {
-        if (openId == null) {
+    public AppUserDTO findByOpenId(String openId) {
+        if (StringUtils.isEmpty(openId)) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByOpenId(openId);
@@ -82,6 +82,27 @@ public class AppUserServiceImpl implements IAppUserService {
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
         // 额外处理手机号
         appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+        return appUserDTO;
+    }
+
+    /**
+     * 根据手机号查询用户信息
+     *
+     * @param phoneNumber 手机号
+     * @return C端用户 VO
+     */
+    @Override
+    public AppUserDTO findByPhone(String phoneNumber) {
+        if (StringUtils.isEmpty(phoneNumber)) {
+            return null;
+        }
+        AppUser appUser = appUserMapper.selectByPhoneNumber(phoneNumber);
+        if (appUser == null) {
+            return null;
+        }
+        AppUserDTO appUserDTO = new AppUserDTO();
+        BeanCopyUtil.copyProperties(appUser, appUserDTO);
+        appUserDTO.setOpenId(AESUtil.decryptHex(appUser.getOpenId()));
         return appUserDTO;
     }
 }
