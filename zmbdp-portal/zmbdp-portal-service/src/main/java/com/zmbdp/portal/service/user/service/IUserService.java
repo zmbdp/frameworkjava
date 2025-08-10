@@ -1,5 +1,6 @@
 package com.zmbdp.portal.service.user.service;
 
+import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
 
@@ -25,4 +26,11 @@ public interface IUserService {
      * @return 验证码
      */
     String sendCode(String phone);
+
+    /**
+     * 编辑 C端用户信息
+     *
+     * @param userEditReqDTO C端用户编辑 DTO
+     */
+    void edit(UserEditReqDTO userEditReqDTO);
 }

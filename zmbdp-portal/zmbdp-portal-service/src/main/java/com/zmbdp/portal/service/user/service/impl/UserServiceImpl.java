@@ -1,5 +1,6 @@
 package com.zmbdp.portal.service.user.service.impl;
 
+import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
@@ -99,6 +100,7 @@ public class UserServiceImpl implements IUserService {
         // 设置登录信息
         if (appUserVo != null) {
             BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
+            loginUserDTO.setUserName(appUserVo.getNickName());
         }
     }
 
@@ -136,6 +138,7 @@ public class UserServiceImpl implements IUserService {
         // 设置登录信息
         if (appUserVo != null) {
             BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
+            loginUserDTO.setUserName(appUserVo.getNickName());
         }
     }
 
@@ -177,5 +180,18 @@ public class UserServiceImpl implements IUserService {
             throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
         }
         return captchaService.sendCode(phone);
+    }
+
+    /**
+     * 编辑 C端用户信息
+     *
+     * @param userEditReqDTO C端用户编辑 DTO
+     */
+    @Override
+    public void edit(UserEditReqDTO userEditReqDTO) {
+        Result<Void> result = appUserApi.edit(userEditReqDTO);
+        if (result == null || result.getCode() != ResultCode.SUCCESS.getCode()) {
+            throw new ServiceException("修改用户失败");
+        }
     }
 }

@@ -139,7 +139,7 @@ public class AppUserServiceImpl implements IAppUserService {
         // 查到了就赋值入库
         BeanCopyUtil.copyProperties(userEditReqDTO, appUser);
         appUserMapper.updateById(appUser);
-        // 还得发送消息，让
+        // 告诉所有服务更改了数据库，发送消息，转换成 DTO 发送
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
         appUserDTO.setUserId(appUser.getId());

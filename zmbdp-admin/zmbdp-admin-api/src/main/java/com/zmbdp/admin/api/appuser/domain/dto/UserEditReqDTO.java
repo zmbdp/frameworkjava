@@ -1,6 +1,7 @@
 package com.zmbdp.admin.api.appuser.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ public class UserEditReqDTO implements Serializable {
     /**
      * 用户 ID
      */
-    @NotBlank(message = "用户ID不能为空")
+    @NotNull(message = "用户ID不能为空")
     private Long userId;
 
     /**

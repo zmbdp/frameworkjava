@@ -1,6 +1,7 @@
 package com.zmbdp.portal.service.user.controller;
 
 
+import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.TokenVO;
 import com.zmbdp.portal.service.user.entity.dto.CodeLoginDTO;
@@ -51,11 +52,24 @@ public class UserController {
 
     /**
      * 手机号登录 / 注册
+     *
      * @param codeLoginDTO 验证码登录信息
      * @return token信息VO
      */
     @PostMapping("/login/code")
     public Result<TokenVO> login(@Validated @RequestBody CodeLoginDTO codeLoginDTO) {
         return Result.success(userService.login(codeLoginDTO).convertToVo());
+    }
+
+    /**
+     * 编辑 C端用户信息
+     *
+     * @param userEditReqDTO C端用户编辑 DTO
+     * @return void
+     */
+    @PostMapping("/edit")
+    public Result<Void> edit(@Validated @RequestBody UserEditReqDTO userEditReqDTO) {
+        userService.edit(userEditReqDTO);
+        return Result.success();
     }
 }
