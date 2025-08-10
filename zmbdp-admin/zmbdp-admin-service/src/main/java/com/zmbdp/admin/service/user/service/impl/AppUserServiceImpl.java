@@ -10,7 +10,6 @@ import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -103,7 +102,7 @@ public class AppUserServiceImpl implements IAppUserService {
     public AppUserDTO registerByPhone(String phoneNumber) {
         // 判空
         if (StringUtils.isEmpty(phoneNumber)) {
-            throw new ServiceException("要注册手机号是空的", ResultCode.INVALID_PARA.getCode());
+            throw new ServiceException("待注册手机号为空", ResultCode.INVALID_PARA.getCode());
         }
         // 属性赋值插入数据库
         AppUser appUser = new AppUser();
@@ -113,7 +112,7 @@ public class AppUserServiceImpl implements IAppUserService {
         appUserMapper.insert(appUser);
         // 对象转换返回
         AppUserDTO appUserDTO = new AppUserDTO();
-        BeanUtils.copyProperties(appUser, appUserDTO);
+        BeanCopyUtil.copyProperties(appUser, appUserDTO);
         appUserDTO.setUserId(appUser.getId());
         return appUserDTO;
     }

@@ -28,7 +28,7 @@ public class UserController {
     private IUserService userService;
 
     /**
-     * 微信登录
+     * 微信登录 / 注册
      *
      * @param wechatLoginDTO 微信登录 DTO
      * @return token令牌
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     /**
-     * 手机号登录
+     * 手机号登录 / 注册
      * @param codeLoginDTO 验证码登录信息
      * @return token信息VO
      */
