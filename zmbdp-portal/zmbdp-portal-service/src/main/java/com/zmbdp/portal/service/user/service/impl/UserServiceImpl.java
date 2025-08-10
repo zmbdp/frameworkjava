@@ -13,12 +13,15 @@ import com.zmbdp.common.message.service.CaptchaService;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
+import com.zmbdp.common.security.utils.JwtUtil;
+import com.zmbdp.common.security.utils.SecurityUtil;
 import com.zmbdp.portal.service.user.entity.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.UserDTO;
 import com.zmbdp.portal.service.user.entity.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -222,5 +225,23 @@ public class UserServiceImpl implements IUserService {
         BeanCopyUtil.copyProperties(result.getData(), userDTO);
         userDTO.setUserName(result.getData().getNickName());
         return userDTO;
+    }
+
+    /**
+     * 退出登录
+     */
+    @Override
+    public void logout() {
+        // 解析令牌, 拿出用户信息做个日志
+        // 拿的是 JWT
+        String Jwt = SecurityUtil.getToken();
+        if (StringUtils.isEmpty(Jwt)) {
+            return;
+        }
+        String userName = JwtUtil.getUserName(Jwt, secret);
+        String userId = JwtUtil.getUserId(Jwt, secret);
+        log.info("[{}] 退出了系统, 用户ID: {}", userName, userId);
+        // 根据 jwt 删除用户缓存记录
+        tokenService.delLoginUser(Jwt, secret);
     }
 }

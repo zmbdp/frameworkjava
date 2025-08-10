@@ -4,7 +4,7 @@ import com.zmbdp.common.domain.domain.vo.LoginUserVO;
 import lombok.Data;
 
 /**
- * C端用户VO
+ * C端用户 VO
  */
 @Data
 public class UserVo extends LoginUserVO {

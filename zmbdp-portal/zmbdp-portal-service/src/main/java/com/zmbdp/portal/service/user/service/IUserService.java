@@ -41,4 +41,9 @@ public interface IUserService {
      * @return 用户信息 DTO
      */
     UserDTO getLoginUser();
+
+    /**
+     * 退出登录
+     */
+    void logout();
 }

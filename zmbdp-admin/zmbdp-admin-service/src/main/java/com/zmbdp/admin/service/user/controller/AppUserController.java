@@ -135,9 +135,9 @@ public class AppUserController implements AppUserApi {
     public Result<List<AppUserVo>> list(List<Long> userIds) {
         List<AppUserDTO> appUserDTOList = appUserService.getUserList(userIds);
         return Result.success(appUserDTOList.stream()
-                .filter(Objects::nonNull)
-                .map(AppUserDTO::convertToVO)
-                .collect(Collectors.toList())
+                .filter(Objects::nonNull) // 过滤空对象
+                .map(AppUserDTO::convertToVO) // 转换为 VO
+                .collect(Collectors.toList()) // 转换成列表
         );
     }
 

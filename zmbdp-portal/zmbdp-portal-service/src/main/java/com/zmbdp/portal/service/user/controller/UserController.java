@@ -84,14 +84,14 @@ public class UserController {
         return Result.success(userService.getLoginUser().convertToVO());
     }
 
-//    /**
-//     * 退出登录
-//     *
-//     * @return void
-//     */
-//    @DeleteMapping("/logout")
-//    Result<Void> logout() {
-//        userService.logout();
-//        return Result.success();
-//    }
+    /**
+     * 退出登录
+     *
+     * @return void
+     */
+    @DeleteMapping("/logout")
+    Result<Void> logout() {
+        userService.logout();
+        return Result.success();
+    }
 }

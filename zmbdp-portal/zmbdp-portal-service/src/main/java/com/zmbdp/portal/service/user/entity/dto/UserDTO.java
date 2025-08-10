@@ -1,12 +1,12 @@
 package com.zmbdp.portal.service.user.entity.dto;
 
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.portal.service.user.entity.vo.UserVo;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 /**
- * C端用户DTO
+ * C端用户 DTO
  */
 @Data
 public class UserDTO extends LoginUserDTO {
@@ -18,11 +18,12 @@ public class UserDTO extends LoginUserDTO {
 
     /**
      * 对象转换
-     * @return
+     *
+     * @return VO 对象
      */
     public UserVo convertToVO() {
         UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(this, userVo);
+        BeanCopyUtil.copyProperties(this, userVo);
         userVo.setNickName(this.getUserName());
         return userVo;
     }
