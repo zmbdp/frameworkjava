@@ -11,9 +11,9 @@ import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
 public interface IUserService {
 
     /**
-     * 微信登录
+     * 用户 登录/注册
      *
-     * @param loginDTO 微信登录 DTO
+     * @param loginDTO 用户信息 DTO
      * @return tokenDTO 令牌
      */
     TokenDTO login(LoginDTO loginDTO);

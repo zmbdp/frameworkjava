@@ -29,7 +29,15 @@ public interface IAppUserService {
      * 根据手机号查询用户信息
      *
      * @param phoneNumber 手机号
-     * @return C端用户 VO
+     * @return C端用户 DTO
      */
     AppUserDTO findByPhone(String phoneNumber);
+
+    /**
+     * 根据手机号注册用户
+     *
+     * @param phoneNumber 手机号
+     * @return C端用户 DTO
+     */
+    AppUserDTO registerByPhone(String phoneNumber);
 }

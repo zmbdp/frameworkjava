@@ -3,6 +3,7 @@ package com.zmbdp.portal.service.user.controller;
 
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.TokenVO;
+import com.zmbdp.portal.service.user.entity.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,5 +47,15 @@ public class UserController {
     @GetMapping("/send_code")
     public Result<String> sendCode(@Validated @RequestParam String phone) {
         return Result.success(userService.sendCode(phone));
+    }
+
+    /**
+     * 手机号登录
+     * @param codeLoginDTO 验证码登录信息
+     * @return token信息VO
+     */
+    @PostMapping("/login/code")
+    public Result<TokenVO> login(@Validated @RequestBody CodeLoginDTO codeLoginDTO) {
+        return Result.success(userService.login(codeLoginDTO).convertToVo());
     }
 }

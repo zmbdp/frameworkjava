@@ -6,6 +6,7 @@ import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.admin.service.user.service.IAppUserService;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,11 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> registerByOpenId(String openId) {
-        return Result.success(appUserService.registerByOpenId(openId).convertToVO());
+        AppUserDTO appUserDTO = appUserService.registerByOpenId(openId);
+        if (appUserDTO == null) {
+            throw new ServiceException("注册失败");
+        }
+        return Result.success(appUserDTO.convertToVO());
     }
 
     /**
@@ -76,7 +81,11 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> registerByPhone(String phoneNumber) {
-        return Result.success(appUserService.registerByOpenId(openId).convertToVO());
+        AppUserDTO appUserDTO = appUserService.registerByPhone(phoneNumber);
+        if (appUserDTO == null) {
+            throw new ServiceException("注册失败");
+        }
+        return Result.success(appUserDTO.convertToVO());
     }
 
     /**

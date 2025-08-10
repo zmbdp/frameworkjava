@@ -10,6 +10,7 @@ import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -74,35 +75,62 @@ public class AppUserServiceImpl implements IAppUserService {
             return null;
         }
         AppUser appUser = appUserMapper.selectByOpenId(openId);
-        if (appUser == null) {
-            return null;
-        }
-        // 转换对象赋值
-        AppUserDTO appUserDTO = new AppUserDTO();
-        BeanCopyUtil.copyProperties(appUser, appUserDTO);
-        // 额外处理手机号
-        appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
-        return appUserDTO;
+        return appUser == null ? null : appUserToAppUserDTO(appUser);
     }
 
     /**
      * 根据手机号查询用户信息
      *
      * @param phoneNumber 手机号
-     * @return C端用户 VO
+     * @return C端用户 DTO
      */
     @Override
     public AppUserDTO findByPhone(String phoneNumber) {
         if (StringUtils.isEmpty(phoneNumber)) {
             return null;
         }
-        AppUser appUser = appUserMapper.selectByPhoneNumber(phoneNumber);
-        if (appUser == null) {
-            return null;
+        AppUser appUser = appUserMapper.selectByPhoneNumber(AESUtil.encryptHex(phoneNumber));
+        return appUser == null ? null : appUserToAppUserDTO(appUser);
+    }
+
+    /**
+     * 根据手机号注册用户
+     *
+     * @param phoneNumber 手机号
+     * @return C端用户 DTO
+     */
+    @Override
+    public AppUserDTO registerByPhone(String phoneNumber) {
+        // 判空
+        if (StringUtils.isEmpty(phoneNumber)) {
+            throw new ServiceException("要注册手机号是空的", ResultCode.INVALID_PARA.getCode());
         }
+        // 属性赋值插入数据库
+        AppUser appUser = new AppUser();
+        appUser.setPhoneNumber(AESUtil.encryptHex(phoneNumber));
+        appUser.setNickName("Java脚手架用户" + (int) (Math.random() * 9000) + 1000);
+        appUser.setAvatar(defaultAvatar);
+        appUserMapper.insert(appUser);
+        // 对象转换返回
+        AppUserDTO appUserDTO = new AppUserDTO();
+        BeanUtils.copyProperties(appUser, appUserDTO);
+        appUserDTO.setUserId(appUser.getId());
+        return appUserDTO;
+    }
+
+    /**
+     * AppUser 转 AppUserDTO
+     *
+     * @param appUser appUser 数据表
+     * @return appUserDTO 对象
+     */
+    private AppUserDTO appUserToAppUserDTO(AppUser appUser) {
+        // 转换对象赋值
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
-        appUserDTO.setOpenId(AESUtil.decryptHex(appUser.getOpenId()));
+        // 额外处理手机号
+        appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+        appUserDTO.setUserId(appUser.getId());
         return appUserDTO;
     }
 }

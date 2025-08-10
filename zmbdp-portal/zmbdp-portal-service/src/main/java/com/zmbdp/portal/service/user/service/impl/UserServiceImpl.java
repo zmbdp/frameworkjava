@@ -12,6 +12,7 @@ import com.zmbdp.common.message.service.CaptchaService;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
+import com.zmbdp.portal.service.user.entity.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
 import com.zmbdp.portal.service.user.entity.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
@@ -56,9 +57,9 @@ public class UserServiceImpl implements IUserService {
     private CaptchaService captchaService;
 
     /**
-     * 微信登录
+     * 用户 登录/注册
      *
-     * @param loginDTO 微信登录 DTO
+     * @param loginDTO 用户信息 DTO
      * @return tokenDTO 令牌
      */
     @Override
@@ -68,6 +69,9 @@ public class UserServiceImpl implements IUserService {
         if (loginDTO instanceof WechatLoginDTO wechatLoginDTO) {
             // 微信登录
             loginByWechat(wechatLoginDTO, loginUserDTO);
+        } else if (loginDTO instanceof CodeLoginDTO codeLoginDTO) {
+            // 手机登录
+            loginByCode(codeLoginDTO, loginUserDTO);
         }
         // 这时候数据表里面肯定有数据的，直接设置缓存，返回给前端就可以了
         loginUserDTO.setUserFrom(UserConstants.USER_FROM_TU_C);
@@ -99,6 +103,43 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
+     * 手机号登录处理逻辑
+     *
+     * @param codeLoginDTO 验证码登录 DTO
+     * @param loginUserDTO 用户信息上下文 DTO
+     */
+    private void loginByCode(CodeLoginDTO codeLoginDTO, LoginUserDTO loginUserDTO) {
+        // 校验手机号
+        if (!VerifyUtil.checkPhone(codeLoginDTO.getPhone())) {
+            throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
+        }
+        AppUserVo appUserVo;
+        // 查询是否存在
+        Result<AppUserVo> result = appUserApi.findByPhone(codeLoginDTO.getPhone());
+        // 查不到就注册，查得到就赋值
+        if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
+            appUserVo = register(codeLoginDTO);
+        } else {
+            appUserVo = result.getData();
+        }
+        // 然后从缓存中获取验证码
+        String cacheCode = captchaService.getCode(codeLoginDTO.getPhone());
+        // 再校验验证码
+        if (cacheCode == null) {
+            throw new ServiceException("验证码无效", ResultCode.INVALID_PARA.getCode());
+        }
+        if (!cacheCode.equals(codeLoginDTO.getCode())) {
+            throw new ServiceException("验证码错误", ResultCode.INVALID_PARA.getCode());
+        }
+        // 走到这里表示通过了，从缓存中删除
+        captchaService.deleteCode(codeLoginDTO.getPhone());
+        // 设置登录信息
+        if (appUserVo != null) {
+            BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
+        }
+    }
+
+    /**
      * 根据入参来注册
      *
      * @param loginDTO 用户生命周期信息
@@ -113,6 +154,12 @@ public class UserServiceImpl implements IUserService {
             // 判断结果
             if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
                 log.error("用户注册失败! {}", wechatLoginDTO.getOpenId());
+            }
+        } else if (loginDTO instanceof CodeLoginDTO codeLoginDTO) {
+            // 3 处理手机号注册逻辑
+            result = appUserApi.registerByPhone(codeLoginDTO.getPhone());
+            if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
+                log.error("用户注册失败! {}", codeLoginDTO.getPhone());
             }
         }
         return result == null ? null : result.getData();
