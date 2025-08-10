@@ -1,13 +1,19 @@
 package com.zmbdp.admin.service.user.controller;
 
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
+import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.admin.service.user.service.IAppUserService;
+import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.domain.domain.Result;
+import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -120,5 +126,19 @@ public class AppUserController implements AppUserApi {
     @Override
     public Result<List<AppUserVo>> list(List<Long> userIds) {
         return null;
+    }
+
+    /**
+     * 查询 C端用户
+     *
+     * @param appUserListReqDTO 查询 C端用户 DTO
+     * @return C端用户分页结果
+     */
+    @PostMapping("/list/search")
+    public Result<BasePageVO<AppUserVo>> list(@RequestBody AppUserListReqDTO appUserListReqDTO) {
+        BasePageDTO<AppUserDTO> appUserDTOList = appUserService.getUserList(appUserListReqDTO);
+        BasePageVO<AppUserVo> result = new BasePageVO<>();
+        BeanUtils.copyProperties(appUserDTOList, result);
+        return Result.success(result);
     }
 }
