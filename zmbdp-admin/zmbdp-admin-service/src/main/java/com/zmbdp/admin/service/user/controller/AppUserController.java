@@ -7,10 +7,10 @@ import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.admin.service.user.service.IAppUserService;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * C端用户服务
@@ -116,7 +118,11 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> findById(Long userId) {
-        return null;
+        AppUserDTO appUserDTO = appUserService.findById(userId);
+        if (appUserDTO == null) {
+            return Result.success();
+        }
+        return Result.success(appUserDTO.convertToVO());
     }
 
     /**
@@ -127,7 +133,12 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<List<AppUserVo>> list(List<Long> userIds) {
-        return null;
+        List<AppUserDTO> appUserDTOList = appUserService.getUserList(userIds);
+        return Result.success(appUserDTOList.stream()
+                .filter(Objects::nonNull)
+                .map(AppUserDTO::convertToVO)
+                .collect(Collectors.toList())
+        );
     }
 
     /*=============================================    前端调用    =============================================*/
@@ -142,7 +153,7 @@ public class AppUserController implements AppUserApi {
     public Result<BasePageVO<AppUserVo>> list(@RequestBody AppUserListReqDTO appUserListReqDTO) {
         BasePageDTO<AppUserDTO> appUserDTOList = appUserService.getUserList(appUserListReqDTO);
         BasePageVO<AppUserVo> result = new BasePageVO<>();
-        BeanUtils.copyProperties(appUserDTOList, result);
+        BeanCopyUtil.copyProperties(appUserDTOList, result);
         return Result.success(result);
     }
 }

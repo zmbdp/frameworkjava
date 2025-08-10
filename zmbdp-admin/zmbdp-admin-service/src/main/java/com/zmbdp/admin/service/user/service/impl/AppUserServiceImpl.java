@@ -179,6 +179,49 @@ public class AppUserServiceImpl implements IAppUserService {
         return appUserDTO;
     }
 
+    /**
+     * 根据用户 ID 获取用户信息
+     *
+     * @param userId 用户 ID
+     * @return C端用户 VO
+     */
+    @Override
+    public AppUserDTO findById(Long userId) {
+        // 对 userId 进行判空操作
+        if (userId == null) {
+            return null;
+        }
+        // 查询 appUser 对象
+        AppUser appUser = appUserMapper.selectById(userId);
+        return appUser == null ? null : appUserToAppUserDTO(appUser);
+    }
+
+    /**
+     * 根据用户 ID 列表获取用户列表信息
+     *
+     * @param userIds 用户 ID 列表
+     * @return C端用户 DTO 列表
+     */
+    @Override
+    public List<AppUserDTO> getUserList(List<Long> userIds) {
+        // 对入参进行判空
+        if (CollectionUtils.isEmpty(userIds)) {
+            return List.of();
+        }
+        // 查询 appUser 列表
+        List<AppUser> appUserList = appUserMapper.selectBatchIds(userIds);
+
+        // 对象转换
+        return appUserList.stream().map(appUser -> {
+            AppUserDTO appUserDTO = new AppUserDTO();
+            BeanCopyUtil.copyProperties(appUser, appUserDTO);
+            // 特殊处理手机号和 id
+            appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+            appUserDTO.setUserId(appUser.getId());
+            return appUserDTO;
+        }).collect(Collectors.toList());
+    }
+
     /*=============================================    前端调用    =============================================*/
 
     /**

@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 @TableName("app_user")
 @EqualsAndHashCode(callSuper = true)
 public class AppUser extends BaseDO {
+
     /**
      * 用户昵称
      */

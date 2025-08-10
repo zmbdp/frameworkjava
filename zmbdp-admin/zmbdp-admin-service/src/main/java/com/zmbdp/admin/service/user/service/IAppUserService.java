@@ -5,6 +5,8 @@ import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
 
+import java.util.List;
+
 /**
  * C端用户服务
  *
@@ -52,6 +54,22 @@ public interface IAppUserService {
      * @param userEditReqDTO C端用户 DTO
      */
     void edit(UserEditReqDTO userEditReqDTO);
+
+    /**
+     * 根据用户 ID 获取用户信息
+     *
+     * @param userId 用户 ID
+     * @return C端用户 VO
+     */
+    AppUserDTO findById(Long userId);
+
+    /**
+     * 根据用户 ID 列表获取用户列表信息
+     *
+     * @param userIds 用户 ID 列表
+     * @return C端用户 DTO 列表
+     */
+    List<AppUserDTO> getUserList(List<Long> userIds);
 
     /*=============================================    前端调用    =============================================*/
 

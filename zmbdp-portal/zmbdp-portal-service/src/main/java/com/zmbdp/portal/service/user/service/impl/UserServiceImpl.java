@@ -203,6 +203,24 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public UserDTO getLoginUser() {
-        appUserApi
+        // 获取当前登录的用户
+        LoginUserDTO loginUserDTO = tokenService.getLoginUser(secret);
+        // 判断令牌是否正确
+        if (loginUserDTO == null) {
+            throw new ServiceException("用户令牌有误", ResultCode.INVALID_PARA.getCode());
+        }
+        // 然后再查出数据库的看看能不能查询出来
+        Result<AppUserVo> result = appUserApi.findById(loginUserDTO.getUserId());
+        if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
+            throw new ServiceException("查询用户失败", ResultCode.INVALID_PARA.getCode());
+        }
+        // 拼接对象，返回结果
+        UserDTO userDTO = new UserDTO();
+        // 拼接 jwt 的结果
+        BeanCopyUtil.copyProperties(loginUserDTO, userDTO);
+        // 拼接 数据库的结果
+        BeanCopyUtil.copyProperties(result.getData(), userDTO);
+        userDTO.setUserName(result.getData().getNickName());
+        return userDTO;
     }
 }
