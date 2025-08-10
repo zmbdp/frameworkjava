@@ -53,7 +53,7 @@ public class SysUserServiceImpl implements ISysUserService {
     /**
      * token 密钥
      */
-    @Value("${jwt.token.secret}")
+    @Value("${jwt.token.secret:}")
     private String secret;
 
     /**

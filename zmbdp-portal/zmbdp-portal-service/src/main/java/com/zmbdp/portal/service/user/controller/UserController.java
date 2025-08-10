@@ -8,10 +8,7 @@ import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 门户服务
@@ -38,5 +35,16 @@ public class UserController {
     @PostMapping("/login/wechat")
     public Result<TokenVO> login(@Validated @RequestBody WechatLoginDTO wechatLoginDTO) {
         return Result.success(userService.login(wechatLoginDTO).convertToVo());
+    }
+
+    /**
+     * 发送短信验证码
+     *
+     * @param phone 手机号
+     * @return 验证码
+     */
+    @GetMapping("/send_code")
+    public Result<String> sendCode(@Validated @RequestParam String phone) {
+        return Result.success(userService.sendCode(phone));
     }
 }

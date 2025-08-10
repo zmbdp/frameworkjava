@@ -17,4 +17,12 @@ public interface IUserService {
      * @return tokenDTO 令牌
      */
     TokenDTO login(LoginDTO loginDTO);
+
+    /**
+     * 发送短信验证码
+     *
+     * @param phone 手机号
+     * @return 验证码
+     */
+    String sendCode(String phone);
 }

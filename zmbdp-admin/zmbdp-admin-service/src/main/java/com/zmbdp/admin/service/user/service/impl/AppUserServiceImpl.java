@@ -34,7 +34,7 @@ public class AppUserServiceImpl implements IAppUserService {
     /**
      * nacos 上的默认头像
      */
-    @Value("${appuser.info.defaultAvatar}")
+    @Value("${appuser.info.defaultAvatar:}")
     private String defaultAvatar;
 
     /**

@@ -1,0 +1,3 @@
+com.zmbdp.common.message.config.AliSmsConfig
+com.zmbdp.common.message.service.AliSmsService
+com.zmbdp.common.message.service.CaptchaService

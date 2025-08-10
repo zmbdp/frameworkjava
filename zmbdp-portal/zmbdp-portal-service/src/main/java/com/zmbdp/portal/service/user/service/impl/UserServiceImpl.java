@@ -3,9 +3,12 @@ package com.zmbdp.portal.service.user.service.impl;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.common.message.service.CaptchaService;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
@@ -40,11 +43,17 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private TokenService tokenService;
 
+    /**
+     * 令牌密钥
+     */
     @Value("${jwt.token.secret}")
     private String secret;
 
-//    @Autowired
-//    private CaptchaService captchaService;
+    /**
+     * 验证码服务
+     */
+    @Autowired
+    private CaptchaService captchaService;
 
     /**
      * 微信登录
@@ -85,7 +94,7 @@ public class UserServiceImpl implements IUserService {
         }
         // 设置登录信息
         if (appUserVo != null) {
-          BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
+            BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
         }
     }
 
@@ -107,5 +116,19 @@ public class UserServiceImpl implements IUserService {
             }
         }
         return result == null ? null : result.getData();
+    }
+
+    /**
+     * 发送短信验证码
+     *
+     * @param phone 手机号
+     * @return 验证码
+     */
+    @Override
+    public String sendCode(String phone) {
+        if (!VerifyUtil.checkPhone(phone)) {
+            throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
+        }
+        return captchaService.sendCode(phone);
     }
 }
