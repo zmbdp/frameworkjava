@@ -1,11 +1,13 @@
 package com.zmbdp.admin.service.user.service.impl;
 
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
+import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.service.user.config.RabbitConfig;
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
 import com.zmbdp.admin.service.user.service.IAppUserService;
+import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -13,10 +15,16 @@ import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * C端用户服务 service
@@ -40,8 +48,13 @@ public class AppUserServiceImpl implements IAppUserService {
     @Value("${appuser.info.defaultAvatar:}")
     private String defaultAvatar;
 
+    /**
+     * RabbitMQ 服务
+     */
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    /*=============================================    内部调用    =============================================*/
 
     /**
      * 根据微信 ID 注册用户
@@ -165,5 +178,48 @@ public class AppUserServiceImpl implements IAppUserService {
         appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
         appUserDTO.setUserId(appUser.getId());
         return appUserDTO;
+    }
+
+    /*=============================================    前端调用    =============================================*/
+
+    /**
+     * 查询 C端用户
+     *
+     * @param appUserListReqDTO 查询 C端用户 DTO
+     * @return C端用户分页结果
+     */
+    @Override
+    public BasePageDTO<AppUserDTO> getUserList(AppUserListReqDTO appUserListReqDTO) {
+        // 先转变手机号
+        appUserListReqDTO.setPhoneNumber(AESUtil.encryptHex(appUserListReqDTO.getPhoneNumber()));
+        BasePageDTO<AppUserDTO> result = new BasePageDTO<>();
+        // 查询总数
+        Long totals = appUserMapper.selectCount(appUserListReqDTO);
+        if (totals == 0) {
+            result.setTotals(0);
+            result.setTotalPages(0);
+            result.setList(new ArrayList<>());
+            return result;
+        }
+        // 分页查询
+        List<AppUser> appUserList = appUserMapper.selectPage(appUserListReqDTO);
+        result.setTotals(totals.intValue());
+        result.setTotalPages(BasePageDTO.calculateTotalPages(totals, appUserListReqDTO.getPageSize()));
+        // 判断是否为空
+        if (CollectionUtils.isEmpty(appUserList)) {
+            result.setList(new ArrayList<>());
+            return result;
+        }
+        // 对象列表结果转换
+        result.setList(appUserList.stream()
+                .map(appUser -> {
+                    AppUserDTO appUserDTO = new AppUserDTO();
+                    BeanUtils.copyProperties(appUser, appUserDTO);
+                    appUserDTO.setUserId(appUser.getId());
+                    appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+                    return appUserDTO;
+                }).collect(Collectors.toList())
+        );
+        return result;
     }
 }

@@ -28,6 +28,8 @@ import java.util.List;
 @RequestMapping("/app_user")
 public class AppUserController implements AppUserApi {
 
+    /*=============================================    内部调用    =============================================*/
+
     /**
      * 用户服务 service
      */
@@ -127,6 +129,8 @@ public class AppUserController implements AppUserApi {
     public Result<List<AppUserVo>> list(List<Long> userIds) {
         return null;
     }
+
+    /*=============================================    前端调用    =============================================*/
 
     /**
      * 查询 C端用户

@@ -1,7 +1,9 @@
 package com.zmbdp.admin.service.user.service;
 
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
+import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
+import com.zmbdp.common.core.domain.dto.BasePageDTO;
 
 /**
  * C端用户服务
@@ -9,6 +11,8 @@ import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
  * @author zmbdp
  */
 public interface IAppUserService {
+
+    /*=============================================    内部调用    =============================================*/
 
     /**
      * 根据微信 ID 注册用户
@@ -48,4 +52,14 @@ public interface IAppUserService {
      * @param userEditReqDTO C端用户 DTO
      */
     void edit(UserEditReqDTO userEditReqDTO);
+
+    /*=============================================    前端调用    =============================================*/
+
+    /**
+     * 查询 C端用户
+     *
+     * @param appUserListReqDTO 查询 C端用户 DTO
+     * @return C端用户分页结果
+     */
+    BasePageDTO<AppUserDTO> getUserList(AppUserListReqDTO appUserListReqDTO);
 }
