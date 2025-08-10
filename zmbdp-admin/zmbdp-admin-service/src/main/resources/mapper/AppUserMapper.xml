@@ -4,18 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zmbdp.admin.service.user.mapper.AppUserMapper">
     <select id="selectByOpenId" parameterType="java.lang.String" resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
-        select *from app_user where open_id = #{openId}
+        select * from app_user where open_id = #{openId}
     </select>
 
     <select id="selectByPhoneNumber" parameterType="java.lang.String"  resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
-        select *
-        from app_user
-        where phone_number = #{phoneNumber}
+        select * from app_user where phone_number = #{phoneNumber}
     </select>
 
-    <select id="selectCount"
-            parameterType="com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO"
-            resultType="java.lang.Long">
+    <select id="selectCount" parameterType="com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO" resultType="java.lang.Long">
         select count(1) from app_user
         <where>
             <if test="userId != null and userId !='' ">

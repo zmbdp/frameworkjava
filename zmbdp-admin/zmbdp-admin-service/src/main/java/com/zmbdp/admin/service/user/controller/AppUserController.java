@@ -1,5 +1,6 @@
 package com.zmbdp.admin.service.user.controller;
 
+import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
@@ -45,7 +46,11 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<AppUserVo> findByOpenId(String openId) {
-        return null;
+        AppUserDTO appUserDTO = appUserService.findByPhone(openId);
+        if (appUserDTO == null) {
+            return Result.success();
+        }
+        return Result.success(appUserDTO.convertToVO());
     }
 
     /**

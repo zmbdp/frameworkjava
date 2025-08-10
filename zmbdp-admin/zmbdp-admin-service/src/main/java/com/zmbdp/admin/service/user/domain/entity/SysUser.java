@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统用户对象 sys_user
+ * 系统用户表 sys_user
  */
 @Data
 @TableName("sys_user")

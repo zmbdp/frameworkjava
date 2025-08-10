@@ -20,4 +20,8 @@ public class UserConstants {
      * 表示用户来源为系统
      */
     public static final String USER_FROM_TU_B = "sys";
+    /**
+     * 表示用户来源为 C端用户
+     */
+    public static final String USER_FROM_TU_C = "app";
 }

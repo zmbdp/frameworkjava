@@ -4,6 +4,7 @@ import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
 import com.zmbdp.admin.service.user.service.IAppUserService;
+import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -48,11 +49,6 @@ public class AppUserServiceImpl implements IAppUserService {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("微信ID不能为空", ResultCode.INVALID_PARA.getCode());
         }
-        // TODO: 不需要判重
-//        // 查看是否存在
-//        if (appUserMapper.selectByOpenId(openId) != null) {
-//            throw new ServiceException("用户已存在", ResultCode.INVALID_PARA.getCode());
-//        }
         // 属性赋值插入数据库
         AppUser appUser = new AppUser();
         appUser.setOpenId(openId);
@@ -63,6 +59,29 @@ public class AppUserServiceImpl implements IAppUserService {
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
         appUserDTO.setUserId(appUser.getId());
+        return appUserDTO;
+    }
+
+    /**
+     * 根据 openId 查询用户信息
+     *
+     * @param openId 用户微信 ID
+     * @return C端用户 DTO
+     */
+    @Override
+    public AppUserDTO findByPhone(String openId) {
+        if (openId == null) {
+            return null;
+        }
+        AppUser appUser = appUserMapper.selectByOpenId(openId);
+        if (appUser == null) {
+            return null;
+        }
+        // 转换对象赋值
+        AppUserDTO appUserDTO = new AppUserDTO();
+        BeanCopyUtil.copyProperties(appUser, appUserDTO);
+        // 额外处理手机号
+        appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
         return appUserDTO;
     }
 }

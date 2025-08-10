@@ -1,13 +1,15 @@
 package com.zmbdp.admin.service.user.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.zmbdp.common.core.domain.entity.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * C端用户表对应的实体类
+ * C端用户表 app_user
  */
 @Data
+@TableName("app_user")
 @EqualsAndHashCode(callSuper = true)
 public class AppUser extends BaseDO {
     /**

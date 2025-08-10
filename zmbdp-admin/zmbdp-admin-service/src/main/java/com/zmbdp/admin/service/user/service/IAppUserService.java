@@ -16,4 +16,12 @@ public interface IAppUserService {
      * @return C端用户 DTO
      */
     AppUserDTO registerByOpenId(String openId);
+
+    /**
+     * 根据 openId 查询用户信息
+     *
+     * @param openId 用户微信 ID
+     * @return C端用户 DTO
+     */
+    AppUserDTO findByPhone(String openId);
 }

@@ -99,11 +99,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
         if (url.contains(HttpConstants.SYS_USER_PATH) && !UserConstants.USER_FROM_TU_B.equals(userFrom)) {
             return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
         }
-        // TODO: 验证用户权限
-        // 如果路径是非系统路径，但是用户是系统来源的话
-//        if (!url.contains(HttpConstants.APP_USER_PATH) && UserConstants.USER_FROM_TU_B.equals(userFrom)) {
-//            return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
-//        }
         // 根据令牌获取用户信息给下面的 controller 层
         String userId = JwtUtil.getUserId(claims);
         String userName = JwtUtil.getUserName(claims);
