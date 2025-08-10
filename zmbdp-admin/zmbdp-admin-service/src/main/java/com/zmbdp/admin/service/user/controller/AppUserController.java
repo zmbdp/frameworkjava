@@ -96,7 +96,8 @@ public class AppUserController implements AppUserApi {
      */
     @Override
     public Result<Void> edit(UserEditReqDTO userEditReqDTO) {
-        return null;
+        appUserService.edit(userEditReqDTO);
+        return Result.success();
     }
 
     /**

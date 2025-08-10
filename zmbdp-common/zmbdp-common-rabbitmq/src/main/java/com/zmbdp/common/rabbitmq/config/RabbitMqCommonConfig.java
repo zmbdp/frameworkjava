@@ -1,8 +1,5 @@
 package com.zmbdp.common.rabbitmq.config;
 
-
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -47,5 +44,4 @@ public class RabbitMqCommonConfig {
 
         return jackson2JsonMessageConverter;
     }
-
 }

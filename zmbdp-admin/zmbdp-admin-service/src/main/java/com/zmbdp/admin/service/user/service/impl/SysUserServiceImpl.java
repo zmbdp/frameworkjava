@@ -131,6 +131,10 @@ public class SysUserServiceImpl implements ISysUserService {
         // 存储名字，密码，id 这些
         sysUser.setId(sysUserDTO.getUserId());
         sysUser.setNickName(sysUserDTO.getNickName());
+        // 校验密码
+        if (StringUtils.isEmpty(sysUserDTO.getPassword()) || !sysUserDTO.checkPassword()) {
+            throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
+        }
         // 密码要加密
         sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
         // 判断用户状态 这个状态在数据库中是否存在

@@ -1,6 +1,7 @@
 package com.zmbdp.admin.service.user.service;
 
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
+import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 
 /**
  * C端用户服务
@@ -40,4 +41,11 @@ public interface IAppUserService {
      * @return C端用户 DTO
      */
     AppUserDTO registerByPhone(String phoneNumber);
+
+    /**
+     * 编辑 C端用户
+     *
+     * @param userEditReqDTO C端用户 DTO
+     */
+    void edit(UserEditReqDTO userEditReqDTO);
 }
