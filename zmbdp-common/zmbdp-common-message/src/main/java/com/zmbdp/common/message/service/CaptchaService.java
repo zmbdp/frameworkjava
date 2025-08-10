@@ -85,6 +85,7 @@ public class CaptchaService {
         }
 
         // 然后生成验证码
+        // 判断 nacos 上是否开启生成验证码设置了
         String verifyCode = sendMessage ? VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_SMS_LENGTH, captChaType) : MessageConstants.DEFAULT_SMS_CODE;
 
         // 发送线上短信
