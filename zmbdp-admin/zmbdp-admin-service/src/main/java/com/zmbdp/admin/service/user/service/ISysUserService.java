@@ -44,4 +44,9 @@ public interface ISysUserService {
      * @return B端用户信息 DTO
      */
     SysUserLoginDTO getLoginUser();
+
+    /**
+     * 退出登录
+     */
+    void logout();
 }

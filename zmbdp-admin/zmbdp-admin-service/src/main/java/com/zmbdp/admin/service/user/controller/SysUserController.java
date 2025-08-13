@@ -73,4 +73,15 @@ public class SysUserController {
     public Result<SysUserLoginVO> getLoginUser() {
         return Result.success(sysUserService.getLoginUser().convertToVO());
     }
+
+    /**
+     * 退出登录
+     *
+     * @return void
+     */
+    @DeleteMapping("/logout")
+    Result<Void> logout() {
+        sysUserService.logout();
+        return Result.success();
+    }
 }

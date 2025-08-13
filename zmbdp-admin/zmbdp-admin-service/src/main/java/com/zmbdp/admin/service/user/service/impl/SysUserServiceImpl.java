@@ -18,6 +18,8 @@ import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.common.security.service.TokenService;
+import com.zmbdp.common.security.utils.JwtUtil;
+import com.zmbdp.common.security.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +82,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 根据加密后的手机号查库是否存在
         SysUser sysUser = sysUserMapper.selectByPhoneNumber(phoneNumber);
         if (sysUser == null) {
-            throw new ServiceException("用户不存在", ResultCode.INVALID_PARA.getCode());
+            throw new ServiceException("手机号或密码错误", ResultCode.INVALID_PARA.getCode());
         }
         // 检查密码是否正确
         // 先解密
@@ -92,7 +94,7 @@ public class SysUserServiceImpl implements ISysUserService {
         String passwordEncrypt = DigestUtil.sha256Hex(password);
         // 和数据库的比较
         if (!passwordEncrypt.equals(sysUser.getPassword())) {
-            throw new ServiceException("密码不正确", ResultCode.INVALID_PARA.getCode());
+            throw new ServiceException("手机号或密码错误", ResultCode.INVALID_PARA.getCode());
         }
         // 校验用户的状态
         if (sysUser.getStatus().equals(UserConstants.USER_DISABLE)) {
@@ -236,5 +238,23 @@ public class SysUserServiceImpl implements ISysUserService {
         // 赋值数据库的属性
         BeanCopyUtil.copyProperties(sysUser, sysUserLoginDTO);
         return sysUserLoginDTO;
+    }
+
+    /**
+     * 退出登录
+     */
+    @Override
+    public void logout() {
+        // 解析令牌, 拿出用户信息做个日志
+        // 拿的是 JWT
+        String Jwt = SecurityUtil.getToken();
+        if (StringUtils.isEmpty(Jwt)) {
+            return;
+        }
+        String userName = JwtUtil.getUserName(Jwt, secret);
+        String userId = JwtUtil.getUserId(Jwt, secret);
+        log.info("[{}] 退出了系统, 用户ID: {}", userName, userId);
+        // 根据 jwt 删除用户缓存记录
+        tokenService.delLoginUser(Jwt, secret);
     }
 }

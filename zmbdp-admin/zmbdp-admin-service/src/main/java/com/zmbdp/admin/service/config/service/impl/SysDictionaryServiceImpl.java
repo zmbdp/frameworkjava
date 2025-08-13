@@ -137,7 +137,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         // 说明是符合要求的，直接改就行了
         sysDictionaryType.setValue(dictionaryTypeWriteReqDTO.getValue());
         if (StringUtils.isNotBlank(dictionaryTypeWriteReqDTO.getRemark())) {
-            dictionaryTypeWriteReqDTO.setRemark(dictionaryTypeWriteReqDTO.getRemark());
+            sysDictionaryType.setRemark(dictionaryTypeWriteReqDTO.getRemark());
         }
         sysDictionaryTypeMapper.updateById(sysDictionaryType);
         return sysDictionaryType.getId();
