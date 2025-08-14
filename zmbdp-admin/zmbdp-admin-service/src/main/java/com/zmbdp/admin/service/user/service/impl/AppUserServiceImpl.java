@@ -12,6 +12,8 @@ import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.common.redis.service.BloomFilterService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -53,6 +55,60 @@ public class AppUserServiceImpl implements IAppUserService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    /**
+     * 布隆过滤器服务
+     */
+    @Autowired
+    private BloomFilterService bloomFilterService;
+
+    /**
+     * 布隆过滤器预热
+     */
+    @PostConstruct
+    public void initSysUser() {
+        // 预热 C端用户信息
+        refreshBloomFilter();
+    }
+
+    public void refreshBloomFilter() {
+        try {
+            log.info("开始执行布隆过滤器刷新任务");
+
+            // 查询所有用户
+            List<AppUser> appUsers = appUserMapper.selectList(null);
+
+            log.info("从数据库加载到 {} 个用户", appUsers.size());
+
+            // 重新初始化布隆过滤器
+            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
+            bloomFilterService.reset();
+            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
+
+            // 将所有用户加密手机号和微信 ID 添加到布隆过滤器中
+            int count = 0;
+            for (AppUser appUser : appUsers) {
+                // 添加加密手机号（如果存在）
+                if (appUser.getPhoneNumber() != null && !appUser.getPhoneNumber().isEmpty()) {
+                    bloomFilterService.put(appUser.getPhoneNumber());
+                    count++;
+                }
+
+                // 添加微信 ID（如果存在）
+                if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
+                    bloomFilterService.put(appUser.getOpenId());
+                    count++;
+                }
+            }
+
+            if (count != appUsers.size()) {
+                log.warn("布隆过滤器刷新任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查", count, appUsers.size());
+            }
+            log.info("布隆过滤器刷新任务执行完成，共加载 {} 个用户数据", count);
+        } catch (Exception e) {
+            log.error("布隆过滤器刷新任务执行失败", e);
+        }
+    }
+
     /*=============================================    内部调用    =============================================*/
 
     /**
@@ -73,6 +129,9 @@ public class AppUserServiceImpl implements IAppUserService {
         appUser.setNickName("Java脚手架用户" + (int) (Math.random() * 9000) + 1000);
         appUser.setAvatar(defaultAvatar);
         appUserMapper.insert(appUser);
+        // 在把这个微信的 id 添加到布隆过滤器中
+        bloomFilterService.put(appUser.getOpenId());
+        bloomFilterService.put(String.valueOf(appUser.getId()));
         // 对象转换
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
@@ -88,7 +147,11 @@ public class AppUserServiceImpl implements IAppUserService {
      */
     @Override
     public AppUserDTO findByOpenId(String openId) {
+        // 先查询布隆过滤器
         if (StringUtils.isEmpty(openId)) {
+            return null;
+        }
+        if (!bloomFilterService.mightContain(openId)) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByOpenId(openId);
@@ -103,7 +166,11 @@ public class AppUserServiceImpl implements IAppUserService {
      */
     @Override
     public AppUserDTO findByPhone(String phoneNumber) {
+        // 先查询布隆过滤器
         if (StringUtils.isEmpty(phoneNumber)) {
+            return null;
+        }
+        if (!bloomFilterService.mightContain(AESUtil.encryptHex(phoneNumber))) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByPhoneNumber(AESUtil.encryptHex(phoneNumber));
@@ -128,6 +195,9 @@ public class AppUserServiceImpl implements IAppUserService {
         appUser.setNickName("Java脚手架用户" + (int) (Math.random() * 9000) + 1000);
         appUser.setAvatar(defaultAvatar);
         appUserMapper.insert(appUser);
+        // 将手机号加密之后添加到布隆过滤器中, 一定要添加 appUser 的，确保注册失败之后里面存的也是空
+        bloomFilterService.put(appUser.getPhoneNumber());
+        bloomFilterService.put(String.valueOf(appUser.getId()));
         // 对象转换返回
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
@@ -143,6 +213,10 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public void edit(UserEditReqDTO userEditReqDTO) {
         // 根据 id 查询
+        // 先查询布隆过滤器
+        if (!bloomFilterService.mightContain(String.valueOf(userEditReqDTO.getUserId()))) {
+            throw new ServiceException("用户不存在", ResultCode.INVALID_PARA.getCode());
+        }
         AppUser appUser = appUserMapper.selectById(userEditReqDTO.getUserId());
         // 没查到
         if (appUser == null) {
@@ -189,6 +263,9 @@ public class AppUserServiceImpl implements IAppUserService {
     public AppUserDTO findById(Long userId) {
         // 对 userId 进行判空操作
         if (userId == null) {
+            return null;
+        }
+        if (!bloomFilterService.mightContain(String.valueOf(userId))) {
             return null;
         }
         // 查询 appUser 对象

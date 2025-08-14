@@ -36,6 +36,12 @@
             <artifactId>redisson-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- 布隆过滤器依赖 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-core</artifactId>

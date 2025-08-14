@@ -102,7 +102,7 @@ public class TokenService {
             if (StringUtils.isNotEmpty(token)) {
                 // 先从 jwt 中拿到 用户的 的 key
                 String userKey = JwtUtil.getUserKey(token, secret);
-                // 然后再拼接成 redis 的 key 查询出 user 对象, 看看 redis 能不能查询到
+                // 然后再拼接成 redis 的 key 查询出 bloom 对象, 看看 redis 能不能查询到
                 user = redisService.getCacheObject(getTokenKey(userKey), LoginUserDTO.class);
             }
         } catch (Exception e) {

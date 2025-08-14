@@ -74,7 +74,7 @@ public class TestRedisController {
         String str = redisService.getCacheObject("test", String.class);
         log.info(str);
         User user = redisService.getCacheObject("userKey", User.class);
-        log.info("user:{}", user);
+        log.info("bloom:{}", user);
 
         // 将 redis 中的数据获取出来  对象的类型不会产生泛型擦除问题
         List<Map<String, RegionTest>> testList = redisService.getCacheObject("testList", new TypeReference<List<Map<String, RegionTest>>>() {

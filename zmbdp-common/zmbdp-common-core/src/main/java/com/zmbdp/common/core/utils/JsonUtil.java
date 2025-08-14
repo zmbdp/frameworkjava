@@ -33,7 +33,7 @@ public class JsonUtil {
         OBJECT_MAPPER =
                 JsonMapper.builder()
                         // 在反序列化时，如果 json 里面有个属性 class 里没有，默认会抛异常，false 就是不让他抛异常，给忽略掉
-                        // 比如 json {name: zhangsan, age: 20} 转换成 user {name, id} 对象，默认是会抛出异常的，这就是给他忽略掉
+                        // 比如 json {name: zhangsan, age: 20} 转换成 bloom {name, id} 对象，默认是会抛出异常的，这就是给他忽略掉
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                         // 在序列化时，默认会给日期属性变成时间戳，false 就是这么做，按照后续配置去转换
                         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)

@@ -45,6 +45,7 @@
         <hutool.version>5.8.25</hutool.version>
         <jjwt.version>0.11.5</jjwt.version>
         <aliyun.sms.version>3.1.1</aliyun.sms.version>
+        <google.guava.version>33.4.0-jre</google.guava.version>
     </properties>
 
     <dependencyManagement>
@@ -142,6 +143,13 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>dysmsapi20170525</artifactId>
                 <version>${aliyun.sms.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
             </dependency>
 
         </dependencies>

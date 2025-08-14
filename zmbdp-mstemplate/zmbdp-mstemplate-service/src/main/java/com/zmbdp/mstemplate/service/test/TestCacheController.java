@@ -70,8 +70,8 @@ public class TestCacheController {
 
             // 1. 测试添加元素到布隆过滤器
             log.info("--- 测试添加元素到布隆过滤器 ---");
-            String key1 = "user:1001";
-            String key2 = "user:1002";
+            String key1 = "bloom:1001";
+            String key2 = "bloom:1002";
             String key3 = "product:2001";
 
             bloomFilterService.put(key1);
@@ -92,7 +92,7 @@ public class TestCacheController {
 
             // 3. 测试不存在的元素
             log.info("--- 测试不存在的元素 ---");
-            String nonExistentKey1 = "user:9999";
+            String nonExistentKey1 = "bloom:9999";
             String nonExistentKey2 = "product:8888";
 
             boolean containsNonExistent1 = bloomFilterService.mightContain(nonExistentKey1);
@@ -114,8 +114,8 @@ public class TestCacheController {
             user2.setAge(30);
 
             // 使用带布隆过滤器的缓存方法存储数据
-            String userKey1 = "user:cache:1001";
-            String userKey2 = "user:cache:1002";
+            String userKey1 = "bloom:cache:1001";
+            String userKey2 = "bloom:cache:1002";
 
             // 模拟存储到缓存并更新布隆过滤器
             redisService.setCacheObject(userKey1, user1);
@@ -137,7 +137,7 @@ public class TestCacheController {
             }
 
             // 测试不存在的键
-            String nonExistentUserKey = "user:cache:9999";
+            String nonExistentUserKey = "bloom:cache:9999";
             if (bloomFilterService.mightContain(nonExistentUserKey)) {
                 User cachedUser = redisService.getCacheObject(nonExistentUserKey, User.class);
                 log.info("通过布隆过滤器检查后获取不存在的用户数据: {}", cachedUser);
@@ -243,7 +243,7 @@ public class TestCacheController {
 
             // 4. 测试复杂对象的缓存
             log.info("--- 测试复杂对象的缓存 ---");
-            String userKey = "test:cache:user:1";
+            String userKey = "test:cache:bloom:1";
             User testUser = new User();
             testUser.setName("测试用户");
             testUser.setAge(28);
@@ -258,8 +258,10 @@ public class TestCacheController {
 
             // 5. 测试性能对比
             log.info("--- 测试性能对比 ---");
-            int testIterations = 1000;
+            int testIterations = 2000;
 
+            // 清空一下布隆过滤器
+            bloomFilterService.reset();
             // 测试不使用布隆过滤器的性能
             long start1 = System.currentTimeMillis();
             for (int i = 0; i < testIterations; i++) {
