@@ -4,8 +4,8 @@
   <a href="https://spring.io/projects/spring-boot">
     <img src="https://img.shields.io/badge/Spring%20Boot-3.3.3-green.svg" alt="Spring Boot">
   </a>
-  <a href="https://spring.io/projects/spring-cloud">
-    <img src="https://img.shields.io/badge/Spring%20Cloud-2023.0.3-blue.svg" alt="Spring Cloud">
+  <a href="https://github.com/alibaba/spring-cloud-alibaba">
+    <img src="https://img.shields.io/badge/Spring%20Cloud%20Alibaba-2023.0.1.0-blue.svg" alt="Spring Cloud Alibaba">
   </a>
   <a href="https://github.com/zmbdp/frameworkjava/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/zmbdp/frameworkjava" alt="License">
@@ -14,7 +14,7 @@
 
 ## 项目简介
 
-FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业级微服务脚手架，旨在帮助开发者快速构建高可用、高性能的Java微服务应用。项目采用模块化设计，集成了企业级应用所需的常见功能，包括但不限于统一认证授权、多级缓存、消息队列、配置中心等。
+FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud Alibaba 2023.0.1.0的企业级微服务脚手架，旨在帮助开发者快速构建高可用、高性能的Java微服务应用。项目采用模块化设计，集成了企业级应用所需的常见功能，包括但不限于统一认证授权、多级缓存、消息队列、配置中心等。
 
 ## 核心特性
 
