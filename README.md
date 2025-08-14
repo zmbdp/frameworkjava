@@ -131,3 +131,35 @@ cd ../../../ mvn clean install -DskipTests
 
 java // 使用CacheUtil工具类 <p>
 T result = CacheUtil.getL2Cache(redisService, bloomFilterService, key, valueTypeRef, caffeineCache);
+
+## 性能优化
+
+1. **数据库优化**: 连接池配置、索引优化
+2. **缓存优化**: 多级缓存减少数据库访问
+3. **并发优化**: Redisson分布式锁、线程池配置
+4. **JVM优化**: 合理的堆内存和GC配置
+
+## 贡献指南
+
+欢迎提交Issue和Pull Request来帮助改进项目：
+
+1. Fork项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启Pull Request
+
+## 许可证
+
+本项目采用MIT许可证，详情请见 [LICENSE](LICENSE) 文件。
+
+## 联系方式
+
+- 作者: 稚名不带撇
+- 邮箱: your-email@example.com
+- GitHub: [https://github.com/yourusername](https://github.com/yourusername)
+
+## 鸣谢
+
+- 感谢所有为开源社区做出贡献的开发者
+- 特别感谢Spring团队提供的优秀框架
