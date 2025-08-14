@@ -113,7 +113,7 @@ frameworkjava<p>
 ### 一键部署
 
 1. 克隆项目
-bash git clone https://github.com/yourusername/frameworkjava.git cd frameworkjava
+bash git clone https://github.com/zmbdp/frameworkjava.git cd frameworkjava
 2. 启动基础服务
 bash cd deploy/dev/app docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
 3. 等待服务启动完成（约2-3分钟），检查服务状态
