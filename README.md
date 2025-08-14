@@ -41,18 +41,66 @@ FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业�
 
 ## 项目结构
 frameworkjava<p>
-├── zmbdp-gateway # 网关服务<p>
-├── zmbdp-common # 公共模块<p>
-│ ├── zmbdp-common-cache # 缓存相关<p>
-│ ├── zmbdp-common-core # 核心工具类<p>
-│ ├── zmbdp-common-domain # 公共领域对象<p>
-│ ├── zmbdp-common-message # 消息服务<p>
-│ ├── zmbdp-common-rabbitmq # RabbitMQ 配置<p>
-│ ├── zmbdp-common-redis # Redis 相关<p>
-│ └── zmbdp-common-security # 安全相关<p>
-├── zmbdp-admin # 管理服务<p>
-├── zmbdp-file # 文件服务<p>
-└── zmbdp-portal # 门户服务<p>
+├── zmbdp-gateway          # 网关服务<p>
+│   ├── src/main/java/com/zmbdp/gateway
+│   │   ├── ZmbdpGatewayServiceApplication.java    # 启动类<p>
+│   │   ├── config/IgnoreWhiteProperties.java      # 忽略白名单配置<p>
+│   │   ├── filter/AuthFilter.java                 # 认证过滤器<p>
+│   │   └── handler/GatewayExceptionHandler.java   # 全局异常处理器<p>
+│<p>
+├── zmbdp-common           # 公共模块<p>
+│   ├── zmbdp-common-cache     # 缓存相关<p>
+│   │   ├── src/main/java/com/zmbdp/common/cache
+│   │   │   ├── config/BloomFilterConfig.java      # 布隆过滤器配置<p>
+│   │   │   ├── service/BloomFilterService.java    # 布隆过滤器服务<p>
+│   │   │   └── utils/CacheUtil.java               # 缓存工具类<p>
+│   │<p>
+│   ├── zmbdp-common-core      # 核心工具类<p>
+│   │   ├── src/main/java/com/zmbdp/common/core<p>
+│   │   │   ├── config/MybatisPlusConfig.java      # MyBatis-Plus配置<p>
+│   │   │   ├── config/RestTemplateConfig.java     # RestTemplate配置<p>
+│   │   │   ├── config/ThreadPoolConfig.java       # 线程池配置<p>
+│   │   │   ├── domain/BasePageDTO.java            # 分页DTO基类<p>
+│   │   │   ├── entity/BaseDO.java                 # 实体基类<p>
+│   │   │   ├── enums/RejectType.java              # 拒绝类型枚举<p>
+│   │   │   └── utils/...                          # 各种工具类<p>
+│   │<p>
+│   ├── zmbdp-common-domain    # 公共领域对象<p>
+│   │   ├── src/main/java/com/zmbdp/common/domain<p>
+│   │   │   ├── constants/...                      # 常量类<p>
+│   │   │   ├── Result.java                        # 统一响应结果<p>
+│   │   │   ├── dto/BasePageReqDTO.java            # 分页请求DTO<p>
+│   │   │   └── exception/ServiceException.java    # 业务异常<p>
+│   │<p>
+│   ├── zmbdp-common-messaging # 消息服务<p>
+│   │   ├── src/main/java/com/zmbdp/common/messaging<p>
+│   │   │   ├── config/RabbitMqCommonConfig.java   # RabbitMQ配置<p>
+│   │   │   └── service/AliSmsService.java         # 阿里云短信服务<p>
+│   │<p>
+│   ├── zmbdp-common-redis     # Redis相关<p>
+│   │   ├── src/main/java/com/zmbdp/common/redis<p>
+│   │   │   ├── config/RedisConfig.java            # Redis配置<p>
+│   │   │   └── service/RedisService.java          # Redis服务<p>
+│   │<p>
+│   ├── zmbdp-common-security  # 安全相关<p>
+│   │   ├── src/main/java/com/zmbdp/common/security<p>
+│   │   │   ├── config/JwtConfig.java              # JWT配置<p>
+│   │   │   ├── service/TokenService.java          # Token服务<p>
+│   │   │   └── utils/JwtUtil.java                 # JWT工具类<p>
+│   │<p>
+│   └── zmbdp-common-thread    # 线程相关<p>
+│       ├── src/main/java/com/zmbdp/common/thread<p>
+│       │   ├── config/ThreadPoolConfig.java       # 线程池配置<p>
+│       │   ├── executor/CustomThreadPoolExecutor.java # 自定义线程池执行器<p>
+│       │   └── utils/ThreadUtils.java             # 线程工具类<p>
+│<p>
+├── zmbdp-admin            # 管理服务<p>
+│   ├── zmbdp-admin-api      # API接口定义<p>
+│   └── zmbdp-admin-service  # 业务实现<p>
+│<p>
+├── zmbdp-file             # 文件服务<p>
+└── zmbdp-portal           # 门户服务<p>
+
 
 ## 快速开始
 
