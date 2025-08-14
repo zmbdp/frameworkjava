@@ -156,10 +156,10 @@ T result = CacheUtil.getL2Cache(redisService, bloomFilterService, key, valueType
 ## 联系方式
 
 - 作者: 稚名不带撇
-- 邮箱: your-email@example.com
-- GitHub: [https://github.com/yourusername](https://github.com/yourusername)
+- 邮箱: JavaFH@163.com
+- GitHub: [https://github.com/zmbdp](https://github.com/zmbdp)
 
 ## 鸣谢
 
 - 感谢所有为开源社区做出贡献的开发者
-- 特别感谢Spring团队提供的优秀框架
+- 特别感谢 Spring 团队提供的优秀框架
