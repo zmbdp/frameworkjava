@@ -42,7 +42,7 @@ FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业�
 ## 项目结构
 frameworkjava<p>
 ├── zmbdp-gateway          # 网关服务<p>
-│   ├── src/main/java/com/zmbdp/gateway
+│   ├── src/main/java/com/zmbdp/gateway<p>
 │   │   ├── ZmbdpGatewayServiceApplication.java    # 启动类<p>
 │   │   ├── config/IgnoreWhiteProperties.java      # 忽略白名单配置<p>
 │   │   ├── filter/AuthFilter.java                 # 认证过滤器<p>
