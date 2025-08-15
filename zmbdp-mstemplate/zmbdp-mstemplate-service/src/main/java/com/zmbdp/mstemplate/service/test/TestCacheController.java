@@ -3,10 +3,10 @@ package com.zmbdp.mstemplate.service.test;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.zmbdp.common.bloomfilter.config.BloomFilterConfig;
+import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import com.zmbdp.common.cache.utils.CacheUtil;
 import com.zmbdp.common.domain.domain.Result;
-import com.zmbdp.common.redis.config.BloomFilterConfig;
-import com.zmbdp.common.redis.service.BloomFilterService;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.mstemplate.service.domain.RegionTest;
 import com.zmbdp.mstemplate.service.domain.User;
@@ -67,6 +67,10 @@ public class TestCacheController {
     public Result<Void> testBloomFilter() {
         try {
             log.info("============================   测试布隆过滤器功能   ============================");
+
+            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
+            bloomFilterService.reset();
+            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
 
             // 1. 测试添加元素到布隆过滤器
             log.info("--- 测试添加元素到布隆过滤器 ---");
@@ -194,6 +198,10 @@ public class TestCacheController {
         try {
             log.info("============================   测试CacheUtil集成布隆过滤器   ============================");
 
+            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
+            bloomFilterService.reset();
+            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
+
             // 创建测试用的本地缓存
             Cache<String, Object> caffeineCache =
                     Caffeine.newBuilder()
@@ -294,6 +302,10 @@ public class TestCacheController {
         try {
             log.info("============================   测试布隆过滤器配置   ============================");
 
+            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
+            bloomFilterService.reset();
+            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
+
             // 1. 测试配置参数获取
             log.info("--- 测试配置参数获取 ---");
             int expectedInsertions = bloomFilterConfig.getExpectedInsertions();
@@ -328,23 +340,35 @@ public class TestCacheController {
             // 4. 测试配置对布隆过滤器的影响
             log.info("--- 测试配置对布隆过滤器的影响 ---");
 
-            // 添加一些测试数据
-            for (int i = 0; i < Math.min(expectedInsertions / 10, 100); i++) {
+            // 添加一些测试数据到布隆过滤器
+            int insertCount = Math.min(expectedInsertions / 10, 100);
+            for (int i = 0; i < insertCount; i++) {
                 bloomFilterService.put("config:test:" + i);
             }
+            log.info("向布隆过滤器中添加了 {} 个元素", insertCount);
 
-            // 检查准确性
-            int hitCount = 0;
-            int testCount = 1000;
-            for (int i = 0; i < testCount; i++) {
+            // 测试存在的元素命中率（应该接近100%）
+            int existHitCount = 0;
+            for (int i = 0; i < insertCount; i++) {
                 if (bloomFilterService.mightContain("config:test:" + i)) {
-                    hitCount++;
+                    existHitCount++;
                 }
             }
+            double existHitRate = insertCount > 0 ? (double) existHitCount / insertCount * 100 : 0;
+            log.info("存在元素测试数量: {}, 命中数量: {}, 命中率: {}%", insertCount, existHitCount, existHitRate);
 
-            double hitRate = (double) hitCount / testCount * 100;
-            log.info("测试 {} 个元素，命中率: {}%", testCount, hitRate);
-            log.info("配置的误判率: {}，实际测试命中率会受到已插入元素数量的影响", falseProbability);
+            // 测试不存在的元素误判率
+            int nonExistTestCount = 1000;
+            int falsePositiveCount = 0;
+            for (int i = insertCount; i < insertCount + nonExistTestCount; i++) {
+                if (bloomFilterService.mightContain("config:test:" + i)) {
+                    falsePositiveCount++;
+                }
+            }
+            double falsePositiveRate = nonExistTestCount > 0 ? (double) falsePositiveCount / nonExistTestCount * 100 : 0;
+            log.info("不存在元素测试数量: {}, 误判数量: {}, 误判率: {}%", nonExistTestCount, falsePositiveCount, falsePositiveRate);
+
+            log.info("配置的误判率: {}，实际测试误判率: {}", falseProbability, falsePositiveRate);
 
             log.info("=== 布隆过滤器配置测试完成 ===");
             return Result.success();
@@ -354,4 +378,5 @@ public class TestCacheController {
             return Result.fail("测试失败: " + e.getMessage());
         }
     }
+
 }

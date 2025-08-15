@@ -2,9 +2,11 @@ package com.zmbdp.admin.service.timedtask.bloom;
 
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
-import com.zmbdp.common.redis.service.BloomFilterService;
+import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@RefreshScope
 public class ResetAppUserBloomFilterTask {
 
     /**
@@ -32,11 +35,23 @@ public class ResetAppUserBloomFilterTask {
     private AppUserMapper appUserMapper;
 
     /**
-     * 每天凌晨 4 点执行布隆过滤器刷新任务
+     * 是否启用布隆过滤器刷新任务
+     */
+    @Value("${bloom.filter.refresh.enabled:true}")
+    private boolean enabled;
+
+    /**
+     * 执行布隆过滤器刷新任务
      * 清空当前布隆过滤器并将数据库中所有用户加密手机号和微信 ID 重新加载
      */
-    @Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "${bloom.filter.refresh.cron:0 0 4 * * ?}")
     public void refreshBloomFilter() {
+        // 如果任务被禁用，则跳过执行
+        if (!enabled) {
+            log.info("布隆过滤器刷新任务已禁用，跳过执行");
+            return;
+        }
+
         try {
             log.info("开始执行布隆过滤器刷新任务");
 

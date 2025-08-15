@@ -12,7 +12,7 @@ import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.common.redis.service.BloomFilterService;
+import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -148,10 +148,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findByOpenId(String openId) {
         // 先查询布隆过滤器
-        if (StringUtils.isEmpty(openId)) {
-            return null;
-        }
-        if (!bloomFilterService.mightContain(openId)) {
+        if (StringUtils.isEmpty(openId) || !bloomFilterService.mightContain(openId)) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByOpenId(openId);
@@ -167,10 +164,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findByPhone(String phoneNumber) {
         // 先查询布隆过滤器
-        if (StringUtils.isEmpty(phoneNumber)) {
-            return null;
-        }
-        if (!bloomFilterService.mightContain(AESUtil.encryptHex(phoneNumber))) {
+        if (StringUtils.isEmpty(phoneNumber) || !bloomFilterService.mightContain(AESUtil.encryptHex(phoneNumber))) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByPhoneNumber(AESUtil.encryptHex(phoneNumber));
@@ -262,10 +256,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findById(Long userId) {
         // 对 userId 进行判空操作
-        if (userId == null) {
-            return null;
-        }
-        if (!bloomFilterService.mightContain(String.valueOf(userId))) {
+        if (userId == null || !bloomFilterService.mightContain(String.valueOf(userId))) {
             return null;
         }
         // 查询 appUser 对象

@@ -1,4 +1,4 @@
-package com.zmbdp.common.redis.config;
+package com.zmbdp.common.bloomfilter.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

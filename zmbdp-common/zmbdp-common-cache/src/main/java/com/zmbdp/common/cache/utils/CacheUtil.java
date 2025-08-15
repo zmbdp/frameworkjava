@@ -2,7 +2,7 @@ package com.zmbdp.common.cache.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.benmanes.caffeine.cache.Cache;
-import com.zmbdp.common.redis.service.BloomFilterService;
+import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import com.zmbdp.common.redis.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,8 +1,8 @@
-package com.zmbdp.common.redis.service;
+package com.zmbdp.common.bloomfilter.service;
 
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
-import com.zmbdp.common.redis.config.BloomFilterConfig;
+import com.zmbdp.common.bloomfilter.config.BloomFilterConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

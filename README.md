@@ -14,7 +14,7 @@
 
 ## 项目简介
 
-FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业级微服务脚手架，旨在帮助开发者快速构建高可用、高性能的Java微服务应用。项目采用模块化设计，集成了企业级应用所需的常见功能，包括但不限于统一认证授权、多级缓存、消息队列、配置中心等。
+FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业级微服务脚手架，旨在帮助开发者快速构建高可用、高性能的Java微服务应用。项目采用模块化设计，集成了企业级应用所需的常见功能，包括但不限于统一认证授权、多级缓存、异步线程、消息队列、配置中心等。
 
 ## 核心特性
 
@@ -94,6 +94,11 @@ frameworkjava
 │   │       └── exception/
 │   │           └── ServiceException.java        # 业务异常
 │   │
+│   ├── zmbdp-common-filter          # 过滤器相关
+│   │   └── src/main/java/com/zmbdp/common/bloomfilter
+│   │       ├── config/BloomFilterConfig.java    # 布隆过滤器配置
+│   │       └── service/BloomFilterService.java  # 布隆过滤器服务
+│   │
 │   ├── zmbdp-common-message         # 消息服务
 │   │   └── src/main/java/com/zmbdp/common/message
 │   │       ├── config/AliSmsConfig.java         # 阿里云短信配置
@@ -106,10 +111,8 @@ frameworkjava
 │   ├── zmbdp-common-redis           # Redis相关
 │   │   └── src/main/java/com/zmbdp/common/redis
 │   │       ├── config/
-│   │       │   ├── BloomFilterConfig.java       # 布隆过滤器配置
 │   │       │   └── RedisConfig.java             # Redis配置
 │   │       └── service/
-│   │           ├── BloomFilterService.java      # 布隆过滤器服务
 │   │           ├── RedisService.java            # Redis服务
 │   │           └── RedissonLockService.java     # Redisson分布式锁服务
 │   │
@@ -135,6 +138,7 @@ frameworkjava
 ├── zmbdp-portal                     # 门户服务
 └── zmbdp-mstemplate                 # 微服务模板
 </pre>
+
 
 ## 快速开始
 
@@ -283,11 +287,24 @@ bash<p>
 ## 配置说明
 
 主要配置项位于Nacos配置中心，包括：
-- 数据库连接配置
-- Redis连接配置
-- JWT密钥配置
-- 缓存参数配置
-- 短信服务配置
+- **服务配置**: 
+  - zmbdp-mstemplate-service-dev.yaml（微服务模板配置）
+  - zmbdp-gateway-service-dev.yaml（网关配置）
+- **公共组件配置**: 
+  - share-redis-dev.yaml（Redis公共配置）
+  - share-caffeine-dev.yaml（本地缓存公共配置）
+  - share-rabbitmq-dev.yaml（RabbitMQ公共配置）
+  - share-mysql-dev.yaml（MySQL公共配置）
+  - share-map-dev.yaml（地图服务公共配置）
+  - share-token-dev.yaml（Token公共配置）
+  - share-sms-dev.yaml（短信服务公共配置）
+  - share-filter-dev.yaml（ [布隆] 过滤器公共配置）
+- **业务服务配置**: 
+  - zmbdp-file-service-dev.yaml（文件服务配置）
+  - zmbdp-admin-service-dev.yaml（基础服务配置）
+  - zmbdp-portal-service-dev.yaml（C端用户服务配置）
+
+
 
 ## 开发指南
 
