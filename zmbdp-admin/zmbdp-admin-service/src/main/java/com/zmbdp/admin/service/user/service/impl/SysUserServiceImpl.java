@@ -117,6 +117,20 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public Long addOrEdit(SysUserDTO sysUserDTO) {
+        // 获取登陆用户的 id
+        Long userId = tokenService.getLoginUser(secret).getUserId();
+        if (sysUserDTO.getUserId() != null) {
+            // 查询数据库他是平台管理员还是超管理员，只允许超级管理员修改管理员的数据
+            SysUser sysUser = sysUserMapper.selectById(userId);
+            if (
+                    sysUser !=  null &&
+                    StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
+                    !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
+            ) {
+                log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能修改账号信息, 平台管理员id: {} ]", sysUserDTO.getUserId());
+                throw new ServiceException("平台管理员不能修改账号信息", ResultCode.FAILED.getCode());
+            }
+        }
         SysUser sysUser = new SysUser();
         // 根据用户 ID 判断是新增还是编辑
         if (sysUserDTO.getUserId() == null) {
@@ -128,17 +142,22 @@ public class SysUserServiceImpl implements ISysUserService {
                     // 加密手机号
                     AESUtil.encryptHex(sysUserDTO.getPhoneNumber())
             );
-            sysUser.setIdentity(sysUserDTO.getIdentity());
+            // 密码要加密, 新增肯定要加密码
+            sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
         }
         // 存储名字，密码，id 这些
         sysUser.setId(sysUserDTO.getUserId());
         sysUser.setNickName(sysUserDTO.getNickName());
-        // 校验密码
-        if (StringUtils.isEmpty(sysUserDTO.getPassword()) || !sysUserDTO.checkPassword()) {
-            throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
+        sysUser.setIdentity(sysUserDTO.getIdentity());
+        // 校验密码, 可能是编辑，编辑的话不传密码就是不编辑密码了
+        if (StringUtils.isNotEmpty(sysUserDTO.getPassword())) {
+            // 说明要修改密码
+            if (!sysUserDTO.checkPassword()) {
+                throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
+            }
+            // 密码要加密
+            sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
         }
-        // 密码要加密
-        sysUser.setPassword(DigestUtil.sha256Hex(sysUserDTO.getPassword()));
         // 判断用户状态 这个状态在数据库中是否存在
         if (sysDictionaryService.getDicDataByKey(sysUserDTO.getStatus()) == null) {
             throw new ServiceException("用户状态错误", ResultCode.INVALID_PARA.getCode());
