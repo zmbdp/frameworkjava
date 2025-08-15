@@ -7,6 +7,9 @@
   <a href="https://spring.io/projects/spring-cloud">
     <img src="https://img.shields.io/badge/Spring%20Cloud-2023.0.3-blue.svg" alt="Spring Cloud">
   </a>
+  <a href="https://github.com/alibaba/spring-cloud-alibaba">
+    <img src="https://img.shields.io/badge/Spring%20Cloud%20Alibaba-2023.0.1.2-blueviolet.svg" alt="Spring Cloud Alibaba">
+  </a>
   <a href="https://github.com/zmbdp/frameworkjava/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/zmbdp/frameworkjava" alt="License">
   </a>
