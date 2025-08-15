@@ -126,7 +126,7 @@ cd ../../../ mvn clean install -DskipTests
 
 ### 访问地址
 
-- Nacos控制台: http://localhost:8848/nacos (用户名/密码: nacos/nacos)
+- Nacos控制台: http://localhost:8848/nacos (用户名/密码: nacos/Hf@173503494)
 - Redis: localhost:6379
 - MySQL: localhost:3306
 - RabbitMQ管理界面: http://localhost:15672 (用户名/密码: zmbdp/Hf@173503494)
