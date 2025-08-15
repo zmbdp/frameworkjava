@@ -112,19 +112,19 @@ frameworkjava<p>
 
 ### 一键部署
 
-1. 克隆项目
+1. 克隆项目<p>
 bash<p>
 `git clone https://github.com/zmbdp/frameworkjava.git cd frameworkjava`
-2. 启动基础服务
+2. 启动基础服务<p>
 bash<p>
 `cd deploy/dev/app`<p>
 `docker-compose -p frameworkjava -f docker-compose-mid.yml up -d`
 3. 等待服务启动完成（约2-3分钟），检查服务状态<p>
-`bash`<p>
+bash<p>
 `docker-compose -p frameworkjava -f docker-compose-mid.yml ps`
-4. 构建并启动应用服务
-`bash`<p>
-返回项目根目录
+4. 构建并启动应用服务<p>
+bash<p>
+返回项目根目录<p>
 `cd ../../../`<p>
 `mvn clean install -DskipTests`<p>
 启动各服务模块...
