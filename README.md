@@ -40,100 +40,101 @@ FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业�
 | RabbitMQ | 消息队列 | 3.12.6 |
 
 ## 项目结构
-frameworkjava<p>
-├── zmbdp-gateway          # 网关服务<p>
-│   ├── src/main/java/com/zmbdp/gateway<p>
-│   │   ├── ZmbdpGatewayServiceApplication.java    # 启动类<p>
-│   │   ├── config/IgnoreWhiteProperties.java      # 忽略白名单配置<p>
-│   │   ├── filter/AuthFilter.java                 # 认证过滤器<p>
-│   │   └── handler/GatewayExceptionHandler.java   # 全局异常处理器<p>
-│<p>
-├── zmbdp-common           # 公共模块<p>
-│   ├── zmbdp-common-cache     # 缓存相关<p>
-│   │   ├── src/main/java/com/zmbdp/common/cache<p>
-│   │   │   ├── config/CaffeineConfig.java         # Caffeine缓存配置<p>
-│   │   │   └── utils/CacheUtil.java               # 缓存工具类<p>
-│   │<p>
-│   ├── zmbdp-common-core      # 核心工具类<p>
-│   │   ├── src/main/java/com/zmbdp/common/core<p>
-│   │   │   ├── config/<p>
-│   │   │   │   ├── MybatisPlusConfig.java         # MyBatis-Plus配置<p>
-│   │   │   │   ├── RestTemplateConfig.java        # RestTemplate配置<p>
-│   │   │   │   └── ThreadPoolConfig.java          # 线程池配置<p>
-│   │   │   ├── domain/<p>
-│   │   │   │   ├── dto/BasePageDTO.java           # 分页DTO基类<p>
-│   │   │   │   └── entity/BaseDO.java             # 实体基类<p>
-│   │   │   ├── enums/<p>
-│   │   │   │   └── RejectType.java                # 拒绝类型枚举<p>
-│   │   │   └── utils/<p>
-│   │   │       ├── AESUtil.java                   # AES加密工具类<p>
-│   │   │       ├── BeanCopyUtil.java              # Bean拷贝工具类<p>
-│   │   │       ├── JsonUtil.java                  # JSON工具类<p>
-│   │   │       ├── PageUtil.java                  # 分页工具类<p>
-│   │   │       ├── ServletUtil.java               # Servlet工具类<p>
-│   │   │       ├── StringUtil.java                # 字符串工具类<p>
-│   │   │       ├── TimestampUtil.java             # 时间戳工具类<p>
-│   │   │       └── VerifyUtil.java                # 验证工具类<p>
-│   │<p>
-│   ├── zmbdp-common-domain    # 公共领域对象<p>
-│   │   ├── src/main/java/com/zmbdp/common/domain<p>
-│   │   │   ├── constants/<p>
-│   │   │   │   ├── CacheConstants.java            # 缓存常量<p>
-│   │   │   │   ├── CommonConstants.java           # 通用常量<p>
-│   │   │   │   ├── HttpConstants.java             # HTTP常量<p>
-│   │   │   │   ├── MessageConstants.java          # 消息常量<p>
-│   │   │   │   ├── SecurityConstants.java         # 安全常量<p>
-│   │   │   │   ├── TokenConstants.java            # Token常量<p>
-│   │   │   │   └── UserConstants.java             # 用户常量<p>
-│   │   │   ├── domain/<p>
-│   │   │   │   ├── Result.java                    # 统一响应结果<p>
-│   │   │   │   ├── ResultCode.java                # 响应码枚举<p>
-│   │   │   │   ├── dto/BasePageReqDTO.java        # 分页请求DTO<p>
-│   │   │   │   └── vo/...                         # 各种VO对象<p>
-│   │   │   └── exception/<p>
-│   │   │       └── ServiceException.java          # 业务异常<p>
-│   │<p>
-│   ├── zmbdp-common-message   # 消息服务<p>
-│   │   ├── src/main/java/com/zmbdp/common/message<p>
-│   │   │   ├── config/AliSmsConfig.java           # 阿里云短信配置<p>
-│   │   │   └── service/...                        # 短信和验证码服务<p>
-│   │<p>
-│   ├── zmbdp-common-rabbitmq  # RabbitMQ相关<p>
-│   │   ├── src/main/java/com/zmbdp/common/rabbitmq<p>
-│   │   │   └── config/RabbitMqCommonConfig.java   # RabbitMQ通用配置<p>
-│   │<p>
-│   ├── zmbdp-common-redis     # Redis相关<p>
-│   │   ├── src/main/java/com/zmbdp/common/redis<p>
-│   │   │   ├── config/<p>
-│   │   │   │   ├── BloomFilterConfig.java         # 布隆过滤器配置<p>
-│   │   │   │   └── RedisConfig.java               # Redis配置<p>
-│   │   │   └── service/<p>
-│   │   │       ├── BloomFilterService.java        # 布隆过滤器服务<p>
-│   │   │       ├── RedisService.java              # Redis服务<p>
-│   │   │       └── RedissonLockService.java       # Redisson分布式锁服务<p>
-│   │<p>
-│   ├── zmbdp-common-security  # 安全相关<p>
-│   │   ├── src/main/java/com/zmbdp/common/security<p>
-│   │   │   ├── domain/dto/<p>
-│   │   │   │   ├── LoginUserDTO.java              # 登录用户DTO<p>
-│   │   │   │   └── TokenDTO.java                  # Token DTO<p>
-│   │   │   ├── handler/<p>
-│   │   │   │   └── GlobalExceptionHandler.java    # 全局异常处理器<p>
-│   │   │   ├── service/<p>
-│   │   │   │   └── TokenService.java              # Token服务<p>
-│   │   │   └── utils/<p>
-│   │   │       ├── JwtUtil.java                   # JWT工具类<p>
-│   │   │       └── SecurityUtil.java              # 安全工具类<p>
-│   │<p>
-├── zmbdp-admin            # 管理服务<p>
-│   ├── zmbdp-admin-api      # API接口定义<p>
-│   └── zmbdp-admin-service  # 业务实现<p>
-│       └── user/config/RabbitConfig.java          # RabbitMQ交换机配置<p>
-│<p>
-├── zmbdp-file             # 文件服务<p>
-├── zmbdp-portal           # 门户服务<p>
-└── zmbdp-mstemplate       # 微服务模板<p>
-
+<pre>
+frameworkjava
+├── zmbdp-gateway                    # 网关服务
+│   └── src/main/java/com/zmbdp/gateway
+│       ├── ZmbdpGatewayServiceApplication.java  # 启动类
+│       ├── config/IgnoreWhiteProperties.java    # 忽略白名单配置
+│       ├── filter/AuthFilter.java               # 认证过滤器
+│       └── handler/GatewayExceptionHandler.java # 全局异常处理器
+│
+├── zmbdp-common                     # 公共模块
+│   ├── zmbdp-common-cache           # 缓存相关
+│   │   └── src/main/java/com/zmbdp/common/cache
+│   │       ├── config/CaffeineConfig.java       # Caffeine缓存配置
+│   │       └── utils/CacheUtil.java             # 缓存工具类
+│   │
+│   ├── zmbdp-common-core            # 核心工具类
+│   │   └── src/main/java/com/zmbdp/common/core
+│   │       ├── config/
+│   │       │   ├── MybatisPlusConfig.java       # MyBatis-Plus配置
+│   │       │   ├── RestTemplateConfig.java      # RestTemplate配置
+│   │       │   └── ThreadPoolConfig.java        # 线程池配置
+│   │       ├── domain/
+│   │       │   ├── dto/BasePageDTO.java         # 分页DTO基类
+│   │       │   └── entity/BaseDO.java           # 实体基类
+│   │       ├── enums/
+│   │       │   └── RejectType.java              # 拒绝类型枚举
+│   │       └── utils/
+│   │           ├── AESUtil.java                 # AES加密工具类
+│   │           ├── BeanCopyUtil.java            # Bean拷贝工具类
+│   │           ├── JsonUtil.java                # JSON工具类
+│   │           ├── PageUtil.java                # 分页工具类
+│   │           ├── ServletUtil.java             # Servlet工具类
+│   │           ├── StringUtil.java              # 字符串工具类
+│   │           ├── TimestampUtil.java           # 时间戳工具类
+│   │           └── VerifyUtil.java              # 验证工具类
+│   │
+│   ├── zmbdp-common-domain          # 公共领域对象
+│   │   └── src/main/java/com/zmbdp/common/domain
+│   │       ├── constants/
+│   │       │   ├── CacheConstants.java          # 缓存常量
+│   │       │   ├── CommonConstants.java         # 通用常量
+│   │       │   ├── HttpConstants.java           # HTTP常量
+│   │       │   ├── MessageConstants.java        # 消息常量
+│   │       │   ├── SecurityConstants.java       # 安全常量
+│   │       │   ├── TokenConstants.java          # Token常量
+│   │       │   └── UserConstants.java           # 用户常量
+│   │       ├── domain/
+│   │       │   ├── Result.java                  # 统一响应结果
+│   │       │   ├── ResultCode.java              # 响应码枚举
+│   │       │   ├── dto/BasePageReqDTO.java      # 分页请求DTO
+│   │       │   └── vo/...                       # 各种VO对象
+│   │       └── exception/
+│   │           └── ServiceException.java        # 业务异常
+│   │
+│   ├── zmbdp-common-message         # 消息服务
+│   │   └── src/main/java/com/zmbdp/common/message
+│   │       ├── config/AliSmsConfig.java         # 阿里云短信配置
+│   │       └── service/...                      # 短信和验证码服务
+│   │
+│   ├── zmbdp-common-rabbitmq        # RabbitMQ相关
+│   │   └── src/main/java/com/zmbdp/common/rabbitmq
+│   │       └── config/RabbitMqCommonConfig.java # RabbitMQ通用配置
+│   │
+│   ├── zmbdp-common-redis           # Redis相关
+│   │   └── src/main/java/com/zmbdp/common/redis
+│   │       ├── config/
+│   │       │   ├── BloomFilterConfig.java       # 布隆过滤器配置
+│   │       │   └── RedisConfig.java             # Redis配置
+│   │       └── service/
+│   │           ├── BloomFilterService.java      # 布隆过滤器服务
+│   │           ├── RedisService.java            # Redis服务
+│   │           └── RedissonLockService.java     # Redisson分布式锁服务
+│   │
+│   ├── zmbdp-common-security        # 安全相关
+│   │   └── src/main/java/com/zmbdp/common/security
+│   │       ├── domain/dto/
+│   │       │   ├── LoginUserDTO.java            # 登录用户DTO
+│   │       │   └── TokenDTO.java                # Token DTO
+│   │       ├── handler/
+│   │       │   └── GlobalExceptionHandler.java  # 全局异常处理器
+│   │       ├── service/
+│   │       │   └── TokenService.java            # Token服务
+│   │       └── utils/
+│   │           ├── JwtUtil.java                 # JWT工具类
+│   │           └── SecurityUtil.java            # 安全工具类
+│   │
+├── zmbdp-admin                      # 管理服务
+│   ├── zmbdp-admin-api              # API接口定义
+│   └── zmbdp-admin-service          # 业务实现
+│       └── user/config/RabbitConfig.java        # RabbitMQ交换机配置
+│
+├── zmbdp-file                       # 文件服务
+├── zmbdp-portal                     # 门户服务
+└── zmbdp-mstemplate                 # 微服务模板
+</pre>
 
 ## 快速开始
 
