@@ -119,19 +119,17 @@ public class SysUserServiceImpl implements ISysUserService {
     public Long addOrEdit(SysUserDTO sysUserDTO) {
         // 获取登陆用户的 id
         Long userId = tokenService.getLoginUser(secret).getUserId();
-        if (sysUserDTO.getUserId() != null) {
-            // 查询数据库他是平台管理员还是超管理员，只允许超级管理员修改管理员的数据
-            SysUser sysUser = sysUserMapper.selectById(userId);
-            if (
-                    sysUser !=  null &&
-                    StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
-                    !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
-            ) {
-                log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能修改账号信息, 平台管理员id: {} ]", sysUser.getId());
-                throw new ServiceException("平台管理员不能修改账号信息", ResultCode.FAILED.getCode());
-            }
+        // 查询数据库他是平台管理员还是超管理员，只允许超级管理员新增/修改管理员的数据
+        SysUser sysUser = sysUserMapper.selectById(userId);
+        if (
+                sysUser !=  null &&
+                StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
+                !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
+        ) {
+            log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能修改账号信息, 平台管理员id: {} ]", sysUser.getId());
+            throw new ServiceException("平台管理员不能修改账号信息", ResultCode.FAILED.getCode());
         }
-        SysUser sysUser = new SysUser();
+        sysUser = new SysUser();
         // 根据用户 ID 判断是新增还是编辑
         if (sysUserDTO.getUserId() == null) {
             // 说明是新增
