@@ -24,4 +24,9 @@ public class BloomFilterConfig {
      * 误判率
      */
     private double falseProbability = 0.01;
+
+    /**
+     * 布隆过滤器阈值
+     */
+    private double warningThreshold = 0.7;
 }

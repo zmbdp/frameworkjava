@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -378,5 +379,139 @@ public class TestCacheController {
             return Result.fail("测试失败: " + e.getMessage());
         }
     }
+
+    /**
+     * 检查布隆过滤器配置
+     *
+     * @return 布隆过滤器配置信息
+     */
+    @PostMapping("/bloom/config/check")
+    public Result<Map<String, Object>> checkBloomFilterConfig() {
+        try {
+            Map<String, Object> result = new HashMap<>();
+
+            // 获取配置值
+            result.put("expectedInsertions", bloomFilterConfig.getExpectedInsertions());
+            result.put("falseProbability", bloomFilterConfig.getFalseProbability());
+            result.put("warningThreshold", bloomFilterConfig.getWarningThreshold());
+            result.put("bloomFilterStatus", bloomFilterService.getStatus());
+
+            log.info("布隆过滤器配置检查: {}", result);
+
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("检查布隆过滤器配置时发生异常", e);
+            return Result.fail("检查失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试布隆过滤器扩容功能
+     */
+    @PostMapping("/bloom/expand")
+    public Result<Void> testBloomFilterExpansion() {
+        try {
+            log.info("============================   测试布隆过滤器扩容功能   ============================");
+
+            // 1. 重置布隆过滤器到小容量
+            log.info("--- 重置布隆过滤器到小容量 ---");
+            log.info("扩容前状态: {}", bloomFilterService.getStatus());
+            bloomFilterService.reset();
+            log.info("重置后状态: {}", bloomFilterService.getStatus());
+
+            // 2. 添加超过容量的元素以触发警告
+            log.info("--- 添加元素测试负载警告 ---");
+            for (int i = 0; i < 8; i++) {
+                bloomFilterService.put("test:small:" + i);
+                log.info("添加元素 test:small:{} 后状态: {}", i, bloomFilterService.getStatus());
+            }
+
+            // 3. 验证元素存在性
+            log.info("--- 验证元素存在性 ---");
+            for (int i = 0; i < 8; i++) {
+                boolean exists = bloomFilterService.mightContain("test:small:" + i);
+                log.info("元素 test:small:{} 存在: {}", i, exists);
+            }
+
+            // 4. 测试不存在的元素
+            log.info("--- 测试不存在的元素 ---");
+            boolean notExists = bloomFilterService.mightContain("test:small:999");
+            log.info("不存在的元素 test:small:999 检查结果: {}", notExists);
+
+            // 5. 手动扩容测试
+            log.info("--- 手动扩容测试 ---");
+            log.info("扩容前实际元素数量: {}", bloomFilterService.actualElementCount());
+
+            // 执行扩容（模拟用户在Nacos上修改配置后调用）
+            bloomFilterService.expand();
+
+            log.info("扩容后状态: {}", bloomFilterService.getStatus());
+            log.info("扩容后实际元素数量: {}", bloomFilterService.actualElementCount());
+
+            // 6. 验证扩容后元素仍然存在
+            log.info("--- 验证扩容后元素仍然存在 ---");
+            for (int i = 0; i < 8; i++) {
+                boolean exists = bloomFilterService.mightContain("test:small:" + i);
+                log.info("扩容后元素 test:small:{} 存在: {}", i, exists);
+            }
+
+            // 7. 添加更多元素测试扩容后容量
+            log.info("--- 添加更多元素测试扩容后容量 ---");
+            for (int i = 8; i < 200; i++) {
+                bloomFilterService.put("test:small:" + i);
+            }
+
+            // 验证新添加的元素存在
+            for (int i = 8; i < 200; i++) {
+                boolean exists = bloomFilterService.mightContain("test:small:" + i);
+                log.info("新添加元素 test:small:{} 存在: {}", i, exists);
+            }
+
+            log.info("扩容后最终状态: {}", bloomFilterService.getStatus());
+
+            // 8. 边界情况测试
+            log.info("--- 边界情况测试 ---");
+
+            // 测试空值处理
+            bloomFilterService.put(null);
+            log.info("尝试添加null值后状态: {}", bloomFilterService.getStatus());
+
+            bloomFilterService.put("");
+            log.info("尝试添加空字符串后状态: {}", bloomFilterService.getStatus());
+
+            // 测试null和空字符串检查
+            boolean nullCheck = bloomFilterService.mightContain(null);
+            boolean emptyCheck = bloomFilterService.mightContain("");
+            log.info("null值检查结果: {}", nullCheck);
+            log.info("空字符串检查结果: {}", emptyCheck);
+
+            // 9. 性能测试
+            log.info("--- 性能测试 ---");
+            long startTime = System.currentTimeMillis();
+            for (int i = 0; i < 1000; i++) {
+                bloomFilterService.put("perf:test:" + i);
+            }
+            long endTime = System.currentTimeMillis();
+            log.info("添加1000个元素耗时: {} ms", endTime - startTime);
+
+            startTime = System.currentTimeMillis();
+            int mightContainCount = 0;
+            for (int i = 0; i < 1000; i++) {
+                if (bloomFilterService.mightContain("perf:test:" + i)) {
+                    mightContainCount++;
+                }
+            }
+            endTime = System.currentTimeMillis();
+            log.info("查询1000个元素耗时: {} ms, 命中数量: {}", endTime - startTime, mightContainCount);
+
+            log.info("=== 布隆过滤器扩容功能测试完成 ===");
+            return Result.success();
+
+        } catch (Exception e) {
+            log.error("测试布隆过滤器扩容功能过程中发生异常", e);
+            return Result.fail("测试失败: " + e.getMessage());
+        }
+    }
+
 
 }

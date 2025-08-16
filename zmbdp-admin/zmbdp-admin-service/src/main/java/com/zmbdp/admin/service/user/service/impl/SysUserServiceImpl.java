@@ -127,7 +127,7 @@ public class SysUserServiceImpl implements ISysUserService {
                     StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
                     !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
             ) {
-                log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能修改账号信息, 平台管理员id: {} ]", sysUserDTO.getUserId());
+                log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能修改账号信息, 平台管理员id: {} ]", sysUser.getId());
                 throw new ServiceException("平台管理员不能修改账号信息", ResultCode.FAILED.getCode());
             }
         }
