@@ -50,7 +50,7 @@ frameworkjava
 │       ├── ZmbdpGatewayServiceApplication.java  # 启动类
 │       ├── config/IgnoreWhiteProperties.java    # 忽略白名单配置
 │       ├── filter/AuthFilter.java               # 认证过滤器
-│       └── handler/GatewayExceptionHandler.java # 全局异常处理器
+│       └── handler/GatewayExceptionHandler.java # 网关层全局异常处理器
 │
 ├── zmbdp-common                     # 公共模块
 │   ├── zmbdp-common-cache           # 缓存相关
@@ -125,7 +125,7 @@ frameworkjava
 │   │       │   ├── LoginUserDTO.java            # 登录用户DTO
 │   │       │   └── TokenDTO.java                # Token DTO
 │   │       ├── handler/
-│   │       │   └── GlobalExceptionHandler.java  # 全局异常处理器
+│   │       │   └── GlobalExceptionHandler.java  # 服务层全局异常处理器
 │   │       ├── service/
 │   │       │   └── TokenService.java            # Token服务
 │   │       └── utils/
