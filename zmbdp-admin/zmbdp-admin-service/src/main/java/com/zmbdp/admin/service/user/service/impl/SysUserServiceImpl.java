@@ -122,7 +122,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 查询数据库他是平台管理员还是超管理员，只允许超级管理员新增/修改管理员的数据
         SysUser sysUser = sysUserMapper.selectById(userId);
         if (
-                sysUser !=  null &&
+                sysUser != null &&
                 StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
                 !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
         ) {

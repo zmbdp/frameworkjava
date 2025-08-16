@@ -37,10 +37,10 @@ public class TestArgumentController {
     @GetMapping("/keys")
     List<ArgumentDTO> getByConfigKeys() {
         List<String> configKeys = new ArrayList<>();
-//        configKeys.add("configKey");
-//        configKeys.add("configKey1");
-//        configKeys.add("configKey1111");
-//        configKeys.add("configKey99999");
+        configKeys.add("admin");
+        configKeys.add("super_admin");
+        configKeys.add("sys_hot_city");
+        configKeys.add("configKey99999");
         return argumentServiceApi.getByConfigKeys(configKeys);
     }
 }
