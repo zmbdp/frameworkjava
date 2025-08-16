@@ -1,0 +1,47 @@
+server:
+  port: 10030
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # 模板微服务
+        - id: zmbdp-mstemplate-service
+          uri: lb://zmbdp-mstemplate-service
+          predicates:
+            - Path=/mstemplate/**
+          filters:
+            - StripPrefix=1
+        # 文件微服务
+        - id: zmbdp-file-service
+          uri: lb://zmbdp-file-service
+          predicates:
+            - Path=/file/**
+        # 地图微服务
+        - id: zmbdp-admin-service
+          uri: lb://zmbdp-admin-service
+          predicates:
+            - Path=/admin/**
+          filters:
+            - StripPrefix=1
+        # C端用户微服务
+        - id: zmbdp-portal-service
+          uri: lb://zmbdp-portal-service
+          predicates:
+            - Path=/portal/**
+          filters:
+            - StripPrefix=1
+
+
+security:
+  ignore:
+  # 白名单配置
+    whites:
+      - /admin/logout
+      # - /admin/register
+      - /**/register/**
+      - /admin/codeLogin
+      - /**/login/**
+      - /**/send_code/**
+      - /**/nologin/**
+      - /**/test/**

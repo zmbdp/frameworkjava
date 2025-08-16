@@ -1,0 +1,22 @@
+sms:
+  # 是否开启短信发送功能
+  send-message: false
+  # 单个手机号，每日发送短信次数的限制
+  send-limit: 50
+  # 验证码有效期
+  code-expiration: 5
+  # 短信签名
+  sign-name: # 你的短信签名
+  aliyun:
+    # 你的 accessKeyId
+    accessKeyId: # 你的 accessKeyId
+    # 你的 accessKeySecret
+    accessKeySecret: # 你的 accessKeySecret
+    # 服务器地址
+    endpoint: dysmsapi.aliyuncs.com
+    # 短信模板 ID
+    templateCode: # 你的短信模板 ID
+
+captcha:
+  # 验证码类型，1: 纯数字; 2: 大小写字母+数字; 3: 大小写字母+数字+特殊字符
+  type: 3

@@ -1,0 +1,37 @@
+server:
+  port: 18082
+
+storage:
+  type: oss
+
+oss:
+  # 是否采用内网上传 true - 是，false - 否
+  internal: false
+  # 你的外网 endpoint
+  endpoint: # 你的外网 endpoint
+  # 你的内网 endpoint
+  intEndpoint: # 你的内网 endpoint
+  # 你的地域 id
+  region: # 你的地域 id
+  # 你的 accessKeyId
+  accessKeyId: # 你的 accessKeyId
+  # 你的 accessKeySecret
+  accessKeySecret: # 你的 accessKeySecret
+  # 你的 bucket 名称
+  bucketName: # 你的 bucket 名称
+  # 你的文件名
+  pathPrefix: # 你的文件名
+  # 签名有效时间
+  expre: 600
+  # 上传到 oss对象存储 的文件最小限制
+  minLen: 0
+  # 上传到 oss对象存储 的文件最大限制 (字节)
+  maxLen: 1073741824
+
+spring:
+  servlet:
+    multipart:
+      # 限制单个文件大小
+      max-file-size: 50MB
+      # 限制一次请求的总文件大小
+      max-request-size: 50MB

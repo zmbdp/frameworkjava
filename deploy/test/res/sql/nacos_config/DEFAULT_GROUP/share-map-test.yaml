@@ -1,0 +1,6 @@
+map:
+  type: qqmap
+  
+qqmap:
+  key: # 你的腾讯地图 key
+  apiService: https://apis.map.qq.com

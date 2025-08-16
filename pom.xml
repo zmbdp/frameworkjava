@@ -46,6 +46,22 @@
         <jjwt.version>0.11.5</jjwt.version>
         <aliyun.sms.version>3.1.1</aliyun.sms.version>
         <google.guava.version>33.4.0-jre</google.guava.version>
+
+        <!--运行环境-->
+        <runenv>dev</runenv>
+        <java.opts.default>-Xmx256m</java.opts.default>
+
+        <!--系统配置中心-->
+        <nacos.addr>http://你的内网ip:8848</nacos.addr>
+
+        <!--docker部署配置-->
+        <dockerhost.addr>tcp://你的外网ip:2376</dockerhost.addr>
+        <dockerregistry.url>registry.cn-chengdu.aliyuncs.com</dockerregistry.url>
+        <dockerregistry.username>houyj1987@163.com</dockerregistry.username>
+        <dockerregistry.password>admin@666777</dockerregistry.password>
+        <dockerregistry.namespace>frameworkjava</dockerregistry.namespace>
+        <docker.skip.push>true</docker.skip.push>
+
     </properties>
 
     <dependencyManagement>

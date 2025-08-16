@@ -142,6 +142,15 @@ frameworkjava
 └── zmbdp-mstemplate                 # 微服务模板
 </pre>
 
+## 部署环境
+
+项目支持多种部署环境：
+
+1. **开发环境** (`deploy/dev/`) - 用于本地开发和测试
+2. **测试环境** (`deploy/test/`) - 用于集成测试和预发布
+3. **生产环境** (`deploy/prd/`) - 用于生产部署
+
+每个环境都包含完整的Docker Compose配置和相关中间件配置。
 
 ## 快速开始
 
@@ -154,21 +163,40 @@ frameworkjava
 ### 一键部署
 
 1. 克隆项目<p>
-bash<p>
-`git clone https://github.com/zmbdp/frameworkjava.git cd frameworkjava`
+```bash
+git clone https://github.com/zmbdp/frameworkjava.git cd frameworkjava
+```
 2. 启动基础服务<p>
-bash<p>
-`cd deploy/dev/app`<p>
-`docker-compose -p frameworkjava -f docker-compose-mid.yml up -d`
+```bash
+# 开发环境
+cd deploy/dev/app
+docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
+# 测试环
+cd deploy/test/app
+docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
+# 生产环境
+cd deploy/prd/app
+docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
+```
 3. 等待服务启动完成（约2-3分钟），检查服务状态<p>
-bash<p>
-`docker-compose -p frameworkjava -f docker-compose-mid.yml ps`
+```bash
+docker-compose -p frameworkjava -f docker-compose-mid.yml ps
+```
 4. 构建并启动应用服务<p>
-bash<p>
-返回项目根目录<p>
-`cd ../../../`<p>
-`mvn clean install -DskipTests`<p>
-启动各服务模块...
+```bash
+# 返回项目根目录
+cd ../../../
+mvn clean install -DskipTests
+# 启动各服务模块...
+# 启动网关服务
+cd zmbdp-gateway/zmbdp-gateway-service
+mvn spring-boot:run
+# 启动管理服务
+cd ../../zmbdp-admin/zmbdp-admin-service
+mvn spring-boot:run
+# 启动其他服务...
+```
+
 
 ### 访问地址
 

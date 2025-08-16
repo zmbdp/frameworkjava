@@ -1,0 +1,6 @@
+spring:
+  rabbitmq:
+    port: 5672
+    host: 你的内网ip
+    username: zmbdp
+    password: Hf@173503494

@@ -1,0 +1,57 @@
+version: '3.8'
+#启动命令 docker compose -p frameworkjava -f docker-compose-mid.yml up -d
+services:
+  frameworkjava-admin:
+    build:
+      context: service/admin
+    image: frameworkjavaprd/zmbdp-admin-service:1.0-SNAPSHOT
+    container_name: frameworkjava-admin-prd
+    ports:
+      - "18081:18081"
+    environment:
+      RUN_ENV: prd
+      NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
+      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    networks:
+      frameworkjava_network_prd:
+  frameworkjava-file:
+    build:
+      context: service/file
+    ports:
+      - "18082:18082"
+    image: frameworkjavaprd/zmbdp-file-service:1.0-SNAPSHOT
+    container_name: frameworkjava-file-prd
+    environment:
+      RUN_ENV: prd
+      NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
+      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    networks:
+      frameworkjava_network_prd:
+  frameworkjava-gateway:
+    build:
+      context: service/gateway
+    ports:
+      - "18080:18080"
+    image: frameworkjavaprd/zmbdp-gateway-service:1.0-SNAPSHOT
+    container_name: frameworkjava-gateway-prd
+    environment:
+      RUN_ENV: prd
+      NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
+      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    networks:
+      frameworkjava_network_prd:
+  frameworkjava-portal:
+    build:
+      context: service/portal
+    ports:
+      - "18083:18083"
+    image: frameworkjavaprd/zmbdp-portal-service:1.0-SNAPSHOT
+    container_name: frameworkjava-portal-prd
+    environment:
+      RUN_ENV: prd
+      NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
+      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    networks:
+      frameworkjava_network_prd:
+networks:
+  frameworkjava_network_prd:

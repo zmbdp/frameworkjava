@@ -1,0 +1,221 @@
+version: '3.8'
+#启动命令 docker compose -p frameworkjava -f docker-compose-mid.yml up -d
+services:
+  frameworkjava-mysql-master:
+    container_name: frameworkjava-mysql-master
+    image: mysql:8.4.2
+    ports:
+      - "3308:3306"
+    volumes:
+      # 数据挂载
+      - ../data/frameworkjavadata/mysql/data:/var/lib/mysql
+      - ./mysql/init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql/sql:/opt/sql
+    command: [
+      'mysqld',
+      '--innodb-buffer-pool-size=80M',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci',
+      '--default-time-zone=+8:00',
+      '--lower-case-table-names=1',
+      '--explicit_defaults_for_timestamp=true',
+      '--server-id=1',
+      '--log-bin=mysql-bin',
+      '--binlog-ignore-db=mysql',
+      '--binlog-cache-size=256M',
+      '--binlog-format=ROW',
+      '--max_connections=2000'
+    ]
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    healthcheck:
+      test: mysql --user=zmbdpdev -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
+      start_period: 30s
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: Hf@173503494
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+  frameworkjava-redis01:
+    container_name: frameworkjava-redis01
+    image: redis:7.0.15
+    ports:
+      - "6380:6380"
+      - "16380:16380"
+    volumes:
+      - ./redis/conf/redis01.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis01/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "redis-cli","-p","6380", "ping" ]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  frameworkjava-redis02:
+    container_name: frameworkjava-redis02
+    image: redis:7.0.15
+    ports:
+      - "6381:6381"
+      - "16381:16381"
+    volumes:
+      - ./redis/conf/redis02.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis02/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "redis-cli","-p","6381", "ping" ]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  frameworkjava-redis03:
+    container_name: frameworkjava-redis03
+    image: redis:7.0.15
+    ports:
+      - "6382:6382"
+      - "16382:16382"
+    volumes:
+      - ./redis/conf/redis03.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis03/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "redis-cli","-p","6382", "ping" ]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 3
+  frameworkjava-nacos01:
+    container_name: frameworkjava-nacos01
+    image: nacos/nacos-server:v2.2.2
+    environment:
+      - MODE=cluster
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - NACOS_APPLICATION_PORT=8854
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=你的云服务器1内网ip/你的虚拟机1内网ip
+      - MYSQL_SERVICE_PORT=3308
+      - MYSQL_SERVICE_DB_NAME=frameworkjava_nacos_prd
+      - MYSQL_SERVICE_USER=zmbdpdev
+      - MYSQL_SERVICE_PASSWORD=Hf@173503494
+      - NACOS_SERVER_IP=你的云服务器1内网ip/你的虚拟机1内网ip
+      - NACOS_SERVERS=你的云服务器1内网ip/你的虚拟机1内网ip:8854 你的云服务器1内网ip/你的虚拟机1内网ip:8856 你的云服务器2内网ip/你的虚拟机2内网ip:8858
+    volumes:
+      - ../data/frameworkjavadata/nacos01/logs/:/home/nacos/logs
+      - ../data/frameworkjavadata/nacos01/tomcatlogs/:/home/bit/nacos/tomcat/logs/
+      - ./nacos/conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8854:8854"
+      - "9854:9854"
+      - "9855:9855"
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    depends_on:
+      frameworkjava-mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8854/nacos" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  frameworkjava-nacos02:
+    container_name: frameworkjava-nacos02
+    image: nacos/nacos-server:v2.2.2
+    environment:
+      - MODE=cluster
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - NACOS_APPLICATION_PORT=8856
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=你的云服务器1内网ip/你的虚拟机1内网ip
+      - MYSQL_SERVICE_PORT=3308
+      - MYSQL_SERVICE_DB_NAME=frameworkjava_nacos_prd
+      - MYSQL_SERVICE_USER=zmbdpdev
+      - MYSQL_SERVICE_PASSWORD=Hf@173503494
+      - NACOS_SERVER_IP=你的云服务器1内网ip/你的虚拟机1内网ip
+      - NACOS_SERVERS=你的云服务器1内网ip/你的虚拟机1内网ip:8854 你的云服务器1内网ip/你的虚拟机1内网ip:8856 你的云服务器2内网ip/你的虚拟机2内网ip:8858
+    volumes:
+      - ../data/frameworkjavadata/nacos02/logs/:/home/nacos/logs
+      - ../data/frameworkjavadata/nacos02/tomcatlogs/:/home/bit/nacos/tomcat/logs/
+      - ./nacos/conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8856:8856"
+      - "9856:9856"
+      - "9857:9857"
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    depends_on:
+      frameworkjava-mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8856/nacos" ]
+      start_period: 30s
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  frameworkjava-rabbitmq01:
+    image: rabbitmq:3.12.6-management
+    container_name: frameworkjava-rabbitmq01
+    restart: always
+    hostname: frameworkjava-rabbitmq01
+    extra_hosts:
+      - "frameworkjava-rabbitmq02:你的云服务器2内网ip/你的虚拟机2内网ip"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: 'BITECOOKIE'
+      RABBITMQ_NODE_PORT: 5673
+      RABBITMQ_NODENAME: "frameworkjava-rabbitmq01"
+      # 用户名
+      RABBITMQ_DEFAULT_USER: zmbdp
+      # 密码
+      RABBITMQ_DEFAULT_PASS: Hf@173503494
+    ports:
+      - "4369:4369"
+      - "5673:5673"
+      - "15673:15673"
+      - "25673:25673"
+    volumes:
+      - ./rabbitmq/conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ../data/frameworkjavadata/rabbitmq01/log:/var/log/rabbitmq
+      - ../data/frameworkjavadata/rabbitmq01/data:/var/lib/rabbitmq
+    networks:
+      frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  frameworkjava-webprd:
+    image: nginx:1.24.0
+    container_name: frameworkjava-webprd
+    restart: always
+    networks:
+      frameworkjava_network_prd:
+    ports:
+      - "8666:80"
+    volumes:
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/web/dist:/data/frameworkjava/web/dist
+
+networks:
+  frameworkjava_network_prd:

@@ -1,0 +1,15 @@
+# 布隆过滤器配置
+bloom:
+  filter:
+    # 预期插入的元素数量, 最小都得是100
+    expectedInsertions: 100
+    # 误判率
+    falseProbability: 0.01
+    # 布隆过滤器扩容阈值
+    warningThreshold: 0.6
+    # 刷新布隆过滤器相关配置
+    refresh:
+      # 刷新布隆过滤器时间配置
+      cron: "0 0 4 * * ?"  # 每天凌晨四点执行一次
+      # 是否刷新布隆过滤器 true - 是; false - 否
+      enabled: true

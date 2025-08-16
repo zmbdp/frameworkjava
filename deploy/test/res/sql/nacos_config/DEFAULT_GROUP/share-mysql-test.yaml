@@ -1,0 +1,9 @@
+spring:
+  data:
+    redis:
+      host: 你的内网ip
+      password: Hf@173503494
+  datasource:
+    url: jdbc:mysql://你的内网ip:3306/frameworkjava_dev?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: zmbdpdev
+    password: Hf@173503494

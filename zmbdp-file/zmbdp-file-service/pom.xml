@@ -99,6 +99,57 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.45.0</version>
+
+                <configuration>
+                    <!--指定远程服务器的Docker服务访问地址-->
+                    <dockerHost>${dockerhost.addr}</dockerHost>
+                    <certPath>${project.basedir}/../../deploy/test/app/config/cert</certPath>
+                    <!--指定私有仓库的访问路径-->
+                    <pushRegistry>${dockerregistry.url}</pushRegistry>
+                    <!--指定库的用户名与密码-->
+                    <authConfig>
+                        <username>${dockerregistry.username}</username>
+                        <password>${dockerregistry.password}</password>
+                    </authConfig>
+                    <containerNamePattern>${dockerregistry.namespace}-%n-%i</containerNamePattern>
+                    <images>
+                        <image>
+                            <!--指定私有仓库访问地址/镜像名称-->
+                            <name>${dockerregistry.namespace}/${project.build.finalName}:${project.version}</name>
+                            <build>
+                                <!--指定Dockerfile的路径-->
+                                <dockerFileDir>${project.basedir}</dockerFileDir>
+                            </build>
+                            <run>
+                                <env>
+                                    <NACOS_ADDR>${nacos.addr}</NACOS_ADDR>
+                                    <RUN_ENV>${runenv}</RUN_ENV>
+                                    <JAVA_OPTS>${java.opts.default}</JAVA_OPTS>
+                                </env>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>stop</goal>
+                            <goal>build</goal>
+                            <goal>start</goal>
+                            <!--推送到远端仓库 -->
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

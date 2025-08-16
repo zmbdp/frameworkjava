@@ -1,0 +1,7 @@
+# redis 相关配置
+spring:
+  data:
+    redis:
+      host: 你的内网ip
+      port: 6379
+      password: Hf@173503494

@@ -1,0 +1,7 @@
+server:
+  port: 18081
+
+appuser:
+  info:
+    # C端用户默认头像路径
+    defaultAvatar: # 你的云服务器1外网ip/你的虚拟机1外网ip:8080/file/download/defaultAvatar.png
