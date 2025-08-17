@@ -15,7 +15,7 @@
 
     <packaging>pom</packaging>
     <modules>
-        <module>zmbdp-mstemplate-aip</module>
+        <module>zmbdp-mstemplate-api</module>
         <module>zmbdp-mstemplate-service</module>
     </modules>
 
