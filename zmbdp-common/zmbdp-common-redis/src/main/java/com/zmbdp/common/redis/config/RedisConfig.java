@@ -11,6 +11,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.zmbdp.common.domain.constants.CommonConstants;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -28,6 +31,8 @@ import java.time.format.DateTimeFormatter;
  * @author 稚名不带撇
  */
 @Configuration
+@EnableCaching // 加上这个注解，可以在方法上使用 @Cacheable、@CacheEvict、@CachePut 等注解来实现缓存功能。
+@AutoConfigureBefore(RedisAutoConfiguration.class) // 确保当前配置类在 RedisAutoConfiguration 之前被加载
 public class RedisConfig {
 
     /**

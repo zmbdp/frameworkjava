@@ -24,6 +24,6 @@ public class RabbitConfig {
      */
     @Bean
     public FanoutExchange editUserExchange() {
-        return new FanoutExchange(EXCHANGE_NAME, true, true);
+        return new FanoutExchange(EXCHANGE_NAME, true, false);
     }
 }
