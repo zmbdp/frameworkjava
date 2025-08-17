@@ -5,6 +5,8 @@ import lombok.Data;
 
 /**
  * token 信息
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class TokenDTO {
@@ -21,6 +23,7 @@ public class TokenDTO {
 
     /**
      * 转换 tokenVo
+     *
      * @return tokenVo
      */
     public TokenVO convertToVo() {

@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 登录响应 VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class TokenVO {

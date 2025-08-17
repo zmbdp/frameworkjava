@@ -10,6 +10,8 @@ import java.util.Objects;
 
 /**
  * 安全工具类
+ *
+ * @author 稚名不带撇
  */
 public class SecurityUtil {
 
@@ -44,5 +46,4 @@ public class SecurityUtil {
         }
         return token;
     }
-
 }

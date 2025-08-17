@@ -53,7 +53,35 @@ public class OSSFileServiceImpl implements IFileService {
     private OSSProperties ossProperties;
 
     /**
+     * 生成签名
+     *
+     * @param key  文件存储路径信息
+     * @param data 文件内容
+     * @return 签名
+     */
+    public static byte[] hmacSha256(byte[] key, String data) {
+        try {
+            // 初始化 HMAC 密钥规格，指定算法为 HMAC-SHA256 并使用提供的密钥
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
+
+            // 获取 Mac 实例，并通过 getInstance 方法指定使用HMAC-SHA256算法
+            Mac mac = Mac.getInstance("HmacSHA256");
+            // 使用密钥初始化 Mac 对象
+            mac.init(secretKeySpec);
+
+            // 执行 HMAC 计算，通过 doFinal 方法接收需要计算的数据并返回计算结果的数组
+            byte[] hmacBytes = mac.doFinal(data.getBytes());
+
+            return hmacBytes;
+        } catch (Exception e) {
+            log.error("生成直传签名失败: {}", e.getMessage(), e);
+            throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);
+        }
+    }
+
+    /**
      * 上传文件
+     *
      * @param file 用户上传的文件
      * @return 文件上传后返回的DTO
      */
@@ -63,9 +91,9 @@ public class OSSFileServiceImpl implements IFileService {
             InputStream inputStream = file.getInputStream();
             // 获取原始的文件名
             String originalFilename = file.getOriginalFilename();
-            String extName = originalFilename.substring(originalFilename.lastIndexOf(".")+1);
+            String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
             //在 oss 中存储名字就是 UUID + 文件的后缀名
-            String objectName = ossProperties.getPathPrefix() + UUID.randomUUID() + "."+extName;
+            String objectName = ossProperties.getPathPrefix() + UUID.randomUUID() + "." + extName;
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
             // set public read 设置文件名权限为公共读
@@ -94,6 +122,7 @@ public class OSSFileServiceImpl implements IFileService {
 
     /**
      * 获取签名
+     *
      * @return 获取到的签名信息
      */
     @Override
@@ -172,33 +201,6 @@ public class OSSFileServiceImpl implements IFileService {
             String signature = BinaryUtil.toHex(result);
             signReqDTO.setSignature(signature);
             return signReqDTO;
-        } catch (Exception e) {
-            log.error("生成直传签名失败: {}", e.getMessage(), e);
-            throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);
-        }
-    }
-
-    /**
-     * 生成签名
-     *
-     * @param key 文件存储路径信息
-     * @param data 文件内容
-     * @return 签名
-     */
-    public static byte[] hmacSha256(byte[] key, String data) {
-        try {
-            // 初始化 HMAC 密钥规格，指定算法为 HMAC-SHA256 并使用提供的密钥
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
-
-            // 获取 Mac 实例，并通过 getInstance 方法指定使用HMAC-SHA256算法
-            Mac mac = Mac.getInstance("HmacSHA256");
-            // 使用密钥初始化 Mac 对象
-            mac.init(secretKeySpec);
-
-            // 执行 HMAC 计算，通过 doFinal 方法接收需要计算的数据并返回计算结果的数组
-            byte[] hmacBytes = mac.doFinal(data.getBytes());
-
-            return hmacBytes;
         } catch (Exception e) {
             log.error("生成直传签名失败: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);

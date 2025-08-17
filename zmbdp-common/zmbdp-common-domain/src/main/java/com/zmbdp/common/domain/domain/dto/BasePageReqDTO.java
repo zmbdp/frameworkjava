@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 分页查询基类 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class BasePageReqDTO {

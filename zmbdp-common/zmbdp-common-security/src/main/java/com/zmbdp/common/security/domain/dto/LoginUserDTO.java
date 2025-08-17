@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 用户信息上下文
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class LoginUserDTO {

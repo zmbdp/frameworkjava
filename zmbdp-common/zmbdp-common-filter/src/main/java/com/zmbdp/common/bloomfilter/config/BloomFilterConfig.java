@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "bloom.filter")
 public class BloomFilterConfig {
+
     /**
      * 预期插入的元素数量
      */

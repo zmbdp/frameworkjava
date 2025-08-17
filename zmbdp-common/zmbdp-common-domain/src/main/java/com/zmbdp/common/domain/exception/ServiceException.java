@@ -12,10 +12,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ServiceException extends RuntimeException {
+
     /**
      * 错误码
      */
     private int code;
+
     /**
      * 错误提示
      */

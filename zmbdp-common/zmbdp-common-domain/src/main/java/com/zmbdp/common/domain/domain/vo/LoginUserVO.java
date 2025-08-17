@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 /**
  * 用户登录信息
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class LoginUserVO implements Serializable {

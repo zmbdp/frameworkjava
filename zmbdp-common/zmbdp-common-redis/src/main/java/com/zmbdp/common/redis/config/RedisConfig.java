@@ -60,7 +60,6 @@ public class RedisConfig {
      * 创建序列化器
      *
      * @return redis 序列化器
-     * @author 稚名不带撇
      */
     private GenericJackson2JsonRedisSerializer createJacksonSerializer() {
         // 在这里配置 value 的序列化配置, 这里配置的属性和 JsonUtil 那里的一摸一样
