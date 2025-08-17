@@ -186,17 +186,17 @@ public class OSSFileServiceImpl implements IFileService {
 
             String jsonPolicy = mapper.writeValueAsString(policy);
 
-            // 步骤 2：构造待签名字符串（StringToSign）
+            // 构造待签名字符串（StringToSign）
             String policyBase64 = new String(Base64.encodeBase64(jsonPolicy.getBytes()));
             signReqDTO.setPolicy(policyBase64);
 
-            // 步骤 3：计算 SigningKey
+            // 计算 SigningKey
             byte[] dateKey = hmacSha256(("aliyun_v4" + accesskeysecret).getBytes(), dateStr);
             byte[] dateRegionKey = hmacSha256(dateKey, ossProperties.getRegion());
             byte[] dateRegionServiceKey = hmacSha256(dateRegionKey, "oss");
             byte[] signingKey = hmacSha256(dateRegionServiceKey, "aliyun_v4_request");
 
-            // 步骤 4：计算 Signature
+            // 计算 Signature
             byte[] result = hmacSha256(signingKey, policyBase64);
             String signature = BinaryUtil.toHex(result);
             signReqDTO.setSignature(signature);

@@ -7,6 +7,8 @@ import lombok.Data;
 
 /**
  * C端用户 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class UserDTO extends LoginUserDTO {

@@ -10,11 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
  * @author 稚名不带撇
  */
 public interface IFileService {
+
     /**
      * 文件上传
      *
      * @param file 上传的文件
-     * @return 文件上传后的DTO
+     * @return 文件上传后的 DTO
      */
     FileReqDTO upload(MultipartFile file);
 

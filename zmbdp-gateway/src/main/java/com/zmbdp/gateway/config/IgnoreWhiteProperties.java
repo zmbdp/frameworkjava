@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * 白名单配置
+ *
+ * @author 稚名不带撇
  */
 @Data
 @RefreshScope

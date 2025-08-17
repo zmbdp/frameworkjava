@@ -18,8 +18,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @author 稚名不带撇
  */
 @Slf4j
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class}) // 禁用数据源自动配置
-@EnableFeignClients(clients = {FileServiceApi.class, MapServiceApi.class, DictionaryServiceApi.class, ArgumentServiceApi.class}) // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
+@SpringBootApplication(exclude = {
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
+}) // 禁用数据源自动配置
+@EnableFeignClients(clients = {
+        FileServiceApi.class, MapServiceApi.class,
+        DictionaryServiceApi.class, ArgumentServiceApi.class
+}) // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
 public class MstemplateServiceApplication {
     /**
      * 启动方法

@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 验证码登录
+ *
+ * @author 稚名不带撇
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

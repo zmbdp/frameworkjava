@@ -55,7 +55,7 @@ public class UserController {
      * 手机号登录 / 注册
      *
      * @param codeLoginDTO 验证码登录信息
-     * @return token信息VO
+     * @return token 信息 VO
      */
     @PostMapping("/login/code")
     public Result<TokenVO> login(@Validated @RequestBody CodeLoginDTO codeLoginDTO) {
