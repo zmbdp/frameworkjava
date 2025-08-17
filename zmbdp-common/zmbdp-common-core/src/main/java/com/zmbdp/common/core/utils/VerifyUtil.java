@@ -18,13 +18,16 @@ public class VerifyUtil {
     public static final Pattern PHONE_PATTERN = Pattern.compile("^1[2|3|4|5|6|7|8|9][0-9]\\d{8}$");
 
     /**
-     * 验证码的取值范围
+     * 纯数字验证码
      */
-    // 纯数字验证码
     public static final String NUMBER_VERIFY_CODES = "1234567890";
-    // 数字 + 字母 验证码
+    /**
+     * 数字 + 字母 验证码
+     */
     public static final String ALPHABET_VERIFY_CODES = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    // 字母 + 数字 + 特殊字符 验证码
+    /**
+     * 字母 + 数字 + 特殊字符 验证码
+     */
     public static final String COMPLEX_VERIFY_CODES = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%^&*?";
 
     /**

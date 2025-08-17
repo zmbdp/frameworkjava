@@ -23,6 +23,9 @@ import java.util.Map;
 @RequestMapping("/dictionary")
 public class DictionaryController implements DictionaryServiceApi {
 
+    /**
+     * 字典服务
+     */
     @Autowired
     private ISysDictionaryService sysDictionaryService;
 

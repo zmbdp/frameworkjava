@@ -40,6 +40,9 @@ public class QQMapServiceImpl implements IMapProvider {
     @Value("${qqmap.key:IWFBZ-FJPW7-JADXW-PURZL-2AJPQ-A5F46}")
     private String key;
 
+    /**
+     * RestTemplate
+     */
     @Autowired
     private RestTemplate restTemplate;
 

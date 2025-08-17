@@ -24,6 +24,9 @@ import java.util.List;
 @RequestMapping("/argument")
 public class ArgumentController implements ArgumentServiceApi {
 
+    /**
+     * 参数服务
+     */
     @Autowired
     private ISysArgumentServiceImpl argumentService;
 

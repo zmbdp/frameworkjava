@@ -22,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisService {
 
+    /**
+     * RedisTemplate
+     */
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -210,6 +213,7 @@ public class RedisService {
      * @param key     缓存键
      * @param value   缓存值
      * @param timeout 缓存超时时间
+     * @param timeUnit 时间单位
      * @param <T>     泛型类型
      * @return 设置成功返回 true，否则返回 false
      */
@@ -829,6 +833,7 @@ public class RedisService {
      * @param key   key
      * @param value 值
      * @param seqNo 分数
+     * @return 添加成功返回 true，否则返回 false
      */
     public Boolean addMemberZSet(final String key, final Object value, final double seqNo) {
         try {
@@ -844,6 +849,7 @@ public class RedisService {
      *
      * @param key   key
      * @param value 值
+     * @return 删除数量
      */
     public Long delMemberZSet(final String key, final Object value) {
         try {
@@ -1059,6 +1065,7 @@ public class RedisService {
      * @param key      key
      * @param minScore 最小分
      * @param maxScore 最大分
+     * @return 删除的元素个数
      */
     public Long removeZSetByScore(final String key, final double minScore, final double maxScore) {
         try {

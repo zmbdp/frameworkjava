@@ -84,6 +84,7 @@ public class CacheUtil {
      * @param key           缓存的键
      * @param value         缓存的值
      * @param caffeineCache 本地缓存信息
+     * @param <T>           缓存的值的类型
      */
     public static <T> void setL2Cache(String key, T value, Cache<String, Object> caffeineCache) {
         caffeineCache.put(key, value);

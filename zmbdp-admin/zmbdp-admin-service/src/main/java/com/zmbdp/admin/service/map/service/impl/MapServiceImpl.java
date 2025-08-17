@@ -63,6 +63,9 @@ public class MapServiceImpl implements IMapService {
     @Autowired
     private IMapProvider iMapProvider;
 
+    /**
+     * 服务启动时，进行缓存预热
+     */
     @PostConstruct
     public void initCityMap() {
         // 缓存预热
@@ -80,6 +83,8 @@ public class MapServiceImpl implements IMapService {
 
     /**
      * 缓存城市信息
+     *
+     * @param cityList 城市列表
      */
     private void loadCityInfo(List<SysRegion> cityList) {
         // 先对象转换城 DTO
@@ -89,6 +94,8 @@ public class MapServiceImpl implements IMapService {
 
     /**
      * 初始化 A - Z 归类城市列表缓存内容
+     *
+     * @param cityList 城市列表
      */
     private void loadCityPinyinInfo(List<SysRegion> cityList) {
         // 先对象转换城 DTO
@@ -115,7 +122,7 @@ public class MapServiceImpl implements IMapService {
     /**
      * 加载热门城市列表
      *
-     * @param cityList
+     * @param cityList 城市列表
      */
     private void loadCityHotListInfo(List<SysRegion> cityList) {
         // 先获取热门城市数据

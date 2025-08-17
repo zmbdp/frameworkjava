@@ -96,6 +96,9 @@ public enum ResultCode {
      */
     SERVICE_NOT_FOUND(404000, "服务未找到"),
 
+    /**
+     * url 未找到
+     */
     URL_NOT_FOUND(404001, "url 未找到"),
 
     //405

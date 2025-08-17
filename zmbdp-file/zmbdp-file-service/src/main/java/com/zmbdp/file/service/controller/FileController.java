@@ -22,6 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/file")
 public class FileController implements FileServiceApi {
 
+    /**
+     * 文件服务
+     */
     @Autowired
     private IFileService fileService;
 

@@ -1,5 +1,10 @@
 package com.zmbdp.file.service.constants;
 
+/**
+ * OSS自定义常量
+ *
+ * @author 稚名不带撇
+ */
 public class OSSCustomConstants {
 
     /**

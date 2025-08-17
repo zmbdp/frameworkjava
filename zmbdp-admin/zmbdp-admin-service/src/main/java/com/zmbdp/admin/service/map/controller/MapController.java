@@ -32,6 +32,9 @@ import java.util.Map;
 @RequestMapping("/map")
 public class MapController implements MapServiceApi {
 
+    /**
+     * 地图服务
+     */
     @Autowired
     private IMapService mapService;
 

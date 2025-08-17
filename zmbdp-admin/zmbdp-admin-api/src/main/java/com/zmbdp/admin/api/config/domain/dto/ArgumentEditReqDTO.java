@@ -27,5 +27,8 @@ public class ArgumentEditReqDTO {
     @NotBlank(message = "参数值不能为空")
     private String value;
 
+    /**
+     * 备注
+     */
     private String remark;
 }

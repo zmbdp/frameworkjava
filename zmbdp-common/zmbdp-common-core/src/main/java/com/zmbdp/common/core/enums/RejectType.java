@@ -30,9 +30,16 @@ public enum RejectType {
      */
     DiscardPolicy(4);
 
-
+    /**
+     * 枚举值
+     */
     private Integer value;
 
+    /**
+     * 构造函数
+     *
+     * @param value 枚举值
+     */
     RejectType(Integer value) {
         this.value = value;
     }

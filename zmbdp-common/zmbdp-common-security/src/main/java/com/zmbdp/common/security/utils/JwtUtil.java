@@ -107,7 +107,8 @@ public class JwtUtil {
     /**
      * 根据令牌获取用户来源
      *
-     * @param token 令牌
+     * @param token  令牌
+     * @param secret 密钥
      * @return 用户来源
      */
     public static String getUserFrom(String token, String secret) {

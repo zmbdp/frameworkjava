@@ -10,8 +10,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JsonUtil 测试类
+ *
+ * @author 稚名不带撇
+ */
 public class JsonUtilTests {
 
+    /**
+     * 测试 类转 json
+     */
     // {"id":1,"name":"中国","fullName":"中国","code":"100000"}
     @Test
     public void testClassToJson() {
@@ -23,12 +31,16 @@ public class JsonUtilTests {
         System.out.println(JsonUtil.classToJson(testRegion));
     }
 
-//    {
+    //    {
 //        "id" : 1,
 //            "name" : "中国",
 //            "fullName" : "中国",
 //            "code" : "100000"
 //    }
+
+    /**
+     * 测试 类转 jsonPretty
+     */
     @Test
     public void testClassToJsonPretty() {
         TestRegion testRegion = new TestRegion();
@@ -39,6 +51,10 @@ public class JsonUtilTests {
         System.out.println(JsonUtil.classToJsonPretty(testRegion));
     }
 
+
+    /**
+     * 测试 json 转 类
+     */
     @Test
     public void testJsonToClass() {
         String json = "{\"id\":1,\"name\":\"中国\",\"fullName\":\"中国\",\"code\":\"100000\"}";
@@ -46,6 +62,10 @@ public class JsonUtilTests {
         System.out.println(testRegion);
     }
 
+
+    /**
+     * 测试 json 转 List
+     */
     @Test
     public void testStringToListObj() {
 //        TestRegion testRegion = new TestRegion();
@@ -64,6 +84,10 @@ public class JsonUtilTests {
         System.out.println(list1);
     }
 
+
+    /**
+     * 测试 json 转 Map
+     */
     @Test
     public void testJsonToMap() {
         TestRegion testRegion = new TestRegion();
@@ -78,7 +102,9 @@ public class JsonUtilTests {
         System.out.println(map1);
     }
 
-    // json 转复杂的嵌套类型测试
+    /**
+     * json 转复杂的嵌套类型测试
+     */
     @Test
     public void testJsonToClass2() {
         TestRegion testRegion = new TestRegion();
@@ -94,7 +120,8 @@ public class JsonUtilTests {
         // 先转换成 json
         String json = JsonUtil.classToJson(list);
         List<Map<String, TestRegion>> list1 = JsonUtil
-                .jsonToClass(json, new TypeReference<List<Map<String, TestRegion>>>() {});
+                .jsonToClass(json, new TypeReference<List<Map<String, TestRegion>>>() {
+                });
         System.out.println(list1);
     }
 }

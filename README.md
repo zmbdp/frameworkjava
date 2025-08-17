@@ -313,6 +313,18 @@ mvn spring-boot:run
 - Nacos配置中心集成
 - 完整的中间件支持（MySQL、Redis、RabbitMQ）
 
+### 16. SDK开发文档
+
+项目提供完整的SDK开发文档，位于`javapro/javadoc`目录下：
+- 基于JavaDoc生成的完整API文档
+- 包含所有公共接口、类、方法的详细说明
+- 支持在线浏览和搜索功能
+- 为开发者提供便捷的参考手册
+
+访问方式：
+1. 在项目根目录下找到`javapro/javadoc/index.html`文件
+2. 使用浏览器直接打开该文件即可浏览完整的SDK文档
+3. 例如：`file:///{项目路径}/javapro/javadoc/index.html`
 
 
 ## 配置说明

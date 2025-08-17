@@ -61,10 +61,19 @@ public class OSSProperties  {
      */
     private String pathPrefix;
 
+    /**
+     * 签名过期时间，单位秒
+     */
     private Integer expre;
 
+    /**
+     * 文件名最小长度
+     */
     private Integer minLen;
 
+    /**
+     * 文件名最大长度
+     */
     private Integer maxLen;
 
 

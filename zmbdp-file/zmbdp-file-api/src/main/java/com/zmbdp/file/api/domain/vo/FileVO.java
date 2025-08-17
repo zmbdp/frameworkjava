@@ -3,6 +3,11 @@ package com.zmbdp.file.api.domain.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 文件返回对象
+ *
+ * @author 稚名不带撇
+ */
 @Getter
 @Setter
 public class FileVO {

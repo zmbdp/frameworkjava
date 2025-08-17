@@ -30,6 +30,9 @@ import java.util.List;
 @Service
 public class SysSysArgumentServiceImplImpl implements ISysArgumentServiceImpl {
 
+    /**
+     * 参数表 Mapper
+     */
     @Autowired
     private SysArgumentMapper sysArgumentMapper;
 

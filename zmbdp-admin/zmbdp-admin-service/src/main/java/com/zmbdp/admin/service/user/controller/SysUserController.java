@@ -25,6 +25,9 @@ import java.util.List;
 @RequestMapping("/sys_user")
 public class SysUserController {
 
+    /**
+     * B端用户服务
+     */
     @Autowired
     private ISysUserService sysUserService;
 

@@ -70,7 +70,10 @@ public class AppUserServiceImpl implements IAppUserService {
         refreshBloomFilter();
     }
 
-    public void refreshBloomFilter() {
+    /**
+     * 刷新布隆过滤器
+     */
+    private void refreshBloomFilter() {
         try {
             log.info("开始执行布隆过滤器刷新任务");
 

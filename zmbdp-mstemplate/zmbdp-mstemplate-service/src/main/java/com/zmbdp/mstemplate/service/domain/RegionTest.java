@@ -3,10 +3,18 @@ package com.zmbdp.mstemplate.service.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 区划测试实体
+ *
+ * @author 稚名不带撇
+ */
 @Getter
 @Setter
 public class RegionTest {
 
+    /**
+     * 区划 id
+     */
     private Long id;
 
     /**

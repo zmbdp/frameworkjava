@@ -27,8 +27,14 @@ import java.util.Map;
 @Slf4j
 public class JsonUtil {
 
+    /**
+     * 创建一个 ObjectMapper 对象，这个对象会根据我们后续的配置，进行 json 转换
+     */
     private static ObjectMapper OBJECT_MAPPER;
 
+    /**
+     * 静态代码块，初始化 ObjectMapper 对象
+     */
     static {
         OBJECT_MAPPER =
                 JsonMapper.builder()

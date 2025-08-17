@@ -30,14 +30,25 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Service
+/**
+ * OSS 文件服务
+ *
+ * @author 稚名不带撇
+ */
 @Slf4j
+@Service
 @ConditionalOnProperty(value = "storage.type", havingValue = "oss")
 public class OSSFileServiceImpl implements IFileService {
 
+    /**
+     * OSS 实例
+     */
     @Autowired
     private OSSClient ossClient;
 
+    /**
+     * OSS 配置信息
+     */
     @Autowired
     private OSSProperties ossProperties;
 
