@@ -46,5 +46,4 @@ public class AppUserDTO implements Serializable {
         BeanUtils.copyProperties(this, appUserVo);
         return appUserVo;
     }
-
 }
