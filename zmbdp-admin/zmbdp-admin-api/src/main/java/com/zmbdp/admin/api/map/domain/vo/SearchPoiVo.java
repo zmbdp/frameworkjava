@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 查询结果 VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SearchPoiVo {

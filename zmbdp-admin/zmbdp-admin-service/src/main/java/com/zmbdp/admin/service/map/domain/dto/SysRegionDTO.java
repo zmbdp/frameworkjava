@@ -5,6 +5,8 @@ import lombok.Setter;
 
 /**
  * 区域信息 DTO
+ *
+ * @author 稚名不带撇
  */
 @Getter
 @Setter

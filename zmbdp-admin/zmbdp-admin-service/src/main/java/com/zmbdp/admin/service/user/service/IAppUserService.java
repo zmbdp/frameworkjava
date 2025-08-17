@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * C端用户服务
  *
- * @author zmbdp
+ * @author 稚名不带撇
  */
 public interface IAppUserService {
 

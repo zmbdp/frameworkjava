@@ -6,9 +6,12 @@ import java.util.List;
 
 /**
  * 响应结果分页报文
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class BasePageDTO<T> {
+
     /**
      * 查询结果总数
      */

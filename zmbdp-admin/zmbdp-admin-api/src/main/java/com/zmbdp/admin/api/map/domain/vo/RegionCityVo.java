@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 城市信息 VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class RegionCityVo {

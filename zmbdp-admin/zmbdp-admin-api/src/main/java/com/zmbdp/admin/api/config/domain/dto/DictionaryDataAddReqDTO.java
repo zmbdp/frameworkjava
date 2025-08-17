@@ -5,6 +5,8 @@ import lombok.Data;
 
 /**
  * 新增字典数据 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class DictionaryDataAddReqDTO {

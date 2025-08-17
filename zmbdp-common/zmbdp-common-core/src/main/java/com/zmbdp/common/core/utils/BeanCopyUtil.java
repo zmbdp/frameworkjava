@@ -14,6 +14,7 @@ import java.util.function.Supplier;
  * @author 稚名不带撇
  */
 public class BeanCopyUtil extends BeanUtils {
+
     /**
      * 批量拷贝 List 集合类型里面的元素
      *

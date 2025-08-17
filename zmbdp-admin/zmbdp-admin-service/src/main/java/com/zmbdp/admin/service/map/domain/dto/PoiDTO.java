@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 地点 poi 信息
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class PoiDTO {

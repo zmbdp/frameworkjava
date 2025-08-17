@@ -8,13 +8,15 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * RestTemplate 模板配置
+ *
+ * @author 稚名不带撇
  */
 @Configuration
 public class RestTemplateConfig {
 
 
     /**
-     * 注册RestTemplate
+     * 注册 RestTemplate
      *
      * @param factory http 工程
      * @return RestTemplate 对象

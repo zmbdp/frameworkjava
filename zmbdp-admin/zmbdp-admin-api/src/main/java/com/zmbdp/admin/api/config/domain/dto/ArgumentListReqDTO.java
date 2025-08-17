@@ -4,7 +4,7 @@ import com.zmbdp.common.domain.domain.dto.BasePageReqDTO;
 import lombok.Data;
 
 /**
- * 查看参数DTO
+ * 查看参数 DTO
  */
 @Data
 public class ArgumentListReqDTO extends BasePageReqDTO {

@@ -6,6 +6,8 @@ import lombok.Data;
 
 /**
  *  do 基类
+ *
+ *  @author 稚名不带撇
  */
 @Data
 public class BaseDO {

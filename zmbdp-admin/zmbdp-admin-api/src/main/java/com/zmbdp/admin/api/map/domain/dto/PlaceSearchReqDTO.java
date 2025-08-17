@@ -6,6 +6,8 @@ import lombok.Data;
 
 /**
  * 查询请求 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class PlaceSearchReqDTO extends BasePageReqDTO {

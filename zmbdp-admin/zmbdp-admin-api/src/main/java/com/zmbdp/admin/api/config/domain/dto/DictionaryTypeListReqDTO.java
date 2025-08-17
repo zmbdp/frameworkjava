@@ -5,6 +5,8 @@ import lombok.Data;
 
 /**
  * 字典类型列表 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class DictionaryTypeListReqDTO extends BasePageReqDTO {

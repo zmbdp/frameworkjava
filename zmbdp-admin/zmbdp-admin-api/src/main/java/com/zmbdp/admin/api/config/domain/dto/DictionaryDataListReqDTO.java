@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 字典数据列表DTO
+ * 字典数据列表 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class DictionaryDataListReqDTO extends BasePageReqDTO {

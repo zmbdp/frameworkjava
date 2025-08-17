@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 逆地址解析结果（带详细地址）
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class AdInfoDTO {

@@ -36,16 +36,15 @@ public class StringUtil {
 
 
     /**
-     * 判断 url 是否与规则匹配
-     *
-     * 匹配规则：
-     * 精确匹配
-     * 匹配规则中包含 ? 表示任意单个字符;
-     * 匹配规则中包含 * 表示一层路径内的任意字符串，不可跨层级;
-     * 匹配规则中包含 ** 表示任意层路径的任意字符，可跨层级
+     * 判断 url 是否与规则匹配<p>
+     * 匹配规则：<p>
+     * 精确匹配<p>
+     * 匹配规则中包含 ? 表示任意单个字符;<p>
+     * 匹配规则中包含 * 表示一层路径内的任意字符串，不可跨层级;<p>
+     * 匹配规则中包含 ** 表示任意层路径的任意字符，可跨层级<p>
      *
      * @param pattern 匹配规则
-     * @param url 需要匹配的url
+     * @param url 需要匹配的 url
      * @return 是否匹配
      */
     public static boolean isMatch(String pattern, String url) {

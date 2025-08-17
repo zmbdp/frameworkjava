@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 城市搜索地点查询条件
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SuggestSearchDTO {

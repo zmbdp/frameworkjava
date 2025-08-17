@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * C端用户表 app_user
+ *
+ * @author 稚名不带撇
  */
 @Data
 @TableName("app_user")

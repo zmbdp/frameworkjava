@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 腾讯位置服务响应基类
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class QQMapBaseResponseDTO {

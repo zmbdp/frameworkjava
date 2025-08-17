@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 /**
  * 查询 C端用户 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class AppUserListReqDTO extends BasePageReqDTO implements Serializable {

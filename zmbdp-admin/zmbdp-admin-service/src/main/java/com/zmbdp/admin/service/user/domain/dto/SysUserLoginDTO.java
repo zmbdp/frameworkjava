@@ -7,6 +7,8 @@ import lombok.Data;
 
 /**
  * B端登录用户信息 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SysUserLoginDTO extends LoginUserDTO {

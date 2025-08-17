@@ -6,6 +6,8 @@ import lombok.Data;
 
 /**
  * B端用户登录信息
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SysUserLoginVO extends LoginUserVO {

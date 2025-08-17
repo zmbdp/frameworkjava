@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * sys_user 表的 mapper
+ *
+ * @author 稚名不带撇
  */
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUser> {

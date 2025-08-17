@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 逆地址解析的结果
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class GeoResultDTO extends QQMapBaseResponseDTO {

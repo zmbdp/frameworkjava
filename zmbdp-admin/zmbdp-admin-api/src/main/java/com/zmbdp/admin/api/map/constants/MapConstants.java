@@ -2,6 +2,8 @@ package com.zmbdp.admin.api.map.constants;
 
 /**
  * 地图常量信息
+ *
+ * @author 稚名不带撇
  */
 public class MapConstants {
 

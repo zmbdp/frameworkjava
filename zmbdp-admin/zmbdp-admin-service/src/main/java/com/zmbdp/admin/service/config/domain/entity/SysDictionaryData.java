@@ -8,6 +8,8 @@ import lombok.Setter;
 
 /**
  * 字典数据表
+ *
+ * @author 稚名不带撇
  */
 @Getter
 @Setter

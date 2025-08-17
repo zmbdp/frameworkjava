@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * sys_region 表的 mapper
+ *
+ * @author 稚名不带撇
  */
 @Mapper
 public interface RegionMapper extends BaseMapper<SysRegion> {

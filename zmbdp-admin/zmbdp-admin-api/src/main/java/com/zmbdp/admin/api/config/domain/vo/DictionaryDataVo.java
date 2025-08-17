@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 字典数据列表 VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class DictionaryDataVo {

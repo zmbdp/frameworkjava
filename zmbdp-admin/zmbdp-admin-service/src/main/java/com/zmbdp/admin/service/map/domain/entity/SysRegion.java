@@ -7,6 +7,8 @@ import lombok.Data;
 
 /**
  * sys_region 表对应的实体类
+ *
+ * @author 稚名不带撇
  */
 @Data
 @TableName("sys_region")
@@ -29,7 +31,7 @@ public class SysRegion {
     private String fullName;
 
     /**
-     * 父级区域ID
+     * 父级区域 ID
      */
     private Long parentId;
 

@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 /**
  * B端用户查询VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SysUserVo implements Serializable {

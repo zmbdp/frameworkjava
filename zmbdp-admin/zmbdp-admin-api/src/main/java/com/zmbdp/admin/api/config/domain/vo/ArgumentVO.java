@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 查看参数 VO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class ArgumentVO {

@@ -8,6 +8,8 @@ import lombok.Setter;
 
 /**
  * 系统参数表对应的实体类
+ *
+ * @author 稚名不带撇
  */
 @Getter
 @Setter

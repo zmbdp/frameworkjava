@@ -21,7 +21,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ThreadPoolConfig {
 
-
     /**
      * 核心线程数
      */

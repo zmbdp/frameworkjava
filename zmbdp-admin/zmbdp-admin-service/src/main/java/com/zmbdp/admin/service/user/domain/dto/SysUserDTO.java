@@ -1,12 +1,13 @@
 package com.zmbdp.admin.service.user.domain.dto;
 
-import com.zmbdp.admin.service.user.domain.vo.SysUserVo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * B端用户信息
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class SysUserDTO {

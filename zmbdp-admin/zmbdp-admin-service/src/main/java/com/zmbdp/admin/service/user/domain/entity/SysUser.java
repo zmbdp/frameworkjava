@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 系统用户表 sys_user
+ *
+ * @author 稚名不带撇
  */
 @Data
 @TableName("sys_user")

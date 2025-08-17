@@ -1,11 +1,12 @@
 package com.zmbdp.admin.api.map.domain.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
  * 位置查询 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class LocationReqDTO {

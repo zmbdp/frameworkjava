@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 远程调用参数对象 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class ArgumentDTO {

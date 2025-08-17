@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * 地图 poi
+ *
+ * @author 稚名不带撇
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

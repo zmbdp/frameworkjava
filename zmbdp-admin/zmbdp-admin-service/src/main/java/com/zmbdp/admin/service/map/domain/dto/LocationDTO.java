@@ -4,6 +4,8 @@ import lombok.Data;
 
 /**
  * 经纬度 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class LocationDTO {

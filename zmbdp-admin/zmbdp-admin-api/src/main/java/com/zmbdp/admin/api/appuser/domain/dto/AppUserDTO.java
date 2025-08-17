@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 /**
  * C端用户 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class AppUserDTO implements Serializable {
