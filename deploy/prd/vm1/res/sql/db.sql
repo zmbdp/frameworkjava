@@ -4604,7 +4604,7 @@ CREATE TABLE `sys_user`
     UNIQUE KEY `uk_phone` (`phone_number`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=10000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='管理端人员表';
 
-insert into `sys_user` (nick_name, phone_number, password, identity, remark, status) values
-    ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
+insert into `sys_user` (nick_name, phone_number, password, identity, remark, status)
+values ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
 
 commit;
