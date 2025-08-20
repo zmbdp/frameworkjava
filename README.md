@@ -104,7 +104,11 @@ frameworkjava
 │   ├── zmbdp-common-filter          # 过滤器相关
 │   │   └── src/main/java/com/zmbdp/common/bloomfilter
 │   │       ├── config/BloomFilterConfig.java    # 布隆过滤器配置
-│   │       └── service/BloomFilterService.java  # 布隆过滤器服务
+│   │       └── service/
+│   │           ├── BloomFilterService.java      # 布隆过滤器服务接口
+│   │           └── impl/
+│   │               ├── FastBloomFilterService.java  # 快速版（不加锁）布隆过滤器实现
+│   │               └── SafeBloomFilterService.java  # 线程安全（分布式锁）版布隆过滤器实现
 │   │
 │   ├── zmbdp-common-message         # 消息服务
 │   │   └── src/main/java/com/zmbdp/common/message
