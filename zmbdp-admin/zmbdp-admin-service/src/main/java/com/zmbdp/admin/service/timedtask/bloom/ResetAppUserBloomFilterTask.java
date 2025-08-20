@@ -3,7 +3,9 @@ package com.zmbdp.admin.service.timedtask.bloom;
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
 import com.zmbdp.common.bloomfilter.service.BloomFilterService;
+import com.zmbdp.common.redis.service.RedissonLockService;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -11,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 重置布隆过滤器
@@ -23,6 +26,11 @@ import java.util.List;
 public class ResetAppUserBloomFilterTask {
 
     /**
+     * 布隆过滤器锁 key
+     */
+    private static final String BLOOM_FILTER_LOCK = "bloom:filter:lock";
+
+    /**
      * 布隆过滤器服务
      */
     @Autowired
@@ -33,6 +41,12 @@ public class ResetAppUserBloomFilterTask {
      */
     @Autowired
     private AppUserMapper appUserMapper;
+
+    /**
+     * Redisson 分布式锁服务
+     */
+    @Autowired
+    private RedissonLockService redissonLockService;
 
     /**
      * 是否启用布隆过滤器刷新任务
@@ -52,6 +66,13 @@ public class ResetAppUserBloomFilterTask {
             return;
         }
 
+        // 获取锁
+        RLock lock = redissonLockService.acquire(BLOOM_FILTER_LOCK, 3, TimeUnit.SECONDS);
+
+        if (null == lock) {
+            log.info("布隆过滤器刷新任务已获取锁失败，跳过执行");
+            return;
+        }
         try {
             log.info("开始执行布隆过滤器刷新任务");
 
@@ -88,6 +109,9 @@ public class ResetAppUserBloomFilterTask {
             log.info("布隆过滤器刷新任务执行完成，共加载 {} 个用户数据", count);
         } catch (Exception e) {
             log.error("布隆过滤器刷新任务执行失败", e);
+        } finally {
+            // 释放锁
+            redissonLockService.releaseLock(lock);
         }
     }
 }

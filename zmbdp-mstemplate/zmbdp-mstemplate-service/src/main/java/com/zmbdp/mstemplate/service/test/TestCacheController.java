@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RestController
@@ -219,7 +218,8 @@ public class TestCacheController {
             log.info("使用不带布隆过滤器的方法存储数据: {} = {}", key1, value1);
 
             // 获取数据（不使用布隆过滤器）
-            String result1 = CacheUtil.getL2Cache(redisService, key1, new TypeReference<String>() {}, caffeineCache);
+            String result1 = CacheUtil.getL2Cache(redisService, key1, new TypeReference<String>() {
+            }, caffeineCache);
             log.info("使用不带布隆过滤器的方法获取数据: {}", result1);
 
             // 2. 测试使用布隆过滤器的缓存方法
@@ -232,7 +232,8 @@ public class TestCacheController {
             log.info("使用带布隆过滤器的方法存储数据: {} = {}", key2, value2);
 
             // 获取数据（使用布隆过滤器）
-            String result2 = CacheUtil.getL2Cache(redisService, bloomFilterService, key2, new TypeReference<String>() {}, caffeineCache);
+            String result2 = CacheUtil.getL2Cache(redisService, bloomFilterService, key2, new TypeReference<String>() {
+            }, caffeineCache);
             log.info("使用带布隆过滤器的方法获取数据: {}", result2);
 
             // 3. 测试布隆过滤器防止缓存穿透
@@ -245,7 +246,8 @@ public class TestCacheController {
 
             if (!mightContain) {
                 // 使用带布隆过滤器的方法获取不存在的数据
-                String result3 = CacheUtil.getL2Cache(redisService, bloomFilterService, nonExistentKey, new TypeReference<String>() {}, caffeineCache);
+                String result3 = CacheUtil.getL2Cache(redisService, bloomFilterService, nonExistentKey, new TypeReference<String>() {
+                }, caffeineCache);
                 log.info("通过布隆过滤器检查不存在的键，结果: {}", result3);
                 log.info("由于布隆过滤器判断键不存在，避免了Redis查询");
             }
@@ -262,7 +264,8 @@ public class TestCacheController {
             log.info("使用带布隆过滤器的方法存储复杂对象: {}", testUser);
 
             // 获取复杂对象（使用布隆过滤器）
-            User cachedUser = CacheUtil.getL2Cache(redisService, bloomFilterService, userKey, new TypeReference<User>() {}, caffeineCache);
+            User cachedUser = CacheUtil.getL2Cache(redisService, bloomFilterService, userKey, new TypeReference<User>() {
+            }, caffeineCache);
             log.info("使用带布隆过滤器的方法获取复杂对象: {}", cachedUser);
 
             // 5. 测试性能对比
@@ -274,14 +277,16 @@ public class TestCacheController {
             // 测试不使用布隆过滤器的性能
             long start1 = System.currentTimeMillis();
             for (int i = 0; i < testIterations; i++) {
-                CacheUtil.getL2Cache(redisService, "nonexistent:key:" + i, new TypeReference<String>() {}, caffeineCache);
+                CacheUtil.getL2Cache(redisService, "nonexistent:key:" + i, new TypeReference<String>() {
+                }, caffeineCache);
             }
             long end1 = System.currentTimeMillis();
 
             // 测试使用布隆过滤器的性能
             long start2 = System.currentTimeMillis();
             for (int i = 0; i < testIterations; i++) {
-                CacheUtil.getL2Cache(redisService, bloomFilterService, "nonexistent:key:" + i, new TypeReference<String>() {}, caffeineCache);
+                CacheUtil.getL2Cache(redisService, bloomFilterService, "nonexistent:key:" + i, new TypeReference<String>() {
+                }, caffeineCache);
             }
             long end2 = System.currentTimeMillis();
 
@@ -513,5 +518,244 @@ public class TestCacheController {
         }
     }
 
+    @PostMapping("/threads/bloom")
+    public Result<Void> testBloomFilterThreads() {
+        log.info("开始布隆过滤器线程安全测试");
+
+        // 保存初始状态
+        long initialCount = bloomFilterService.approximateElementCount();
+        String initialStatus = bloomFilterService.getStatus();
+        log.info("测试前状态 - 元素数量: {}, 状态: {}", initialCount, initialStatus);
+
+        // 重置布隆过滤器确保干净的测试环境
+        bloomFilterService.reset();
+        log.info("重置后状态: {}", bloomFilterService.getStatus());
+
+        // 准备测试数据
+        int threadCount = 10;
+        int itemsPerThread = 100;
+        List<Thread> threads = new ArrayList<>();
+        List<String> addedKeys = Collections.synchronizedList(new ArrayList<>());
+
+        // 创建多个线程并发添加元素
+        for (int t = 0; t < threadCount; t++) {
+            final int threadId = t;
+            Thread thread = new Thread(() -> {
+                for (int i = 0; i < itemsPerThread; i++) {
+                    String key = "thread:" + threadId + ":item:" + i;
+                    bloomFilterService.put(key);
+                    addedKeys.add(key);
+                }
+                log.info("线程 {} 完成添加 {} 个元素", threadId, itemsPerThread);
+            });
+            threads.add(thread);
+        }
+
+        // 启动所有线程
+        long startTime = System.currentTimeMillis();
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        // 等待所有线程执行完成
+        try {
+            for (Thread thread : threads) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            log.error("线程执行中断", e);
+            Thread.currentThread().interrupt();
+            return Result.fail("测试被中断");
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        // 测试结果分析
+        long expectedElements = (long) threadCount * itemsPerThread;
+        long actualElements = bloomFilterService.approximateElementCount();
+        String finalStatus = bloomFilterService.getStatus();
+
+        log.info("测试完成 - 预期元素数量: {}, 实际元素数量: {}, 耗时: {}ms",
+                expectedElements, actualElements, endTime - startTime);
+        log.info("最终状态: {}", finalStatus);
+
+        // 验证1: 元素数量是否大致正确（布隆过滤器的approximateElementCount可能有轻微误差）
+        double countDeviation = Math.abs((double) (actualElements - expectedElements) / expectedElements);
+        log.info("元素数量偏差率: {}%", String.format("%.2f", countDeviation * 100));
+
+        // 验证2: 所有添加的元素是否都能被正确识别
+        AtomicInteger foundCount = new AtomicInteger(0);
+        AtomicInteger notFoundCount = new AtomicInteger(0);
+
+        // 并发查询测试
+        List<Thread> queryThreads = new ArrayList<>();
+        for (int t = 0; t < 5; t++) {
+            final int threadId = t;
+            Thread queryThread = new Thread(() -> {
+                int localFound = 0;
+                int localNotFound = 0;
+                for (int i = threadId; i < addedKeys.size(); i += 5) {
+                    String key = addedKeys.get(i);
+                    if (bloomFilterService.mightContain(key)) {
+                        localFound++;
+                    } else {
+                        localNotFound++;
+                        log.warn("元素未找到: {}", key);
+                    }
+                }
+                foundCount.addAndGet(localFound);
+                notFoundCount.addAndGet(localNotFound);
+            });
+            queryThreads.add(queryThread);
+        }
+
+        // 启动查询线程
+        for (Thread thread : queryThreads) {
+            thread.start();
+        }
+
+        // 等待查询完成
+        try {
+            for (Thread thread : queryThreads) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            log.error("查询线程执行中断", e);
+            Thread.currentThread().interrupt();
+            return Result.fail("测试被中断");
+        }
+
+        log.info("查询结果 - 找到: {}, 未找到: {}", foundCount.get(), notFoundCount.get());
+
+        // 验证3: 状态信息的一致性
+        String status1 = bloomFilterService.getStatus();
+        String status2 = bloomFilterService.getStatus();
+        boolean statusConsistent = status1.equals(status2);
+        log.info("状态信息一致性: {}", statusConsistent ? "一致" : "不一致");
+
+        // 验证4: 精确计数与近似计数的比较（如果有提供）
+        try {
+            long exactCount = bloomFilterService.exactElementCount();
+            long approxCount = bloomFilterService.approximateElementCount();
+            log.info("精确计数: {}, 近似计数: {}, 差异: {}", exactCount, approxCount, Math.abs(exactCount - approxCount));
+        } catch (Exception e) {
+            log.warn("无法获取精确计数: {}", e.getMessage());
+        }
+
+        // 测试结论
+        boolean testPassed = true;
+        StringBuilder resultMessage = new StringBuilder();
+
+        if (countDeviation > 0.1) { // 允许10%的偏差
+            testPassed = false;
+            resultMessage.append("元素计数偏差过大; ");
+        }
+
+        if (notFoundCount.get() > 0) {
+            testPassed = false;
+            resultMessage.append("存在元素丢失; ");
+        }
+
+        if (!statusConsistent) {
+            resultMessage.append("状态信息不一致; ");
+        }
+
+        if (testPassed) {
+            log.info("并发测试成功：布隆过滤器在高并发环境下表现稳定" + "并发测试成功，处理了" + expectedElements + "个元素，耗时" + (endTime - startTime) + "ms");
+            return Result.success();
+        } else {
+            log.error("并发测试发现问题：{}", resultMessage.toString());
+            return Result.fail("并发测试失败: " + resultMessage.toString());
+        }
+    }
+
+    @PostMapping("/threads/bloom/stress")
+    public Result<Void> stressTestBloomFilter() {
+        log.info("开始布隆过滤器压力测试");
+
+        // 重置布隆过滤器
+        bloomFilterService.reset();
+        log.info("初始状态: {}", bloomFilterService.getStatus());
+
+        // 高并发压力测试
+        int threadCount = 20;
+        int operationsPerThread = 500;
+        List<Thread> threads = new ArrayList<>();
+
+        // 性能计数器
+        AtomicInteger putSuccessCount = new AtomicInteger(0);
+        AtomicInteger querySuccessCount = new AtomicInteger(0);
+        AtomicInteger queryFalseCount = new AtomicInteger(0);
+
+        long startTime = System.currentTimeMillis();
+
+        // 创建混合操作线程（添加和查询）
+        for (int t = 0; t < threadCount; t++) {
+            final int threadId = t;
+            Thread thread = new Thread(() -> {
+                for (int i = 0; i < operationsPerThread; i++) {
+                    // 70% 概率执行添加操作，30% 概率执行查询操作
+                    if (Math.random() < 0.7) {
+                        String key = "stress:" + threadId + ":" + i;
+                        bloomFilterService.put(key);
+                        putSuccessCount.incrementAndGet();
+                    } else {
+                        String key = "stress:" + threadId + ":" + (i + 10000); // 查询未添加的键
+                        boolean result = bloomFilterService.mightContain(key);
+                        if (result) {
+                            querySuccessCount.incrementAndGet();
+                        } else {
+                            queryFalseCount.incrementAndGet();
+                        }
+                    }
+                }
+                log.info("压力测试线程 {} 完成", threadId);
+            });
+            threads.add(thread);
+        }
+
+        // 启动所有线程
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        // 等待所有线程完成
+        try {
+            for (Thread thread : threads) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            log.error("压力测试线程执行中断", e);
+            Thread.currentThread().interrupt();
+            return Result.fail("测试被中断");
+        }
+
+        long endTime = System.currentTimeMillis();
+
+        // 输出测试结果
+        log.info("压力测试完成，耗时: {}ms", endTime - startTime);
+        log.info("添加操作成功次数: {}", putSuccessCount.get());
+        log.info("查询操作成功次数: {}，失败次数: {}", querySuccessCount.get(), queryFalseCount.get());
+        log.info("最终状态: {}", bloomFilterService.getStatus());
+
+        // 验证最终状态的一致性
+        String status1 = bloomFilterService.getStatus();
+        try {
+            Thread.sleep(100); // 短暂等待
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        String status2 = bloomFilterService.getStatus();
+
+        if (status1.equals(status2)) {
+            log.info("压力测试后状态信息一致" + "压力测试完成，总操作数: " + (putSuccessCount.get() + querySuccessCount.get() + queryFalseCount.get()));
+            return Result.success();
+        } else {
+            log.warn("压力测试后状态信息不一致");
+            log.warn("状态1: {}", status1);
+            log.warn("状态2: {}", status2);
+            return Result.success();
+        }
+    }
 
 }

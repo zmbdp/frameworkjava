@@ -1,2 +1,3 @@
 com.zmbdp.common.bloomfilter.config.BloomFilterConfig
-com.zmbdp.common.bloomfilter.service.BloomFilterService
+com.zmbdp.common.bloomfilter.service.impl.FastBloomFilterService
+com.zmbdp.common.bloomfilter.service.impl.SafeBloomFilterService

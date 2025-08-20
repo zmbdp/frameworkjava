@@ -3,16 +3,17 @@ package com.zmbdp.admin.service.user.service.impl;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
+import com.zmbdp.admin.service.timedtask.bloom.ResetAppUserBloomFilterTask;
 import com.zmbdp.admin.service.user.config.RabbitConfig;
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
 import com.zmbdp.admin.service.user.service.IAppUserService;
+import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +63,12 @@ public class AppUserServiceImpl implements IAppUserService {
     private BloomFilterService bloomFilterService;
 
     /**
+     * 重置布隆过滤器任务
+     */
+    @Autowired
+    private ResetAppUserBloomFilterTask resetAppUserBloomFilterTask;
+
+    /**
      * 布隆过滤器预热
      */
     @PostConstruct
@@ -74,42 +81,10 @@ public class AppUserServiceImpl implements IAppUserService {
      * 刷新布隆过滤器
      */
     private void refreshBloomFilter() {
-        try {
-            log.info("开始执行布隆过滤器刷新任务");
+        log.info("布隆过滤器初始化开始 -----");
+        resetAppUserBloomFilterTask.refreshBloomFilter();
+        log.info("布隆过滤器初始化结束 -----");
 
-            // 查询所有用户
-            List<AppUser> appUsers = appUserMapper.selectList(null);
-
-            log.info("从数据库加载到 {} 个用户", appUsers.size());
-
-            // 重新初始化布隆过滤器
-            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
-            bloomFilterService.reset();
-            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
-
-            // 将所有用户加密手机号和微信 ID 添加到布隆过滤器中
-            int count = 0;
-            for (AppUser appUser : appUsers) {
-                // 添加加密手机号（如果存在）
-                if (appUser.getPhoneNumber() != null && !appUser.getPhoneNumber().isEmpty()) {
-                    bloomFilterService.put(appUser.getPhoneNumber());
-                    count++;
-                }
-
-                // 添加微信 ID（如果存在）
-                if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
-                    bloomFilterService.put(appUser.getOpenId());
-                    count++;
-                }
-            }
-
-            if (count != appUsers.size()) {
-                log.warn("布隆过滤器刷新任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查", count, appUsers.size());
-            }
-            log.info("布隆过滤器刷新任务执行完成，共加载 {} 个用户数据", count);
-        } catch (Exception e) {
-            log.error("布隆过滤器刷新任务执行失败", e);
-        }
     }
 
     /*=============================================    内部调用    =============================================*/

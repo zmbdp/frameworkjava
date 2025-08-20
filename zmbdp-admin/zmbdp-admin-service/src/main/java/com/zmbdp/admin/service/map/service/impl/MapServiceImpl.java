@@ -16,8 +16,10 @@ import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.PageUtil;
 import com.zmbdp.common.redis.service.RedisService;
+import com.zmbdp.common.redis.service.RedissonLockService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +64,12 @@ public class MapServiceImpl implements IMapService {
      */
     @Autowired
     private IMapProvider iMapProvider;
+
+    /**
+     * redisson 分布式锁服务对象
+     */
+    @Autowired
+    private RedissonLockService redissonLockService;
 
     /**
      * 服务启动时，进行缓存预热
@@ -153,24 +161,32 @@ public class MapServiceImpl implements IMapService {
     public List<SysRegionDTO> getCityListV1() {
         // 继续优化，使用看门狗分布式锁来确定只有一个线程需要查数据库
         // 先获取到一把锁
-        Boolean lock = redisService.setCacheObjectIfAbsent(MapConstants.CACHE_MAP_CITY_KEY, "mapLocke", -1, TimeUnit.SECONDS); // 加锁
+        RLock lock = redissonLockService.acquire(MapConstants.CACHE_MAP_CITY_KEY, -1, TimeUnit.SECONDS);// 加锁
         // 如果说未获取到锁，那就返回空
-        if (!lock) {
-            return new ArrayList<>();
+        if (null == lock) {
+            return CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
+            }, caffeineCache);
         }
-        // 走到这里说明获取到锁了，但是还得判断一下缓存中是否有数据，如果说有的话，直接就返回
-        List<SysRegionDTO> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
-        }, caffeineCache);
-        if (resultDTO != null && !resultDTO.isEmpty()) {
+        try {
+            // 走到这里说明获取到锁了，但是还得判断一下缓存中是否有数据，如果说有的话，直接就返回
+            List<SysRegionDTO> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
+            }, caffeineCache);
+            if (resultDTO != null && !resultDTO.isEmpty()) {
+                return resultDTO;
+            }
+            // 查数据库
+            List<SysRegion> list = regionMapper.selectAllRegion();
+            // 拷贝成 dto 返回
+            resultDTO = BeanCopyUtil.copyListProperties(list, SysRegionDTO::new);
+            // 然后再存储到缓存中
+            CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, resultDTO, caffeineCache, 120L, TimeUnit.MINUTES);
             return resultDTO;
+        } catch (Exception e) {
+            log.error("获取城市列表失败: {}", e.getMessage(), e);
+        } finally {
+            redissonLockService.releaseLock(lock);
         }
-        // 查数据库
-        List<SysRegion> list = regionMapper.selectAllRegion();
-        // 拷贝成 dto 返回
-        resultDTO = BeanCopyUtil.copyListProperties(list, SysRegionDTO::new);
-        // 然后再存储到缓存中
-        CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, resultDTO, caffeineCache, 120L, TimeUnit.MINUTES);
-        return resultDTO;
+        return null;
     }
 
     /**

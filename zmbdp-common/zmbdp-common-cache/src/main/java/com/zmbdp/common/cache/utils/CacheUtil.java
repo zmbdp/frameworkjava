@@ -18,12 +18,13 @@ public class CacheUtil {
 
     /**
      * 从一级缓存（本地缓存）中获取数据，如果没查到就从二级缓存（Redis缓存）中获取数据
+     *
      * @param redisService  Redis 缓存服务
      * @param key           缓存的键
      * @param valueTypeRef  值类型引用
      * @param caffeineCache 本地缓存信息
+     * @param <T>           缓存值的类型
      * @return 缓存值
-     * @param <T> 缓存值的类型
      */
     public static <T> T getL2Cache(RedisService redisService, String key, TypeReference<T> valueTypeRef, Cache<String, Object> caffeineCache) {
         // 先从一级缓存中拿取数据, 如果有就返回
@@ -44,13 +45,14 @@ public class CacheUtil {
 
     /**
      * 从一级缓存（本地缓存）中获取数据，如果没查到就从二级缓存（Redis缓存）中获取数据（布隆过滤器先查）
-     * @param redisService  Redis 缓存服务
+     *
+     * @param redisService       Redis 缓存服务
      * @param bloomFilterService 布隆过滤器服务
-     * @param key           缓存的键
-     * @param valueTypeRef  值类型引用
-     * @param caffeineCache 本地缓存信息
+     * @param key                缓存的键
+     * @param valueTypeRef       值类型引用
+     * @param caffeineCache      本地缓存信息
+     * @param <T>                缓存值的类型
      * @return 缓存值
-     * @param <T> 缓存值的类型
      */
     public static <T> T getL2Cache(RedisService redisService, BloomFilterService bloomFilterService,
                                    String key, TypeReference<T> valueTypeRef, Cache<String, Object> caffeineCache) {
@@ -112,14 +114,14 @@ public class CacheUtil {
     /**
      * 存储到二级缓存（Redis缓存）、一级缓存（本地缓存）和布隆过滤器中
      *
-     * @param redisService  Redis 缓存服务
+     * @param redisService       Redis 缓存服务
      * @param bloomFilterService 布隆过滤器服务
-     * @param key           缓存的键
-     * @param value         缓存的值
-     * @param caffeineCache 本地缓存信息
-     * @param timeout       缓存的过期时间
-     * @param timeUnit      时间单位
-     * @param <T>           缓存的值的类型
+     * @param key                缓存的键
+     * @param value              缓存的值
+     * @param caffeineCache      本地缓存信息
+     * @param timeout            缓存的过期时间
+     * @param timeUnit           时间单位
+     * @param <T>                缓存的值的类型
      */
     public static <T> void setL2Cache(
             RedisService redisService, BloomFilterService bloomFilterService,
