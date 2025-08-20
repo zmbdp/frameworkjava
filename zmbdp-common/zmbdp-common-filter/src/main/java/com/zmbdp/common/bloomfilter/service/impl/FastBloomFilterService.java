@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author 稚名不带撇
  */
 @Slf4j
-@Service
 @ConditionalOnProperty(value = "bloom.filter.type", havingValue = "fast") // 只有读取到这个配置时，才会初始化
 public class FastBloomFilterService implements BloomFilterService {
 
