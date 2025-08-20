@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author 稚名不带撇
  */
 @Slf4j
-@ConditionalOnProperty(value = "bloom.filter.type", havingValue = "safe", matchIfMissing = true)
+@ConditionalOnProperty(value = "bloom.filter.type", havingValue = "safe")
 public class SafeBloomFilterService implements BloomFilterService {
 
     /**
