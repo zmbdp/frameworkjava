@@ -1,10 +1,10 @@
 package com.zmbdp.common.security.utils;
 
 import com.zmbdp.common.core.utils.ServletUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.SecurityConstants;
 import com.zmbdp.common.domain.constants.TokenConstants;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
@@ -40,7 +40,7 @@ public class SecurityUtil {
      */
     private static String replaceTokenPrefix(String token) {
         // 假如前端设置了令牌的前缀，需要替换裁剪
-        if (StringUtils.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
+        if (StringUtil.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
             // 把前缀换成空串
             token = token.replaceFirst(TokenConstants.PREFIX, "");
         }

@@ -1,11 +1,11 @@
 package com.zmbdp.common.message.service;
 
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.MessageConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.redis.service.RedisService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -79,7 +79,7 @@ public class CaptchaService {
         String codeKey = MessageConstants.SMS_CODE_KEY + phone;
         String cacheValue = redisService.getCacheObject(codeKey, String.class);
         long expireTime = redisService.getExpire(codeKey);
-        if (!StringUtils.isEmpty(cacheValue) && expireTime > phoneCodeExpiration * 60 - 60) {
+        if (!StringUtil.isEmpty(cacheValue) && expireTime > phoneCodeExpiration * 60 - 60) {
             long time = expireTime - phoneCodeExpiration * 60 + 60;
             throw new ServiceException("操作频繁, 请在 " + time + " 秒之后重试", ResultCode.INVALID_PARA.getCode());
         }
@@ -134,7 +134,7 @@ public class CaptchaService {
      * @return 布尔类型
      */
     public boolean checkCode(String phone, String code) {
-        if (getCode(phone) == null || StringUtils.isEmpty(getCode(phone))) {
+        if (getCode(phone) == null || StringUtil.isEmpty(getCode(phone))) {
             throw new ServiceException(ResultCode.INVALID_CODE);
         }
         return getCode(phone).equals(code);

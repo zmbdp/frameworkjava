@@ -11,7 +11,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.zmbdp.common.domain.constants.CommonConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -120,7 +119,7 @@ public class JsonUtil {
      * @return 转换好的对象
      */
     public static <T> T jsonToClass(String json, Class<T> clazz) {
-        if (StringUtils.isEmpty(json) || clazz == null) {
+        if (StringUtil.isEmpty(json) || clazz == null) {
             return null;
         }
         if (clazz.equals(String.class)) {
@@ -144,7 +143,7 @@ public class JsonUtil {
      * @return 转换好的对象
      */
     public static <T> T jsonToClass(String json, TypeReference<T> valueTypeRef) {
-        if (StringUtils.isEmpty(json) || valueTypeRef == null) {
+        if (StringUtil.isEmpty(json) || valueTypeRef == null) {
             return null;
         }
         try {
@@ -164,7 +163,7 @@ public class JsonUtil {
      * @return 转换好的 List
      */
     public static <T> List<T> jsonToList(String json, Class<T> clazz) {
-        if (StringUtils.isEmpty(json) || clazz == null) {
+        if (StringUtil.isEmpty(json) || clazz == null) {
             return null;
         }
         // 拿到 List 的里面是啥类型
@@ -186,7 +185,7 @@ public class JsonUtil {
      * @return 转换好的 Map
      */
     public static <T> Map<String, T> jsonToMap(String json, Class<T> valueClass) {
-        if (StringUtils.isEmpty(json) || valueClass == null) {
+        if (StringUtil.isEmpty(json) || valueClass == null) {
             return null;
         }
         // 拿到 Map 里面的 value 是啥类型

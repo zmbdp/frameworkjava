@@ -1,8 +1,8 @@
 package com.zmbdp.admin.service.user.domain.dto;
 
+import com.zmbdp.common.core.utils.StringUtil;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * B端用户信息
@@ -56,7 +56,7 @@ public class SysUserDTO {
      * @return 合理: true; 否则: false
      */
     public boolean checkPassword() {
-        if (StringUtils.isEmpty(this.password)) {
+        if (StringUtil.isEmpty(this.password)) {
             return false;
         }
         if (this.password.length() > 20) {

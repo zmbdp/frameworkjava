@@ -4,9 +4,9 @@ import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import com.zmbdp.common.bloomfilter.config.BloomFilterConfig;
 import com.zmbdp.common.bloomfilter.service.BloomFilterService;
+import com.zmbdp.common.core.utils.StringUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -118,7 +118,7 @@ public class SafeBloomFilterService implements BloomFilterService {
      */
     @Override
     public boolean mightContain(String key) {
-        if (StringUtils.isEmpty(key)) {
+        if (StringUtil.isEmpty(key)) {
             return false;
         }
 

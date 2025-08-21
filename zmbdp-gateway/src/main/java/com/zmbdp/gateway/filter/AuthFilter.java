@@ -12,7 +12,6 @@ import com.zmbdp.common.security.utils.JwtUtil;
 import com.zmbdp.gateway.config.IgnoreWhiteProperties;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -78,7 +77,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
         // 拿到令牌
         String token = getToken(request);
-        if (StringUtils.isEmpty(token)) {
+        if (StringUtil.isEmpty(token)) {
             // 如果为空就拼接 webFlux 响应体内容
             return unauthorizedResponse(exchange, ResultCode.TOKEN_EMPTY);
         }
@@ -104,7 +103,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         // 根据令牌获取用户信息给下面的 controller 层
         String userId = JwtUtil.getUserId(claims);
         String userName = JwtUtil.getUserName(claims);
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(userName)) {
+        if (StringUtil.isEmpty(userId) || StringUtil.isEmpty(userName)) {
             return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
         }
         // 设置用户状态到 header 请求中取
@@ -125,7 +124,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private String getToken(ServerHttpRequest request) {
         String token = request.getHeaders().getFirst(SecurityConstants.AUTHENTICATION);
         // 裁剪令牌前缀
-        if (StringUtils.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
+        if (StringUtil.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
             token = token.replaceFirst(TokenConstants.PREFIX, "");
         }
         return token;

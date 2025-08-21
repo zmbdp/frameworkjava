@@ -3,7 +3,6 @@ package com.zmbdp.common.core.utils;
 import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.domain.Result;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,7 +34,7 @@ public class ServletUtil {
         try {
             return URLEncoder.encode(str, CommonConstants.UTF8);
         } catch (UnsupportedEncodingException e) {
-            return StringUtils.EMPTY;
+            return StringUtil.EMPTY;
         }
     }
 

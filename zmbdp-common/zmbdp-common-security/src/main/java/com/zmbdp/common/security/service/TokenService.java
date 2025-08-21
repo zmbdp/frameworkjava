@@ -1,6 +1,7 @@
 package com.zmbdp.common.security.service;
 
 import com.zmbdp.common.core.utils.ServletUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.CacheConstants;
 import com.zmbdp.common.domain.constants.SecurityConstants;
 import com.zmbdp.common.domain.constants.TokenConstants;
@@ -11,7 +12,6 @@ import com.zmbdp.common.security.utils.JwtUtil;
 import com.zmbdp.common.security.utils.SecurityUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -99,7 +99,7 @@ public class TokenService {
         LoginUserDTO user = null;
         // 然后解析 token
         try {
-            if (StringUtils.isNotEmpty(token)) {
+            if (StringUtil.isNotEmpty(token)) {
                 // 先从 jwt 中拿到 用户的 的 key
                 String userKey = JwtUtil.getUserKey(token, secret);
                 // 然后再拼接成 redis 的 key 查询出 bloom 对象, 看看 redis 能不能查询到
@@ -141,7 +141,7 @@ public class TokenService {
      * @param secret 密钥
      */
     public void delLoginUser(String token, String secret) {
-        if (StringUtils.isNotEmpty(token)) {
+        if (StringUtil.isNotEmpty(token)) {
             String useKey = JwtUtil.getUserKey(token, secret);
             redisService.deleteObject(getTokenKey(useKey));
         }
@@ -193,7 +193,7 @@ public class TokenService {
      * @param loginUserDTO 用户信息
      */
     public void setLoginUser(LoginUserDTO loginUserDTO) {
-        if (loginUserDTO != null && StringUtils.isNotEmpty(loginUserDTO.getToken())) {
+        if (loginUserDTO != null && StringUtil.isNotEmpty(loginUserDTO.getToken())) {
             refreshToken(loginUserDTO);
         }
     }

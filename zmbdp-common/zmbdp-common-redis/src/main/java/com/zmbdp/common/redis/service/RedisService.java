@@ -2,8 +2,8 @@ package com.zmbdp.common.redis.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.zmbdp.common.core.utils.JsonUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -279,7 +279,7 @@ public class RedisService {
      * @return 递增后的值（失败返回 -1）
      */
     public Long incr(final String key) {
-        if (StringUtils.isEmpty(key)) {
+        if (StringUtil.isEmpty(key)) {
             return -1L;
         }
         try {
@@ -297,7 +297,7 @@ public class RedisService {
      * @return 递减后的值（失败返回 -1）
      */
     public Long decr(final String key) {
-        if (StringUtils.isEmpty(key)) {
+        if (StringUtil.isEmpty(key)) {
             return -1L;
         }
         try {
@@ -1432,7 +1432,7 @@ public class RedisService {
      */
     public boolean compareAndDelete(String key, String value) {
         // 验证 key 和 value 中不能包含空格
-        if (key.contains(StringUtils.SPACE) || value.contains(StringUtils.SPACE)) {
+        if (key.contains(StringUtil.SPACE) || value.contains(StringUtil.SPACE)) {
             return false;
         }
 

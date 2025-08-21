@@ -4,6 +4,7 @@ import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.Result;
@@ -21,7 +22,6 @@ import com.zmbdp.portal.service.user.entity.dto.UserDTO;
 import com.zmbdp.portal.service.user.entity.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -235,7 +235,7 @@ public class UserServiceImpl implements IUserService {
         // 解析令牌, 拿出用户信息做个日志
         // 拿的是 JWT
         String Jwt = SecurityUtil.getToken();
-        if (StringUtils.isEmpty(Jwt)) {
+        if (StringUtil.isEmpty(Jwt)) {
             return;
         }
         String userName = JwtUtil.getUserName(Jwt, secret);

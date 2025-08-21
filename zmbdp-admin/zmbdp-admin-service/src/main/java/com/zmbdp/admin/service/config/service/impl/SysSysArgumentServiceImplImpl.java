@@ -11,10 +11,10 @@ import com.zmbdp.admin.service.config.domain.entity.SysArgument;
 import com.zmbdp.admin.service.config.mapper.SysArgumentMapper;
 import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,10 +73,10 @@ public class SysSysArgumentServiceImplImpl implements ISysArgumentServiceImpl {
     public BasePageVO<ArgumentVO> listArgument(ArgumentListReqDTO argumentListReqDTO) {
         // 查询数据库，查出所有符合的参数列表
         LambdaQueryWrapper<SysArgument> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(argumentListReqDTO.getConfigKey())) {
+        if (StringUtil.isNotBlank(argumentListReqDTO.getConfigKey())) {
             queryWrapper.eq(SysArgument::getConfigKey, argumentListReqDTO.getConfigKey());
         }
-        if (StringUtils.isNotBlank(argumentListReqDTO.getName())) {
+        if (StringUtil.isNotBlank(argumentListReqDTO.getName())) {
             queryWrapper.like(SysArgument::getName, argumentListReqDTO.getName());
         }
         Page<SysArgument> page = sysArgumentMapper.selectPage(
@@ -119,7 +119,7 @@ public class SysSysArgumentServiceImplImpl implements ISysArgumentServiceImpl {
         // 这里就说明可以修改了
         sysArgument.setName(argumentEditReqDTO.getName());
         sysArgument.setValue(argumentEditReqDTO.getValue());
-        if (StringUtils.isNotBlank(argumentEditReqDTO.getRemark())) {
+        if (StringUtil.isNotBlank(argumentEditReqDTO.getRemark())) {
             sysArgument.setRemark(argumentEditReqDTO.getRemark());
         }
         sysArgumentMapper.updateById(sysArgument);

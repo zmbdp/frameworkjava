@@ -11,6 +11,7 @@ import com.zmbdp.admin.service.user.mapper.SysUserMapper;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.UserConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
@@ -21,7 +22,6 @@ import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.common.security.utils.JwtUtil;
 import com.zmbdp.common.security.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -87,7 +87,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 检查密码是否正确
         // 先解密
         String password = AESUtil.decryptHex(passwordLoginDTO.getPassword());
-        if (StringUtils.isEmpty(password)) {
+        if (StringUtil.isEmpty(password)) {
             throw new ServiceException("密码解析为空", ResultCode.INVALID_PARA.getCode());
         }
         // 然后再使用 DigestUtil.sha256Hex() 方法加密成不可逆的密码
@@ -123,7 +123,7 @@ public class SysUserServiceImpl implements ISysUserService {
         SysUser sysUser = sysUserMapper.selectById(userId);
         if (
                 sysUser != null &&
-                StringUtils.isNoneEmpty(sysUser.getIdentity()) &&
+                StringUtil.isNoneEmpty(sysUser.getIdentity()) &&
                 !sysUser.getIdentity().equals(UserConstants.SUPER_ADMIN)
         ) {
             log.warn("SysUserServiceImpl.addOrEdit: [平台管理员不能新增或修改账号信息, 平台管理员id: {} ]", sysUser.getId());
@@ -148,7 +148,7 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setNickName(sysUserDTO.getNickName());
         sysUser.setIdentity(sysUserDTO.getIdentity());
         // 校验密码, 可能是编辑，编辑的话不传密码就是不编辑密码了
-        if (StringUtils.isNotEmpty(sysUserDTO.getPassword())) {
+        if (StringUtil.isNotEmpty(sysUserDTO.getPassword())) {
             // 说明要修改密码
             if (!sysUserDTO.checkPassword()) {
                 throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
@@ -184,7 +184,7 @@ public class SysUserServiceImpl implements ISysUserService {
             throw new ServiceException("手机格式错误", ResultCode.INVALID_PARA.getCode());
         }
         // 校验密码
-        if (StringUtils.isEmpty(sysUserDTO.getPassword()) || !sysUserDTO.checkPassword()) {
+        if (StringUtil.isEmpty(sysUserDTO.getPassword()) || !sysUserDTO.checkPassword()) {
             throw new ServiceException("密码校验失败", ResultCode.INVALID_PARA.getCode());
         }
         // 手机号唯一性判断
@@ -193,7 +193,7 @@ public class SysUserServiceImpl implements ISysUserService {
             throw new ServiceException("当前手机号已注册", ResultCode.INVALID_PARA.getCode());
         }
         // 判断身份信息
-        if (StringUtils.isEmpty(sysUserDTO.getIdentity()) || sysDictionaryService.getDicDataByKey(sysUserDTO.getIdentity()) == null) {
+        if (StringUtil.isEmpty(sysUserDTO.getIdentity()) || sysDictionaryService.getDicDataByKey(sysUserDTO.getIdentity()) == null) {
             throw new ServiceException("用户身份错误", ResultCode.INVALID_PARA.getCode());
         }
     }
@@ -265,7 +265,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 解析令牌, 拿出用户信息做个日志
         // 拿的是 JWT
         String Jwt = SecurityUtil.getToken();
-        if (StringUtils.isEmpty(Jwt)) {
+        if (StringUtil.isEmpty(Jwt)) {
             return;
         }
         String userName = JwtUtil.getUserName(Jwt, secret);

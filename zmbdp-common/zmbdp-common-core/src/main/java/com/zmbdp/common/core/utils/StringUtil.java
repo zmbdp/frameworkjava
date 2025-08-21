@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author 稚名不带撇
  */
-public class StringUtil {
+public class StringUtil extends StringUtils{
 
     /**
      * 判断指定字符串是否与指定匹配规则链表中的任意一个匹配规则匹配
@@ -21,7 +21,7 @@ public class StringUtil {
      * @return 是否匹配
      */
     public static boolean matches(String str, List<String> patternList) {
-        if (StringUtils.isEmpty(str) || CollectionUtils.isEmpty(patternList)) {
+        if (isEmpty(str) || CollectionUtils.isEmpty(patternList)) {
             return false;
         }
         for (String pattern : patternList) {
@@ -48,7 +48,7 @@ public class StringUtil {
      * @return 是否匹配
      */
     public static boolean isMatch(String pattern, String url) {
-        if (StringUtils.isEmpty(url) || StringUtils.isEmpty(pattern)) {
+        if (isEmpty(url) || isEmpty(pattern)) {
             return false;
         }
         AntPathMatcher matcher = new AntPathMatcher();

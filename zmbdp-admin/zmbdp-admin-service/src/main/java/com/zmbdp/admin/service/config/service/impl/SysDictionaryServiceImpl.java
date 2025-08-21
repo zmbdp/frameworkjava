@@ -11,10 +11,10 @@ import com.zmbdp.admin.service.config.mapper.SysDictionaryDataMapper;
 import com.zmbdp.admin.service.config.mapper.SysDictionaryTypeMapper;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,10 +81,10 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
     public BasePageVO<DictionaryTypeVO> listType(DictionaryTypeListReqDTO dictionaryTypeListReqDTO) {
         BasePageVO<DictionaryTypeVO> result = new BasePageVO<>();
         LambdaQueryWrapper<SysDictionaryType> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(dictionaryTypeListReqDTO.getValue())) {
+        if (StringUtil.isNotBlank(dictionaryTypeListReqDTO.getValue())) {
             queryWrapper.like(SysDictionaryType::getValue, dictionaryTypeListReqDTO.getValue());
         }
-        if (StringUtils.isNotBlank(dictionaryTypeListReqDTO.getTypeKey())) {
+        if (StringUtil.isNotBlank(dictionaryTypeListReqDTO.getTypeKey())) {
             queryWrapper.eq(SysDictionaryType::getTypeKey, dictionaryTypeListReqDTO.getTypeKey());
         }
         Page<SysDictionaryType> page = sysDictionaryTypeMapper.selectPage(
@@ -136,7 +136,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         }
         // 说明是符合要求的，直接改就行了
         sysDictionaryType.setValue(dictionaryTypeWriteReqDTO.getValue());
-        if (StringUtils.isNotBlank(dictionaryTypeWriteReqDTO.getRemark())) {
+        if (StringUtil.isNotBlank(dictionaryTypeWriteReqDTO.getRemark())) {
             sysDictionaryType.setRemark(dictionaryTypeWriteReqDTO.getRemark());
         }
         sysDictionaryTypeMapper.updateById(sysDictionaryType);
@@ -192,7 +192,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<>();
         // 构建查询条件
         queryWrapper.eq(SysDictionaryData::getTypeKey, dictionaryDataListReqDTO.getTypeKey());
-        if (StringUtils.isNotBlank(dictionaryDataListReqDTO.getValue())) {
+        if (StringUtil.isNotBlank(dictionaryDataListReqDTO.getValue())) {
             queryWrapper.like(SysDictionaryData::getValue, dictionaryDataListReqDTO.getValue());
         }
         // 根据排序字段升序排序
@@ -245,7 +245,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         if (dictionaryDataEditReqDTO.getSort() != null) {
             sysDictionaryData.setSort(dictionaryDataEditReqDTO.getSort());
         }
-        if (StringUtils.isNotBlank(dictionaryDataEditReqDTO.getRemark())) {
+        if (StringUtil.isNotBlank(dictionaryDataEditReqDTO.getRemark())) {
             sysDictionaryData.setRemark(dictionaryDataEditReqDTO.getRemark());
         }
         sysDictionaryDataMapper.updateById(sysDictionaryData);

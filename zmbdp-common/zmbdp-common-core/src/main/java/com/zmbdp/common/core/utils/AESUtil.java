@@ -1,7 +1,6 @@
 package com.zmbdp.common.core.utils;
 
 import cn.hutool.crypto.SecureUtil;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -24,7 +23,7 @@ public class AESUtil {
      * @return 加密后的数据
      */
     public static String encryptHex(String data) {
-        if (StringUtils.isNotEmpty(data)) {
+        if (StringUtil.isNotEmpty(data)) {
             return SecureUtil.aes(KEYS).encryptHex(data);
         }
         return null;
@@ -37,7 +36,7 @@ public class AESUtil {
      * @return 原始数据
      */
     public static String decryptHex(String data) {
-        if (StringUtils.isNotEmpty(data)) {
+        if (StringUtil.isNotEmpty(data)) {
             return SecureUtil.aes(KEYS).decryptStr(data);
         }
         return null;

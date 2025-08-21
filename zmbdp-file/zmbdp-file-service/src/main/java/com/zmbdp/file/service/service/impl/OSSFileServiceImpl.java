@@ -7,6 +7,7 @@ import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.file.api.domain.dto.FileReqDTO;
@@ -16,7 +17,6 @@ import com.zmbdp.file.service.constants.OSSCustomConstants;
 import com.zmbdp.file.service.service.IFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -105,7 +105,7 @@ public class OSSFileServiceImpl implements IFileService {
             // 创建 PutObject 请求
             PutObjectResult putObjectResult = ossClient.putObject(putObjectRequest);
 
-            if (putObjectResult == null || StringUtils.isBlank(putObjectResult.getRequestId())) {
+            if (putObjectResult == null || StringUtil.isBlank(putObjectResult.getRequestId())) {
                 log.error("上传 oss 异常 putObjectResult 未正常返回: {}", putObjectRequest);
                 throw new ServiceException(ResultCode.OSS_UPLOAD_FAILED);
             }
