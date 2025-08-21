@@ -5,6 +5,8 @@ import lombok.Data;
 
 /**
  * 查看参数 DTO
+ *
+ * @author 稚名不带撇
  */
 @Data
 public class ArgumentListReqDTO extends BasePageReqDTO {
