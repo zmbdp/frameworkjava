@@ -37,8 +37,6 @@ security:
   ignore:
   # 白名单配置
     whites:
-      - /admin/logout
-      # - /admin/register
       - /**/register/**
       - /admin/codeLogin
       - /**/login/**
