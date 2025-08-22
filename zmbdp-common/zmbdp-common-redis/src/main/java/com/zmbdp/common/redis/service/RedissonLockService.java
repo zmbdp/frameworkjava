@@ -85,7 +85,7 @@ public class RedissonLockService {
         }
         try {
             // 直接调用 unlock()，依赖 Redisson 的内部校验
-            if (lock.isHeldByCurrentThread()) {
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
                 lock.unlock();
                 log.debug("RedissonLockService.releaseLock Lock released: {}", lock.getName());
                 return true;
