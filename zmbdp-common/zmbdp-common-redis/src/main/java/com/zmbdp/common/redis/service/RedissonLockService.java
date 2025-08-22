@@ -21,6 +21,39 @@ public class RedissonLockService {
     private final RedissonClient redissonClient;
 
     /**
+     * 获取有看门狗的锁，并且没获取到，就一直会被阻塞
+     *
+     * @param lockKey 锁的 key
+     * @return RLock 锁实例（获取失败返回 null）
+     */
+    public RLock acquire(String lockKey) {
+        try {
+            final RLock lock = redissonClient.getLock(lockKey);
+            lock.lock(-1, TimeUnit.SECONDS);
+            return lock;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取锁，并且没获取到，就一直会被阻塞
+     *
+     * @param lockKey 锁的 key
+     * @param expire  锁有效期（毫秒）
+     * @return RLock 锁实例（获取失败返回 null）
+     */
+    public RLock acquire(String lockKey, long expire) {
+        try {
+            final RLock lock = redissonClient.getLock(lockKey);
+            lock.lock(expire, TimeUnit.SECONDS);
+            return lock;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * 获取有看门狗的锁
      *
      * @param lockKey  锁的 key
@@ -32,7 +65,7 @@ public class RedissonLockService {
         try {
             // 获取分布式锁实例（注意：此时并未实际加锁，只是创建锁对象）
             // lockKey 建议格式：业务前缀: 唯一标识（如 "order:pay:123456"）
-            RLock lock = redissonClient.getLock(lockKey);
+            final RLock lock = redissonClient.getLock(lockKey);
             // 尝试获取锁，支持看门狗自动续期
             // waitTime: 最大等待时间（单位由 unit 指定），waitTime 为 0 表示不等待立即返回
             // -1: leaseTime参数，表示启用看门狗机制（默认 30 秒锁有效期，每 10 秒自动续期）
@@ -59,7 +92,7 @@ public class RedissonLockService {
         try {
             // 获取分布式锁实例（注意：此时并未实际加锁，只是创建锁对象）
             // lockKey 建议格式：业务前缀: 唯一标识（如 "order:pay:123456"）
-            RLock lock = redissonClient.getLock(lockKey);
+            final RLock lock = redissonClient.getLock(lockKey);
             // 尝试获取锁，支持看门狗自动续期
             // waitTime: 最大等待时间（单位由 unit 指定），waitTime 为 0 表示不等待立即返回
             // -1: leaseTime参数，表示启用看门狗机制（默认 30 秒锁有效期，每 10 秒自动续期）
