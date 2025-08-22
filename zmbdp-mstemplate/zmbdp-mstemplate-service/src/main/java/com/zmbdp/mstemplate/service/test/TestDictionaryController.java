@@ -22,7 +22,7 @@ public class TestDictionaryController {
      * @return 字典数据列表
      */
     @GetMapping("/type")
-    List<DictionaryDataDTO> selectDictDataByType(@RequestParam String typeKey) {
+    List<DictionaryDataDTO> selectDictDataByType(@RequestParam("typeKey") String typeKey) {
         return dictionaryServiceApi.selectDictDataByType(typeKey);
     }
 
@@ -44,7 +44,7 @@ public class TestDictionaryController {
      * @return 该字典数据的对象
      */
     @GetMapping("/key")
-    DictionaryDataDTO getDicDataByKey(@RequestParam String dataKey) {
+    DictionaryDataDTO getDicDataByKey(@RequestParam("dataKey") String dataKey) {
         return dictionaryServiceApi.getDicDataByKey(dataKey);
     }
 

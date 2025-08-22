@@ -27,7 +27,7 @@ public interface AppUserApi {
      * @return C端用户 VO
      */
     @GetMapping("/register/openid")
-    Result<AppUserVo> registerByOpenId(@RequestParam String openId);
+    Result<AppUserVo> registerByOpenId(@RequestParam("openId") String openId);
 
     /**
      * 根据 openId 查询用户信息
@@ -36,7 +36,7 @@ public interface AppUserApi {
      * @return C端用户 VO
      */
     @GetMapping("/open_id_find")
-    Result<AppUserVo> findByOpenId(@RequestParam String openId);
+    Result<AppUserVo> findByOpenId(@RequestParam("openId") String openId);
 
     /**
      * 根据手机号查询用户信息
@@ -45,7 +45,7 @@ public interface AppUserApi {
      * @return C端用户 VO
      */
     @GetMapping("/phone_find")
-    Result<AppUserVo> findByPhone(@RequestParam String phoneNumber);
+    Result<AppUserVo> findByPhone(@RequestParam("phoneNumber") String phoneNumber);
 
     /**
      * 根据手机号注册用户
@@ -54,7 +54,7 @@ public interface AppUserApi {
      * @return C端用户 VO
      */
     @GetMapping("/register/phone")
-    Result<AppUserVo> registerByPhone(@RequestParam String phoneNumber);
+    Result<AppUserVo> registerByPhone(@RequestParam("phoneNumber") String phoneNumber);
 
     /**
      * 编辑 C端用户
@@ -63,7 +63,7 @@ public interface AppUserApi {
      * @return void
      */
     @PostMapping("/edit")
-    Result<Void> edit(@RequestBody @Validated UserEditReqDTO userEditReqDTO);
+    Result<Void> edit(@RequestBody UserEditReqDTO userEditReqDTO);
 
     /**
      * 根据用户 ID 获取用户信息
@@ -72,7 +72,7 @@ public interface AppUserApi {
      * @return C端用户 VO
      */
     @GetMapping("/id_find")
-    Result<AppUserVo> findById(@RequestParam Long userId);
+    Result<AppUserVo> findById(@RequestParam("userId") Long userId);
 
     /**
      * 根据用户 ID 列表获取用户列表信息

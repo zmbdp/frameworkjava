@@ -22,7 +22,7 @@ public interface ArgumentServiceApi {
      * @return 参数对象
      */
     @GetMapping("/key")
-    ArgumentDTO getByConfigKey(@RequestParam String configKey);
+    ArgumentDTO getByConfigKey(@RequestParam("configKey") String configKey);
 
     /**
      * 根据多个参数键查询多个参数对象

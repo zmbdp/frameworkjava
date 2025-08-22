@@ -47,7 +47,7 @@ public class UserController {
      * @return 验证码
      */
     @GetMapping("/send_code")
-    public Result<String> sendCode(@Validated @RequestParam String phone) {
+    public Result<String> sendCode(@Validated @RequestParam("phone") String phone) {
         return Result.success(userService.sendCode(phone));
     }
 

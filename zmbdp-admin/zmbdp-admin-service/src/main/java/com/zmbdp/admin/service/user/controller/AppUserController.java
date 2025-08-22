@@ -12,6 +12,7 @@ import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,7 +106,7 @@ public class AppUserController implements AppUserApi {
      * @return void
      */
     @Override
-    public Result<Void> edit(UserEditReqDTO userEditReqDTO) {
+    public Result<Void> edit(@Validated UserEditReqDTO userEditReqDTO) {
         appUserService.edit(userEditReqDTO);
         return Result.success();
     }

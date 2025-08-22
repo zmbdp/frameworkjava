@@ -25,7 +25,7 @@ public interface DictionaryServiceApi {
      * @return 字典数据列表
      */
     @GetMapping("/type")
-    List<DictionaryDataDTO> selectDictDataByType(@RequestParam String typeKey);
+    List<DictionaryDataDTO> selectDictDataByType(@RequestParam("typeKey") String typeKey);
 
     /**
      * 获取多个字典类型下的所有字典数据
@@ -43,7 +43,7 @@ public interface DictionaryServiceApi {
      * @return 该字典数据的对象
      */
     @GetMapping("/key")
-    DictionaryDataDTO getDicDataByKey(@RequestParam String dataKey);
+    DictionaryDataDTO getDicDataByKey(@RequestParam("dataKey") String dataKey);
 
     /**
      * 根据多个字典数据业务主键获取多个字典数据对象

@@ -25,7 +25,7 @@ public class TestArgumentController {
      * @return 参数对象
      */
     @GetMapping("/key")
-    ArgumentDTO getByConfigKey(@RequestParam String configKey) {
+    ArgumentDTO getByConfigKey(@RequestParam("configKey") String configKey) {
         return argumentServiceApi.getByConfigKey(configKey);
     }
 
