@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RefreshScope
-public class ResetAppUserBloomFilterTask {
+public class ResetBloomFilterTimedTask {
 
     /**
      * 用户前缀
