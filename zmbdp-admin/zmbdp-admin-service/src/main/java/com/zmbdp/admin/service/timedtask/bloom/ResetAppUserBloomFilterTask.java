@@ -105,7 +105,9 @@ public class ResetAppUserBloomFilterTask {
             log.error("布隆过滤器刷新任务执行失败 =======================", e);
         } finally {
             // 释放锁
-            redissonLockService.releaseLock(lock);
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
+                redissonLockService.releaseLock(lock);
+            }
         }
     }
 
