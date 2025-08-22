@@ -337,7 +337,7 @@ mvn spring-boot:run
 
 ### 17. API文档和使用手册
 
-- **API文档**: [https://s.apifox.cn/40d30ad6-e65b-4c96-af44-2747d6e22dbc](https://s.apifox.cn/40d30ad6-e65b-4c96-af44-2747d6e22dbc) (访问密码: zmbdp@123.com)
+- **API文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn) (访问密码: zmbdp@123.com)
 - **使用手册**: [https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink](https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink)
 
 
