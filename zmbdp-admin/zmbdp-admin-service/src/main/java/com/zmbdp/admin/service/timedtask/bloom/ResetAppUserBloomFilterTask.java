@@ -26,6 +26,21 @@ import java.util.concurrent.TimeUnit;
 public class ResetAppUserBloomFilterTask {
 
     /**
+     * 用户前缀
+     */
+    private static final String APP_USER_PREFIX = "app_user:";
+
+    /**
+     * 用户手机号前缀
+     */
+    private static final String APP_USER_PHONE_NUMBER_PREFIX = "app_user:phone_number:";
+
+    /**
+     * 用户微信 ID 前缀
+     */
+    private static final String APP_USER_OPEN_ID_PREFIX = "app_user:open_id:";
+
+    /**
      * 布隆过滤器锁 key
      */
     private static final String BLOOM_FILTER_LOCK = "bloom:filter:lock";
@@ -73,45 +88,59 @@ public class ResetAppUserBloomFilterTask {
             log.info("布隆过滤器刷新任务已获取锁失败，跳过执行");
             return;
         }
+        log.info("开始执行布隆过滤器刷新任务 =======================");
+
+        // 重置布隆过滤器
+        // 打印一下数量
+        log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
+        bloomFilterService.reset();
+        log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
+
         try {
-            log.info("开始执行布隆过滤器刷新任务");
+            // 刷新 C端用户的布隆过滤器
+            refreshAppUserBloomFilter();
 
-            // 查询所有用户
-            List<AppUser> appUsers = appUserMapper.selectList(null);
-
-            log.info("从数据库加载到 {} 个用户", appUsers.size());
-
-            // 重新初始化布隆过滤器
-            // 打印一下数量
-            log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
-            bloomFilterService.reset();
-            log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
-
-            // 将所有用户加密手机号和微信 ID 添加到布隆过滤器中
-            int count = 0;
-            for (AppUser appUser : appUsers) {
-                // 添加加密手机号（如果存在）
-                if (appUser.getPhoneNumber() != null && !appUser.getPhoneNumber().isEmpty()) {
-                    bloomFilterService.put(appUser.getPhoneNumber());
-                    count++;
-                }
-
-                // 添加微信 ID（如果存在）
-                if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
-                    bloomFilterService.put(appUser.getOpenId());
-                    count++;
-                }
-            }
-
-            if (count != appUsers.size()) {
-                log.warn("布隆过滤器刷新任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查", count, appUsers.size());
-            }
-            log.info("布隆过滤器刷新任务执行完成，共加载 {} 个用户数据", count);
+            log.info("布隆过滤器刷新任务执行完成 =======================");
         } catch (Exception e) {
-            log.error("布隆过滤器刷新任务执行失败", e);
+            log.error("布隆过滤器刷新任务执行失败 =======================", e);
         } finally {
             // 释放锁
             redissonLockService.releaseLock(lock);
         }
+    }
+
+    /**
+     * 重置 C端用户的布隆过滤器
+     */
+    public void refreshAppUserBloomFilter() {
+        log.info("开始执行布隆过滤器刷新用户任务 -----------------------");
+        // 查询所有用户
+        List<AppUser> appUsers = appUserMapper.selectList(null);
+
+        log.info("从数据库加载到 {} 个用户", appUsers.size());
+
+        // 将所有用户加密手机号和微信 ID 添加到布隆过滤器中
+        int count = 0;
+        for (AppUser appUser : appUsers) {
+            // 添加加密手机号（如果存在）
+            if (appUser.getPhoneNumber() != null && !appUser.getPhoneNumber().isEmpty()) {
+                bloomFilterService.put(APP_USER_PHONE_NUMBER_PREFIX + appUser.getPhoneNumber());
+                count++;
+            }
+
+            // 添加微信 ID（如果存在）
+            if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
+                bloomFilterService.put(APP_USER_OPEN_ID_PREFIX + appUser.getOpenId());
+                count++;
+            }
+
+            // 添加用户 ID
+            bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+        }
+
+        if (count != appUsers.size()) {
+            log.warn("布隆过滤器刷新用户任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查 -----------------------", count, appUsers.size());
+        }
+        log.info("布隆过滤器刷新用户任务执行完成，共加载 {} 个用户数据 -----------------------", count);
     }
 }
