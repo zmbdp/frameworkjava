@@ -1,4 +1,4 @@
-package com.zmbdp.portal.service.user.entity.vo;
+package com.zmbdp.portal.service.user.domain.vo;
 
 import com.zmbdp.common.domain.domain.vo.LoginUserVO;
 import lombok.Data;

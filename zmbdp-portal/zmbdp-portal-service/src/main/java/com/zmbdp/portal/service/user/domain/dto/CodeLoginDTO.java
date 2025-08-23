@@ -1,4 +1,4 @@
-package com.zmbdp.portal.service.user.entity.dto;
+package com.zmbdp.portal.service.user.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

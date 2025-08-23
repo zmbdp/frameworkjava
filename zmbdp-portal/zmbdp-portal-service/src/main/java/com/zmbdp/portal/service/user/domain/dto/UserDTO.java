@@ -1,8 +1,8 @@
-package com.zmbdp.portal.service.user.entity.dto;
+package com.zmbdp.portal.service.user.domain.dto;
 
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
-import com.zmbdp.portal.service.user.entity.vo.UserVo;
+import com.zmbdp.portal.service.user.domain.vo.UserVo;
 import lombok.Data;
 
 /**

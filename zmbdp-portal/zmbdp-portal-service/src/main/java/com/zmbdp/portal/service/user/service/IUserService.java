@@ -2,8 +2,8 @@ package com.zmbdp.portal.service.user.service;
 
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
-import com.zmbdp.portal.service.user.entity.dto.LoginDTO;
-import com.zmbdp.portal.service.user.entity.dto.UserDTO;
+import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
+import com.zmbdp.portal.service.user.domain.dto.UserDTO;
 
 /**
  * 门户服务
