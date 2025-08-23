@@ -22,5 +22,6 @@ public class ZmbdpAdminServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(ZmbdpAdminServiceApplication.class, args);
+        log.info("admin 服务启动成功......");
     }
 }

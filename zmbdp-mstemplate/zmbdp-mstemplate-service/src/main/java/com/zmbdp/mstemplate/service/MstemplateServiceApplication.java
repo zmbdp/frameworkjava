@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
- * ，模板微服务启动类
+ * 模板微服务启动类
  *
  * @author 稚名不带撇
  */
@@ -26,6 +26,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         DictionaryServiceApi.class, ArgumentServiceApi.class
 }) // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
 public class MstemplateServiceApplication {
+
     /**
      * 启动方法
      *
@@ -33,5 +34,6 @@ public class MstemplateServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(MstemplateServiceApplication.class, args);
+        log.info("模板服务启动成功......");
     }
 }

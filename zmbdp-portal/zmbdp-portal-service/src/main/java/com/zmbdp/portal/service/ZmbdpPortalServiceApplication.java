@@ -1,5 +1,6 @@
 package com.zmbdp.portal.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -9,6 +10,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @SpringBootApplication
 @EnableFeignClients(basePackages = {"com.zmbdp.**.feign"})
 public class ZmbdpPortalServiceApplication {
@@ -20,5 +22,6 @@ public class ZmbdpPortalServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(ZmbdpPortalServiceApplication.class, args);
+        log.info("门户服务启动成......");
     }
 }

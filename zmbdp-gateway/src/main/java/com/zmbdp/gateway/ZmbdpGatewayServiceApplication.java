@@ -1,5 +1,6 @@
 package com.zmbdp.gateway;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @SpringBootApplication(exclude = {
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class
@@ -23,6 +25,6 @@ public class ZmbdpGatewayServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(ZmbdpGatewayServiceApplication.class, args);
+        log.info("网关服务启动成功......");
     }
-
 }

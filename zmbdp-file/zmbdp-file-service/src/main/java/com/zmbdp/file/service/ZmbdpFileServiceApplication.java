@@ -1,5 +1,6 @@
 package com.zmbdp.file.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @SpringBootApplication(exclude = {
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
@@ -25,5 +27,6 @@ public class ZmbdpFileServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(ZmbdpFileServiceApplication.class, args);
+        log.info("文件服务启动成功......");
     }
 }
