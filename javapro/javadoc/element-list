@@ -3,7 +3,7 @@ com.zmbdp.admin.api.appuser.domain.vo
 com.zmbdp.admin.api.appuser.feign
 com.zmbdp.admin.api.config.domain.dto
 com.zmbdp.admin.api.config.domain.vo
-com.zmbdp.admin.api.config.frign
+com.zmbdp.admin.api.config.feign
 com.zmbdp.admin.api.map.constants
 com.zmbdp.admin.api.map.domain.dto
 com.zmbdp.admin.api.map.domain.vo

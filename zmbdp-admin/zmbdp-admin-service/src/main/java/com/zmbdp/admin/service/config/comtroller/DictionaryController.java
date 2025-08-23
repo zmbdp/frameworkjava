@@ -3,7 +3,7 @@ package com.zmbdp.admin.service.config.comtroller;
 import com.zmbdp.admin.api.config.domain.dto.*;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
-import com.zmbdp.admin.api.config.frign.DictionaryServiceApi;
+import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;

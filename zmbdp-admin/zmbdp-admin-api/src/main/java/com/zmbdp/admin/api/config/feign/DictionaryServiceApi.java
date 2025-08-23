@@ -1,4 +1,4 @@
-package com.zmbdp.admin.api.config.frign;
+package com.zmbdp.admin.api.config.feign;
 
 
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataDTO;

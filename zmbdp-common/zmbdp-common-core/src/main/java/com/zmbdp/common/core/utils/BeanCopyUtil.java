@@ -46,7 +46,7 @@ public class BeanCopyUtil extends BeanUtils {
      * 批量拷贝 Map 集合类型里面的元素
      *
      * @param source 待拷贝的数据
-     * @param target 拷贝之后的目标对象
+     * @param target 拷贝之后 value 的目标对象
      * @param <S>    源类型
      * @param <T>    目标对象类型
      * @return 目标对象集合
@@ -72,7 +72,7 @@ public class BeanCopyUtil extends BeanUtils {
      * 批量拷贝 Map 集合类型里面的元素（支持复杂泛型嵌套）
      *
      * @param source 待拷贝的数据
-     * @param target 拷贝之后的目标对象
+     * @param target 拷贝之后 List 集合里面的的目标对象
      * @param <S>    源类型
      * @param <T>    目标对象类型
      * @return 目标对象集合

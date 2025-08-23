@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.admin.api.config.domain.dto.ArgumentDTO;
-import com.zmbdp.admin.api.config.frign.ArgumentServiceApi;
+import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

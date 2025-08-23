@@ -4541,7 +4541,7 @@ create table `sys_argument`
 ) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '系统参数表';
 
 INSERT INTO sys_argument (name, config_key, value)
-VALUES ('热门城市', 'sys_hot_city', '35,108,234,236,289,342');
+VALUES ('热门城市', 'sys_hot_city', '35,108,234,236,289,122');
 
 drop table if exists `sys_dictionary_type`;
 create table `sys_dictionary_type`

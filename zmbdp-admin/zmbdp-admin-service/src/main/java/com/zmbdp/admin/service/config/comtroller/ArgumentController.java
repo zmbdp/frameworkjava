@@ -5,7 +5,7 @@ import com.zmbdp.admin.api.config.domain.dto.ArgumentDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
-import com.zmbdp.admin.api.config.frign.ArgumentServiceApi;
+import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
 import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;

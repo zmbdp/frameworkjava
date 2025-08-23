@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataDTO;
-import com.zmbdp.admin.api.config.frign.DictionaryServiceApi;
+import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

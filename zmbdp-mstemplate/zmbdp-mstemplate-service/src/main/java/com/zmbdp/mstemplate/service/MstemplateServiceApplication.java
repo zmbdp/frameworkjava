@@ -1,8 +1,8 @@
 package com.zmbdp.mstemplate.service;
 
 
-import com.zmbdp.admin.api.config.frign.ArgumentServiceApi;
-import com.zmbdp.admin.api.config.frign.DictionaryServiceApi;
+import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
+import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.file.api.feign.FileServiceApi;
 import lombok.extern.slf4j.Slf4j;
