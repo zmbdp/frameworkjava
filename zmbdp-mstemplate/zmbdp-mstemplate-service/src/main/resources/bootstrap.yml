@@ -30,6 +30,8 @@ spring:
             refresh: true # 配置是否支持动态刷新
           - data-id: share-filter-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             refresh: true # 配置是否支持动态刷新
+          - data-id: share-thread-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true # 配置是否支持动态刷新
 
 # 这⼀配置用于定义应用在控制台输出日志时所遵循的格式规则
 logging:

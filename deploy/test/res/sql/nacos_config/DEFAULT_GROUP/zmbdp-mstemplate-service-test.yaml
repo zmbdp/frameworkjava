@@ -1,19 +1,2 @@
 server:
   port: 18085
-
-
-# 线程相关配置
-thread:
-  pool-executor:
-    # 核心线程数配置
-    corePoolSize: 5
-    # 最大线程数配置
-    maxPoolSize: 100
-    # 阻塞队列大小配置
-    queueCapacity: 100
-    # 空闲时间存货配置 (s)
-    keepAliveSeconds: 60
-    # 线程名称前缀
-    prefixName: zmbdp-thread-
-    # 据决策略的选择：1-AbortPolicy(任务丢失抛异常) 2-CallerRunsPolicy(丢失让提交任务的线程运行) 3-DiscardOldestPolicy(丢弃最老的，执行新的) 4-直接丢弃
-    rejectHandler: 2 

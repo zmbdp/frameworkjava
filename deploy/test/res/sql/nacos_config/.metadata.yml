@@ -64,3 +64,8 @@ metadata:
   desc: 布隆过滤器相关配置
   group: DEFAULT_GROUP
   type: yaml
+- appName: 异步线程公共配置
+  dataId: share-thread-test.yaml
+  desc: 异步线程相关配置
+  group: DEFAULT_GROUP
+  type: yaml
