@@ -81,8 +81,8 @@ public class ResetBloomFilterTimedTask {
             return;
         }
 
-        // 获取锁，因为布隆过滤器是一级缓存，如果说指定超时时间，就刷新不了了，所有这里要让他一直阻塞，直到获取到锁
-        RLock lock = redissonLockService.acquire(BLOOM_FILTER_LOCK);
+        // 获取锁
+        RLock lock = redissonLockService.acquire(BLOOM_FILTER_LOCK, 10, TimeUnit.SECONDS);
 
         if (null == lock) {
             log.info("布隆过滤器刷新任务已获取锁失败，跳过执行");
