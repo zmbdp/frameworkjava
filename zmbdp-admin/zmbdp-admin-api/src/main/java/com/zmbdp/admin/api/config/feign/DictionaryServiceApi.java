@@ -18,6 +18,7 @@ import java.util.Map;
  */
 @FeignClient(contextId = "dictionaryServiceApi", name = "zmbdp-admin-service", path = "/dictionary")
 public interface DictionaryServiceApi {
+
     /**
      * 获取某个字典类型下的所有字典数据
      *
