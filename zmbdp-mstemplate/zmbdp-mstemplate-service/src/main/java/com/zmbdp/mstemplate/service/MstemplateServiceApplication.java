@@ -19,7 +19,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @Slf4j
 @SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
+        DataSourceAutoConfiguration.class,
+        DataSourceTransactionManagerAutoConfiguration.class
 }) // 禁用数据源自动配置
 @EnableFeignClients(clients = {
         FileServiceApi.class, MapServiceApi.class,
