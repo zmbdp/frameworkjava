@@ -17,6 +17,11 @@ spring:
           uri: lb://zmbdp-file-service
           predicates:
             - Path=/file/**
+          metadata:
+            # 响应超时时间
+            response-timeout: 300000
+            # 连接超时时间
+            connect-timeout: 300000
         # 地图微服务
         - id: zmbdp-admin-service
           uri: lb://zmbdp-admin-service
