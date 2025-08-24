@@ -12,11 +12,11 @@ import com.zmbdp.common.bloomfilter.service.BloomFilterService;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -112,7 +112,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO registerByOpenId(String openId) {
         // 微信 id 判空
-        if (StringUtils.isEmpty(openId)) {
+        if (StringUtil.isEmpty(openId)) {
             throw new ServiceException("微信ID不能为空", ResultCode.INVALID_PARA.getCode());
         }
         // 属性赋值插入数据库
@@ -140,7 +140,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findByOpenId(String openId) {
         // 先查询布隆过滤器
-        if (StringUtils.isEmpty(openId) || !bloomFilterService.mightContain(APP_USER_OPEN_ID_PREFIX + openId)) {
+        if (StringUtil.isEmpty(openId) || !bloomFilterService.mightContain(APP_USER_OPEN_ID_PREFIX + openId)) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByOpenId(openId);
@@ -156,7 +156,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findByPhone(String phoneNumber) {
         // 先查询布隆过滤器
-        if (StringUtils.isEmpty(phoneNumber) || !bloomFilterService.mightContain(APP_USER_PHONE_NUMBER_PREFIX + AESUtil.encryptHex(phoneNumber))) {
+        if (StringUtil.isEmpty(phoneNumber) || !bloomFilterService.mightContain(APP_USER_PHONE_NUMBER_PREFIX + AESUtil.encryptHex(phoneNumber))) {
             return null;
         }
         AppUser appUser = appUserMapper.selectByPhoneNumber(AESUtil.encryptHex(phoneNumber));
@@ -172,7 +172,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO registerByPhone(String phoneNumber) {
         // 判空
-        if (StringUtils.isEmpty(phoneNumber)) {
+        if (StringUtil.isEmpty(phoneNumber)) {
             throw new ServiceException("待注册手机号为空", ResultCode.INVALID_PARA.getCode());
         }
         // 属性赋值插入数据库
