@@ -38,7 +38,7 @@ public class SecurityUtil {
      * @param token 前端可能设置了令牌的前缀
      * @return token 信息
      */
-    private static String replaceTokenPrefix(String token) {
+    public static String replaceTokenPrefix(String token) {
         // 假如前端设置了令牌的前缀，需要替换裁剪
         if (StringUtil.isNotEmpty(token) && token.startsWith(TokenConstants.PREFIX)) {
             // 把前缀换成空串

@@ -3,7 +3,7 @@ package com.zmbdp.admin.service.user.controller;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
-import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
+import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.admin.service.user.service.IAppUserService;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
@@ -46,7 +46,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO
      */
     @Override
-    public Result<AppUserVo> registerByOpenId(String openId) {
+    public Result<AppUserVO> registerByOpenId(String openId) {
         AppUserDTO appUserDTO = appUserService.registerByOpenId(openId);
         if (appUserDTO == null) {
             throw new ServiceException("注册失败");
@@ -61,7 +61,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO
      */
     @Override
-    public Result<AppUserVo> findByOpenId(String openId) {
+    public Result<AppUserVO> findByOpenId(String openId) {
         AppUserDTO appUserDTO = appUserService.findByOpenId(openId);
         if (appUserDTO == null) {
             return Result.success();
@@ -76,7 +76,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO
      */
     @Override
-    public Result<AppUserVo> findByPhone(String phoneNumber) {
+    public Result<AppUserVO> findByPhone(String phoneNumber) {
         AppUserDTO appUserDTO = appUserService.findByPhone(phoneNumber);
         if (appUserDTO == null) {
             return Result.success();
@@ -91,7 +91,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO
      */
     @Override
-    public Result<AppUserVo> registerByPhone(String phoneNumber) {
+    public Result<AppUserVO> registerByPhone(String phoneNumber) {
         AppUserDTO appUserDTO = appUserService.registerByPhone(phoneNumber);
         if (appUserDTO == null) {
             throw new ServiceException("注册失败");
@@ -118,7 +118,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO
      */
     @Override
-    public Result<AppUserVo> findById(Long userId) {
+    public Result<AppUserVO> findById(Long userId) {
         AppUserDTO appUserDTO = appUserService.findById(userId);
         if (appUserDTO == null) {
             return Result.success();
@@ -133,7 +133,7 @@ public class AppUserController implements AppUserApi {
      * @return C端用户 VO 列表
      */
     @Override
-    public Result<List<AppUserVo>> list(List<Long> userIds) {
+    public Result<List<AppUserVO>> list(List<Long> userIds) {
         List<AppUserDTO> appUserDTOList = appUserService.getUserList(userIds);
         return Result.success(appUserDTOList.stream()
                 .filter(Objects::nonNull) // 过滤空对象
@@ -151,9 +151,9 @@ public class AppUserController implements AppUserApi {
      * @return C端用户分页结果
      */
     @PostMapping("/list/search")
-    public Result<BasePageVO<AppUserVo>> list(@RequestBody AppUserListReqDTO appUserListReqDTO) {
+    public Result<BasePageVO<AppUserVO>> list(@RequestBody AppUserListReqDTO appUserListReqDTO) {
         BasePageDTO<AppUserDTO> appUserDTOList = appUserService.getUserList(appUserListReqDTO);
-        BasePageVO<AppUserVo> result = new BasePageVO<>();
+        BasePageVO<AppUserVO> result = new BasePageVO<>();
         BeanCopyUtil.copyProperties(appUserDTOList, result);
         return Result.success(result);
     }
