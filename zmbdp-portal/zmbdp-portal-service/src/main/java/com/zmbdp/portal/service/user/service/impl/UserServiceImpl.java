@@ -1,7 +1,7 @@
 package com.zmbdp.portal.service.user.service.impl;
 
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
-import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
+import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.StringUtil;
@@ -90,9 +90,9 @@ public class UserServiceImpl implements IUserService {
      * @param loginUserDTO   用户生命周期对象
      */
     private void loginByWechat(WechatLoginDTO wechatLoginDTO, LoginUserDTO loginUserDTO) {
-        AppUserVo appUserVo;
+        AppUserVO appUserVo;
         // 先进行查询是否存在
-        Result<AppUserVo> result = appUserApi.findByOpenId(wechatLoginDTO.getOpenId());
+        Result<AppUserVO> result = appUserApi.findByOpenId(wechatLoginDTO.getOpenId());
         // 对查询结果进行判断
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
             // 没查到，需要进行注册
@@ -119,9 +119,9 @@ public class UserServiceImpl implements IUserService {
         if (!VerifyUtil.checkPhone(codeLoginDTO.getPhone())) {
             throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
         }
-        AppUserVo appUserVo;
+        AppUserVO appUserVo;
         // 查询是否存在
-        Result<AppUserVo> result = appUserApi.findByPhone(codeLoginDTO.getPhone());
+        Result<AppUserVO> result = appUserApi.findByPhone(codeLoginDTO.getPhone());
         // 查不到就注册，查得到就赋值
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
             appUserVo = register(codeLoginDTO);
@@ -152,8 +152,8 @@ public class UserServiceImpl implements IUserService {
      * @param loginDTO 用户生命周期信息
      * @return 用户 VO
      */
-    private AppUserVo register(LoginDTO loginDTO) {
-        Result<AppUserVo> result = null;
+    private AppUserVO register(LoginDTO loginDTO) {
+        Result<AppUserVO> result = null;
         // 判断一下是微信还是手机号
         if (loginDTO instanceof WechatLoginDTO wechatLoginDTO) {
             // 如果是微信的，就直接找微信登录的 api 就行了
@@ -213,7 +213,7 @@ public class UserServiceImpl implements IUserService {
             throw new ServiceException("用户令牌有误", ResultCode.INVALID_PARA.getCode());
         }
         // 然后再查出数据库的看看能不能查询出来
-        Result<AppUserVo> result = appUserApi.findById(loginUserDTO.getUserId());
+        Result<AppUserVO> result = appUserApi.findById(loginUserDTO.getUserId());
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
             throw new ServiceException("查询用户失败", ResultCode.INVALID_PARA.getCode());
         }
