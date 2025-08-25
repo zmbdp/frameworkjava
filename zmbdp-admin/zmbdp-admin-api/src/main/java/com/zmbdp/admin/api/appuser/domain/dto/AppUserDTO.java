@@ -1,6 +1,6 @@
 package com.zmbdp.admin.api.appuser.domain.dto;
 
-import com.zmbdp.admin.api.appuser.domain.vo.AppUserVo;
+import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -43,8 +43,8 @@ public class AppUserDTO implements Serializable {
      * DTO 对象转换 VO 对象
      * @return VO 对象
      */
-    public AppUserVo convertToVO() {
-        AppUserVo appUserVo = new AppUserVo();
+    public AppUserVO convertToVO() {
+        AppUserVO appUserVo = new AppUserVO();
         BeanUtils.copyProperties(this, appUserVo);
         return appUserVo;
     }
