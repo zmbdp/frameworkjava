@@ -6,6 +6,7 @@ package com.zmbdp.common.bloomfilter.service;
  * @author 稚名不带撇
  */
 public interface BloomFilterService {
+
     /**
      * 添加元素
      *
