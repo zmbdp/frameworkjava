@@ -13,6 +13,7 @@ import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.StringUtil;
+import com.zmbdp.common.domain.constants.BloomFilterConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.annotation.PostConstruct;
@@ -41,17 +42,17 @@ public class AppUserServiceImpl implements IAppUserService {
     /**
      * 用户前缀
      */
-    private static final String APP_USER_PREFIX = "app_user:";
+    private static final String APP_USER_PREFIX = BloomFilterConstants.APP_USER_PREFIX;
 
     /**
      * 用户手机号前缀
      */
-    private static final String APP_USER_PHONE_NUMBER_PREFIX = "app_user:phone_number:";
+    private static final String APP_USER_PHONE_NUMBER_PREFIX = BloomFilterConstants.APP_USER_PHONE_NUMBER_PREFIX;
 
     /**
      * 用户微信 ID 前缀
      */
-    private static final String APP_USER_OPEN_ID_PREFIX = "app_user:open_id:";
+    private static final String APP_USER_OPEN_ID_PREFIX = BloomFilterConstants.APP_USER_OPEN_ID_PREFIX;
 
     /**
      * C端用户的 mapper
