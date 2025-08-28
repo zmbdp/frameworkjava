@@ -8,7 +8,7 @@ package com.zmbdp.common.domain.constants;
 public class BloomFilterConstants {
 
     /**
-     * 用户前缀
+     * C端 用户前缀
      */
     public static final String APP_USER_PREFIX = "app_user:";
 
