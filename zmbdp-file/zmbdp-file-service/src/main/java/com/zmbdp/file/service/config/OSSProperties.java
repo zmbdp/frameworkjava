@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author 稚名不带撇
  */
-@Slf4j
 @Data
-@Configuration
+@Slf4j
 @RefreshScope
+@Configuration
 @ConfigurationProperties(prefix = "oss")
 @ConditionalOnProperty(value = "storage.type", havingValue = "oss")
 // 当括号中条件成立时，微服务启动的时候就会加载当前类。
