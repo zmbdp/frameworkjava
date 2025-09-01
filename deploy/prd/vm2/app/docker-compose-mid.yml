@@ -113,7 +113,7 @@ services:
       - MYSQL_SERVICE_PORT=3308
       - MYSQL_SERVICE_DB_NAME=frameworkjava_nacos_prd
       - MYSQL_SERVICE_USER=zmbdpdev
-      - MYSQL_SERVICE_PASSWORD:Hf@173503494
+      - MYSQL_SERVICE_PASSWORD=Hf@173503494
       - NACOS_SERVER_IP=你的云服务器2内网ip/你的虚拟机2内网ip
       - NACOS_SERVERS=你的云服务器1内网ip/你的虚拟机1内网ip:8854 你的云服务器1内网ip/你的虚拟机1内网ip:8856 你的云服务器2内网ip/你的虚拟机2内网ip:8858
     volumes:
