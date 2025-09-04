@@ -30,5 +30,5 @@ public class UserEditReqDTO implements Serializable {
      * 用户头像
      */
     @NotBlank(message = "用户头像不能为空")
-    private String avtar;
+    private String avatar;
 }

@@ -8,7 +8,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
-public class SearchPoiVo {
+public class SearchPoiVO {
 
     /**
      * 地点名称

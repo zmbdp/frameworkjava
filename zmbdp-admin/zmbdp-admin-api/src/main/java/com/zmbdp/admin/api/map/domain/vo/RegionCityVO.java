@@ -8,7 +8,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
-public class RegionCityVo {
+public class RegionCityVO {
 
     /**
      * 城市 ID
