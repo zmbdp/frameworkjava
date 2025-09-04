@@ -2,9 +2,9 @@ package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
-import com.zmbdp.admin.api.map.domain.vo.RegionCityVo;
+import com.zmbdp.admin.api.map.domain.vo.RegionCityVO;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
-import com.zmbdp.admin.api.map.domain.vo.SearchPoiVo;
+import com.zmbdp.admin.api.map.domain.vo.SearchPoiVO;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
@@ -69,7 +69,7 @@ public class TestMapController {
      * @return 搜索结果
      */
     @PostMapping("/search")
-    Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@RequestBody PlaceSearchReqDTO placeSearchReqDTO) {
+    Result<BasePageVO<SearchPoiVO>> searchSuggestOnMap(@RequestBody PlaceSearchReqDTO placeSearchReqDTO) {
         return mapServiceApi.searchSuggestOnMap(placeSearchReqDTO);
     }
 
@@ -80,7 +80,7 @@ public class TestMapController {
      * @return 城市信息
      */
     @PostMapping("/locate_city_by_location")
-    Result<RegionCityVo> locateCityByLocation(@RequestBody LocationReqDTO locationReqDTO) {
+    Result<RegionCityVO> locateCityByLocation(@RequestBody LocationReqDTO locationReqDTO) {
         return mapServiceApi.locateCityByLocation(locationReqDTO);
     }
 }

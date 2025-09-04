@@ -2,9 +2,9 @@ package com.zmbdp.admin.api.map.feign;
 
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
-import com.zmbdp.admin.api.map.domain.vo.RegionCityVo;
+import com.zmbdp.admin.api.map.domain.vo.RegionCityVO;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
-import com.zmbdp.admin.api.map.domain.vo.SearchPoiVo;
+import com.zmbdp.admin.api.map.domain.vo.SearchPoiVO;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -64,7 +64,7 @@ public interface MapServiceApi {
      * @return 搜索结果
      */
     @PostMapping("/search")
-    Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@RequestBody PlaceSearchReqDTO placeSearchReqDTO);
+    Result<BasePageVO<SearchPoiVO>> searchSuggestOnMap(@RequestBody PlaceSearchReqDTO placeSearchReqDTO);
 
     /**
      * 根据经纬度获取城市的信息
@@ -73,5 +73,5 @@ public interface MapServiceApi {
      * @return 城市信息
      */
     @PostMapping("/locate_city_by_location")
-    Result<RegionCityVo> locateCityByLocation(@RequestBody LocationReqDTO locationReqDTO);
+    Result<RegionCityVO> locateCityByLocation(@RequestBody LocationReqDTO locationReqDTO);
 }

@@ -2,9 +2,9 @@ package com.zmbdp.admin.service.map.controller;
 
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
-import com.zmbdp.admin.api.map.domain.vo.RegionCityVo;
+import com.zmbdp.admin.api.map.domain.vo.RegionCityVO;
 import com.zmbdp.admin.api.map.domain.vo.RegionVO;
-import com.zmbdp.admin.api.map.domain.vo.SearchPoiVo;
+import com.zmbdp.admin.api.map.domain.vo.SearchPoiVO;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.admin.service.map.domain.dto.RegionCityDTO;
 import com.zmbdp.admin.service.map.domain.dto.SearchPoiDTO;
@@ -101,9 +101,9 @@ public class MapController implements MapServiceApi {
      * @return 搜索结果
      */
     @Override
-    public Result<BasePageVO<SearchPoiVo>> searchSuggestOnMap(@Validated PlaceSearchReqDTO placeSearchReqDTO) {
+    public Result<BasePageVO<SearchPoiVO>> searchSuggestOnMap(@Validated PlaceSearchReqDTO placeSearchReqDTO) {
         BasePageDTO<SearchPoiDTO> basePageReqDTO = mapService.searchSuggestOnMap(placeSearchReqDTO);
-        BasePageVO<SearchPoiVo> result = new BasePageVO<>();
+        BasePageVO<SearchPoiVO> result = new BasePageVO<>();
         BeanCopyUtil.copyProperties(basePageReqDTO, result);
         return Result.success(result);
     }
@@ -115,9 +115,9 @@ public class MapController implements MapServiceApi {
      * @return 城市信息
      */
     @Override
-    public Result<RegionCityVo> locateCityByLocation(@Validated LocationReqDTO locationReqDTO) {
+    public Result<RegionCityVO> locateCityByLocation(@Validated LocationReqDTO locationReqDTO) {
         RegionCityDTO regionCityDTO = mapService.getCityByLocation(locationReqDTO);
-        RegionCityVo result = new RegionCityVo();
+        RegionCityVO result = new RegionCityVO();
         BeanCopyUtil.copyProperties(regionCityDTO, result);
         return Result.success(result);
     }
