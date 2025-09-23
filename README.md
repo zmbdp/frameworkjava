@@ -140,6 +140,10 @@ frameworkjava
 │   │           ├── JwtUtil.java                 # JWT工具类
 │   │           └── SecurityUtil.java            # 安全工具类
 │   │
+│   ├── zmbdp-common-snowflake        # 雪花算法服务
+│   │   └── src/main/java/com/zmbdp/common/snowflake/service
+│   │       └── SnowflakeIdService.java         # 雪花算法服务
+│   │
 ├── zmbdp-admin                      # 管理服务
 │   ├── zmbdp-admin-api              # API接口定义
 │   └── zmbdp-admin-service          # 业务实现
