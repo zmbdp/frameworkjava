@@ -60,23 +60,8 @@ public class CacheUtil {
         if (!bloomFilterService.mightContain(key)) {
             return null;
         }
-
-        // 先从一级缓存中拿取数据, 如果有就返回
-        T ifPresent = (T) caffeineCache.getIfPresent(key);
-        if (ifPresent != null) {
-            return ifPresent;
-        }
-
-        // 如果没查到，就查二级缓存
-        ifPresent = redisService.getCacheObject(key, valueTypeRef);
-        if (ifPresent != null) {
-            // 如果查到了，就存储到一级缓存中再返回
-            setL2Cache(key, ifPresent, caffeineCache);
-            return ifPresent;
-        }
-
-        // 如果还没查到，就返回空，让用户去查询数据库
-        return null;
+        // 再调用上面的逻辑从一级和二级缓存中获取数据
+        return getL2Cache(redisService, key, valueTypeRef, caffeineCache);
     }
 
 
