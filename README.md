@@ -141,8 +141,8 @@ frameworkjava
 │   │           └── SecurityUtil.java            # 安全工具类
 │   │
 │   ├── zmbdp-common-snowflake        # 雪花算法服务
-│   │   └── src/main/java/com/zmbdp/common/snowflake/service
-│   │       └── SnowflakeIdService.java         # 雪花算法服务
+│   │   └── src/main/java/com/zmbdp/common/snowflake
+│   │       └── service/SnowflakeIdService.java         # 雪花算法服务
 │   │
 ├── zmbdp-admin                      # 管理服务
 │   ├── zmbdp-admin-api              # API接口定义
