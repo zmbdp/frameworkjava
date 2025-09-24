@@ -92,4 +92,28 @@ public class BeanCopyUtil extends BeanUtils {
         }
         return map;
     }
+
+    /**
+     * 有返回值的 bean 拷贝 (仅支持简单类型)
+     *
+     * @param source      源对象
+     * @param targetClass 目标类类型
+     * @param <S>         源类型
+     * @param <T>         目标对象类型
+     * @return 目标对象实例
+     */
+    public static <S, T> T copyProperties(S source, Class<T> targetClass) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            // 创建目标对象实例
+            T target = targetClass.getDeclaredConstructor().newInstance();
+            // 拷贝属性
+            copyProperties(source, target);
+            return target;
+        } catch (Exception e) {
+            throw new RuntimeException("Bean copy and create failed", e);
+        }
+    }
 }
