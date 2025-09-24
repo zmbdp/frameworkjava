@@ -116,4 +116,24 @@ public class BeanCopyUtil extends BeanUtils {
             throw new RuntimeException("Bean copy and create failed", e);
         }
     }
+
+    /**
+     * 有返回值的 bean 拷贝 (支持复杂泛型嵌套)
+     *
+     * @param source 源对象
+     * @param <T>    目标对象类型
+     * @return 目标对象实例
+     */
+    public static <S, T> T copyProperties(S source, Supplier<T> supplier) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            T target = supplier.get();
+            copyProperties(source, target);
+            return target;
+        } catch (Exception e) {
+            throw new RuntimeException("Bean属性拷贝并创建实例失败", e);
+        }
+    }
 }
