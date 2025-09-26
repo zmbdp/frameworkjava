@@ -218,8 +218,7 @@ public class TestCacheController {
             log.info("使用不带布隆过滤器的方法存储数据: {} = {}", key1, value1);
 
             // 获取数据（不使用布隆过滤器）
-            String result1 = CacheUtil.getL2Cache(redisService, key1, new TypeReference<String>() {
-            }, caffeineCache);
+            String result1 = CacheUtil.getL2Cache(redisService, key1, String.class, caffeineCache);
             log.info("使用不带布隆过滤器的方法获取数据: {}", result1);
 
             // 2. 测试使用布隆过滤器的缓存方法
@@ -232,8 +231,7 @@ public class TestCacheController {
             log.info("使用带布隆过滤器的方法存储数据: {} = {}", key2, value2);
 
             // 获取数据（使用布隆过滤器）
-            String result2 = CacheUtil.getL2Cache(redisService, bloomFilterService, key2, new TypeReference<String>() {
-            }, caffeineCache);
+            String result2 = CacheUtil.getL2Cache(redisService, bloomFilterService, key2, String.class, caffeineCache);
             log.info("使用带布隆过滤器的方法获取数据: {}", result2);
 
             // 3. 测试布隆过滤器防止缓存穿透
@@ -758,4 +756,184 @@ public class TestCacheController {
         }
     }
 
+    /**
+     * 全面测试 CacheUtil 所有功能
+     */
+    @GetMapping("/comprehensive/test")
+    public Result<Map<String, Object>> comprehensiveTest() {
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            log.info("============================   全面测试 CacheUtil 功能   ============================");
+
+            // 1. 测试基本的本地缓存功能
+            log.info("--- 测试基本本地缓存功能 ---");
+            String localKey = "comprehensive:test:local";
+            String localValue = "Local Cache Value";
+
+            // 存储到本地缓存
+            CacheUtil.setL2Cache(localKey, localValue, caffeineCache);
+            log.info("已存储到本地缓存: {} = {}", localKey, localValue);
+
+            // 从本地缓存获取
+            String localResult = CacheUtil.getL2Cache(redisService, localKey, String.class, caffeineCache);
+            resultMap.put("localCacheResult", localResult);
+            log.info("从本地缓存获取结果: {}", localResult);
+
+            // 删除本地缓存
+            CacheUtil.delL1Cache(localKey, caffeineCache);
+            String localResultAfterDelete = CacheUtil.getL2Cache(redisService, localKey, String.class, caffeineCache);
+            log.info("删除本地缓存后获取结果: {}", localResultAfterDelete);
+
+            // 2. 测试Redis缓存功能
+            log.info("--- 测试Redis缓存功能 ---");
+            String redisKey = "comprehensive:test:redis";
+            String redisValue = "Redis Cache Value";
+
+            // 存储到Redis缓存
+            CacheUtil.setL2Cache(redisService, redisKey, redisValue, caffeineCache, 300L, TimeUnit.SECONDS);
+            log.info("已存储到Redis缓存: {} = {}", redisKey, redisValue);
+
+            // 清空本地缓存以确保从Redis获取
+            caffeineCache.invalidate(redisKey);
+
+            // 从Redis缓存获取
+            String redisResult = CacheUtil.getL2Cache(redisService, redisKey, String.class, caffeineCache);
+            resultMap.put("redisCacheResult", redisResult);
+            log.info("从Redis缓存获取结果: {}", redisResult);
+
+            // 删除Redis缓存
+            CacheUtil.delL2Cache(redisKey, redisService);
+            caffeineCache.invalidate(redisKey); // 同时清除本地缓存
+            String redisResultAfterDelete = CacheUtil.getL2Cache(redisService, redisKey, String.class, caffeineCache);
+            resultMap.put("redisCacheAfterDelete", redisResultAfterDelete);
+            log.info("删除Redis缓存后获取结果: {}", redisResultAfterDelete);
+
+            // 3. 测试复杂对象缓存功能
+            log.info("--- 测试复杂对象缓存功能 ---");
+            String objectKey = "comprehensive:test:object";
+            User testUser = new User();
+            testUser.setName("综合测试用户");
+            testUser.setAge(30);
+
+            // 存储复杂对象到缓存
+            CacheUtil.setL2Cache(redisService, objectKey, testUser, caffeineCache, 300L, TimeUnit.SECONDS);
+            log.info("已存储复杂对象到缓存: {}", testUser);
+
+            // 清空本地缓存以确保从Redis获取
+            caffeineCache.invalidate(objectKey);
+
+            // 从缓存获取复杂对象
+            User cachedUser = CacheUtil.getL2Cache(redisService, objectKey, new TypeReference<User>() {
+            }, caffeineCache);
+            resultMap.put("objectCacheResult", cachedUser != null ? cachedUser.getName() + "(" + cachedUser.getAge() + ")" : null);
+            log.info("从缓存获取复杂对象: {}", cachedUser);
+
+            // 4. 测试布隆过滤器功能
+            log.info("--- 测试布隆过滤器功能 ---");
+            String bloomKey = "comprehensive:test:bloom";
+            String bloomValue = "Bloom Filter Value";
+
+            // 存储数据并更新布隆过滤器
+            CacheUtil.setL2Cache(redisService, bloomFilterService, bloomKey, bloomValue, caffeineCache, 300L, TimeUnit.SECONDS);
+            log.info("已存储数据并更新布隆过滤器: {} = {}", bloomKey, bloomValue);
+
+            // 检查存在的键
+            boolean mightContainExist = bloomFilterService.mightContain(bloomKey);
+            resultMap.put("bloomFilterExistKey", mightContainExist);
+            log.info("布隆过滤器检查存在的键 {}: {}", bloomKey, mightContainExist);
+
+            // 从缓存获取数据（通过布隆过滤器）
+            String bloomResult = CacheUtil.getL2Cache(redisService, bloomFilterService, bloomKey, String.class, caffeineCache);
+            resultMap.put("bloomFilterCacheResult", bloomResult);
+            log.info("通过布隆过滤器从缓存获取数据: {}", bloomResult);
+
+            // 检查不存在的键
+            String nonExistKey = "comprehensive:test:nonexist";
+            boolean mightContainNonExist = bloomFilterService.mightContain(nonExistKey);
+            resultMap.put("bloomFilterNonExistKey", mightContainNonExist);
+            log.info("布隆过滤器检查不存在的键 {}: {}", nonExistKey, mightContainNonExist);
+
+            // 尝试获取不存在的数据（应该被布隆过滤器拦截）
+            String nonExistResult = CacheUtil.getL2Cache(redisService, bloomFilterService, nonExistKey, String.class, caffeineCache);
+            resultMap.put("bloomFilterNonExistResult", nonExistResult);
+            log.info("通过布隆过滤器获取不存在的数据结果: {}", nonExistResult);
+
+            // 5. 测试同时删除本地和Redis缓存
+            log.info("--- 测试同时删除本地和Redis缓存 ---");
+            String bothKey = "comprehensive:test:both";
+            String bothValue = "Both Cache Value";
+
+            // 存储数据
+            CacheUtil.setL2Cache(redisService, bothKey, bothValue, caffeineCache, 300L, TimeUnit.SECONDS);
+            log.info("已存储数据到两级缓存: {} = {}", bothKey, bothValue);
+
+            // 同时删除两级缓存
+            CacheUtil.delL2Cache(bothKey, caffeineCache, redisService);
+            String bothResultAfterDelete = CacheUtil.getL2Cache(redisService, bothKey, String.class, caffeineCache);
+            resultMap.put("bothCacheAfterDelete", bothResultAfterDelete);
+            log.info("同时删除两级缓存后获取结果: {}", bothResultAfterDelete);
+
+            // 6. 测试缓存穿透防护
+            log.info("--- 测试缓存穿透防护 ---");
+            String penetrationKey = "comprehensive:test:penetration";
+
+            // 确保这个键不在布隆过滤器中
+            boolean inBloom = bloomFilterService.mightContain(penetrationKey);
+            if (!inBloom) {
+                // 尝试获取不存在的数据
+                String penetrationResult = CacheUtil.getL2Cache(redisService, bloomFilterService, penetrationKey, new TypeReference<String>() {
+                }, caffeineCache);
+                resultMap.put("penetrationTestResult", penetrationResult);
+                log.info("缓存穿透防护测试结果: {}", penetrationResult);
+                log.info("由于布隆过滤器判断键不存在，避免了Redis查询");
+            }
+
+            // 7. 测试性能对比
+            log.info("--- 测试性能对比 ---");
+            int testIterations = 10000;
+
+            // 测试不使用布隆过滤器的性能
+            long start1 = System.currentTimeMillis();
+            for (int i = 0; i < testIterations; i++) {
+                CacheUtil.getL2Cache(redisService, "nonexistent:key:" + i, new TypeReference<String>() {
+                }, caffeineCache);
+            }
+            long end1 = System.currentTimeMillis();
+
+            // 测试使用布隆过滤器的性能
+            long start2 = System.currentTimeMillis();
+            for (int i = 0; i < testIterations; i++) {
+                CacheUtil.getL2Cache(redisService, bloomFilterService, "nonexistent:key:" + i, new TypeReference<String>() {
+                }, caffeineCache);
+            }
+            long end2 = System.currentTimeMillis();
+
+            long timeWithoutBloom = end1 - start1;
+            long timeWithBloom = end2 - start2;
+            resultMap.put("performanceWithoutBloom", timeWithoutBloom + "ms");
+            resultMap.put("performanceWithBloom", timeWithBloom + "ms");
+            resultMap.put("performanceImprovement", (timeWithoutBloom - timeWithBloom) + "ms");
+
+            log.info("不使用布隆过滤器查询 {} 次耗时: {} ms", testIterations, timeWithoutBloom);
+            log.info("使用布隆过滤器查询 {} 次耗时: {} ms", testIterations, timeWithBloom);
+            log.info("性能提升: {} ms", timeWithoutBloom - timeWithBloom);
+
+            // 清理测试数据
+            redisService.deleteObject(localKey);
+            redisService.deleteObject(redisKey);
+            redisService.deleteObject(objectKey);
+            redisService.deleteObject(bloomKey);
+            redisService.deleteObject(bothKey);
+            caffeineCache.invalidateAll();
+
+            log.info("=== CacheUtil全面功能测试完成 ===");
+            resultMap.put("status", "测试完成");
+            return Result.success(resultMap);
+
+        } catch (Exception e) {
+            log.error("全面测试CacheUtil功能过程中发生异常", e);
+            resultMap.put("error", e.getMessage());
+            return Result.fail("测试失败: " + e.getMessage());
+        }
+    }
 }

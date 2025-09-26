@@ -21,6 +21,33 @@ public class CacheUtil {
      *
      * @param redisService  Redis 缓存服务
      * @param key           缓存的键
+     * @param clazz  值类型引用
+     * @param caffeineCache 本地缓存信息
+     * @param <T>           缓存值的类型
+     * @return 缓存值
+     */
+    public static <T> T getL2Cache(RedisService redisService, String key, Class<T> clazz, Cache<String, Object> caffeineCache) {
+        // 先从一级缓存中拿取数据, 如果有就返回
+        T ifPresent = (T) caffeineCache.getIfPresent(key);
+        if (ifPresent != null) {
+            return ifPresent;
+        }
+        // 如果没查到，就查二级缓存
+        ifPresent = redisService.getCacheObject(key, clazz);
+        if (ifPresent != null) {
+            // 如果查到了，就存储到一级缓存中再返回
+            setL2Cache(key, ifPresent, caffeineCache);
+            return ifPresent;
+        }
+        // 如果还没查到，就返回空，让用户去查询数据库
+        return null;
+    }
+
+    /**
+     * 从一级缓存（本地缓存）中获取数据，如果没查到就从二级缓存（Redis缓存）中获取数据（支持复杂泛型嵌套）
+     *
+     * @param redisService  Redis 缓存服务
+     * @param key           缓存的键
      * @param valueTypeRef  值类型引用
      * @param caffeineCache 本地缓存信息
      * @param <T>           缓存值的类型
@@ -45,6 +72,27 @@ public class CacheUtil {
 
     /**
      * 从一级缓存（本地缓存）中获取数据，如果没查到就从二级缓存（Redis缓存）中获取数据（布隆过滤器先查）
+     *
+     * @param redisService       Redis 缓存服务
+     * @param bloomFilterService 布隆过滤器服务
+     * @param key                缓存的键
+     * @param clazz       值类型引用
+     * @param caffeineCache      本地缓存信息
+     * @param <T>                缓存值的类型
+     * @return 缓存值
+     */
+    public static <T> T getL2Cache(RedisService redisService, BloomFilterService bloomFilterService,
+                                   String key, Class<T> clazz, Cache<String, Object> caffeineCache) {
+        // 先检查布隆过滤器，如果确定不存在则直接返回null
+        if (!bloomFilterService.mightContain(key)) {
+            return null;
+        }
+        // 再调用上面的逻辑从一级和二级缓存中获取数据
+        return getL2Cache(redisService, key, clazz, caffeineCache);
+    }
+
+    /**
+     * 从一级缓存（本地缓存）中获取数据，如果没查到就从二级缓存（Redis缓存）中获取数据（布隆过滤器先查）（支持复杂泛型嵌套）
      *
      * @param redisService       Redis 缓存服务
      * @param bloomFilterService 布隆过滤器服务
@@ -119,5 +167,39 @@ public class CacheUtil {
 
         // 添加到布隆过滤器
         bloomFilterService.put(key);
+    }
+
+    /**
+     * 从一级缓存（本地缓存）中删除数据
+     *
+     * @param key           缓存的键
+     * @param caffeineCache 本地缓存信息
+     */
+    public static void delL1Cache(String key, Cache<String, Object> caffeineCache) {
+        caffeineCache.invalidate(key);
+    }
+
+    /**
+     * 从二级缓存（Redis缓存）中删除数据
+     *
+     * @param key          缓存的键
+     * @param redisService Redis 缓存服务
+     */
+    public static void delL2Cache(String key, RedisService redisService) {
+        redisService.deleteObject(key);
+    }
+
+    /**
+     * 从一级缓存（本地缓存）和二级缓存（Redis缓存）中删除数据
+     *
+     * @param key           缓存的键
+     * @param caffeineCache 本地缓存信息
+     * @param redisService  Redis 缓存服务
+     */
+    public static void delL2Cache(String key, Cache<String, Object> caffeineCache, RedisService redisService) {
+        // 从一级缓存中删除
+        caffeineCache.invalidate(key);
+        // 从二级缓存中删除
+        redisService.deleteObject(key);
     }
 }

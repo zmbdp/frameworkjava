@@ -237,6 +237,15 @@ public class RedisService {
     public <T> T getCacheObject(final String key, Class<T> clazz) {
         try {
             Object o = redisTemplate.opsForValue().get(key);
+            if (o == null) {
+                return null;
+            }
+
+            // 如果对象本身就是目标类型，直接返回
+            if (clazz.isInstance(o)) {
+                return clazz.cast(o);
+            }
+
             // 缓存对象先转换成 json
             String jsonStr = JsonUtil.classToJson(o);
             // 再转换成对象
