@@ -3,6 +3,9 @@ package com.zmbdp.common.snowflake.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 雪花算法生成全局唯一 ID 服务
  *
@@ -169,5 +172,29 @@ public class SnowflakeIdService {
      */
     private long timeGen() {
         return System.currentTimeMillis();
+    }
+
+    /**
+     * 批量生成 ID
+     *
+     * @param count 生成数量
+     * @return ID列表
+     */
+    public synchronized List<Long> nextIds(int count) {
+        List<Long> nextIds = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            nextIds.add(nextId());
+        }
+        return nextIds;
+    }
+
+    /**
+     * 生成带前缀的 ID
+     *
+     * @param prefix 前缀
+     * @return ID
+     */
+    public String nextIdStr(String prefix) {
+        return prefix + nextId();
     }
 }
