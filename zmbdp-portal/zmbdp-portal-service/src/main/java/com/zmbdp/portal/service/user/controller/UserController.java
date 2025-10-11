@@ -6,7 +6,7 @@ import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.TokenVO;
 import com.zmbdp.portal.service.user.domain.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.WechatLoginDTO;
-import com.zmbdp.portal.service.user.domain.vo.UserVo;
+import com.zmbdp.portal.service.user.domain.vo.UserVO;
 import com.zmbdp.portal.service.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +80,7 @@ public class UserController {
      * @return 用户信息 VO
      */
     @GetMapping("/login_info/get")
-    public Result<UserVo> getLoginUser() {
+    public Result<UserVO> getLoginUser() {
         return Result.success(userService.getLoginUser().convertToVO());
     }
 

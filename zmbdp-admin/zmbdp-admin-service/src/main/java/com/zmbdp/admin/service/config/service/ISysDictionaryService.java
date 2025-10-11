@@ -1,7 +1,7 @@
 package com.zmbdp.admin.service.config.service;
 
 import com.zmbdp.admin.api.config.domain.dto.*;
-import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVO;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 
@@ -55,7 +55,7 @@ public interface ISysDictionaryService {
      * @param dictionaryDataListReqDTO 字典数据列表 DTO
      * @return 符合要求的字典数据列表数据
      */
-    BasePageVO<DictionaryDataVo> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO);
+    BasePageVO<DictionaryDataVO> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO);
 
     /**
      * 编辑字典数据

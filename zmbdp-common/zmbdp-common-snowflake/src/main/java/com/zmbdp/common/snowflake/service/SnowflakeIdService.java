@@ -70,7 +70,7 @@ public class SnowflakeIdService {
     private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
 
     /**
-     * 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
+     * 生成序列的掩码，这里为 4095 (0b111111111111 = 0 x fff = 4095)
      */
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
 

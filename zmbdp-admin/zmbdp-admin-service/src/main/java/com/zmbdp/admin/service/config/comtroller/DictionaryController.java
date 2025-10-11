@@ -1,7 +1,7 @@
 package com.zmbdp.admin.service.config.comtroller;
 
 import com.zmbdp.admin.api.config.domain.dto.*;
-import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVO;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import com.zmbdp.admin.service.config.service.ISysDictionaryService;
@@ -82,7 +82,7 @@ public class DictionaryController implements DictionaryServiceApi {
      * @return 符合要求的字典数据列表数据
      */
     @GetMapping("/listData")
-    public Result<BasePageVO<DictionaryDataVo>> listData(@Validated DictionaryDataListReqDTO dictionaryDataListReqDTO) {
+    public Result<BasePageVO<DictionaryDataVO>> listData(@Validated DictionaryDataListReqDTO dictionaryDataListReqDTO) {
         return Result.success(sysDictionaryService.listData(dictionaryDataListReqDTO));
     }
 
