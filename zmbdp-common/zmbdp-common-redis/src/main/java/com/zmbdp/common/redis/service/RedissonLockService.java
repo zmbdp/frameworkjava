@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author 稚名不带撇
  */
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor // 创建实例时，会自动注入 RedissonClient 实例
 public class RedissonLockService {
     
     /**

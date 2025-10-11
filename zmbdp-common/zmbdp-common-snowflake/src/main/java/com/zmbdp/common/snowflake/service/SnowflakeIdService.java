@@ -1,13 +1,15 @@
 package com.zmbdp.common.snowflake.service;
 
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * 雪花算法生成全局唯一 ID 服务
  *
  * @author 稚名不带撇
  */
-@Service
+@Slf4j
+@Component
 public class SnowflakeIdService {
 
     /**
