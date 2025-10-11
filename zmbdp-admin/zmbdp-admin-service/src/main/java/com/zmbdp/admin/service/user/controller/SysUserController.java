@@ -4,7 +4,7 @@ import com.zmbdp.admin.service.user.domain.dto.PasswordLoginDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserDTO;
 import com.zmbdp.admin.service.user.domain.dto.SysUserListReqDTO;
 import com.zmbdp.admin.service.user.domain.vo.SysUserLoginVO;
-import com.zmbdp.admin.service.user.domain.vo.SysUserVo;
+import com.zmbdp.admin.service.user.domain.vo.SysUserVO;
 import com.zmbdp.admin.service.user.service.ISysUserService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
@@ -61,9 +61,9 @@ public class SysUserController {
      * @return B端用户列表
      */
     @PostMapping("/list")
-    public Result<List<SysUserVo>> getUserList(@RequestBody SysUserListReqDTO sysUserListReqDTO) {
+    public Result<List<SysUserVO>> getUserList(@RequestBody SysUserListReqDTO sysUserListReqDTO) {
         List<SysUserDTO> sysUserDTOS = sysUserService.getUserList(sysUserListReqDTO);
-        List<SysUserVo> result = BeanCopyUtil.copyListProperties(sysUserDTOS, SysUserVo::new);
+        List<SysUserVO> result = BeanCopyUtil.copyListProperties(sysUserDTOS, SysUserVO::new);
         return Result.success(result);
     }
 

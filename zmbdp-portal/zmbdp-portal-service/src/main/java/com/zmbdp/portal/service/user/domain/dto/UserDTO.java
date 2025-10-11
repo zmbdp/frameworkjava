@@ -2,7 +2,7 @@ package com.zmbdp.portal.service.user.domain.dto;
 
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
-import com.zmbdp.portal.service.user.domain.vo.UserVo;
+import com.zmbdp.portal.service.user.domain.vo.UserVO;
 import lombok.Data;
 
 /**
@@ -23,8 +23,8 @@ public class UserDTO extends LoginUserDTO {
      *
      * @return VO 对象
      */
-    public UserVo convertToVO() {
-        UserVo userVo = new UserVo();
+    public UserVO convertToVO() {
+        UserVO userVo = new UserVO();
         BeanCopyUtil.copyProperties(this, userVo);
         userVo.setNickName(this.getUserName());
         return userVo;

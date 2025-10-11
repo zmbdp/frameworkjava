@@ -53,6 +53,7 @@ com.zmbdp.common.security.domain.dto
 com.zmbdp.common.security.handler
 com.zmbdp.common.security.service
 com.zmbdp.common.security.utils
+com.zmbdp.common.snowflake.service
 com.zmbdp.file.api.domain.dto
 com.zmbdp.file.api.domain.vo
 com.zmbdp.file.api.feign

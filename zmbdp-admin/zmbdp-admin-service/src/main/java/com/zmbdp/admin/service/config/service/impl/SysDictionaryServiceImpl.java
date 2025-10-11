@@ -3,7 +3,7 @@ package com.zmbdp.admin.service.config.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zmbdp.admin.api.config.domain.dto.*;
-import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVo;
+import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVO;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryTypeVO;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryData;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryType;
@@ -187,8 +187,8 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      * @return 符合要求的字典数据列表数据
      */
     @Override
-    public BasePageVO<DictionaryDataVo> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO) {
-        BasePageVO<DictionaryDataVo> result = new BasePageVO<>();
+    public BasePageVO<DictionaryDataVO> listData(DictionaryDataListReqDTO dictionaryDataListReqDTO) {
+        BasePageVO<DictionaryDataVO> result = new BasePageVO<>();
         LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<>();
         // 构建查询条件
         queryWrapper.eq(SysDictionaryData::getTypeKey, dictionaryDataListReqDTO.getTypeKey());
@@ -205,7 +205,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 queryWrapper
         );
         // 然后再构建返回参数
-        List<DictionaryDataVo> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVo::new);
+        List<DictionaryDataVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVO::new);
         result.setTotals((int) page.getTotal());
         result.setTotalPages((int) page.getPages());
         result.setList(list);

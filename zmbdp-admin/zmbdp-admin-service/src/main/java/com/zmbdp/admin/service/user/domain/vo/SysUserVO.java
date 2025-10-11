@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author 稚名不带撇
  */
 @Data
-public class SysUserVo implements Serializable {
+public class SysUserVO implements Serializable {
 
     /**
      * 用户 ID

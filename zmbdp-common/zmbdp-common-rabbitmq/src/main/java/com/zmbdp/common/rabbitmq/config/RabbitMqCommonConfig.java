@@ -21,7 +21,7 @@ public class RabbitMqCommonConfig {
      * 或将 Map 结构序列化为 JSON 消息体。特别适用于处理动态结构的消息内容。
      *
      * @return 配置完成的 MessageConverter 实例
-     * @apiNote <p>
+     * @apiNote
      * 1. 信任所有包的反序列化（setTrustedPackages("*")）存在安全风险，仅应在受控环境使用<p>
      * 2. 生产环境建议明确指定可信包列表而非通配符 <p>
      * 3. 默认使用 Jackson 库处理 JSON 序列化/反序列化

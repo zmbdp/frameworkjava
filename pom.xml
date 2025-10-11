@@ -192,6 +192,17 @@
                         <skip>true</skip>
                     </configuration>
                 </plugin>
+                <!-- ✅ 统一定义 javadoc 插件 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.11.2</version>
+                    <configuration>
+                        <additionalOptions>
+                            <option>-Xdoclint:none</option>
+                        </additionalOptions>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
