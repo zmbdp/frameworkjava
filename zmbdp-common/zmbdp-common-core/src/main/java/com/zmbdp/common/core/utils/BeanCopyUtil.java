@@ -94,13 +94,16 @@ public class BeanCopyUtil extends BeanUtils {
     }
 
     /**
-     * 有返回值的 bean 拷贝 (仅支持简单类型)
+     * 将源对象的属性拷贝到目标类的新实例中。
+     * <p>
+     * 适用于目标类具有无参构造函数且无需复杂初始化的场景。
      *
      * @param source      源对象
-     * @param targetClass 目标类类型
-     * @param <S>         源类型
+     * @param targetClass 目标类的 Class 对象（必须有无参构造函数）
+     * @param <S>         源对象类型
      * @param <T>         目标对象类型
-     * @return 目标对象实例
+     * @return 目标对象实例，若源对象为 null 则返回 null
+     * @throws RuntimeException 当目标类无法通过无参构造函数创建实例时抛出异常
      */
     public static <S, T> T copyProperties(S source, Class<T> targetClass) {
         if (source == null) {
@@ -113,16 +116,21 @@ public class BeanCopyUtil extends BeanUtils {
             copyProperties(source, target);
             return target;
         } catch (Exception e) {
-            throw new RuntimeException("Bean copy and create failed", e);
+            throw new RuntimeException("Bean拷贝并创建实例失败（通过Class<T>创建）", e);
         }
     }
 
     /**
-     * 有返回值的 bean 拷贝 (支持复杂泛型嵌套)
+     * 将源对象的属性拷贝到由 Supplier 提供的目标对象实例中。
+     * <p>
+     * 适用于需要自定义目标对象创建逻辑的场景，如使用工厂、Spring Bean 或 Builder 模式。
      *
-     * @param source 源对象
-     * @param <T>    目标对象类型
-     * @return 目标对象实例
+     * @param source   源对象
+     * @param supplier 用于创建目标对象的工厂函数（例如：MyClass::new）
+     * @param <S>      源对象类型
+     * @param <T>      目标对象类型
+     * @return 目标对象实例，若源对象为 null 则返回 null
+     * @throws RuntimeException 当 supplier.get() 返回 null 或拷贝失败时抛出异常
      */
     public static <S, T> T copyProperties(S source, Supplier<T> supplier) {
         if (source == null) {
@@ -133,7 +141,7 @@ public class BeanCopyUtil extends BeanUtils {
             copyProperties(source, target);
             return target;
         } catch (Exception e) {
-            throw new RuntimeException("Bean属性拷贝并创建实例失败", e);
+            throw new RuntimeException("Bean拷贝并创建实例失败（通过Supplier<T>创建）", e);
         }
     }
 }

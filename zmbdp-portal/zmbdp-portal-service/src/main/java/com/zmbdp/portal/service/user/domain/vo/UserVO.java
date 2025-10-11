@@ -9,7 +9,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
-public class UserVo extends LoginUserVO {
+public class UserVO extends LoginUserVO {
 
     /**
      * 用户头像

@@ -8,7 +8,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
-public class DictionaryDataVo {
+public class DictionaryDataVO {
 
     /**
      * 字典数据主键
