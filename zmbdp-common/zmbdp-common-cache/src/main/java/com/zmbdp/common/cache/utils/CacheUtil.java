@@ -198,8 +198,8 @@ public class CacheUtil {
      */
     public static void delL2Cache(String key, Cache<String, Object> caffeineCache, RedisService redisService) {
         // 从一级缓存中删除
-        caffeineCache.invalidate(key);
+        delL1Cache(key, caffeineCache);
         // 从二级缓存中删除
-        redisService.deleteObject(key);
+        delL2Cache(key, redisService);
     }
 }
