@@ -210,11 +210,11 @@ public class RedisService {
     /**
      * 存入 redis 并设置过期时间，如果键不存在则设置缓存
      *
-     * @param key     缓存键
-     * @param value   缓存值
-     * @param timeout 缓存超时时间
+     * @param key      缓存键
+     * @param value    缓存值
+     * @param timeout  缓存超时时间
      * @param timeUnit 时间单位
-     * @param <T>     泛型类型
+     * @param <T>      泛型类型
      * @return 设置成功返回 true，否则返回 false
      */
     public <T> Boolean setCacheObjectIfAbsent(final String key, final T value, final long timeout, final TimeUnit timeUnit) {
@@ -1435,6 +1435,7 @@ public class RedisService {
     /**
      * 删除指定值对应的 Redis 中的键值（Compare And Delete）
      * 先对 value 进行比较，成功了再进行删除（所有的操作通过 lua 脚本原子性实现）
+     *
      * @param key   缓存 key
      * @param value 期望的值
      * @return 是否完成了删除操作，true - 表示删除成功; false - 表示删除失败
@@ -1445,7 +1446,14 @@ public class RedisService {
             return false;
         }
 
-        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        String script = """
+                -- 如果 key 对应的值等于传入值，则删除 key
+                if redis.call('get', KEYS[1]) == ARGV[1] then
+                    return redis.call('del', KEYS[1])
+                else
+                    return 0
+                end
+                """;
 
         // 通过 lua 脚本原子验证令牌和删除令牌
         Long result = (Long) redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),

@@ -30,4 +30,14 @@ public class BloomFilterConfig {
      * 布隆过滤器阈值
      */
     private double warningThreshold = 0.7;
+
+    /**
+     * 是否开启布隆过滤器阈值检查
+     */
+    private boolean checkWarning = true;
+
+    /**
+     * 批量插入的元素数量
+     */
+    private Integer batchSize = 7500;
 }
