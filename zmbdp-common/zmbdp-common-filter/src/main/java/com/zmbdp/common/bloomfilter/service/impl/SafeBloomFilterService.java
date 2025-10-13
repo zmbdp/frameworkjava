@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -111,6 +112,46 @@ public class SafeBloomFilterService implements BloomFilterService {
     }
 
     /**
+     * 批量添加元素（线程安全）
+     *
+     * @param keys 键集合
+     */
+    @Override
+    public void putAll(Collection<String> keys) {
+        if (keys == null || keys.isEmpty()) {
+            log.warn("尝试批量添加空集合到布隆过滤器");
+            return;
+        }
+
+        rwLock.writeLock().lock();
+        try {
+            int addedCount = 0;
+
+            for (String key : keys) {
+                if (key == null || key.isEmpty()) {
+                    log.debug("跳过空键");
+                    continue;
+                }
+
+                // 完全依赖 Set 判断新元素
+                if (actualElements.add(key)) {
+                    bloomFilter.put(key);
+                    elementCount.incrementAndGet();
+                    addedCount++;
+                }
+            }
+
+            if (addedCount > 0) {
+                checkAndWarnLoadFactor(elementCount.get());
+            }
+
+            log.info("批量添加完成，共添加 {} 个新元素，当前状态: {}", addedCount, getStatus());
+        } finally {
+            rwLock.writeLock().unlock();
+        }
+    }
+
+    /**
      * 检查元素是否存在（线程安全）
      *
      * @param key 键
@@ -125,6 +166,22 @@ public class SafeBloomFilterService implements BloomFilterService {
         rwLock.readLock().lock();
         try {
             return bloomFilter.mightContain(key);
+        } finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+    /**
+     * 判断集合中是否有任意元素存在
+     *
+     * @param keys 键集合
+     * @return true 至少有一个存在，false 一个都不存在
+     */
+    @Override
+    public boolean mightContainAny(Collection<String> keys) {
+        rwLock.readLock().lock();
+        try {
+            return keys.stream().anyMatch(bloomFilter::mightContain);
         } finally {
             rwLock.readLock().unlock();
         }
@@ -276,5 +333,13 @@ public class SafeBloomFilterService implements BloomFilterService {
      */
     private double sanitizeFalseProbability(double probability) {
         return Math.min(0.999, Math.max(0.000001, probability));
+    }
+
+    /**
+     * 清空布隆过滤器（线程安全）
+     */
+    @Override
+    public void clear() {
+        refreshFilter();
     }
 }

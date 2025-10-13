@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -124,6 +125,16 @@ public class FastBloomFilterService implements BloomFilterService {
     }
 
     /**
+     * 批量添加元素
+     *
+     * @param keys 键集合
+     */
+    @Override
+    public void putAll(Collection<String> keys) {
+        keys.forEach(this::put);
+    }
+
+    /**
      * 检查负载率并在超过阈值时打印警告
      *
      * @param currentCount 当前元素数量
@@ -150,6 +161,20 @@ public class FastBloomFilterService implements BloomFilterService {
             return false;
         }
         return bloomFilter.mightContain(key);
+    }
+
+    /**
+     * 判断集合中是否有任意元素存在
+     *
+     * @param keys 键集合
+     * @return true 至少有一个存在，false 一个都不存在
+     */
+    @Override
+    public boolean mightContainAny(Collection<String> keys) {
+        return keys.stream()
+                .anyMatch(
+                        key -> mightContain(key)
+                );
     }
 
     /**
@@ -230,5 +255,13 @@ public class FastBloomFilterService implements BloomFilterService {
     @Override
     public int actualElementCount() {
         return actualElements.size();
+    }
+
+    /**
+     * 清空布隆过滤器
+     */
+    @Override
+    public void clear() {
+        refreshFilter(); // 重新初始化过滤器，达到清空效果
     }
 }
