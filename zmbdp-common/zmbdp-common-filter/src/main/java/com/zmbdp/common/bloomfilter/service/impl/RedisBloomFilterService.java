@@ -10,8 +10,10 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -119,8 +121,8 @@ public class RedisBloomFilterService implements BloomFilterService {
             return;
         }
 
-        // 移除分布式锁，直接调用 Redis 命令
         try {
+            // Lua 脚本调用 RedisBloom 的 BF.ADD
             String lua = "return redis.call('BF.ADD', KEYS[1], ARGV[1])";
 
             Object result = redissonClient.getScript().eval(
@@ -131,12 +133,21 @@ public class RedisBloomFilterService implements BloomFilterService {
                     key
             );
 
-            if ((result instanceof Integer && ((Integer) result) == 1) ||
-                    (result instanceof Long && ((Long) result) == 1L)) {
+            boolean added = (result instanceof Integer && ((Integer) result) == 1)
+                    || (result instanceof Long && ((Long) result) == 1L);
+
+            if (added) {
+                // 新增成功
                 elementCount.incrementAndGet();
+                log.debug("[RedisBloom] 新增元素: {}", key);
+            } else {
+                // 元素已存在
+                log.trace("[RedisBloom] 元素已存在: {}", key);
             }
+
         } catch (Exception e) {
-            log.error("添加元素失败: {}", key, e);
+            // Redis 执行错误
+            log.error("[RedisBloom] 添加元素失败: {}", key, e);
         }
     }
 
@@ -152,21 +163,15 @@ public class RedisBloomFilterService implements BloomFilterService {
             return;
         }
 
-        RLock lock = redissonLockService.acquire("lock:redis:bloom:putAll");
-        if (lock == null) {
-            log.warn("获取批量 put 锁失败");
-            return;
-        }
-
         try {
-            // 使用 BF.MADD 批量添加
+            // 使用 Lua 调用 RedisBloom 的 BF.MADD 实现批量插入
             String lua = "return redis.call('BF.MADD', KEYS[1], unpack(ARGV))";
 
             Object result = redissonClient.getScript().eval(
                     RScript.Mode.READ_WRITE,
                     lua,
                     RScript.ReturnType.MULTI,
-                    Collections.singletonList(BLOOM_NAME),
+                    List.of(BLOOM_NAME),
                     keys.toArray(new String[0])
             );
 
@@ -177,11 +182,11 @@ public class RedisBloomFilterService implements BloomFilterService {
                         .count();
 
                 elementCount.addAndGet(addedCount);
+                log.debug("[RedisBloom] 批量新增 {} / {} 个元素", addedCount, keys.size());
             }
 
-            log.info("批量添加 {} 个元素完成", keys.size());
-        } finally {
-            redissonLockService.releaseLock(lock);
+        } catch (Exception e) {
+            log.error("[RedisBloom] 批量添加元素失败: {}", e.getMessage(), e);
         }
     }
 
@@ -197,7 +202,6 @@ public class RedisBloomFilterService implements BloomFilterService {
             return false;
         }
 
-        // 移除分布式锁，直接调用 Redis 命令
         try {
             String lua = "return redis.call('BF.EXISTS', KEYS[1], ARGV[1])";
 
@@ -239,7 +243,7 @@ public class RedisBloomFilterService implements BloomFilterService {
                 RScript.Mode.READ_ONLY,
                 lua,
                 RScript.ReturnType.BOOLEAN,
-                Collections.singletonList(BLOOM_NAME),
+                List.of(BLOOM_NAME),
                 keys.toArray(new String[0])
         );
 
@@ -274,7 +278,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     @Override
     public String getStatus() {
         return String.format(
-                "RedisBloomFilter{name=%s, 本地计数=%d, 预期误判率=%.2f%%}",
+                "RedisBloomFilter{name = %s, 本地计数 = %d, 预期误判率 = %.2f%%}",
                 BLOOM_NAME,
                 elementCount.get(),
                 bloomFilterConfig.getFalseProbability() * 100

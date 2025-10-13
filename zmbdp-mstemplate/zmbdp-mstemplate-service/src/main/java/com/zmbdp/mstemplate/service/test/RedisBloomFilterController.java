@@ -93,7 +93,7 @@ public class RedisBloomFilterController {
      * 2️⃣ 高并发写入测试
      *
      * @param totalOps 总操作数
-     * @param threads 线程数
+     * @param threads  线程数
      */
     @PostMapping("/concurrentWriteTest")
     public Result<Void> concurrentWriteTest(@RequestParam(defaultValue = "1000") int totalOps,
@@ -158,7 +158,7 @@ public class RedisBloomFilterController {
     /**
      * 4️⃣ 性能统计测试
      *
-     * @param ops 操作数
+     * @param ops     操作数
      * @param threads 线程数
      */
     @PostMapping("/performanceTest")
@@ -198,7 +198,7 @@ public class RedisBloomFilterController {
     /**
      * 5️⃣ RedisBloom 单个 VS lua脚本 前后对比测试
      *
-     * @param ops 操作数
+     * @param ops     操作数
      * @param threads 线程数
      */
     @PostMapping("/compareRedisBloomPutAndQuery")
@@ -275,5 +275,94 @@ public class RedisBloomFilterController {
         log.info("=========== RedisBloom 单个 VS lua脚本 前后对比测试结束 ===========");
         bloomFilterService.clear();
         return Result.success();
+    }
+
+    /**
+     * 6️⃣ 全面测试（包含边界情况、并发安全、误判率等）
+     */
+    @PostMapping("/comprehensiveTest")
+    public Result<Void> comprehensiveTest() {
+        log.info("=========== 全面测试开始 ===========");
+        bloomFilterService.reset();
+
+        try {
+            // 1. 基础功能测试
+            log.info("--- 基础功能测试 ---");
+            List<String> basicData = Arrays.asList("test1", "test2", "test3");
+            bloomFilterService.putAll(basicData);
+            log.info("批量添加完成: {}", basicData);
+
+            // 验证存在性
+            basicData.forEach(key -> {
+                boolean exists = bloomFilterService.mightContain(key);
+                log.info("键 '{}' 存在: {}", key, exists);
+            });
+
+            // 验证不存在的键
+            List<String> nonExistKeys = Arrays.asList("nonexist1", "nonexist2");
+            nonExistKeys.forEach(key -> {
+                boolean exists = bloomFilterService.mightContain(key);
+                log.info("键 '{}' 存在: {} (应为false或误判)", key, exists);
+            });
+
+            // 2. 边界情况测试
+            log.info("--- 边界情况测试 ---");
+            bloomFilterService.put(null);
+            bloomFilterService.put("");
+            boolean nullExists = bloomFilterService.mightContain(null);
+            boolean emptyExists = bloomFilterService.mightContain("");
+            log.info("null键存在: {}, 空字符串存在: {}", nullExists, emptyExists);
+
+            // 3. mightContainAny测试
+            log.info("--- mightContainAny测试 ---");
+            List<String> mixedKeys = Arrays.asList("test1", "nonexist3");
+            boolean anyExist = bloomFilterService.mightContainAny(mixedKeys);
+            log.info("集合 {:?} 中至少有一个存在: {}", mixedKeys, anyExist);
+
+            // 4. 大量数据测试
+            log.info("--- 大量数据测试 ---");
+            int largeDataCount = 5000;
+            List<String> largeData = new ArrayList<>();
+            for (int i = 0; i < largeDataCount; i++) {
+                largeData.add("large_" + i);
+            }
+
+            long start = System.currentTimeMillis();
+            bloomFilterService.putAll(largeData);
+            long end = System.currentTimeMillis();
+            log.info("批量添加 {} 个元素耗时: {} ms", largeDataCount, end - start);
+
+            // 5. 误判率测试
+            log.info("--- 误判率测试 ---");
+            int testCount = 1000;
+            int falsePositiveCount = 0;
+            for (int i = 0; i < testCount; i++) {
+                String key = "false_positive_test_" + (i + 10000);
+                if (bloomFilterService.mightContain(key)) {
+                    falsePositiveCount++;
+                }
+            }
+            double falsePositiveRate = (double) falsePositiveCount / testCount * 100;
+            log.info("测试 {} 个不存在的元素，误判 {} 个，误判率: {}%",
+                    testCount, falsePositiveCount, String.format("%.4f", falsePositiveRate));
+
+            // 6. 状态检查
+            log.info("--- 状态检查 ---");
+            String status = bloomFilterService.getStatus();
+            long exactCount = bloomFilterService.exactElementCount();
+            long approxCount = bloomFilterService.approximateElementCount();
+            int actualCount = bloomFilterService.actualElementCount();
+            log.info("状态: {}", status);
+            log.info("精确计数: {}, 近似计数: {}, 实际计数: {}", exactCount, approxCount, actualCount);
+
+            log.info("=========== 全面测试结束 ===========");
+            bloomFilterService.clear();
+            return Result.success();
+
+        } catch (Exception e) {
+            log.error("全面测试过程中发生异常", e);
+            bloomFilterService.clear();
+            return Result.fail("测试失败: " + e.getMessage());
+        }
     }
 }
