@@ -10,7 +10,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -70,19 +69,22 @@ public class RedisBloomFilterService implements BloomFilterService {
                 throw new IllegalArgumentException("预期插入数量必须为正整数，当前值: " + expectedInsertions);
             }
 
-            // 使用 Lua 脚本调用 BF.RESERVE 初始化布隆过滤器
+            // 防止重复初始化的安全版本
             String lua = String.format(
-                    "return redis.call('BF.RESERVE', '%s', %f, %d)",
-                    BLOOM_NAME, falseProbability, expectedInsertions
+                    "if redis.call('EXISTS', KEYS[1]) == 0 then " +
+                            " return redis.call('BF.RESERVE', KEYS[1], %f, %d) " +
+                            "else return 'EXISTS' end",
+                    falseProbability, expectedInsertions
             );
 
-            redissonClient.getScript().eval(
+            Object result = redissonClient.getScript().eval(
                     RScript.Mode.READ_WRITE,
                     lua,
-                    RScript.ReturnType.BOOLEAN
+                    RScript.ReturnType.VALUE,
+                    Collections.singletonList(BLOOM_NAME)
             );
 
-            log.info("RedisBloom 初始化完成: {}", BLOOM_NAME);
+            log.info("RedisBloom 初始化完成: {}, result = {}", BLOOM_NAME, result);
 
         } finally {
             redissonLockService.releaseLock(lock);
@@ -270,11 +272,19 @@ public class RedisBloomFilterService implements BloomFilterService {
         }
     }
 
+    /**
+     * 扩容（MBbloom 类型）
+     */
     @Override
     public void expand() {
         log.info("RedisBloom 不需要手动扩容");
     }
 
+    /**
+     * 获取布隆过滤器状态
+     *
+     * @return 状态信息
+     */
     @Override
     public String getStatus() {
         return String.format(
@@ -285,21 +295,41 @@ public class RedisBloomFilterService implements BloomFilterService {
         );
     }
 
+    /**
+     * 计算当前布隆过滤器负载因子
+     *
+     * @return 负载因子
+     */
     @Override
     public double calculateLoadFactor() {
         return -1;
     }
 
+    /**
+     * 获取当前布隆过滤器中元素数量（MBbloom 类型）
+     *
+     * @return 元素数量
+     */
     @Override
     public long approximateElementCount() {
         return -1;
     }
 
+    /**
+     * 获取当前布隆过滤器中元素数量（MBbloom 类型）
+     *
+     * @return 元素数量
+     */
     @Override
     public long exactElementCount() {
         return elementCount.get();
     }
 
+    /**
+     * 获取当前布隆过滤器中实际元素数量（MBbloom 类型）
+     *
+     * @return 元素数量
+     */
     @Override
     public int actualElementCount() {
         return (int) elementCount.get();
