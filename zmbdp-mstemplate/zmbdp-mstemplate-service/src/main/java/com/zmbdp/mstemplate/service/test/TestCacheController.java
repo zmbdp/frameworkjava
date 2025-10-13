@@ -669,13 +669,13 @@ public class TestCacheController {
 
     @PostMapping("/threads/bloom/stress")
     public Result<Void> stressTestBloomFilter() {
-        log.info("开始布隆过滤器压力测试");
+        log.info("🧪 开始布隆过滤器压力测试");
 
         // 重置布隆过滤器
         bloomFilterService.reset();
         log.info("初始状态: {}", bloomFilterService.getStatus());
 
-        // 高并发压力测试
+        // 高并发压力测试参数
         int threadCount = 20;
         int operationsPerThread = 500;
         List<Thread> threads = new ArrayList<>();
@@ -692,13 +692,12 @@ public class TestCacheController {
             final int threadId = t;
             Thread thread = new Thread(() -> {
                 for (int i = 0; i < operationsPerThread; i++) {
-                    // 70% 概率执行添加操作，30% 概率执行查询操作
                     if (Math.random() < 0.7) {
                         String key = "stress:" + threadId + ":" + i;
                         bloomFilterService.put(key);
                         putSuccessCount.incrementAndGet();
                     } else {
-                        String key = "stress:" + threadId + ":" + (i + 10000); // 查询未添加的键
+                        String key = "stress:" + threadId + ":" + (i + 10000);
                         boolean result = bloomFilterService.mightContain(key);
                         if (result) {
                             querySuccessCount.incrementAndGet();
@@ -707,17 +706,15 @@ public class TestCacheController {
                         }
                     }
                 }
-                log.info("压力测试线程 {} 完成", threadId);
+                log.info("线程 {} 完成", threadId);
             });
             threads.add(thread);
         }
 
-        // 启动所有线程
-        for (Thread thread : threads) {
-            thread.start();
-        }
+        // 启动线程
+        threads.forEach(Thread::start);
 
-        // 等待所有线程完成
+        // 等待线程完成
         try {
             for (Thread thread : threads) {
                 thread.join();
@@ -729,31 +726,31 @@ public class TestCacheController {
         }
 
         long endTime = System.currentTimeMillis();
+        long totalOps = putSuccessCount.get() + querySuccessCount.get() + queryFalseCount.get();
+        double durationSec = (endTime - startTime) / 1000.0;
+        double throughput = totalOps / durationSec;
 
-        // 输出测试结果
-        log.info("压力测试完成，耗时: {}ms", endTime - startTime);
+        // 输出结果
+        log.info("💥 压力测试完成，耗时: {}ms ({}秒)", endTime - startTime, durationSec);
         log.info("添加操作成功次数: {}", putSuccessCount.get());
-        log.info("查询操作成功次数: {}，失败次数: {}", querySuccessCount.get(), queryFalseCount.get());
+        log.info("查询操作成功次数: {}，查询失败次数: {}", querySuccessCount.get(), queryFalseCount.get());
         log.info("最终状态: {}", bloomFilterService.getStatus());
+        log.info("总操作数: {}, 吞吐量: {} ops/s", totalOps, String.format("%.2f", throughput));
 
-        // 验证最终状态的一致性
+        // 验证状态一致性
         String status1 = bloomFilterService.getStatus();
-        try {
-            Thread.sleep(100); // 短暂等待
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        try { Thread.sleep(100); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         String status2 = bloomFilterService.getStatus();
 
         if (status1.equals(status2)) {
-            log.info("压力测试后状态信息一致" + "压力测试完成，总操作数: " + (putSuccessCount.get() + querySuccessCount.get() + queryFalseCount.get()));
-            return Result.success();
+            log.info("压力测试后状态信息一致 ✅");
         } else {
-            log.warn("压力测试后状态信息不一致");
+            log.warn("压力测试后状态信息不一致 ⚠️");
             log.warn("状态1: {}", status1);
             log.warn("状态2: {}", status2);
-            return Result.success();
         }
+        bloomFilterService.clear();
+        return Result.success();
     }
 
     /**
