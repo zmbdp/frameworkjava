@@ -80,7 +80,10 @@ services:
       retries: 10
   frameworkjava-redis:
     container_name: frameworkjava-redis
-    image: redis:7.0.15
+    # 带有布隆过滤器版本的 redis 镜像
+    image: redislabs/rebloom:latest
+    # 普通版本 redis 镜像
+#    image: redis:7.0.15
     ports:
       - "6379:6379"
     volumes:
