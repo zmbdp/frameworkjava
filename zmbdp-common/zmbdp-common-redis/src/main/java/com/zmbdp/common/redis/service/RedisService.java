@@ -46,7 +46,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 设置有效时间 (并指定时间单位)
      *
@@ -109,7 +108,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 重命名key
      *
@@ -171,7 +169,6 @@ public class RedisService {
             log.warn("RedisService.setCacheObject set cache error: {}", e.getMessage());
         }
     }
-
 
     /**
      * 存入 redis，设置过期时间
@@ -255,7 +252,6 @@ public class RedisService {
             return null;
         }
     }
-
 
     /**
      * 获取复杂的泛型嵌套缓存对象
@@ -356,7 +352,6 @@ public class RedisService {
     }
 
     /*=============================================    List    =============================================*/
-
 
     /**
      * 将 List 数据保持原有顺序存入缓存
@@ -832,7 +827,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取两个集合的差集（支持复杂泛型嵌套）
      *
@@ -927,7 +921,6 @@ public class RedisService {
             return null;
         }
     }
-
 
     /**
      * 获取所有有序集合数据（升序，支持复杂的泛型嵌套）
@@ -1210,7 +1203,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取缓存的 map 数据（支持复杂的泛型嵌套）
      *
@@ -1247,7 +1239,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取 Hash 中的单个数据（支持复杂的泛型嵌套）
      *
@@ -1266,7 +1257,6 @@ public class RedisService {
             return null;
         }
     }
-
 
     /**
      * 获取 Hash 中的多个数据
@@ -1466,7 +1456,6 @@ public class RedisService {
             }
         }
     }
-
 
     /*=============================================    LUA脚本    =============================================*/
 
