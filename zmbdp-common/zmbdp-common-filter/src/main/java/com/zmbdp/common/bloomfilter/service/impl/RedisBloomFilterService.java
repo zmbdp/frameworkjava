@@ -224,6 +224,7 @@ public class RedisBloomFilterService implements BloomFilterService {
         if (key == null || key.isEmpty()) {
             return false;
         }
+        log.trace("[RedisBloom] 查询元素: {}", key);
         try {
             String lua = "return redis.call('BF.EXISTS', KEYS[1], ARGV[1])";
             Object result = redissonClient.getScript().eval(

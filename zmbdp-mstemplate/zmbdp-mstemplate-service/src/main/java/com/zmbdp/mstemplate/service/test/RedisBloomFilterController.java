@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -282,59 +283,69 @@ public class RedisBloomFilterController {
      */
     @PostMapping("/comprehensiveTest")
     public Result<Void> comprehensiveTest() {
-        log.info("=========== 全面测试开始 ===========");
-        bloomFilterService.reset();
+        log.info("=========== RedisBloom 全面测试开始 ===========");
 
         try {
-            // 1. 基础功能测试
+            // ------------------------------
+            // 1️⃣ 初始化与清空
+            // ------------------------------
+            log.info("--- 初始化与清空测试 ---");
+            bloomFilterService.clear();
+            log.info("布隆过滤器已清空");
+
+            // ------------------------------
+            // 2️⃣ 基础功能测试
+            // ------------------------------
             log.info("--- 基础功能测试 ---");
             List<String> basicData = Arrays.asList("test1", "test2", "test3");
             bloomFilterService.putAll(basicData);
             log.info("批量添加完成: {}", basicData);
 
-            // 验证存在性
-            basicData.forEach(key -> {
-                boolean exists = bloomFilterService.mightContain(key);
-                log.info("键 '{}' 存在: {}", key, exists);
-            });
+            basicData.forEach(key -> log.info("键 '{}' 存在: {}", key, bloomFilterService.mightContain(key)));
 
-            // 验证不存在的键
             List<String> nonExistKeys = Arrays.asList("nonexist1", "nonexist2");
-            nonExistKeys.forEach(key -> {
-                boolean exists = bloomFilterService.mightContain(key);
-                log.info("键 '{}' 存在: {} (应为false或误判)", key, exists);
-            });
+            nonExistKeys.forEach(key -> log.info("键 '{}' 存在: {} (应为 false 或误判)",
+                    key, bloomFilterService.mightContain(key)));
 
-            // 2. 边界情况测试
-            log.info("--- 边界情况测试 ---");
+            // ------------------------------
+            // 3️⃣ 边界值测试
+            // ------------------------------
+            log.info("--- 边界值测试 ---");
             bloomFilterService.put(null);
             bloomFilterService.put("");
-            boolean nullExists = bloomFilterService.mightContain(null);
-            boolean emptyExists = bloomFilterService.mightContain("");
-            log.info("null键存在: {}, 空字符串存在: {}", nullExists, emptyExists);
+            log.info("null键存在: {}, 空字符串存在: {}",
+                    bloomFilterService.mightContain(null),
+                    bloomFilterService.mightContain("")
+            );
 
-            // 3. mightContainAny测试
-            log.info("--- mightContainAny测试 ---");
-            List<String> mixedKeys = Arrays.asList("test1", "nonexist3");
-            boolean anyExist = bloomFilterService.mightContainAny(mixedKeys);
-            log.info("集合 {:?} 中至少有一个存在: {}", mixedKeys, anyExist);
+            bloomFilterService.put("test1");
+            log.info("重复插入 'test1' 后负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
 
-            // 4. 大量数据测试
+            // ------------------------------
+            // 4️⃣ 大量数据测试（控制在10000以内）
+            // ------------------------------
             log.info("--- 大量数据测试 ---");
-            int largeDataCount = 5000;
+            int largeDataCount = 9000; // 控制在 10000 以内
             List<String> largeData = new ArrayList<>();
             for (int i = 0; i < largeDataCount; i++) {
                 largeData.add("large_" + i);
             }
 
+            // 分批插入，避免 Lua unpack 超量
+            int batchSize = 1000;
             long start = System.currentTimeMillis();
-            bloomFilterService.putAll(largeData);
+            for (int i = 0; i < largeData.size(); i += batchSize) {
+                List<String> batch = largeData.subList(i, Math.min(i + batchSize, largeData.size()));
+                bloomFilterService.putAll(batch);
+            }
             long end = System.currentTimeMillis();
-            log.info("批量添加 {} 个元素耗时: {} ms", largeDataCount, end - start);
+            log.info("批量添加 {} 个元素耗时: {} ms", largeDataCount, (end - start));
 
-            // 5. 误判率测试
+            // ------------------------------
+            // 5️⃣ 误判率测试
+            // ------------------------------
             log.info("--- 误判率测试 ---");
-            int testCount = 1000;
+            int testCount = 10000;
             int falsePositiveCount = 0;
             for (int i = 0; i < testCount; i++) {
                 String key = "false_positive_test_" + (i + 10000);
@@ -344,9 +355,39 @@ public class RedisBloomFilterController {
             }
             double falsePositiveRate = (double) falsePositiveCount / testCount * 100;
             log.info("测试 {} 个不存在的元素，误判 {} 个，误判率: {}%",
-                    testCount, falsePositiveCount, String.format("%.4f", falsePositiveRate));
+                    testCount, falsePositiveCount, String.format("%.2f", falsePositiveRate));
 
-            // 6. 状态检查
+            // ------------------------------
+            // 6️⃣ 并发测试（小规模）
+            // ------------------------------
+            log.info("--- 并发测试 ---");
+            ExecutorService executor = Executors.newFixedThreadPool(10);
+            List<Callable<Void>> tasks = new ArrayList<>();
+            for (int i = 0; i < 500; i++) { // 控制数量
+                final int idx = i;
+                tasks.add(() -> {
+                    bloomFilterService.put("concurrent_" + idx);
+                    return null;
+                });
+            }
+            executor.invokeAll(tasks);
+            executor.shutdown();
+            log.info("并发插入完成，精确计数: {}", bloomFilterService.exactElementCount());
+
+            // ------------------------------
+            // 7️⃣ 清空与重置测试
+            // ------------------------------
+            log.info("负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
+            log.info("--- 清空与重置测试 ---");
+            bloomFilterService.clear();
+            log.info("清空后精确计数: {}", bloomFilterService.exactElementCount());
+
+            bloomFilterService.reset();
+            log.info("重置后精确计数: {}", bloomFilterService.exactElementCount());
+
+            // ------------------------------
+            // 8️⃣ 状态检查
+            // ------------------------------
             log.info("--- 状态检查 ---");
             String status = bloomFilterService.getStatus();
             long exactCount = bloomFilterService.exactElementCount();
@@ -354,9 +395,9 @@ public class RedisBloomFilterController {
             int actualCount = bloomFilterService.actualElementCount();
             log.info("状态: {}", status);
             log.info("精确计数: {}, 近似计数: {}, 实际计数: {}", exactCount, approxCount, actualCount);
+            log.info("负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
 
-            log.info("=========== 全面测试结束 ===========");
-            bloomFilterService.clear();
+            log.info("=========== RedisBloom 全面测试结束 ===========");
             return Result.success();
 
         } catch (Exception e) {
