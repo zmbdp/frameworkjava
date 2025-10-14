@@ -192,22 +192,11 @@ public class RedisBloomFilterService implements BloomFilterService {
             List<String> batch = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
             try {
                 // Lua 脚本：统计新增元素数量
-                String lua = """
-                        -- 批量添加元素，并统计成功新增的数量
-                        local added = 0
-                        for i = 1, #ARGV do
-                            local r = redis.call('BF.ADD', KEYS[1], ARGV[i])
-                            if r == 1 then
-                                added = added + 1
-                            end
-                        end
-                        return added
-                        """;
-
+                String lua = "return redis.call('BF.MADD', KEYS[1], unpack(ARGV))";
                 Object result = redissonClient.getScript().eval(
                         RScript.Mode.READ_WRITE,
                         lua,
-                        RScript.ReturnType.INTEGER,
+                        RScript.ReturnType.MULTI,
                         List.of(BLOOM_NAME),
                         batch.toArray(new String[0])
                 );
