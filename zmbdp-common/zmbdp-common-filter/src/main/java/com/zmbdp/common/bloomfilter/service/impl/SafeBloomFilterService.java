@@ -53,6 +53,14 @@ public class SafeBloomFilterService implements BloomFilterService {
     private BloomFilter<String> bloomFilter;
 
     /**
+     * 清空布隆过滤器（线程安全）
+     */
+    @Override
+    public void clear() {
+        refreshFilter();
+    }
+
+    /**
      * 初始化/重置过滤器
      */
     @Override
@@ -333,13 +341,5 @@ public class SafeBloomFilterService implements BloomFilterService {
      */
     private double sanitizeFalseProbability(double probability) {
         return Math.min(0.999, Math.max(0.000001, probability));
-    }
-
-    /**
-     * 清空布隆过滤器（线程安全）
-     */
-    @Override
-    public void clear() {
-        refreshFilter();
     }
 }

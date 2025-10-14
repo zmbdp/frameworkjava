@@ -40,7 +40,12 @@ public interface BloomFilterService {
     boolean mightContainAny(Collection<String> keys);
 
     /**
-     * 重置
+     * 清空布隆过滤器和计数（配置不变）
+     */
+    void clear();
+
+    /**
+     * 重置布隆过滤器
      */
     void reset();
 
@@ -85,7 +90,9 @@ public interface BloomFilterService {
     int actualElementCount();
 
     /**
-     * 清空布隆过滤器
+     * 删除布隆过滤器
+     *
+     * @return true 删除成功，false 删除失败
      */
-    void clear();
+    boolean delete();
 }

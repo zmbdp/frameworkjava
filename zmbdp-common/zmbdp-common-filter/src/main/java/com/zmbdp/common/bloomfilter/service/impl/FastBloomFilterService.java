@@ -47,6 +47,13 @@ public class FastBloomFilterService implements BloomFilterService {
     private volatile BloomFilter<String> bloomFilter;
 
     /**
+     * 清空布隆过滤器
+     */
+    @Override
+    public void clear() {
+        refreshFilter(); // 重新初始化过滤器，达到清空效果
+    }
+    /**
      * 初始化/重置过滤器
      */
     @Override
@@ -255,13 +262,5 @@ public class FastBloomFilterService implements BloomFilterService {
     @Override
     public int actualElementCount() {
         return actualElements.size();
-    }
-
-    /**
-     * 清空布隆过滤器
-     */
-    @Override
-    public void clear() {
-        refreshFilter(); // 重新初始化过滤器，达到清空效果
     }
 }

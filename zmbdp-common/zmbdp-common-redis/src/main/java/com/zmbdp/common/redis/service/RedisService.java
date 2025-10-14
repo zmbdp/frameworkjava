@@ -300,6 +300,25 @@ public class RedisService {
     }
 
     /**
+     * 对 key 对应的 value 进行原子递增（指定增量）
+     *
+     * @param key   Redis 键, value 必须为数字类型
+     * @param delta 增加的数值
+     * @return 递增后的值（失败返回 -1）
+     */
+    public Long incr(final String key, final long delta) {
+        if (StringUtil.isEmpty(key)) {
+            return -1L;
+        }
+        try {
+            return redisTemplate.opsForValue().increment(key, delta);
+        } catch (Exception e) {
+            log.warn("RedisService.incr error: key={}", key, e);
+            return -1L;
+        }
+    }
+
+    /**
      * 对 key 对应的 value 进行原子递减（-1）
      *
      * @param key Redis 键, value 必须为数字类型
@@ -311,6 +330,25 @@ public class RedisService {
         }
         try {
             return redisTemplate.opsForValue().decrement(key);
+        } catch (Exception e) {
+            log.warn("RedisService.decr error: {}", key, e);
+            return -1L;
+        }
+    }
+
+    /**
+     * 对 key 对应的 value 进行原子递减（指定减量）
+     *
+     * @param key Redis 键, value 必须为数字类型
+     * @param delta 减少的数值
+     * @return 递减后的值（失败返回 -1）
+     */
+    public Long decr(final String key, final long delta) {
+        if (StringUtil.isEmpty(key)) {
+            return -1L;
+        }
+        try {
+            return redisTemplate.opsForValue().decrement(key, delta);
         } catch (Exception e) {
             log.warn("RedisService.decr error: {}", key, e);
             return -1L;

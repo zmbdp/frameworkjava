@@ -278,7 +278,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     }
 
     /**
-     * 清空布隆过滤器和计数<p>
+     * 清空布隆过滤器和计数（配置不变）<p>
      * 使用分布式锁保证多实例安全
      */
     @Override
@@ -367,7 +367,6 @@ public class RedisBloomFilterService implements BloomFilterService {
         }
     }
 
-
     /**
      * 获取近似元素数量
      */
@@ -397,5 +396,33 @@ public class RedisBloomFilterService implements BloomFilterService {
     public int actualElementCount() {
         long count = exactElementCount();
         return count > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) count;
+    }
+
+    /**
+     * 删除布隆过滤器（不重新创建）
+     *
+     * @return true 删除成功，false 删除失败
+     */
+    @Override
+    public boolean delete() {
+        RLock lock = redissonLockService.acquire("lock:redis:bloom:delete");
+        if (lock == null) {
+            return false;
+        }
+        try {
+            // 删除布隆过滤器和计数器
+            long result = redissonClient.getKeys().delete(BLOOM_NAME, BLOOM_COUNT_KEY);
+
+            // 删除配置信息
+            redissonClient.getKeys().delete("{frameworkjava:bloom}:config");
+
+            log.info("[RedisBloom] 已删除");
+            return result > 0;
+        } catch (Exception e) {
+            log.error("[RedisBloom] 删除失败", e);
+            return false;
+        } finally {
+            redissonLockService.releaseLock(lock);
+        }
     }
 }
