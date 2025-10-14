@@ -339,7 +339,7 @@ public class RedisService {
     /**
      * 对 key 对应的 value 进行原子递减（指定减量）
      *
-     * @param key Redis 键, value 必须为数字类型
+     * @param key   Redis 键, value 必须为数字类型
      * @param delta 减少的数值
      * @return 递减后的值（失败返回 -1）
      */
