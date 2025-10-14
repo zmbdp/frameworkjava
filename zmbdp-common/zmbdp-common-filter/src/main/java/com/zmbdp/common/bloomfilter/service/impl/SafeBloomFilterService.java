@@ -342,4 +342,29 @@ public class SafeBloomFilterService implements BloomFilterService {
     private double sanitizeFalseProbability(double probability) {
         return Math.min(0.999, Math.max(0.000001, probability));
     }
+
+    /**
+     * 删除布隆过滤器
+     *
+     * @return true 删除成功，false 删除失败
+     */
+    @Override
+    public boolean delete() {
+        rwLock.writeLock().lock();
+        try {
+            // 清空布隆过滤器相关资源
+            if (bloomFilter != null) {
+                bloomFilter = null;
+            }
+            elementCount.set(0);
+            actualElements.clear();
+            log.info("布隆过滤器删除成功");
+            return true;
+        } catch (Exception e) {
+            log.error("删除布隆过滤器时发生错误", e);
+            return false;
+        } finally {
+            rwLock.writeLock().unlock();
+        }
+    }
 }

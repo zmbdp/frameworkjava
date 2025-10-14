@@ -2,9 +2,9 @@ package com.zmbdp.common.bloomfilter.service.impl;
 
 import com.zmbdp.common.bloomfilter.config.BloomFilterConfig;
 import com.zmbdp.common.bloomfilter.service.BloomFilterService;
+import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.redis.service.RedissonLockService;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -65,6 +66,12 @@ public class RedisBloomFilterService implements BloomFilterService {
      */
     @Autowired
     private Executor threadPoolTaskExecutor;
+
+    /**
+     * Redis 服务
+     */
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 初始化布隆过滤器（MBbloom 类型）<p>
@@ -121,8 +128,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     private void incrementBloomCountAsync(long delta) {
         threadPoolTaskExecutor.execute(() -> {
             try {
-                RAtomicLong counter = redissonClient.getAtomicLong(BLOOM_COUNT_KEY);
-                long total = counter.addAndGet(delta); // 异步增加计数
+                long total = redisService.incr(BLOOM_COUNT_KEY, delta); // 异步增加计数
                 log.trace("[RedisBloom] 异步增加计数: {}", delta);
 
                 if (bloomFilterConfig.isCheckWarning()) {
@@ -288,7 +294,7 @@ public class RedisBloomFilterService implements BloomFilterService {
             return;
         }
         try {
-            redissonClient.getKeys().delete(BLOOM_NAME, BLOOM_COUNT_KEY);
+            redisService.deleteObject(Arrays.asList(BLOOM_NAME, BLOOM_COUNT_KEY));
             initBloomFilter();
             log.info("[RedisBloom] 已清空");
         } finally {
@@ -308,7 +314,7 @@ public class RedisBloomFilterService implements BloomFilterService {
             return;
         }
         try {
-            redissonClient.getKeys().delete(BLOOM_NAME, BLOOM_COUNT_KEY);
+            redisService.deleteObject(Arrays.asList(BLOOM_NAME, BLOOM_COUNT_KEY));
             initBloomFilter();
             log.info("[RedisBloom] 已重置");
         } finally {
@@ -381,8 +387,8 @@ public class RedisBloomFilterService implements BloomFilterService {
     @Override
     public long exactElementCount() {
         try {
-            RAtomicLong counter = redissonClient.getAtomicLong(BLOOM_COUNT_KEY);
-            return counter.get();
+            Long count = redisService.getCacheObject(BLOOM_COUNT_KEY, Long.class);
+            return count != null ? count : 0L;
         } catch (Exception e) {
             log.error("[RedisBloom] 获取元素计数失败", e);
             return -1;
@@ -410,11 +416,8 @@ public class RedisBloomFilterService implements BloomFilterService {
             return false;
         }
         try {
-            // 删除布隆过滤器和计数器
-            long result = redissonClient.getKeys().delete(BLOOM_NAME, BLOOM_COUNT_KEY);
-
-            // 删除配置信息
-            redissonClient.getKeys().delete("{frameworkjava:bloom}:config");
+            // 删除布隆过滤器、计数器、配置信息
+            long result = redisService.deleteObject(Arrays.asList(BLOOM_NAME, BLOOM_COUNT_KEY, "{frameworkjava:bloom}:config"));
 
             log.info("[RedisBloom] 已删除");
             return result > 0;
