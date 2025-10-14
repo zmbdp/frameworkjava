@@ -1,17 +1,21 @@
 # 布隆过滤器配置
 bloom:
   filter:
-    # 布隆过滤器类型, safe - 安全（加锁实现线程安全）, fast - 快速（未加锁）
-    type: safe
+    # 布隆过滤器的选择, fast-> 不加锁线程不安全的; safe-> 加锁线程安全的; redis-> redis版本适合分布式线程安全的
+    type: redis
     # 预期插入的元素数量, 最小都得是100
-    expectedInsertions: 100000
+    expectedInsertions: 10000
     # 误判率
     falseProbability: 0.01
     # 布隆过滤器扩容阈值
-    warningThreshold: 0.6
+    warningThreshold: 0.7
     # 刷新布隆过滤器相关配置
     refresh:
       # 刷新布隆过滤器时间配置
       cron: "0 0 4 * * ?"  # 每天凌晨四点执行一次
       # 是否刷新布隆过滤器 true - 是; false - 否
       enabled: true
+    # 是否开启布隆过滤器阈值检查
+    checkWarning: true
+    # putAll 每批最多传输多少条数据（个人测试最大 7500 左右）
+    batchSize: 7500
