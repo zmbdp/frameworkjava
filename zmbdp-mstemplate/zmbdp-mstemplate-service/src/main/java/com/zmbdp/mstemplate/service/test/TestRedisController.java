@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.stream.Stream;
 
 @RestController
 @Slf4j
@@ -1054,5 +1055,117 @@ public class TestRedisController {
         }
     }
 
+    /**
+     * 测试 Redis 事务执行方法
+     * 包括正常事务执行、异常回滚、嵌套事务等情况
+     */
+    @PostMapping("/transaction")
+    public Result<Map<String, String>> transactionOperations() {
+        log.info("=== Redis executeInTransaction 测试开始 ===");
 
+        Map<String, String> result = new LinkedHashMap<>();
+
+        String keyNormal = "tx:test:normal";
+        String keyRollback = "tx:test:rollback";
+        String keyError = "tx:test:error";
+        String keyComplex = "tx:test:complex";
+        String keyConcurrent = "tx:test:concurrent";
+
+        // 先清理旧数据
+        redisService.deleteObject(Arrays.asList(keyNormal, keyRollback, keyError, keyComplex, keyConcurrent));
+
+        try {
+            // 1️⃣ 正常事务提交
+            log.info("[1] 测试正常事务提交");
+            redisService.executeInTransaction(ops -> {
+                ops.opsForValue().set(keyNormal, "ok");
+                ops.opsForValue().increment(keyNormal + ":count", 1);
+            });
+            boolean ok = "ok".equals(redisService.getCacheObject(keyNormal, String.class));
+            result.put("normalTx", ok ? "✅ 正常提交成功" : "❌ 提交失败");
+            log.info("[1] 验证结果：{}", ok);
+
+            // 2️⃣ 模拟异常回滚（预期行为）
+            log.info("[2] 测试事务中异常回滚（预期会抛出异常）");
+            try {
+                redisService.executeInTransaction(ops -> {
+                    ops.opsForValue().set(keyRollback, "temp");
+                    throw new RuntimeException("模拟业务异常（预期）");
+                });
+                result.put("rollbackTx", "❌ 未回滚（错误）");
+            } catch (Exception e) {
+                boolean rolledBack = !redisService.hasKey(keyRollback);
+                result.put("rollbackTx", rolledBack ? "✅ 事务异常回滚成功" : "❌ 回滚失败");
+                log.info("[2] 捕获到预期异常：{}", e.getMessage());
+            }
+
+            // 3️⃣ 逻辑错误测试（非预期异常）
+            log.info("[3] 测试 Redis 类型错误（非预期异常）");
+            redisService.setCacheObject(keyError, "stringValue");
+            try {
+                redisService.executeInTransaction(ops -> {
+                    // 故意对 String key 使用 Hash 操作，触发 WRONGTYPE
+                    ops.opsForHash().put(keyError, "field", "value");
+                });
+                result.put("typeErrorTx", "❌ 未抛出异常（错误）");
+            } catch (Exception e) {
+                result.put("typeErrorTx", "⚠️ Redis类型错误（非预期异常）: " + e.getMessage());
+                log.warn("[3] 捕获到 Redis WRONGTYPE 异常（这是 bug 级的）", e);
+            }
+
+            // 4️⃣ 复杂事务
+            log.info("[4] 测试复杂事务（多类型操作）");
+            redisService.executeInTransaction(ops -> {
+                ops.opsForValue().set(keyComplex + ":v", "123");
+                ops.opsForList().rightPush(keyComplex + ":list", "a");
+                ops.opsForHash().put(keyComplex + ":hash", "h1", "hv1");
+            });
+
+            Map<String, String> hashMap = redisService.getCacheMap(keyComplex + ":hash", String.class);
+            boolean complexOK =
+                    "123".equals(redisService.getCacheObject(keyComplex + ":v", String.class)) &&
+                            hashMap != null &&
+                            "hv1".equals(hashMap.get("h1"));
+            result.put("complexTx", complexOK ? "✅ 复杂事务成功" : "❌ 复杂事务执行错误");
+
+            // 5️⃣ 并发事务测试
+            log.info("[5] 测试并发事务");
+            redisService.setCacheObject(keyConcurrent, 0L);
+            int threadCount = 10;
+            ExecutorService executor = Executors.newFixedThreadPool(5);
+            CountDownLatch latch = new CountDownLatch(threadCount);
+
+            for (int i = 0; i < threadCount; i++) {
+                executor.submit(() -> {
+                    try {
+                        // ❌ 不要在事务中读 + 写
+                        // ✅ 直接使用自增原子操作即可
+                        redisService.executeInTransaction(ops -> {
+                            ops.opsForValue().increment(keyConcurrent, 1L);
+                        });
+                    } catch (Exception ex) {
+                        log.error("[5] 并发事务异常", ex);
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            latch.await();
+            executor.shutdown();
+
+            Long finalVal = redisService.getCacheObject(keyConcurrent, Long.class);
+            result.put("concurrentTx", Long.valueOf(threadCount).equals(finalVal)
+                    ? "✅ 并发事务计数正确"
+                    : "❌ 并发结果错误，最终值=" + finalVal);
+
+            log.info("=== Redis executeInTransaction 全部测试完成 ===");
+            return Result.success(result);
+
+        } catch (Exception e) {
+            log.error("测试过程中出现异常", e);
+            result.put("error", "❌ 测试过程异常：" + e.getMessage());
+            return Result.fail(result);
+        }
+    }
 }
