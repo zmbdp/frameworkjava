@@ -53,6 +53,14 @@ public class SafeBloomFilterService implements BloomFilterService {
     private BloomFilter<String> bloomFilter;
 
     /**
+     * 清空布隆过滤器（线程安全）
+     */
+    @Override
+    public void clear() {
+        refreshFilter();
+    }
+
+    /**
      * 初始化/重置过滤器
      */
     @Override
@@ -336,10 +344,27 @@ public class SafeBloomFilterService implements BloomFilterService {
     }
 
     /**
-     * 清空布隆过滤器（线程安全）
+     * 删除布隆过滤器
+     *
+     * @return true 删除成功，false 删除失败
      */
     @Override
-    public void clear() {
-        refreshFilter();
+    public boolean delete() {
+        rwLock.writeLock().lock();
+        try {
+            // 清空布隆过滤器相关资源
+            if (bloomFilter != null) {
+                bloomFilter = null;
+            }
+            elementCount.set(0);
+            actualElements.clear();
+            log.info("布隆过滤器删除成功");
+            return true;
+        } catch (Exception e) {
+            log.error("删除布隆过滤器时发生错误", e);
+            return false;
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 }

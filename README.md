@@ -108,6 +108,7 @@ frameworkjava
 │   │           ├── BloomFilterService.java      # 布隆过滤器服务接口
 │   │           └── impl/
 │   │               ├── FastBloomFilterService.java  # 快速版（不加锁）布隆过滤器实现
+│   │               ├── RedisBloomFilterService.java # Redis版布隆过滤器实现
 │   │               └── SafeBloomFilterService.java  # 线程安全（分布式锁）版布隆过滤器实现
 │   │
 │   ├── zmbdp-common-message         # 消息服务
@@ -176,14 +177,15 @@ frameworkjava
 
 1. 克隆项目<p>
 ```bash
-git clone https://github.com/zmbdp/frameworkjava.git cd frameworkjava
+git clone https://github.com/zmbdp/frameworkjava.git
+cd frameworkjava
 ```
 2. 启动基础服务<p>
 ```bash
 # 开发环境
 cd deploy/dev/app
 docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
-# 测试环
+# 测试环境
 cd deploy/test/app
 docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
 # 生产环境
@@ -231,7 +233,19 @@ mvn spring-boot:run
 - 支持复杂泛型类型缓存
 - 缓存工具类封装完整操作流程
 
-### 2. 安全认证机制
+### 2. Redis 复杂数据结构操作
+
+RedisService 提供了对 Redis 各种数据结构的增强操作支持：
+
+- **String 类型**：支持复杂泛型对象的存取操作
+- **List 类型**：提供丰富的列表操作，包括头插、尾插、批量删除、范围获取等
+- **Set 类型**：支持交集、并集、差集运算，以及元素移动等高级操作
+- **ZSet (有序集合)**：支持按分数范围、排名等条件的查询和操作
+- **Hash 类型**：提供批量获取字段值、数值字段原子增减等增强功能
+
+所有操作均支持复杂泛型嵌套结构，如 `Map<String, List<Set<RegionTest>>>` 等。
+
+### 3. 安全认证机制
 
 采用JWT无状态认证：
 - 网关层统一鉴权
@@ -240,49 +254,50 @@ mvn spring-boot:run
 - 支持白名单配置
 - Token与Redis结合实现状态管理
 
-### 3. 微服务治理
+### 4. 微服务治理
 
 - Nacos配置中心和服务发现
 - 网关统一路由和限流
 - Feign服务间调用
 - 统一异常处理和响应格式
 
-### 4. 高性能线程池
+### 5. 高性能线程池
 
 - 支持四种拒绝策略配置（AbortPolicy、CallerRunsPolicy、DiscardOldestPolicy、DiscardPolicy）
 - 参数可动态配置
 - 线程安全关闭机制
 - 异步任务执行支持
 
-### 5. 完善的工具类库
+### 6. 完善的工具类库
 
 - BeanCopyUtil：支持List、Map、Map<List>等复杂结构对象拷贝
 - JsonUtil：全面的JSON处理能力，支持Java 8时间类型
 - CacheUtil：封装完整的三级缓存操作
 - JwtUtil：完整的JWT处理功能
 
-### 6. 增强型布隆过滤器
+### 7. 增强型布隆过滤器
 
-- 多实现版本支持（安全版和快速版）
+- 多实现版本支持（安全版、快速版和Redis版）
 - 线程安全实现，支持高并发场景
 - 精确计数和近似计数双重统计
 - 负载率和误判率实时监控
 - 配置化管理，支持Nacos动态刷新
 - 定时任务自动维护
+- 支持手动扩容和自动重置功能
 
-### 7. 完整的用户管理体系
+### 8. 完整的用户管理体系
 
 - B端用户管理：登录、注册、权限控制
 - C端用户管理：微信登录、手机号登录、用户信息维护
 - 用户信息服务：用户信息获取、编辑、退出登录
 
-### 8. 配置管理服务
+### 9. 配置管理服务
 
 - 参数配置管理
 - 支持根据键值查询配置
 - 支持批量查询配置
 
-### 9. 地图服务功能
+### 10. 地图服务功能
 
 - 城市列表获取
 - 城市拼音归类查询
@@ -290,43 +305,43 @@ mvn spring-boot:run
 - 根据关键词搜索地点
 - 根据经纬度定位城市
 
-### 10. 文件服务功能
+### 11. 文件服务功能
 
 - 文件上传功能
 - 签名信息获取
 - Feign远程调用接口
 
-### 11. 消息队列集成
+### 12. 消息队列集成
 
 - RabbitMQ集成
 - 消息生产者和消费者示例
 - 支持消息的发送和接收
 
-### 12. 定时任务系统
+### 13. 定时任务系统
 
 - 布隆过滤器定时刷新任务
 - 每天凌晨4点自动执行
 - 日志记录和异常处理
 
-### 13. 完善的异常处理机制
+### 14. 完善的异常处理机制
 
 - 统一异常处理
 - 业务异常封装
 - 错误码体系
 
-### 14. 标准化的API设计
+### 15. 标准化的API设计
 
 - Feign远程调用接口
 - RESTful API设计
 - 统一响应格式
 
-### 15. 容器化部署支持
+### 16. 容器化部署支持
 
 - Docker Compose部署方案
 - Nacos配置中心集成
 - 完整的中间件支持（MySQL、Redis、RabbitMQ）
 
-### 16. SDK开发文档
+### 17. SDK开发文档
 
 项目提供完整的SDK开发文档，位于`javapro/javadoc`目录下：
 - 基于JavaDoc生成的完整API文档
@@ -339,7 +354,7 @@ mvn spring-boot:run
 2. 使用浏览器直接打开该文件即可浏览完整的SDK文档
 3. 例如：`file:///{项目路径}/javapro/javadoc/index.html`
 
-### 17. API文档和使用手册
+### 18. API文档和使用手册
 
 - **API文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn) (访问密码: zmbdp@123.com)
 - **使用手册**: [https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink](https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink)
@@ -359,7 +374,8 @@ mvn spring-boot:run
   - share-map-dev.yaml（地图服务公共配置）
   - share-token-dev.yaml（Token公共配置）
   - share-sms-dev.yaml（短信服务公共配置）
-  - share-filter-dev.yaml（ [布隆] 过滤器公共配置）
+  - share-filter-dev.yaml（布隆过滤器公共配置）
+  - share-thread-dev.yaml（线程池公共配置）
 - **业务服务配置**: 
   - zmbdp-file-service-dev.yaml（文件服务配置）
   - zmbdp-admin-service-dev.yaml（基础服务配置）
@@ -396,9 +412,10 @@ T result = CacheUtil.getL2Cache(redisService, bloomFilterService, key, valueType
 - 可配置缓存预热和刷新机制
 
 #### 3. 认证授权扩展
-- 支持OAuth2、LDAP等多种认证方式扩展
+- 支持JWT Token无状态认证
+- 支持微信登录和手机号验证码登录
 - 可自定义权限验证规则
-- 可扩展第三方登录集成（微信、QQ、GitHub等）
+- 可扩展第三方登录集成（微信、手机号）
 
 #### 4. 消息队列扩展
 - 支持多种消息模式（点对点、发布订阅）

@@ -46,7 +46,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 设置有效时间 (并指定时间单位)
      *
@@ -109,7 +108,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 重命名key
      *
@@ -171,7 +169,6 @@ public class RedisService {
             log.warn("RedisService.setCacheObject set cache error: {}", e.getMessage());
         }
     }
-
 
     /**
      * 存入 redis，设置过期时间
@@ -256,7 +253,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取复杂的泛型嵌套缓存对象
      *
@@ -300,6 +296,25 @@ public class RedisService {
     }
 
     /**
+     * 对 key 对应的 value 进行原子递增（指定增量）
+     *
+     * @param key   Redis 键, value 必须为数字类型
+     * @param delta 增加的数值
+     * @return 递增后的值（失败返回 -1）
+     */
+    public Long incr(final String key, final long delta) {
+        if (StringUtil.isEmpty(key)) {
+            return -1L;
+        }
+        try {
+            return redisTemplate.opsForValue().increment(key, delta);
+        } catch (Exception e) {
+            log.warn("RedisService.incr error: key={}", key, e);
+            return -1L;
+        }
+    }
+
+    /**
      * 对 key 对应的 value 进行原子递减（-1）
      *
      * @param key Redis 键, value 必须为数字类型
@@ -317,8 +332,26 @@ public class RedisService {
         }
     }
 
-    /*=============================================    List    =============================================*/
+    /**
+     * 对 key 对应的 value 进行原子递减（指定减量）
+     *
+     * @param key   Redis 键, value 必须为数字类型
+     * @param delta 减少的数值
+     * @return 递减后的值（失败返回 -1）
+     */
+    public Long decr(final String key, final long delta) {
+        if (StringUtil.isEmpty(key)) {
+            return -1L;
+        }
+        try {
+            return redisTemplate.opsForValue().decrement(key, delta);
+        } catch (Exception e) {
+            log.warn("RedisService.decr error: {}", key, e);
+            return -1L;
+        }
+    }
 
+    /*=============================================    List    =============================================*/
 
     /**
      * 将 List 数据保持原有顺序存入缓存
@@ -794,7 +827,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取两个集合的差集（支持复杂泛型嵌套）
      *
@@ -889,7 +921,6 @@ public class RedisService {
             return null;
         }
     }
-
 
     /**
      * 获取所有有序集合数据（升序，支持复杂的泛型嵌套）
@@ -1172,7 +1203,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取缓存的 map 数据（支持复杂的泛型嵌套）
      *
@@ -1209,7 +1239,6 @@ public class RedisService {
         }
     }
 
-
     /**
      * 获取 Hash 中的单个数据（支持复杂的泛型嵌套）
      *
@@ -1228,7 +1257,6 @@ public class RedisService {
             return null;
         }
     }
-
 
     /**
      * 获取 Hash 中的多个数据
@@ -1428,7 +1456,6 @@ public class RedisService {
             }
         }
     }
-
 
     /*=============================================    LUA脚本    =============================================*/
 

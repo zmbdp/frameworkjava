@@ -36,7 +36,7 @@ public class RedisBloomFilterController {
     private BloomFilterService bloomFilterService;
 
     /**
-     * 1️⃣ 一键全流程测试（基础测试）
+     * 1️⃣ 一键全流程测试（基础测试）<p>
      * 包含：重置 -> 批量插入 -> 校验存在/不存在 -> 打印状态与计数
      */
     @PostMapping("/fullCheck")
@@ -47,6 +47,7 @@ public class RedisBloomFilterController {
             // 1️⃣ 重置布隆过滤器
             log.info("[Step 1] 重置布隆过滤器...");
             bloomFilterService.reset();
+            bloomFilterService.clear();
 
             // 2️⃣ 添加一批测试数据
             List<String> testData = Arrays.asList("user_1", "user_2", "user_3", "admin", "guest");
@@ -82,7 +83,7 @@ public class RedisBloomFilterController {
             log.info("📈 当前精确计数: {}", count);
 
             log.info("✅========== RedisBloomFilter 全流程测试完成 ==========");
-            bloomFilterService.clear();
+            bloomFilterService.delete();
             return Result.success();
         } catch (Exception e) {
             log.error("❌ RedisBloomFilter 全流程测试失败", e);
@@ -138,7 +139,7 @@ public class RedisBloomFilterController {
         }
 
         log.info("=========== 高并发写入测试结束 ===========");
-        bloomFilterService.clear();
+        bloomFilterService.delete();
         return Result.success();
     }
 
@@ -192,7 +193,7 @@ public class RedisBloomFilterController {
         log.info("吞吐量: {} ops/s", opsPerSecond);
         log.info("当前精确计数: {}", bloomFilterService.exactElementCount());
         log.info("=========== 性能测试结束 ===========");
-        bloomFilterService.clear();
+        bloomFilterService.delete();
         return Result.success();
     }
 
@@ -274,7 +275,7 @@ public class RedisBloomFilterController {
         log.info("Lua 批量查询完成: {} 条数据, 耗时 {} ms, 吞吐量 {} ops/s, 查询结果 anyExist = {}", ops, (end4 - start4), String.format("%.2f", ops4), anyExist);
 
         log.info("=========== RedisBloom 单个 VS lua脚本 前后对比测试结束 ===========");
-        bloomFilterService.clear();
+        bloomFilterService.delete();
         return Result.success();
     }
 
@@ -398,11 +399,12 @@ public class RedisBloomFilterController {
             log.info("负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
 
             log.info("=========== RedisBloom 全面测试结束 ===========");
+            bloomFilterService.delete();
             return Result.success();
 
         } catch (Exception e) {
             log.error("全面测试过程中发生异常", e);
-            bloomFilterService.clear();
+            bloomFilterService.delete();
             return Result.fail("测试失败: " + e.getMessage());
         }
     }
