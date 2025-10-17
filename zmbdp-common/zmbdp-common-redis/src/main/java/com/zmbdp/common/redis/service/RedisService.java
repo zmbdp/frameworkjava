@@ -5,13 +5,17 @@ import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.core.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * redis 相关操作工具类
@@ -150,6 +154,39 @@ public class RedisService {
         } catch (Exception e) {
             log.warn("RedisService.deleteObject multiple error: {}", e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * 执行 Redis 事务
+     *
+     * @param action 缓存操作
+     * @return 缓存操作结果
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public List<Object> executeInTransaction(Consumer<RedisOperations> action) {
+        try {
+            return (List<Object>) redisTemplate.execute(new SessionCallback<List<Object>>() {
+                @Override
+                public List<Object> execute(RedisOperations operations) throws DataAccessException {
+                    operations.multi(); // 开启事务
+                    try {
+                        ((Consumer) action).accept(operations);
+                    } catch (Exception e) {
+                        operations.discard(); // 回滚事务
+                        throw e;
+                    }
+                    // exec() 提交事务，若命令队列中有类型错误或执行失败，exec() 会返回 null
+                    List<Object> results = operations.exec();
+                    if (results == null) {
+                        throw new RuntimeException("Redis事务执行失败，可能命令类型错误或队列为空");
+                    }
+                    return results;
+                }
+            });
+        } catch (Exception e) {
+            log.error("Redis 事务执行失败", e);
+            throw e;
         }
     }
 
