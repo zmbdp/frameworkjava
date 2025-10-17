@@ -47,6 +47,14 @@ public class FastBloomFilterService implements BloomFilterService {
     private volatile BloomFilter<String> bloomFilter;
 
     /**
+     * 清空布隆过滤器
+     */
+    @Override
+    public void clear() {
+        refreshFilter(); // 重新初始化过滤器，达到清空效果
+    }
+
+    /**
      * 初始化/重置过滤器
      */
     @Override
@@ -258,10 +266,21 @@ public class FastBloomFilterService implements BloomFilterService {
     }
 
     /**
-     * 清空布隆过滤器
+     * 删除布隆过滤器
+     *
+     * @return true 删除成功，false 删除失败
      */
-    @Override
-    public void clear() {
-        refreshFilter(); // 重新初始化过滤器，达到清空效果
+    public boolean delete() {
+        try {
+            // 清空布隆过滤器相关资源
+            this.bloomFilter = null;
+            elementCount.set(0);
+            actualElements.clear();
+            log.info("布隆过滤器删除成功");
+            return true;
+        } catch (Exception e) {
+            log.error("删除布隆过滤器时发生错误", e);
+            return false;
+        }
     }
 }
