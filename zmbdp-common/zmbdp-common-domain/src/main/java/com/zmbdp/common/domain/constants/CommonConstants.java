@@ -30,4 +30,9 @@ public class CommonConstants {
      * 异步线程池名字
      */
     public final static String ASYNCHRONOUS_THREADS_BEAN_NAME = "threadPoolTaskExecutor";
+
+    /**
+     * 定时任务线程池名字
+     */
+    public final static String SCHEDULED_THREADS_BEAN_NAME = "scheduledExecutorService";
 }
