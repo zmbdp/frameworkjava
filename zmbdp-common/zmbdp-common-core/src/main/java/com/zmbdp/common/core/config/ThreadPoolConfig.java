@@ -1,36 +1,39 @@
 package com.zmbdp.common.core.config;
 
 import com.zmbdp.common.core.enums.RejectType;
+import com.zmbdp.common.core.utils.ThreadUtil;
 import com.zmbdp.common.domain.constants.CommonConstants;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 /**
  * 线程池配置
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @EnableAsync // 启动类上添加该注解，则该类下的方法会异步执行
 @Configuration
 public class ThreadPoolConfig {
 
     /**
-     * 核心线程数
+     * 核心线程数，如果说 nacos 上没有，就默认是 cpu 数 + 1
      */
-    @Value("${thread.pool-executor.corePoolSize:5}")
+    @Value("${thread.pool-executor.corePoolSize:0}")
     private Integer corePoolSize;
 
     /**
-     * 最大线程数
+     * 最大线程数，如果 nacos 上没有，默认就是 (核心线程数 + 1) * 2
      */
-    @Value("${thread.pool-executor.maxPoolSize:100}")
+    @Value("${thread.pool-executor.maxPoolSize:0}")
     private Integer maxPoolSize;
 
     /**
@@ -57,6 +60,25 @@ public class ThreadPoolConfig {
     @Value("${thread.pool-executor.rejectHandler:2}")
     private Integer rejectHandler;
 
+    /**
+     * 初始化线程池参数
+     */
+    @PostConstruct
+    public void initThreadPoolParameters() {
+        // 获取 cpu 核数 + 1
+        int cpuCore = Runtime.getRuntime().availableProcessors() + 1;
+
+        if (corePoolSize == null || corePoolSize <= 0) {
+            corePoolSize = cpuCore;
+        }
+
+        if (maxPoolSize == null || maxPoolSize <= 0) {
+            maxPoolSize = cpuCore * 2;
+        }
+
+        log.info("初始化线程池参数：corePoolSize: {}, maxPoolSize: {}, queueCapacity: {}, keepAliveSeconds: {}, prefixName: {}, rejectHandler: {}",
+                                corePoolSize, maxPoolSize, queueCapacity, keepAliveSeconds, prefixName, rejectHandler);
+    }
 
     /**
      * 注册和配置线程池执行器
@@ -88,8 +110,7 @@ public class ThreadPoolConfig {
         // 如果是 AbortPolicy 策略, 不允许任务丢失, 抛出 RejectedExecutionException 异常
         if (RejectType.AbortPolicy.getValue().equals(rejectHandler)) {
             return new ThreadPoolExecutor.AbortPolicy();
-        }
-        else if (RejectType.CallerRunsPolicy.getValue().equals(rejectHandler)) {
+        } else if (RejectType.CallerRunsPolicy.getValue().equals(rejectHandler)) {
             // 如果是 CallerRunsPolicy 策略, 让提交任务的线程运行被拒绝的任务
             return new ThreadPoolExecutor.CallerRunsPolicy();
         } else if (RejectType.DiscardOldestPolicy.getValue().equals(rejectHandler)) {
@@ -99,5 +120,26 @@ public class ThreadPoolConfig {
             // 如果是 DiscardPolicy 策略, 丢弃请求, 无反馈
             return new ThreadPoolExecutor.DiscardPolicy();
         }
+    }
+
+    /**
+     * 执行周期性或定时任务
+     *
+     * @return 定时任务执行器
+     */
+    @Bean(CommonConstants.SCHEDULED_THREADS_BEAN_NAME)
+    public ScheduledExecutorService scheduledExecutorService() {
+        // ScheduledThreadPoolExecutor：专门用于执行需要定时或重复执行的任务
+        return new ScheduledThreadPoolExecutor(
+                corePoolSize,
+                new BasicThreadFactory.Builder().namingPattern("schedule-pool-%d").daemon(true).build(),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        ) {
+            @Override
+            protected void afterExecute(Runnable runnable, Throwable throwable) {
+                super.afterExecute(runnable, throwable);
+                ThreadUtil.printException(runnable, throwable);
+            }
+        };
     }
 }
