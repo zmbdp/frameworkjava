@@ -1,5 +1,8 @@
 package com.zmbdp.common.core.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,6 +13,7 @@ import java.time.temporal.ChronoUnit;
  *
  * @author 稚名不带撇
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
 public class TimestampUtil {
 
     /**

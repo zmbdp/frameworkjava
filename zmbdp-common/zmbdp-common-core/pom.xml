@@ -109,6 +109,17 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Jakarta Mail API -->
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+        </dependency>
+        <!-- Jakarta Mail 实现 -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-domain</artifactId>

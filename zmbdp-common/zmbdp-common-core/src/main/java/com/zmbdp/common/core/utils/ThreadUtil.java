@@ -12,7 +12,7 @@ import java.util.concurrent.*;
  * @author 稚名不带撇
  */
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE) // 禁止实例化，只能通过静态方法获取实例
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
 public class ThreadUtil {
 
     /**
@@ -57,7 +57,7 @@ public class ThreadUtil {
     /**
      * 打印线程异常信息
      *
-     * @param runnable 线程
+     * @param runnable  线程
      * @param throwable 异常
      */
     public static void printException(Runnable runnable, Throwable throwable) {
