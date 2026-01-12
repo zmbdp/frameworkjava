@@ -3,30 +3,35 @@ package com.zmbdp.common.core.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.mail.Mail;
-import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.spring.SpringUtil;
+import com.zmbdp.common.core.config.MailAccount;
+import com.zmbdp.common.domain.constants.CommonConstants;
 import jakarta.mail.Authenticator;
+import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
- * 邮件工具类（基于 Hutool Mail + Jakarta Mail）<br>
+ * 邮件工具类（基于 Spring JavaMailSender + Jakarta Mail）<br>
  *
  * <p>
  * 功能说明：
  * <ul>
- *     <li>基于 Spring 容器中的 {@link MailAccount} 发送邮件</li>
+ *     <li>基于 Spring 容器中的 {@link MailAccount} 和 {@link JavaMailSender} 发送邮件</li>
  *     <li>支持文本 / HTML 邮件</li>
  *     <li>支持抄送（CC）、密送（BCC）</li>
  *     <li>支持附件、内嵌图片（cid）</li>
@@ -36,13 +41,13 @@ import java.util.Map;
  * <p>
  * 使用前准备：
  * <ol>
- *     <li>在 Spring 容器中注册 {@link MailAccount} Bean</li>
+ *     <li>在 Spring 容器中注册 {@link MailAccount} 和 {@link JavaMailSender} Bean</li>
  *     <li>引入 zmbdp-common-core 相关依赖</li>
  * </ol>
  * <p>
  * 示例：
  * <pre>
- * MailUtils.sendHtml("a@b.com", "标题", "&lt;h1&gt;内容&lt;/h1&gt;");
+ * MailUtil.sendHtml("a@b.com", "标题", "&lt;h1&gt;内容&lt;/h1&gt;");
  * </pre>
  * <p>
  * 工具类说明：
@@ -53,13 +58,34 @@ import java.util.Map;
  *
  * @author 稚名不带撇
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
-public class MailUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class MailUtil {
 
     /**
-     * 从 Spring 容器拿到公共的 MailAccount
+     * 从 Spring 容器获取默认的 JavaMailSender
      */
-    private static final MailAccount ACCOUNT = SpringUtil.getBean(MailAccount.class);
+    private static JavaMailSender getDefaultJavaMailSender() {
+        return SpringUtil.getBean(JavaMailSender.class);
+    }
+
+    /**
+     * 根据 MailAccount 创建 JavaMailSender
+     *
+     * @param mailAccount 邮件账号配置
+     * @return JavaMailSender 邮件发送器
+     */
+    private static JavaMailSender createJavaMailSender(MailAccount mailAccount) {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(mailAccount.getHost());
+        mailSender.setPort(mailAccount.getPort());
+        mailSender.setUsername(mailAccount.getUser());
+        mailSender.setPassword(mailAccount.getPass());
+
+        Properties props = mailAccount.getSmtpProps();
+        mailSender.setJavaMailProperties(props);
+
+        return mailSender;
+    }
 
     /**
      * 获取默认邮件账号
@@ -74,31 +100,36 @@ public class MailUtils {
      * @return MailAccount 邮件账号配置对象，包含 SMTP 服务器、用户名、授权码等信息
      */
     public static MailAccount getMailAccount() {
-        return ACCOUNT;
+        return SpringUtil.getBean(MailAccount.class);
     }
 
     /**
-     * 在默认 MailAccount 的基础上，临时覆盖发件人信息
+     * 在默认 MailAccount 的基础上，创建新的 MailAccount 并覆盖发件人信息
      *
      * <p>该方法适用于：</p>
      * <ul>
      *     <li>需要临时修改发件人显示名称、账号或授权码</li>
      *     <li>需要在保持其他配置不变的情况下更换发件人</li>
      *     <li>参数为空时会保留原有配置值</li>
+     *     <li>需要线程安全的邮件账号配置（返回新对象，不修改全局配置）</li>
      * </ul>
-     *
-     * <p>注意：该方法会修改全局 MailAccount，不适合并发场景频繁调用</p>
      *
      * @param from 发件人显示名称，为空时保留原值
      * @param user 邮箱账号，为空时保留原值
      * @param pass 邮箱授权码，为空时保留原值
-     * @return MailAccount 修改后的邮件账号配置
+     * @return MailAccount 新的邮件账号配置对象（不修改全局配置）
      */
     public static MailAccount getMailAccount(String from, String user, String pass) {
-        ACCOUNT.setFrom(StrUtil.blankToDefault(from, ACCOUNT.getFrom()));
-        ACCOUNT.setUser(StrUtil.blankToDefault(user, ACCOUNT.getUser()));
-        ACCOUNT.setPass(StrUtil.blankToDefault(pass, ACCOUNT.getPass()));
-        return ACCOUNT;
+        MailAccount account = new MailAccount();
+        MailAccount defaultAccount = getMailAccount();
+        // 使用 BeanCopyUtil 复制属性
+        BeanCopyUtil.copyProperties(defaultAccount, account);
+
+        // 覆盖新值（如果参数为空，使用已复制的 account 中的值）
+        account.setFrom(StrUtil.blankToDefault(from, account.getFrom()));
+        account.setUser(StrUtil.blankToDefault(user, account.getUser()));
+        account.setPass(StrUtil.blankToDefault(pass, account.getPass()));
+        return account;
     }
 
 
@@ -646,29 +677,21 @@ public class MailUtils {
      * @return Session JavaMail Session 对象，用于邮件发送操作
      */
     public static Session getSession(MailAccount mailAccount, boolean isSingleton) {
-        // 创建一个认证器对象，初始值为 null
         Authenticator authenticator = null;
 
-        // 检查邮件账号是否需要认证
         if (mailAccount.isAuth()) {
-            // 获取用户名和密码
             final String user = mailAccount.getUser();
             final String pass = mailAccount.getPass();
-            // 创建认证器，用于 SMTP 认证
             authenticator = new Authenticator() {
-                // 重写获取密码认证的方法
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    // 返回用户名和密码的认证对象
                     return new PasswordAuthentication(user, pass);
                 }
             };
         }
-        // 根据 isSingleton 参数决定使用单例 Session 还是创建新 Session
+
         return isSingleton ?
-                // 使用单例模式，获取默认 Session 实例
                 Session.getDefaultInstance(mailAccount.getSmtpProps(), authenticator) :
-                // 创建新的 Session 实例
                 Session.getInstance(mailAccount.getSmtpProps(), authenticator);
     }
 
@@ -703,36 +726,77 @@ public class MailUtils {
             Collection<String> ccs, Collection<String> bccs, String subject,
             String content, Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        // 创建邮件对象并设置是否使用全局会话
-        final Mail mail = Mail.create(mailAccount).setUseGlobalSession(useGlobalSession);
-
-        // 再检查抄送人列表和密送列表是否为空，不为空就得填写
-        if (CollUtil.isNotEmpty(ccs)) { // 抄送人列表
-            mail.setCcs(ccs.toArray(new String[0]));
+        // 检查收件人列表是否为空
+        if (CollUtil.isEmpty(tos)) {
+            throw new IllegalArgumentException("收件人不能为空");
         }
-        if (CollUtil.isNotEmpty(bccs)) { // 密送人列表
-            mail.setBccs(bccs.toArray(new String[0]));
-        }
-        // 设置邮件相关信息
-        mail.setTos(tos.toArray(new String[0])); // 收件人列表
-        mail.setTitle(subject); // 标题
-        mail.setContent(content); // 内容
-        mail.setHtml(isHtml); // 是否为 HTML 格式
-        mail.setFiles(files); // 附件
 
-        // 检查内嵌图片映射是否不为空，不为空就得添加
-        if (MapUtil.isNotEmpty(imageMap)) {
-            // 遍历图片映射
-            for (Map.Entry<String, InputStream> entry : imageMap.entrySet()) {
-                // 添加图片到邮件中
-                mail.addImage(entry.getKey(), entry.getValue());
-                // 关闭输入流
-                IoUtil.close(entry.getValue());
+        try {
+            // 创建或获取 JavaMailSender
+            JavaMailSender mailSender;
+            if (useGlobalSession && mailAccount == getMailAccount()) {
+                // 使用默认的 JavaMailSender（复用全局 Session）
+                mailSender = getDefaultJavaMailSender();
+            } else {
+                // 创建新的 JavaMailSender（使用指定的 MailAccount）
+                mailSender = createJavaMailSender(mailAccount);
             }
-        }
+            
+            jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        // 发送邮件并返回消息 ID
-        return mail.send();
+            // 设置发件人
+            helper.setFrom(mailAccount.getFrom());
+
+            // 设置收件人
+            helper.setTo(tos.toArray(new String[0]));
+
+            // 设置抄送人
+            if (CollUtil.isNotEmpty(ccs)) {
+                helper.setCc(ccs.toArray(new String[0]));
+            }
+
+            // 设置密送人
+            if (CollUtil.isNotEmpty(bccs)) {
+                helper.setBcc(bccs.toArray(new String[0]));
+            }
+
+            // 设置主题
+            helper.setSubject(subject);
+
+            // 设置内容
+            helper.setText(content, isHtml);
+
+            // 添加附件
+            if (files != null && files.length > 0) {
+                for (File file : files) {
+                    if (file != null && file.exists()) {
+                        helper.addAttachment(file.getName(), file);
+                    }
+                }
+            }
+
+            // 添加内嵌图片
+            if (MapUtil.isNotEmpty(imageMap)) {
+                for (Map.Entry<String, InputStream> entry : imageMap.entrySet()) {
+                    String cid = entry.getKey();
+                    InputStream inputStream = entry.getValue();
+                    try {
+                        helper.addInline(cid, new InputStreamResource(inputStream), "image/png");
+                    } finally {
+                        IoUtil.close(inputStream);
+                    }
+                }
+            }
+
+            // 发送邮件
+            mailSender.send(message);
+
+            // 返回消息 ID
+            return message.getMessageID();
+        } catch (MessagingException e) {
+            throw new RuntimeException("邮件发送失败", e);
+        }
     }
 
     /**
@@ -747,24 +811,19 @@ public class MailUtils {
      * </ul>
      *
      * @param addresses 邮箱地址字符串，多个地址可使用 "," 或 ";" 分隔，可为空
-     * @return List<String> 解析后的邮箱地址列表，如果输入为空则返回 null
+     * @return List<String> 解析后的邮箱地址列表，如果输入为空则返回空列表
      */
     private static List<String> splitAddress(String addresses) {
-        // 判空，如果是空就直接返回
         if (StrUtil.isBlank(addresses)) {
-            return null;
+            return CollUtil.newArrayList();
         }
 
         List<String> result;
-        // 判断字符串中是否包含逗号或分号
-        if (StrUtil.contains(addresses, CharUtil.COMMA)) {
-            // 如果包含逗号，则使用逗号进行分割
-            result = StrUtil.splitTrim(addresses, CharUtil.COMMA);
-        } else if (StrUtil.contains(addresses, ';')) {
-            // 如果包含分号，则使用分号进行分割
-            result = StrUtil.splitTrim(addresses, ';');
+        if (StrUtil.contains(addresses, CommonConstants.COMMA_SEPARATOR)) {
+            result = StrUtil.splitTrim(addresses, CommonConstants.COMMA_SEPARATOR);
+        } else if (StrUtil.contains(addresses, CommonConstants.DEFAULT_DELIMITER)) {
+            result = StrUtil.splitTrim(addresses, CommonConstants.DEFAULT_DELIMITER);
         } else {
-            // 否则，将字符串放入列表中
             result = CollUtil.newArrayList(addresses);
         }
         return result;

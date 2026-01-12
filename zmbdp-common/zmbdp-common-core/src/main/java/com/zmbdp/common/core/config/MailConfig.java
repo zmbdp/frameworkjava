@@ -1,14 +1,17 @@
 package com.zmbdp.common.core.config;
 
-import cn.hutool.extra.mail.MailAccount;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+import java.util.Properties;
 
 /**
- * 邮件配置，用 Hutool 的 MailAccount<br>
+ * 邮件配置，使用 Spring JavaMailSender<br>
  * 配置项放 nacos 或 yml：<br>
  * mail.from, mail.user, mail.pass, mail.host, mail.port, mail.ssl-enable<br>
  *
@@ -55,19 +58,46 @@ public class MailConfig {
     private Boolean sslEnable;
 
     /**
-     * 注册 Hutool 的 MailAccount Bean
+     * 注册 JavaMailSender Bean
      *
-     * @return MailAccount 邮箱实例 Bean
+     * @return JavaMailSender 邮件发送器实例
+     */
+    @Bean
+    @ConditionalOnProperty(value = "mail.isEnabled", havingValue = "true")
+    public JavaMailSender javaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(user);
+        mailSender.setPassword(pass);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        if (sslEnable != null && sslEnable) {
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.socketFactory.class", "jakarta.net.ssl.SSLSocketFactory");
+            props.put("mail.smtp.socketFactory.port", String.valueOf(port));
+        }
+        props.put("mail.mime.charset", "UTF-8");
+
+        return mailSender;
+    }
+
+    /**
+     * 注册 MailAccount Bean（用于兼容性）
+     *
+     * @return MailAccount 邮箱配置实例
      */
     @Bean
     @ConditionalOnProperty(value = "mail.isEnabled", havingValue = "true")
     public MailAccount mailAccount() {
         MailAccount account = new MailAccount();
-        account.setFrom(from); // 发件人邮箱
-        account.setUser(user); // 登录用户名
-        account.setPass(pass); // 授权码
-        account.setHost(host); // SMTP 服务器地址
-        account.setPort(port); // SMTP 端口
+        account.setFrom(from);
+        account.setUser(user);
+        account.setPass(pass);
+        account.setHost(host);
+        account.setPort(port);
         account.setSslEnable(sslEnable);
         return account;
     }
