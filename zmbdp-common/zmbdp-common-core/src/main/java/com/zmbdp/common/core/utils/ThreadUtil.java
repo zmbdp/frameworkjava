@@ -140,9 +140,8 @@ public class ThreadUtil {
      * @param throwable 异常对象（如果为 null，会尝试从 Future 中获取）
      */
     public static void printException(Runnable runnable, Throwable throwable) {
-        if (throwable == null && runnable instanceof Future<?>) {
+        if (throwable == null && runnable instanceof Future<?> future) {
             try {
-                Future<?> future = (Future<?>) runnable;
                 if (future.isDone()) {
                     future.get();
                 }
