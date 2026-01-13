@@ -30,8 +30,10 @@ FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业�
 - ⚡ **三级缓存**: 布隆过滤器 + Caffeine本地缓存 + Redis分布式缓存
 - 📦 **模块化设计**: 清晰的模块划分，便于扩展和维护
 - 🛠️ **开箱即用**: 预置常见业务模块（用户管理、配置管理、地图服务等）
+- 📊 **Excel处理**: 完整的Excel导入导出功能，支持大数值、单元格合并等
+- 📧 **邮件服务**: 完善的邮件发送功能，支持HTML、附件、内嵌图片等
 - 🐳 **容器化部署**: 完整的Docker Compose部署方案
-- 📊 **监控友好**: 集成Docker容器健康检查和Spring Boot Actuator监控端点
+- 📈 **监控友好**: 集成Docker容器健康检查和Spring Boot Actuator监控端点
 
 ## 技术栈
 
@@ -64,7 +66,11 @@ frameworkjava
 │   │
 │   ├── zmbdp-common-core            # 核心工具类
 │   │   └── src/main/java/com/zmbdp/common/core
+│   │       ├── annotation/
+│   │       │   └── excel/
+│   │       │       └── CellMerge.java           # Excel单元格合并注解
 │   │       ├── config/
+│   │       │   ├── MailConfig.java              # 邮件配置
 │   │       │   ├── MybatisPlusConfig.java       # MyBatis-Plus配置
 │   │       │   ├── RestTemplateConfig.java      # RestTemplate配置
 │   │       │   └── ThreadPoolConfig.java        # 线程池配置
@@ -73,14 +79,27 @@ frameworkjava
 │   │       │   └── entity/BaseDO.java           # 实体基类
 │   │       ├── enums/
 │   │       │   └── RejectType.java              # 拒绝类型枚举
+│   │       ├── excel/
+│   │       │   ├── CellMergeStrategy.java       # Excel单元格合并策略
+│   │       │   ├── DefaultExcelListener.java    # Excel默认导入监听器
+│   │       │   ├── DefaultExcelResult.java      # Excel默认导入结果
+│   │       │   ├── ExcelBigNumberConverter.java # Excel大数值转换器
+│   │       │   ├── ExcelListener.java           # Excel导入监听器接口
+│   │       │   └── ExcelResult.java             # Excel导入结果接口
 │   │       └── utils/
 │   │           ├── AESUtil.java                 # AES加密工具类
 │   │           ├── BeanCopyUtil.java            # Bean拷贝工具类
+│   │           ├── ExcelUtil.java               # Excel工具类
+│   │           ├── FileUtil.java                # 文件工具类
 │   │           ├── JsonUtil.java                # JSON工具类
+│   │           ├── MailUtil.java                # 邮件工具类
 │   │           ├── PageUtil.java                # 分页工具类
 │   │           ├── ServletUtil.java             # Servlet工具类
+│   │           ├── StreamUtil.java              # 流工具类
 │   │           ├── StringUtil.java              # 字符串工具类
+│   │           ├── ThreadUtil.java              # 线程工具类
 │   │           ├── TimestampUtil.java           # 时间戳工具类
+│   │           ├── ValidatorUtil.java           # 校验工具类
 │   │           └── VerifyUtil.java              # 验证工具类
 │   │
 │   ├── zmbdp-common-domain          # 公共领域对象
@@ -274,6 +293,12 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - JsonUtil：全面的JSON处理能力，支持Java 8时间类型
 - CacheUtil：封装完整的三级缓存操作
 - JwtUtil：完整的JWT处理功能
+- ExcelUtil：完整的Excel导入导出功能，支持大数值处理、单元格合并等
+- MailUtil：邮件发送工具类，支持文本/HTML邮件、附件、内嵌图片等
+- StreamUtil：流操作工具类，提供丰富的集合和流处理方法
+- ValidatorUtil：数据校验工具类，基于Jakarta Validation框架
+- ThreadUtil：线程工具类，提供线程休眠、线程池管理等实用方法
+- FileUtil：文件处理工具类，支持文件下载响应头设置、文件名编码等
 
 ### 7. 增强型布隆过滤器
 
@@ -329,19 +354,37 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - 业务异常封装
 - 错误码体系
 
-### 15. 标准化的API设计
+### 15. Excel导入导出功能
+
+- 基于EasyExcel实现的Excel导入导出
+- 支持大数值处理（超过15位自动转换为字符串）
+- 支持单元格合并（基于注解自动合并相同值）
+- 支持数据校验（基于Jakarta Validation）
+- 支持自定义转换器和监听器
+- 提供完整的导入结果反馈机制
+
+### 16. 邮件发送功能
+
+- 基于Hutool Mail + Jakarta Mail的邮件发送
+- 支持文本/HTML格式邮件
+- 支持抄送（CC）、密送（BCC）
+- 支持附件和内嵌图片（cid方式）
+- 支持自定义MailAccount或使用全局配置
+- 线程安全的邮件账号配置
+
+### 17. 标准化的API设计
 
 - Feign远程调用接口
 - RESTful API设计
 - 统一响应格式
 
-### 16. 容器化部署支持
+### 18. 容器化部署支持
 
 - Docker Compose部署方案
 - Nacos配置中心集成
 - 完整的中间件支持（MySQL、Redis、RabbitMQ）
 
-### 17. SDK开发文档
+### 19. SDK开发文档
 
 项目提供完整的SDK开发文档，位于`javapro/javadoc`目录下：
 - 基于JavaDoc生成的完整API文档
@@ -354,7 +397,7 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 2. 使用浏览器直接打开该文件即可浏览完整的SDK文档
 3. 例如：`file:///{项目路径}/javapro/javadoc/index.html`
 
-### 18. API文档和使用手册
+### 20. API文档和使用手册
 
 - **API文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn) (访问密码: zmbdp@123.com)
 - **使用手册**: [https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink](https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink)
@@ -397,6 +440,27 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 // 使用 CacheUtil 工具类
 T result = CacheUtil.getL2Cache(redisService, bloomFilterService, key, valueTypeRef, caffeineCache);
 ```
+
+### Excel导入导出
+```java
+// 导出Excel
+ExcelUtil.exportExcel(response, "用户列表", UserDTO.class, userList, true);
+
+// 导入Excel
+DefaultExcelListener<UserDTO> listener = new DefaultExcelListener<>(true);
+EasyExcel.read(inputStream, UserDTO.class, listener).sheet().doRead();
+ExcelResult<UserDTO> result = listener.getExcelResult();
+```
+
+### 邮件发送
+```java
+// 发送HTML邮件
+MailUtil.sendHtml("user@example.com", "邮件标题", "<h1>邮件内容</h1>");
+
+// 发送带附件的邮件
+MailUtil.send("user@example.com", "标题", "内容", false, new File("附件.pdf"));
+```
+
 ### 扩展功能开发
 
 #### 1. 自定义业务模块扩展

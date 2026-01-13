@@ -22,6 +22,11 @@ public class CommonConstants {
     public final static String DEFAULT_DELIMITER = "; ";
 
     /**
+     * 逗号分隔符
+     */
+    public static final String COMMA_SEPARATOR = ",";
+
+    /**
      * 空字符串
      */
     public final static String EMPTY_STR = "";
@@ -30,4 +35,9 @@ public class CommonConstants {
      * 异步线程池名字
      */
     public final static String ASYNCHRONOUS_THREADS_BEAN_NAME = "threadPoolTaskExecutor";
+
+    /**
+     * 定时任务线程池名字
+     */
+    public final static String SCHEDULED_THREADS_BEAN_NAME = "scheduledExecutorService";
 }
