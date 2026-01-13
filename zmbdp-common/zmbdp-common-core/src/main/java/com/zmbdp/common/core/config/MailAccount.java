@@ -12,6 +12,7 @@ import java.util.Properties;
  */
 @Data
 public class MailAccount {
+
     /**
      * 发件人邮箱地址
      */

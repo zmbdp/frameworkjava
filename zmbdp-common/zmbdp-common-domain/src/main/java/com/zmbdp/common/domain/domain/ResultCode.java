@@ -125,7 +125,6 @@ public enum ResultCode {
      */
     SEND_MSG_FAILED(500002, "短信发送失败"),
 
-
     /**
      * 获取直传地址失败
      */
@@ -160,6 +159,66 @@ public enum ResultCode {
      * 地图区划特性未开启
      */
     MAP_REGION_NOT_ENABLED(500009, "地图区划特性未开启,开启方式参考使用手册"),
+
+    /**
+     * 邮件发送失败
+     */
+    EMAIL_SEND_FAILED(500010, "邮件发送失败"),
+
+    /**
+     * 邮件配置错误
+     */
+    EMAIL_CONFIG_ERROR(500011, "邮件配置错误"),
+
+    /**
+     * 邮件地址格式错误
+     */
+    EMAIL_ADDRESS_ERROR(500012, "邮件地址格式错误"),
+
+    /**
+     * 邮件附件处理失败
+     */
+    EMAIL_ATTACHMENT_FAILED(500013, "邮件附件处理失败"),
+
+    /**
+     * 邮件模板错误
+     */
+    EMAIL_TEMPLATE_ERROR(500014, "邮件模板错误"),
+
+    /**
+     * 邮件收件人为空
+     */
+    EMAIL_RECIPIENT_EMPTY(500015, "邮件收件人为空"),
+
+    /**
+     * Excel 导出失败
+     */
+    EXCEL_EXPORT_FAILED(500016, "Excel 导出失败"),
+
+    /**
+     * Excel 导入失败
+     */
+    EXCEL_IMPORT_FAILED(500017, "Excel 导入失败"),
+
+    /**
+     * Excel 格式错误
+     */
+    EXCEL_FORMAT_ERROR(500018, "Excel 格式错误"),
+
+    /**
+     * Excel 数据验证失败
+     */
+    EXCEL_VALIDATE_FAILED(500019, "Excel 数据验证失败"),
+
+    /**
+     * Excel 文件读取失败
+     */
+    EXCEL_READ_FAILED(500020, "Excel 文件读取失败"),
+
+    /**
+     * Excel 文件写入失败
+     */
+    EXCEL_WRITE_FAILED(500021, "Excel 文件写入失败"),
 
 
     //---------------------枚举占位

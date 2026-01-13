@@ -121,6 +121,12 @@
             <artifactId>easyexcel</artifactId>
         </dependency>
 
+        <!-- xmlbeans (EasyExcel 所需) -->
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+        </dependency>
+
         <!-- Jakarta Validation API -->
         <dependency>
             <groupId>jakarta.validation</groupId>

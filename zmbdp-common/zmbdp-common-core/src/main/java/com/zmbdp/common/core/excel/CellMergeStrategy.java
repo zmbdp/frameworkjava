@@ -9,6 +9,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -205,8 +208,36 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
         if (CollectionUtils.isNotEmpty(cellList)) {
             // the judge is necessary
             if (cell.getRowIndex() == 1 && cell.getColumnIndex() == 0) {
+                // 创建居中样式（在循环外创建，避免重复创建）
+                CellStyle centerStyle = sheet.getWorkbook().createCellStyle();
+                centerStyle.setAlignment(HorizontalAlignment.CENTER);
+                centerStyle.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
+                // 设置自动换行，确保垂直居中效果更好
+                centerStyle.setWrapText(false);
+                
                 for (CellRangeAddress item : cellList) {
                     sheet.addMergedRegion(item);
+                    
+                    // 对合并区域内的所有行和单元格应用居中样式
+                    int firstRow = item.getFirstRow();
+                    int lastRow = item.getLastRow();
+                    int colIndex = item.getFirstColumn();
+                    
+                    // 遍历合并区域内的所有行
+                    for (int rowIndex = firstRow; rowIndex <= lastRow; rowIndex++) {
+                        Row row = sheet.getRow(rowIndex);
+                        if (row != null) {
+                            Cell mergedCell = row.getCell(colIndex);
+                            if (mergedCell != null) {
+                                // 设置合并单元格的样式为居中（水平和垂直都居中）
+                                mergedCell.setCellStyle(centerStyle);
+                            } else {
+                                // 如果单元格不存在，创建一个并设置样式
+                                mergedCell = row.createCell(colIndex);
+                                mergedCell.setCellStyle(centerStyle);
+                            }
+                        }
+                    }
                 }
             }
         }

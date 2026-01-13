@@ -12,6 +12,8 @@ import com.alibaba.excel.write.metadata.fill.FillWrapper;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.zmbdp.common.core.excel.*;
 import com.zmbdp.common.domain.constants.CommonConstants;
+import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -83,7 +85,7 @@ public class ExcelUtil {
      * @param <T>    数据对象泛型
      * @return List&lt;T&gt; 转换后的数据对象列表
      */
-    public static <T> List<T> importExcel(InputStream is, Class<T> clazz) {
+    public static <T> List<T> inputExcel(InputStream is, Class<T> clazz) {
         return EasyExcel.read(is).head(clazz).autoCloseStream(false).sheet().doReadSync();
     }
 
@@ -103,7 +105,7 @@ public class ExcelUtil {
      * @param <T>         数据对象泛型
      * @return ExcelResult&lt;T&gt; Excel 导入结果对象（包含成功数据和错误信息）
      */
-    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, boolean isValidate) {
+    public static <T> ExcelResult<T> inputExcel(InputStream is, Class<T> clazz, boolean isValidate) {
         DefaultExcelListener<T> listener = new DefaultExcelListener<>(isValidate);
         EasyExcel.read(is, clazz, listener).sheet().doRead();
         return listener.getExcelResult();
@@ -125,7 +127,7 @@ public class ExcelUtil {
      * @param <T>       数据对象泛型
      * @return ExcelResult&lt;T&gt; Excel 导入结果对象（由监听器返回）
      */
-    public static <T> ExcelResult<T> importExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
+    public static <T> ExcelResult<T> inputExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
         EasyExcel.read(is, clazz, listener).sheet().doRead();
         return listener.getExcelResult();
     }
@@ -146,13 +148,13 @@ public class ExcelUtil {
      * @param response  HTTP 响应对象
      * @param <T>       数据对象泛型
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
+    public static <T> void outputExcel(List<T> list, String sheetName, Class<T> clazz, HttpServletResponse response) {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, false, os);
+            outputExcel(list, sheetName, clazz, false, os);
         } catch (IOException e) {
-            throw new RuntimeException("导出Excel异常");
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -173,13 +175,13 @@ public class ExcelUtil {
      * @param response  HTTP 响应对象
      * @param <T>       数据对象泛型
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, HttpServletResponse response) {
+    public static <T> void outputExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, HttpServletResponse response) {
         try {
             resetResponse(sheetName, response);
             ServletOutputStream os = response.getOutputStream();
-            exportExcel(list, sheetName, clazz, merge, os);
+            outputExcel(list, sheetName, clazz, merge, os);
         } catch (IOException e) {
-            throw new RuntimeException("导出Excel异常");
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -199,8 +201,8 @@ public class ExcelUtil {
      * @param os        输出流
      * @param <T>       数据对象泛型
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, OutputStream os) {
-        exportExcel(list, sheetName, clazz, false, os);
+    public static <T> void outputExcel(List<T> list, String sheetName, Class<T> clazz, OutputStream os) {
+        outputExcel(list, sheetName, clazz, false, os);
     }
 
     /**
@@ -221,7 +223,7 @@ public class ExcelUtil {
      * @param os        输出流
      * @param <T>       数据对象泛型
      */
-    public static <T> void exportExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, OutputStream os) {
+    public static <T> void outputExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, OutputStream os) {
         ExcelWriterSheetBuilder builder = EasyExcel.write(os, clazz)
                 .autoCloseStream(false)
                 // 自动适配
@@ -260,11 +262,14 @@ public class ExcelUtil {
      */
     public static void exportTemplate(List<Object> data, String filename, String templatePath, HttpServletResponse response) {
         try {
+            // 设置响应头
             resetResponse(filename, response);
+            // 响应流
             ServletOutputStream os = response.getOutputStream();
+            // 模板导出
             exportTemplate(data, templatePath, os);
         } catch (IOException e) {
-            throw new RuntimeException("导出Excel异常");
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -299,7 +304,7 @@ public class ExcelUtil {
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
         if (CollUtil.isEmpty(data)) {
-            throw new IllegalArgumentException("数据为空");
+            throw new ServiceException(ResultCode.INVALID_PARA);
         }
         // 单表多数据导出 模板格式为 {.属性}
         for (Object d : data) {
@@ -342,7 +347,7 @@ public class ExcelUtil {
             ServletOutputStream os = response.getOutputStream();
             exportTemplateMultiList(data, templatePath, os);
         } catch (IOException e) {
-            throw new RuntimeException("导出Excel异常");
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -383,7 +388,7 @@ public class ExcelUtil {
                 .build();
         WriteSheet writeSheet = EasyExcel.writerSheet().build();
         if (CollUtil.isEmpty(data)) {
-            throw new IllegalArgumentException("数据为空");
+            throw new ServiceException(ResultCode.INVALID_PARA);
         }
         for (Map.Entry<String, Object> map : data.entrySet()) {
             // 设置列表后续还有数据

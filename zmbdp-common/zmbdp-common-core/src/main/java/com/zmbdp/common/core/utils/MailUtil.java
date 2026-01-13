@@ -7,13 +7,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.zmbdp.common.core.config.MailAccount;
 import com.zmbdp.common.domain.constants.CommonConstants;
+import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.mail.Authenticator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -313,7 +315,7 @@ public class MailUtil {
             Collection<String> tos, Collection<String> ccs, Collection<String> bccs,
             String subject, String content, boolean isHtml, File... files
     ) {
-        return send(getMailAccount(), true, tos, ccs, bccs, subject, content, null, isHtml, files);
+        return send(getMailAccount(), true, tos, ccs, bccs, subject, content, null, null, isHtml, files);
     }
 
 
@@ -346,6 +348,34 @@ public class MailUtil {
     }
 
     /**
+     * 发送 HTML 邮件（支持内嵌图片，可指定图片格式）
+     *
+     * <p>该方法适用于：</p>
+     * <ul>
+     *     <li>发送 HTML 格式的邮件，正文中包含内嵌图片</li>
+     *     <li>需要手动指定图片的 MIME 类型（如 image/png、image/jpeg 等）</li>
+     *     <li>收件人可以是单个或多个（使用逗号或分号分隔）</li>
+     *     <li>图片通过 cid 方式内嵌到邮件正文中</li>
+     *     <li>需要附带文件附件</li>
+     *     <li>使用 Spring 容器中配置的默认邮件账号</li>
+     * </ul>
+     *
+     * @param to                 收件人邮箱地址，多个收件人可使用 "," 或 ";" 分隔
+     * @param subject            邮件标题
+     * @param content            HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
+     * @param imageMap           内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
+     * @param imageContentTypeMap 图片格式映射，key 为 cid，value 为 MIME 类型（如 "image/png"、"image/jpeg"），如果为 null 或某个 cid 不存在，则自动检测格式
+     * @param files              邮件附件（可选，可传入多个文件）
+     * @return message-id 邮件发送成功后返回的消息 ID
+     */
+    public static String sendHtml(
+            String to, String subject, String content,
+            Map<String, InputStream> imageMap, Map<String, String> imageContentTypeMap, File... files
+    ) {
+        return send(getMailAccount(), true, splitAddress(to), null, null, subject, content, imageMap, imageContentTypeMap, true, files);
+    }
+
+    /**
      * 发送邮件（支持内嵌图片）
      *
      * <p>该方法适用于：</p>
@@ -369,7 +399,7 @@ public class MailUtil {
             String to, String subject, String content,
             Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(splitAddress(to), subject, content, imageMap, isHtml, files);
+        return send(getMailAccount(), true, splitAddress(to), null, null, subject, content, imageMap, null, isHtml, files);
     }
 
     /**
@@ -399,11 +429,11 @@ public class MailUtil {
             String to, String cc, String bcc, String subject, String content,
             Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(splitAddress(to), splitAddress(cc), splitAddress(bcc), subject, content, imageMap, isHtml, files);
+        return send(getMailAccount(), true, splitAddress(to), splitAddress(cc), splitAddress(bcc), subject, content, imageMap, null, isHtml, files);
     }
 
     /**
-     * 发送 HTML 邮件（多收件人 + 内嵌图片）
+     * 发送 HTML 邮件（多收件人 + 内嵌图片，自动检测图片格式）
      *
      * <p>该方法适用于：</p>
      * <ul>
@@ -425,7 +455,35 @@ public class MailUtil {
             Collection<String> tos, String subject, String content,
             Map<String, InputStream> imageMap, File... files
     ) {
-        return send(tos, subject, content, imageMap, true, files);
+        return send(getMailAccount(), true, tos, null, null, subject, content, imageMap, null, true, files);
+    }
+
+    /**
+     * 发送 HTML 邮件（多收件人 + 内嵌图片，手动指定图片格式）
+     *
+     * <p>该方法适用于：</p>
+     * <ul>
+     *     <li>发送 HTML 格式的邮件，正文中包含内嵌图片</li>
+     *     <li>需要手动指定图片的 MIME 类型（如 image/png、image/jpeg 等）</li>
+     *     <li>收件人已经以集合形式准备好</li>
+     *     <li>图片通过 cid 方式内嵌到邮件正文中</li>
+     *     <li>需要附带文件附件</li>
+     *     <li>使用 Spring 容器中配置的默认邮件账号</li>
+     * </ul>
+     *
+     * @param tos                收件人邮箱地址集合
+     * @param subject           邮件标题
+     * @param content           HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
+     * @param imageMap          内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
+     * @param imageContentTypeMap 图片格式映射，key 为 cid，value 为 MIME 类型（如 "image/png"、"image/jpeg"），如果为 null 或某个 cid 不存在，则自动检测格式
+     * @param files             邮件附件（可选，可传入多个文件）
+     * @return message-id 邮件发送成功后返回的消息 ID
+     */
+    public static String sendHtml(
+            Collection<String> tos, String subject, String content,
+            Map<String, InputStream> imageMap, Map<String, String> imageContentTypeMap, File... files
+    ) {
+        return send(getMailAccount(), true, tos, null, null, subject, content, imageMap, imageContentTypeMap, true, files);
     }
 
     /**
@@ -453,7 +511,7 @@ public class MailUtil {
             Collection<String> tos, String subject, String content,
             Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(tos, null, null, subject, content, imageMap, isHtml, files);
+        return send(getMailAccount(), true, tos, null, null, subject, content, imageMap, null, isHtml, files);
     }
 
     /**
@@ -483,7 +541,7 @@ public class MailUtil {
             Collection<String> tos, Collection<String> ccs, Collection<String> bccs, String subject,
             String content, Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(getMailAccount(), true, tos, ccs, bccs, subject, content, imageMap, isHtml, files);
+        return send(getMailAccount(), true, tos, ccs, bccs, subject, content, imageMap, null, isHtml, files);
     }
 
     /* ========================= 传入自定义 MailAccount 的方法 ========================= */
@@ -567,7 +625,7 @@ public class MailUtil {
             MailAccount mailAccount, Collection<String> tos, Collection<String> ccs,
             Collection<String> bccs, String subject, String content, boolean isHtml, File... files
     ) {
-        return send(mailAccount, false, tos, ccs, bccs, subject, content, null, isHtml, files);
+        return send(mailAccount, false, tos, ccs, bccs, subject, content, null, null, isHtml, files);
     }
 
     /**
@@ -595,7 +653,7 @@ public class MailUtil {
             MailAccount mailAccount, String to, String subject, String content,
             Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(mailAccount, splitAddress(to), subject, content, imageMap, isHtml, files);
+        return send(mailAccount, false, splitAddress(to), null, null, subject, content, imageMap, null, isHtml, files);
     }
 
     /**
@@ -624,7 +682,7 @@ public class MailUtil {
             MailAccount mailAccount, Collection<String> tos, String subject, String content,
             Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(mailAccount, tos, null, null, subject, content, imageMap, isHtml, files);
+        return send(mailAccount, false, tos, null, null, subject, content, imageMap, null, isHtml, files);
     }
 
     /**
@@ -655,7 +713,7 @@ public class MailUtil {
             MailAccount mailAccount, Collection<String> tos, Collection<String> ccs, Collection<String> bccs,
             String subject, String content, Map<String, InputStream> imageMap, boolean isHtml, File... files
     ) {
-        return send(mailAccount, false, tos, ccs, bccs, subject, content, imageMap, isHtml, files);
+        return send(mailAccount, false, tos, ccs, bccs, subject, content, imageMap, null, isHtml, files);
     }
 
 
@@ -724,7 +782,8 @@ public class MailUtil {
     private static String send(
             MailAccount mailAccount, boolean useGlobalSession, Collection<String> tos,
             Collection<String> ccs, Collection<String> bccs, String subject,
-            String content, Map<String, InputStream> imageMap, boolean isHtml, File... files
+            String content, Map<String, InputStream> imageMap, Map<String, String> imageContentTypeMap,
+            boolean isHtml, File... files
     ) {
         // 检查收件人列表是否为空
         if (CollUtil.isEmpty(tos)) {
@@ -782,7 +841,16 @@ public class MailUtil {
                     String cid = entry.getKey();
                     InputStream inputStream = entry.getValue();
                     try {
-                        helper.addInline(cid, new InputStreamResource(inputStream), "image/png");
+                        // 将 InputStream 读取为字节数组，使用 ByteArrayResource 支持多次读取
+                        byte[] imageBytes = IoUtil.readBytes(inputStream);
+                        // 如果指定了格式，使用指定的格式；否则自动检测
+                        String contentType;
+                        if (imageContentTypeMap != null && imageContentTypeMap.containsKey(cid)) {
+                            contentType = imageContentTypeMap.get(cid);
+                        } else {
+                            contentType = detectImageContentType(imageBytes);
+                        }
+                        helper.addInline(cid, new ByteArrayResource(imageBytes), contentType);
                     } finally {
                         IoUtil.close(inputStream);
                     }
@@ -795,8 +863,82 @@ public class MailUtil {
             // 返回消息 ID
             return message.getMessageID();
         } catch (MessagingException e) {
-            throw new RuntimeException("邮件发送失败", e);
+            throw new ServiceException(ResultCode.EMAIL_SEND_FAILED);
         }
+    }
+
+    /**
+     * 检测图片格式（通过文件头 Magic Number）
+     *
+     * <p>该方法适用于：</p>
+     * <ul>
+     *     <li>通过读取图片文件的文件头（Magic Number）自动检测图片格式</li>
+     *     <li>支持 PNG、JPEG、GIF、WebP、BMP 等常见图片格式</li>
+     *     <li>如果无法识别格式，默认返回 image/png</li>
+     * </ul>
+     *
+     * @param imageBytes 图片字节数组
+     * @return String 图片的 MIME 类型（如 image/png、image/jpeg 等）
+     */
+    private static String detectImageContentType(byte[] imageBytes) {
+        if (imageBytes == null || imageBytes.length < 4) {
+            return "image/png"; // 默认返回 PNG
+        }
+
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (imageBytes.length >= 8
+                && imageBytes[0] == (byte) 0x89
+                && imageBytes[1] == 0x50
+                && imageBytes[2] == 0x4E
+                && imageBytes[3] == 0x47
+                && imageBytes[4] == 0x0D
+                && imageBytes[5] == 0x0A
+                && imageBytes[6] == 0x1A
+                && imageBytes[7] == 0x0A) {
+            return "image/png";
+        }
+
+        // JPEG: FF D8 FF
+        if (imageBytes.length >= 3
+                && imageBytes[0] == (byte) 0xFF
+                && imageBytes[1] == (byte) 0xD8
+                && imageBytes[2] == (byte) 0xFF) {
+            return "image/jpeg";
+        }
+
+        // GIF: 47 49 46 38 (GIF8)
+        if (imageBytes.length >= 6
+                && imageBytes[0] == 0x47
+                && imageBytes[1] == 0x49
+                && imageBytes[2] == 0x46
+                && imageBytes[3] == 0x38
+                && (imageBytes[4] == 0x37 || imageBytes[4] == 0x39) // 7 or 9
+                && imageBytes[5] == 0x61) { // a
+            return "image/gif";
+        }
+
+        // WebP: 52 49 46 46 ... 57 45 42 50 (RIFF...WEBP)
+        if (imageBytes.length >= 12
+                && imageBytes[0] == 0x52
+                && imageBytes[1] == 0x49
+                && imageBytes[2] == 0x46
+                && imageBytes[3] == 0x46
+                && imageBytes[8] == 0x57
+                && imageBytes[9] == 0x45
+                && imageBytes[10] == 0x42
+                && imageBytes[11] == 0x50) {
+            return "image/webp";
+        }
+
+        // BMP: 42 4D (BM)
+        if (imageBytes.length >= 2
+                && imageBytes[0] == 0x42
+                && imageBytes[1] == 0x4D) {
+            return "image/bmp";
+        }
+
+        // 默认返回 PNG
+        return "image/png";
     }
 
     /**

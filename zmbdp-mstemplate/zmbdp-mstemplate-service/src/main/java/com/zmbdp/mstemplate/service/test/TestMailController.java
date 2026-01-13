@@ -6,9 +6,11 @@ import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.InputStream;
@@ -258,49 +260,136 @@ public class TestMailController {
     }
 
     /**
-     * 测试8：发送HTML邮件（带内嵌图片）
+     * 测试8：发送HTML邮件（带内嵌图片 - 自动检测格式）
      */
-    @GetMapping("/send/html/image")
-    public Result<String> sendHtmlWithImage(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
-        log.info("========== 开始测试：发送HTML邮件（带内嵌图片） ==========");
+    @PostMapping(value = "/send/html/image", consumes = "multipart/form-data")
+    public Result<String> sendHtmlWithImage(
+            @RequestParam(value = "to", required = false) String to,
+            @RequestParam("image") MultipartFile imageFile) {
+        log.info("========== 开始测试：发送HTML邮件（带内嵌图片 - 自动检测格式） ==========");
+        // 如果没有传 to 参数，使用默认值
+        if (to == null || to.isEmpty()) {
+            to = "test@example.com";
+        }
         log.info("收件人：{}", to);
+        log.info("上传图片：{}，大小：{} 字节", imageFile.getOriginalFilename(), imageFile.getSize());
 
         try {
-            String subject = "测试邮件 - HTML格式（带内嵌图片）";
+            // 验证文件
+            if (imageFile.isEmpty()) {
+                log.warn("⚠️ 图片文件为空");
+                return Result.fail(ResultCode.FAILED.getCode(), "图片文件不能为空");
+            }
+
+            String subject = "测试邮件 - HTML格式（带内嵌图片 - 自动检测格式）";
             String content = "<html><body>"
                     + "<h1>这是一封HTML格式的测试邮件（带内嵌图片）</h1>"
                     + "<p>测试内容：</p>"
                     + "<ul>"
                     + "<li>HTML格式邮件</li>"
                     + "<li>内嵌图片功能（cid方式）</li>"
+                    + "<li>自动检测图片格式</li>"
                     + "<li>基本功能测试</li>"
                     + "</ul>"
-                    + "<p>内嵌图片：<img src='cid:testImage' alt='测试图片' /></p>"
+                    + "<p>内嵌图片：<img src='cid:testImage' alt='测试图片' style='max-width: 500px;' /></p>"
                     + "</body></html>";
 
-            // 创建测试图片数据（简单的文本作为图片数据用于测试）
+            // 将上传的文件转换为 InputStream
             Map<String, InputStream> imageMap = new HashMap<>();
-            // 这里使用一个简单的字节数组作为测试图片
-            byte[] imageBytes = "测试图片数据".getBytes(StandardCharsets.UTF_8);
-            imageMap.put("testImage", new java.io.ByteArrayInputStream(imageBytes));
+            imageMap.put("testImage", imageFile.getInputStream());
 
             log.info("邮件标题：{}", subject);
             log.info("内嵌图片数量：{}", imageMap.size());
+            log.info("图片文件名：{}", imageFile.getOriginalFilename());
+            log.info("图片大小：{} 字节", imageFile.getSize());
+            log.info("图片格式：自动检测（未指定格式参数）");
 
             String messageId = MailUtil.sendHtml(to, subject, content, imageMap);
 
-            log.info("✅ 邮件发送成功（带内嵌图片），Message-ID: {}", messageId);
-            log.info("========== 测试完成：发送HTML邮件（带内嵌图片） ==========");
-            return Result.success("邮件发送成功（带内嵌图片），Message-ID: " + messageId);
+            log.info("✅ 邮件发送成功（带内嵌图片 - 自动检测格式），Message-ID: {}", messageId);
+            log.info("========== 测试完成：发送HTML邮件（带内嵌图片 - 自动检测格式） ==========");
+            return Result.success("邮件发送成功（带内嵌图片 - 自动检测格式），Message-ID: " + messageId);
         } catch (Exception e) {
             log.error("❌ 邮件发送失败", e);
-            log.info("========== 测试失败：发送HTML邮件（带内嵌图片） ==========");
+            log.info("========== 测试失败：发送HTML邮件（带内嵌图片 - 自动检测格式） ==========");
             return Result.fail(ResultCode.FAILED.getCode(), "邮件发送失败：" + e.getMessage());
         }
     }
 
     /**
-     * 测试9：发送邮件（使用自定义MailAccount）
+     * 测试9：发送HTML邮件（带内嵌图片 - 手动指定格式）
+     */
+    @PostMapping(value = "/send/html/image/manual", consumes = "multipart/form-data")
+    public Result<String> sendHtmlWithImageManual(
+            @RequestParam(value = "to", required = false) String to,
+            @RequestParam("logo") MultipartFile logoFile,
+            @RequestParam("photo") MultipartFile photoFile) {
+        log.info("========== 开始测试：发送HTML邮件（带内嵌图片 - 手动指定格式） ==========");
+        // 如果没有传 to 参数，使用默认值
+        if (to == null || to.isEmpty()) {
+            to = "test@example.com";
+        }
+        log.info("收件人：{}", to);
+        log.info("上传Logo：{}，大小：{} 字节", logoFile.getOriginalFilename(), logoFile.getSize());
+        log.info("上传Photo：{}，大小：{} 字节", photoFile.getOriginalFilename(), photoFile.getSize());
+
+        try {
+            // 验证文件
+            if (logoFile.isEmpty()) {
+                log.warn("⚠️ Logo文件为空");
+                return Result.fail(ResultCode.FAILED.getCode(), "Logo文件不能为空");
+            }
+            if (photoFile.isEmpty()) {
+                log.warn("⚠️ Photo文件为空");
+                return Result.fail(ResultCode.FAILED.getCode(), "Photo文件不能为空");
+            }
+
+            String subject = "测试邮件 - HTML格式（带内嵌图片 - 手动指定格式）";
+            String content = "<html><body>"
+                    + "<h1>这是一封HTML格式的测试邮件（带内嵌图片）</h1>"
+                    + "<p>测试内容：</p>"
+                    + "<ul>"
+                    + "<li>HTML格式邮件</li>"
+                    + "<li>内嵌图片功能（cid方式）</li>"
+                    + "<li>手动指定图片格式</li>"
+                    + "<li>基本功能测试</li>"
+                    + "</ul>"
+                    + "<p>内嵌图片1（Logo）：<img src='cid:logo' alt='Logo' style='max-width: 500px;' /></p>"
+                    + "<p>内嵌图片2（Photo）：<img src='cid:photo' alt='Photo' style='max-width: 500px;' /></p>"
+                    + "</body></html>";
+
+            // 将上传的文件转换为 InputStream
+            Map<String, InputStream> imageMap = new HashMap<>();
+            imageMap.put("logo", logoFile.getInputStream());
+            imageMap.put("photo", photoFile.getInputStream());
+
+            // 手动指定图片格式
+            Map<String, String> imageContentTypeMap = new HashMap<>();
+            imageContentTypeMap.put("logo", "image/png");
+            imageContentTypeMap.put("photo", "image/jpeg");
+
+            log.info("邮件标题：{}", subject);
+            log.info("内嵌图片数量：{}", imageMap.size());
+            log.info("Logo文件名：{}，大小：{} 字节", logoFile.getOriginalFilename(), logoFile.getSize());
+            log.info("Photo文件名：{}，大小：{} 字节", photoFile.getOriginalFilename(), photoFile.getSize());
+            log.info("图片格式：手动指定");
+            log.info("Logo格式：{}", imageContentTypeMap.get("logo"));
+            log.info("Photo格式：{}", imageContentTypeMap.get("photo"));
+
+            String messageId = MailUtil.sendHtml(to, subject, content, imageMap, imageContentTypeMap);
+
+            log.info("✅ 邮件发送成功（带内嵌图片 - 手动指定格式），Message-ID: {}", messageId);
+            log.info("========== 测试完成：发送HTML邮件（带内嵌图片 - 手动指定格式） ==========");
+            return Result.success("邮件发送成功（带内嵌图片 - 手动指定格式），Message-ID: " + messageId);
+        } catch (Exception e) {
+            log.error("❌ 邮件发送失败", e);
+            log.info("========== 测试失败：发送HTML邮件（带内嵌图片 - 手动指定格式） ==========");
+            return Result.fail(ResultCode.FAILED.getCode(), "邮件发送失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 测试10：发送邮件（使用自定义MailAccount）
      */
     @GetMapping("/send/custom")
     public Result<String> sendWithCustomAccount(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -326,7 +415,7 @@ public class TestMailController {
             log.info("邮件标题：{}", subject);
 
             Collection<String> tos = Arrays.asList(to);
-            String messageId = MailUtil.send(customAccount, tos, subject, content, false, (File[]) null);
+            String messageId = MailUtil.send(customAccount, tos, subject, content, false);
 
             log.info("✅ 邮件发送成功（自定义MailAccount），Message-ID: {}", messageId);
             log.info("========== 测试完成：发送邮件（使用自定义MailAccount） ==========");
@@ -339,7 +428,7 @@ public class TestMailController {
     }
 
     /**
-     * 测试10：发送邮件（错误情况 - 空收件人）
+     * 测试11：发送邮件（错误情况 - 空收件人）
      */
     @GetMapping("/send/error/empty")
     public Result<String> sendWithEmptyTo() {
@@ -365,7 +454,7 @@ public class TestMailController {
     }
 
     /**
-     * 测试11：发送邮件（错误情况 - 无效邮箱地址）
+     * 测试12：发送邮件（错误情况 - 无效邮箱地址）
      */
     @GetMapping("/send/error/invalid")
     public Result<String> sendWithInvalidEmail(@RequestParam(required = false, defaultValue = "invalid-email") String to) {
@@ -391,7 +480,7 @@ public class TestMailController {
     }
 
     /**
-     * 测试12：获取默认MailAccount
+     * 测试13：获取默认MailAccount
      */
     @GetMapping("/account/default")
     public Result<String> getDefaultAccount() {
@@ -417,7 +506,7 @@ public class TestMailController {
     }
 
     /**
-     * 测试13：获取自定义MailAccount（线程安全测试）
+     * 测试14：获取自定义MailAccount（线程安全测试）
      */
     @GetMapping("/account/custom")
     public Result<String> getCustomAccount(

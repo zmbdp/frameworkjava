@@ -18,7 +18,7 @@ import com.alibaba.excel.read.listener.ReadListener;
  * <ol>
  *     <li>实现该接口创建自定义监听器</li>
  *     <li>或使用 {@link DefaultExcelListener} 默认实现</li>
- *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#importExcel} 方法中使用</li>
+ *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#inputExcel} 方法中使用</li>
  * </ol>
  *
  * <p>

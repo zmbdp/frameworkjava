@@ -32,7 +32,7 @@ import java.util.Set;
  * 使用方式：
  * <ol>
  *     <li>创建 {@link DefaultExcelListener} 实例，传入是否校验参数</li>
- *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#importExcel} 方法中使用</li>
+ *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#inputExcel} 方法中使用</li>
  *     <li>通过 {@link #getExcelResult()} 获取导入结果</li>
  * </ol>
  *

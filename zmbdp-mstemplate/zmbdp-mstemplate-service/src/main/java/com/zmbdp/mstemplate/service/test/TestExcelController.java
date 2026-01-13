@@ -7,6 +7,7 @@ import com.zmbdp.common.core.excel.ExcelResult;
 import com.zmbdp.common.core.utils.ExcelUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,7 +60,7 @@ public class TestExcelController {
      * 测试1：导出Excel（正常情况 - 不合并单元格）
      */
     @GetMapping("/export/normal")
-    public Result<String> exportNormal(HttpServletResponse response) {
+    public void exportNormal(HttpServletResponse response) {
         log.info("========== 开始测试：导出Excel（正常情况 - 不合并单元格） ==========");
         try {
             // 准备测试数据
@@ -69,14 +71,13 @@ public class TestExcelController {
             log.info("准备导出数据，共{}条", list.size());
 
             // 导出Excel
-            ExcelUtil.exportExcel(list, "用户列表", ExcelTestDTO.class, false, response);
+            ExcelUtil.outputExcel(list, "用户列表", ExcelTestDTO.class, false, response);
             log.info("✅ 导出成功，文件名：用户列表.xlsx");
             log.info("========== 测试完成：导出Excel（正常情况） ==========");
-            return Result.success("导出成功，请查看下载的文件");
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel（正常情况） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -84,7 +85,7 @@ public class TestExcelController {
      * 测试2：导出Excel（合并单元格）
      */
     @GetMapping("/export/merge")
-    public Result<String> exportMerge(HttpServletResponse response) {
+    public void exportMerge(HttpServletResponse response) {
         log.info("========== 开始测试：导出Excel（合并单元格） ==========");
         try {
             // 准备测试数据（部门有重复值，用于测试合并）
@@ -96,14 +97,13 @@ public class TestExcelController {
             log.info("准备导出数据，共{}条，部门字段有重复值用于测试合并", list.size());
 
             // 导出Excel（启用合并）
-            ExcelUtil.exportExcel(list, "用户列表（合并）", ExcelTestDTO.class, true, response);
+            ExcelUtil.outputExcel(list, "用户列表（合并）", ExcelTestDTO.class, true, response);
             log.info("✅ 导出成功（启用合并），文件名：用户列表（合并）.xlsx");
             log.info("========== 测试完成：导出Excel（合并单元格） ==========");
-            return Result.success("导出成功（启用合并），请查看下载的文件");
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel（合并单元格） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -111,7 +111,7 @@ public class TestExcelController {
      * 测试3：导出Excel（大数值测试 - 超过15位）
      */
     @GetMapping("/export/bigNumber")
-    public Result<String> exportBigNumber(HttpServletResponse response) {
+    public void exportBigNumber(HttpServletResponse response) {
         log.info("========== 开始测试：导出Excel（大数值测试） ==========");
         try {
             // 准备测试数据（包含超过15位的大数值）
@@ -122,14 +122,13 @@ public class TestExcelController {
             log.info("准备导出数据，包含超过15位的大数值，测试精度处理");
 
             // 导出Excel
-            ExcelUtil.exportExcel(list, "大数值测试", ExcelTestDTO.class, false, response);
+            ExcelUtil.outputExcel(list, "大数值测试", ExcelTestDTO.class, false, response);
             log.info("✅ 导出成功（大数值），文件名：大数值测试.xlsx");
             log.info("========== 测试完成：导出Excel（大数值测试） ==========");
-            return Result.success("导出成功（大数值），请查看下载的文件，大数值应自动转换为字符串");
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel（大数值测试） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -137,7 +136,7 @@ public class TestExcelController {
      * 测试4：导出Excel（空列表）
      */
     @GetMapping("/export/empty")
-    public Result<String> exportEmpty(HttpServletResponse response) {
+    public void exportEmpty(HttpServletResponse response) {
         log.info("========== 开始测试：导出Excel（空列表） ==========");
         try {
             // 准备空数据
@@ -145,14 +144,13 @@ public class TestExcelController {
             log.info("准备导出空列表数据");
 
             // 导出Excel
-            ExcelUtil.exportExcel(list, "空列表", ExcelTestDTO.class, false, response);
+            ExcelUtil.outputExcel(list, "空列表", ExcelTestDTO.class, false, response);
             log.info("✅ 导出成功（空列表），应只有表头");
             log.info("========== 测试完成：导出Excel（空列表） ==========");
-            return Result.success("导出成功（空列表），应只有表头");
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel（空列表） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 
@@ -171,7 +169,7 @@ public class TestExcelController {
 
             // 导出到输出流
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ExcelUtil.exportExcel(list, "用户列表", ExcelTestDTO.class, false, os);
+            ExcelUtil.outputExcel(list, "用户列表", ExcelTestDTO.class, false, os);
             byte[] bytes = os.toByteArray();
             log.info("✅ 导出到输出流成功，数据大小：{} 字节", bytes.length);
             log.info("========== 测试完成：导出Excel到输出流 ==========");
@@ -179,21 +177,21 @@ public class TestExcelController {
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel到输出流 ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            return Result.fail(ResultCode.EXCEL_EXPORT_FAILED.getCode(), ResultCode.EXCEL_EXPORT_FAILED.getErrMsg());
         }
     }
 
     /**
      * 测试6：导入Excel（正常情况 - 不校验）
      */
-    @PostMapping("/import/normal")
+    @PostMapping(value = "/import/normal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> importNormal(@RequestParam("file") MultipartFile file) {
         log.info("========== 开始测试：导入Excel（正常情况 - 不校验） ==========");
         try {
             log.info("接收文件：{}，大小：{} 字节", file.getOriginalFilename(), file.getSize());
 
             // 导入Excel（不校验）
-            ExcelResult<ExcelTestDTO> result = ExcelUtil.importExcel(
+            ExcelResult<ExcelTestDTO> result = ExcelUtil.inputExcel(
                     file.getInputStream(), ExcelTestDTO.class, false);
 
             List<ExcelTestDTO> list = result.getList();
@@ -210,21 +208,21 @@ public class TestExcelController {
         } catch (Exception e) {
             log.error("❌ 导入失败", e);
             log.info("========== 测试失败：导入Excel（正常情况） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导入失败：" + e.getMessage());
+            return Result.fail(ResultCode.EXCEL_IMPORT_FAILED.getCode(), ResultCode.EXCEL_IMPORT_FAILED.getErrMsg());
         }
     }
 
     /**
      * 测试7：导入Excel（启用校验）
      */
-    @PostMapping("/import/validate")
+    @PostMapping(value = "/import/validate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> importValidate(@RequestParam("file") MultipartFile file) {
         log.info("========== 开始测试：导入Excel（启用校验） ==========");
         try {
             log.info("接收文件：{}，大小：{} 字节", file.getOriginalFilename(), file.getSize());
 
             // 导入Excel（启用校验）
-            ExcelResult<ExcelTestDTO> result = ExcelUtil.importExcel(
+            ExcelResult<ExcelTestDTO> result = ExcelUtil.inputExcel(
                     file.getInputStream(), ExcelTestDTO.class, true);
 
             List<ExcelTestDTO> list = result.getList();
@@ -241,14 +239,14 @@ public class TestExcelController {
         } catch (Exception e) {
             log.error("❌ 导入失败", e);
             log.info("========== 测试失败：导入Excel（启用校验） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导入失败：" + e.getMessage());
+            return Result.fail(ResultCode.EXCEL_IMPORT_FAILED.getCode(), e.getMessage());
         }
     }
 
     /**
      * 测试8：导入Excel（使用自定义监听器）
      */
-    @PostMapping("/import/custom")
+    @PostMapping(value = "/import/custom", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> importCustom(@RequestParam("file") MultipartFile file) {
         log.info("========== 开始测试：导入Excel（使用自定义监听器） ==========");
         try {
@@ -258,7 +256,7 @@ public class TestExcelController {
             DefaultExcelListener<ExcelTestDTO> listener = new DefaultExcelListener<>(true);
 
             // 导入Excel（使用自定义监听器）
-            ExcelResult<ExcelTestDTO> result = ExcelUtil.importExcel(
+            ExcelResult<ExcelTestDTO> result = ExcelUtil.inputExcel(
                     file.getInputStream(), ExcelTestDTO.class, listener);
 
             List<ExcelTestDTO> list = result.getList();
@@ -275,14 +273,14 @@ public class TestExcelController {
         } catch (Exception e) {
             log.error("❌ 导入失败", e);
             log.info("========== 测试失败：导入Excel（自定义监听器） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导入失败：" + e.getMessage());
+            return Result.fail(ResultCode.EXCEL_IMPORT_FAILED.getCode(), ResultCode.EXCEL_IMPORT_FAILED.getErrMsg());
         }
     }
 
     /**
      * 测试9：导入Excel（错误情况 - 空文件）
      */
-    @PostMapping("/import/empty")
+    @PostMapping(value = "/import/empty", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> importEmpty(@RequestParam("file") MultipartFile file) {
         log.info("========== 开始测试：导入Excel（错误情况 - 空文件） ==========");
         try {
@@ -291,11 +289,11 @@ public class TestExcelController {
             if (file.isEmpty()) {
                 log.warn("⚠️ 文件为空");
                 log.info("========== 测试完成：导入Excel（空文件） ==========");
-                return Result.fail(ResultCode.FAILED.getCode(), "文件为空");
+                return Result.fail(ResultCode.EXCEL_READ_FAILED.getCode(), ResultCode.EXCEL_READ_FAILED.getErrMsg());
             }
 
             // 导入Excel
-            ExcelResult<ExcelTestDTO> result = ExcelUtil.importExcel(
+            ExcelResult<ExcelTestDTO> result = ExcelUtil.inputExcel(
                     file.getInputStream(), ExcelTestDTO.class, false);
 
             List<ExcelTestDTO> list = result.getList();
@@ -308,7 +306,7 @@ public class TestExcelController {
         } catch (Exception e) {
             log.error("❌ 导入失败（预期行为）", e);
             log.info("========== 测试完成：导入Excel（空文件 - 预期失败） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导入失败（预期行为）：" + e.getMessage());
+            return Result.fail(ResultCode.EXCEL_IMPORT_FAILED.getCode(), ResultCode.EXCEL_IMPORT_FAILED.getErrMsg());
         }
     }
 
@@ -316,7 +314,7 @@ public class TestExcelController {
      * 测试10：导出Excel（null数据测试）
      */
     @GetMapping("/export/null")
-    public Result<String> exportNull(HttpServletResponse response) {
+    public void exportNull(HttpServletResponse response) {
         log.info("========== 开始测试：导出Excel（null数据测试） ==========");
         try {
             // 准备包含null的数据
@@ -326,14 +324,13 @@ public class TestExcelController {
             log.info("准备导出数据，包含null值");
 
             // 导出Excel
-            ExcelUtil.exportExcel(list, "null测试", ExcelTestDTO.class, false, response);
+            ExcelUtil.outputExcel(list, "null测试", ExcelTestDTO.class, false, response);
             log.info("✅ 导出成功（包含null值），文件名：null测试.xlsx");
             log.info("========== 测试完成：导出Excel（null数据测试） ==========");
-            return Result.success("导出成功（包含null值），请查看下载的文件");
         } catch (Exception e) {
             log.error("❌ 导出失败", e);
             log.info("========== 测试失败：导出Excel（null数据测试） ==========");
-            return Result.fail(ResultCode.FAILED.getCode(), "导出失败：" + e.getMessage());
+            throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
     }
 }
