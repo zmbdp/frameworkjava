@@ -34,29 +34,6 @@ import java.util.List;
 public class TestExcelController {
 
     /**
-     * Excel 测试 DTO（用于导入导出测试）
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ExcelTestDTO {
-        @ExcelProperty("姓名")
-        @NotBlank(message = "姓名不能为空")
-        private String name;
-
-        @ExcelProperty("年龄")
-        @NotNull(message = "年龄不能为空")
-        private Integer age;
-
-        @ExcelProperty("部门")
-        @CellMerge  // 测试单元格合并
-        private String department;
-
-        @ExcelProperty("大数值ID")
-        private Long bigNumber;  // 测试大数值处理
-    }
-
-    /**
      * 测试1：导出Excel（正常情况 - 不合并单元格）
      */
     @GetMapping("/export/normal")
@@ -332,5 +309,28 @@ public class TestExcelController {
             log.info("========== 测试失败：导出Excel（null数据测试） ==========");
             throw new ServiceException(ResultCode.EXCEL_EXPORT_FAILED);
         }
+    }
+
+    /**
+     * Excel 测试 DTO（用于导入导出测试）
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ExcelTestDTO {
+        @ExcelProperty("姓名")
+        @NotBlank(message = "姓名不能为空")
+        private String name;
+
+        @ExcelProperty("年龄")
+        @NotNull(message = "年龄不能为空")
+        private Integer age;
+
+        @ExcelProperty("部门")
+        @CellMerge  // 测试单元格合并
+        private String department;
+
+        @ExcelProperty("大数值ID")
+        private Long bigNumber;  // 测试大数值处理
     }
 }

@@ -1,9 +1,9 @@
 package com.zmbdp.common.core.utils;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -57,8 +57,8 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
      *     <li>设置 Content-Disposition 头信息</li>
      * </ul>
      *
-     * @param response      HTTP 响应对象
-     * @param realFileName  真实文件名（包含中文）
+     * @param response     HTTP 响应对象
+     * @param realFileName 真实文件名（包含中文）
      * @throws UnsupportedEncodingException 编码异常
      */
     public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) throws UnsupportedEncodingException {
