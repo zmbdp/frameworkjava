@@ -1,6 +1,8 @@
 package com.zmbdp.common.core.utils;
 
-import java.util.Random;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author 稚名不带撇
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
 public class VerifyUtil {
 
     /**

@@ -3,6 +3,8 @@ package com.zmbdp.common.core.utils;
 import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.domain.Result;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import java.util.Objects;
  *
  * @author 稚名不带撇
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
 public class ServletUtil {
 
     /**

@@ -22,6 +22,11 @@ public class CommonConstants {
     public final static String DEFAULT_DELIMITER = "; ";
 
     /**
+     * 逗号分隔符
+     */
+    public static final String COMMA_SEPARATOR = ",";
+
+    /**
      * 空字符串
      */
     public final static String EMPTY_STR = "";

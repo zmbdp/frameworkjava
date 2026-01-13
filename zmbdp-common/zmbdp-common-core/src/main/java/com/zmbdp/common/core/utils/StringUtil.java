@@ -1,5 +1,7 @@
 package com.zmbdp.common.core.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.AntPathMatcher;
@@ -11,12 +13,13 @@ import java.util.List;
  *
  * @author 稚名不带撇
  */
-public class StringUtil extends StringUtils{
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
+public class StringUtil extends StringUtils {
 
     /**
      * 判断指定字符串是否与指定匹配规则链表中的任意一个匹配规则匹配
      *
-     * @param str 指定字符串
+     * @param str         指定字符串
      * @param patternList 匹配规则链表
      * @return 是否匹配
      */
@@ -38,13 +41,15 @@ public class StringUtil extends StringUtils{
     /**
      * 判断 url 是否与规则匹配<p>
      * 匹配规则：<p>
-     * 精确匹配<p>
-     * 匹配规则中包含 ? 表示任意单个字符;<p>
-     * 匹配规则中包含 * 表示一层路径内的任意字符串，不可跨层级;<p>
+     * <pre>
+     * 精确匹配
+     * 匹配规则中包含 ? 表示任意单个字符;
+     * 匹配规则中包含 * 表示一层路径内的任意字符串，不可跨层级;
      * 匹配规则中包含 ** 表示任意层路径的任意字符，可跨层级
+     * </pre>
      *
      * @param pattern 匹配规则
-     * @param url 需要匹配的 url
+     * @param url     需要匹配的 url
      * @return 是否匹配
      */
     public static boolean isMatch(String pattern, String url) {

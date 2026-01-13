@@ -10,6 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.zmbdp.common.domain.constants.CommonConstants;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +26,7 @@ import java.util.Map;
  * @author 稚名不带撇
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE) // 生成无参私有的构造方法，避免外部通过 new 创建对象
 public class JsonUtil {
 
     /**
@@ -74,7 +77,7 @@ public class JsonUtil {
      * 对象转 json
      *
      * @param clazz 需要转成 json 的对象
-     * @param <T>    泛型
+     * @param <T>   泛型
      * @return 转换好的 json 字符串
      */
     public static <T> String classToJson(T clazz) {
@@ -94,7 +97,7 @@ public class JsonUtil {
      * 对象转 Json 格式字符串(格式化的 Json 字符串, 调整缩进美化一下)
      *
      * @param clazz 需要转 json 的对象
-     * @param <T>    对象类型
+     * @param <T>   对象类型
      * @return 美化后的 Json 格式字符串
      */
     public static <T> String classToJsonPretty(T clazz) {
