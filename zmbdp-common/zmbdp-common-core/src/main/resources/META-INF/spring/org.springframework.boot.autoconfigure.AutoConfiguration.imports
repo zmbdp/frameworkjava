@@ -1,3 +1,4 @@
 com.zmbdp.common.core.config.ThreadPoolConfig
 com.zmbdp.common.core.config.RestTemplateConfig
 com.zmbdp.common.core.config.MybatisPlusConfig
+com.zmbdp.common.core.config.MailConfig

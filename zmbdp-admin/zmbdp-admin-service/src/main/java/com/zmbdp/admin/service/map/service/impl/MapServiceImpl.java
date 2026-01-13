@@ -15,6 +15,7 @@ import com.zmbdp.common.cache.utils.CacheUtil;
 import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.PageUtil;
+import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.redis.service.RedissonLockService;
 import jakarta.annotation.PostConstruct;
@@ -138,7 +139,7 @@ public class MapServiceImpl implements IMapService {
         String ids = sysArgumentService.getByConfigKey(MapConstants.CONFIG_KEY).getValue();
         // 获取热门城市数据
         Set<Long> idList = new HashSet<>();
-        for (String id : ids.split(",")) {
+        for (String id : ids.split(CommonConstants.COMMA_SEPARATOR)) {
             idList.add(Long.valueOf(id));
         }
         List<SysRegion> sysRegionList = new ArrayList<>();
@@ -307,7 +308,7 @@ public class MapServiceImpl implements IMapService {
         // 获取热门城市数据
         List<Long> idList = new ArrayList<>();
         resultDTO = new ArrayList<>();
-        for (String id : ids.split(",")) {
+        for (String id : ids.split(CommonConstants.COMMA_SEPARATOR)) {
             idList.add(Long.valueOf(id));
         }
         for (SysRegion sysRegion : regionMapper.selectBatchIds(idList)) {

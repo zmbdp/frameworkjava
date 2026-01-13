@@ -28,5 +28,4 @@ public class BasePageReqDTO {
     public Integer getOffset() {
         return (pageNo - 1) * pageSize;
     }
-
 }
