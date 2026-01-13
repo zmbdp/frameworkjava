@@ -53,7 +53,7 @@ import java.util.Map;
  * <pre>
  * // 导入
  * ExcelResult&lt;UserDTO&gt; result = ExcelUtil.importExcel(inputStream, UserDTO.class, true);
- * 
+ *
  * // 导出
  * ExcelUtil.exportExcel(list, "用户列表", UserDTO.class, response);
  * </pre>
@@ -80,9 +80,9 @@ public class ExcelUtil {
      *     <li>需要一次性获取所有数据的场景</li>
      * </ul>
      *
-     * @param is     Excel 文件输入流
-     * @param clazz  数据对象类型（需要与 Excel 表头对应）
-     * @param <T>    数据对象泛型
+     * @param is    Excel 文件输入流
+     * @param clazz 数据对象类型（需要与 Excel 表头对应）
+     * @param <T>   数据对象泛型
      * @return List&lt;T&gt; 转换后的数据对象列表
      */
     public static <T> List<T> inputExcel(InputStream is, Class<T> clazz) {
@@ -99,10 +99,10 @@ public class ExcelUtil {
      *     <li>数据量较大的 Excel 文件导入</li>
      * </ul>
      *
-     * @param is          Excel 文件输入流
-     * @param clazz       数据对象类型（需要与 Excel 表头对应）
-     * @param isValidate  是否启用数据校验，true 表示启用，false 表示不校验
-     * @param <T>         数据对象泛型
+     * @param is         Excel 文件输入流
+     * @param clazz      数据对象类型（需要与 Excel 表头对应）
+     * @param isValidate 是否启用数据校验，true 表示启用，false 表示不校验
+     * @param <T>        数据对象泛型
      * @return ExcelResult&lt;T&gt; Excel 导入结果对象（包含成功数据和错误信息）
      */
     public static <T> ExcelResult<T> inputExcel(InputStream is, Class<T> clazz, boolean isValidate) {
@@ -121,10 +121,10 @@ public class ExcelUtil {
      *     <li>需要实时处理导入数据的场景</li>
      * </ul>
      *
-     * @param is        Excel 文件输入流
-     * @param clazz     数据对象类型（需要与 Excel 表头对应）
-     * @param listener  自定义监听器（实现 ExcelListener 接口）
-     * @param <T>       数据对象泛型
+     * @param is       Excel 文件输入流
+     * @param clazz    数据对象类型（需要与 Excel 表头对应）
+     * @param listener 自定义监听器（实现 ExcelListener 接口）
+     * @param <T>      数据对象泛型
      * @return ExcelResult&lt;T&gt; Excel 导入结果对象（由监听器返回）
      */
     public static <T> ExcelResult<T> inputExcel(InputStream is, Class<T> clazz, ExcelListener<T> listener) {
@@ -329,7 +329,7 @@ public class ExcelUtil {
      * 用户列表：
      * 姓名        | 年龄
      * {users.name} | {users.age}
-     * 
+     *
      * 部门列表：
      * 部门名称
      * {departments.name}
@@ -367,7 +367,7 @@ public class ExcelUtil {
      * 用户列表：
      * 姓名        | 年龄
      * {users.name} | {users.age}
-     * 
+     *
      * 部门列表：
      * 部门名称
      * {departments.name}

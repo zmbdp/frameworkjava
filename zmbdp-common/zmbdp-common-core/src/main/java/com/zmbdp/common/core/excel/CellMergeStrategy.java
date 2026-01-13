@@ -8,11 +8,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.lang.reflect.Field;
@@ -71,6 +67,28 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
     private boolean hasTitle;
 
     /**
+     * 重复单元格信息（内部类）
+     *
+     * <p>用于记录需要合并的单元格值和起始行索引</p>
+     *
+     * @author 稚名不带撇
+     */
+    @Data
+    @AllArgsConstructor
+    static class RepeatCell {
+
+        /**
+         * 列值（用于判断是否需要合并）
+         */
+        private Object value;
+
+        /**
+         * 当前行索引（合并起始行）
+         */
+        private int current;
+    }
+
+    /**
      * 处理单元格合并逻辑
      *
      * <p>该方法适用于：</p>
@@ -88,22 +106,22 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
     private static List<CellRangeAddress> handle(List<?> list, boolean hasTitle) {
         // 初始化合并区域列表
         List<CellRangeAddress> cellList = new ArrayList<>();
-        
+
         // 如果数据列表为空，直接返回空列表
         if (CollectionUtils.isEmpty(list)) {
             return cellList;
         }
-        
+
         // 获取数据对象的类型，用于反射获取字段和方法
         Class<?> clazz = list.get(0).getClass();
         // 获取类中声明的所有字段
         Field[] fields = clazz.getDeclaredFields();
-        
+
         // 收集需要合并的字段（带有 @CellMerge 注解的字段）
         List<Field> mergeFields = new ArrayList<>();
         // 收集每个合并字段对应的列索引
         List<Integer> mergeFieldsIndex = new ArrayList<>();
-        
+
         // 遍历所有字段，查找带有 @CellMerge 注解的字段
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];
@@ -114,13 +132,13 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                 mergeFieldsIndex.add(cm.index() == -1 ? i : cm.index());
             }
         }
-        
+
         // 计算数据行的起始索引：如果有标题行，数据从第2行（索引1）开始；否则从第1行（索引0）开始
         int rowIndex = hasTitle ? 1 : 0;
-        
+
         // 用于记录每个字段的当前值和起始行索引（用于判断是否需要合并）
         Map<Field, RepeatCell> map = new HashMap<>();
-        
+
         // 遍历数据列表，计算相同值的连续单元格范围
         for (int i = 0; i < list.size(); i++) {
             // 遍历每个需要合并的字段
@@ -136,7 +154,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
 
                 // 获取该字段对应的列索引
                 int colNum = mergeFieldsIndex.get(j);
-                
+
                 // 如果是第一次遇到该字段，记录当前值和行索引
                 if (!map.containsKey(field)) {
                     map.put(field, new RepeatCell(val, i));
@@ -144,14 +162,14 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                     // 获取之前记录的单元格信息
                     RepeatCell repeatCell = map.get(field);
                     Object cellValue = repeatCell.getValue();
-                    
+
                     // 如果之前的值是空值，跳过不合并（空值不参与合并）
                     if (cellValue == null || "".equals(cellValue)) {
                         // 更新为当前值，继续下一行
                         map.put(field, new RepeatCell(val, i));
                         continue;
                     }
-                    
+
                     // 如果当前值与之前的值不同，说明需要结束之前的合并区域
                     if (!cellValue.equals(val)) {
                         // 如果连续相同值的行数大于1（即 i - repeatCell.getCurrent() > 1），才需要合并
@@ -166,7 +184,7 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                         }
                         // 更新为新的值和起始行索引
                         map.put(field, new RepeatCell(val, i));
-                    } 
+                    }
                     // 如果当前值与之前的值相同，且是最后一行，需要合并到最后一行
                     else if (i == list.size() - 1) {
                         // 如果最后一行与起始行不是同一行（即 i > repeatCell.getCurrent()），需要合并
@@ -214,15 +232,15 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                 centerStyle.setVerticalAlignment(org.apache.poi.ss.usermodel.VerticalAlignment.CENTER);
                 // 设置自动换行，确保垂直居中效果更好
                 centerStyle.setWrapText(false);
-                
+
                 for (CellRangeAddress item : cellList) {
                     sheet.addMergedRegion(item);
-                    
+
                     // 对合并区域内的所有行和单元格应用居中样式
                     int firstRow = item.getFirstRow();
                     int lastRow = item.getLastRow();
                     int colIndex = item.getFirstColumn();
-                    
+
                     // 遍历合并区域内的所有行
                     for (int rowIndex = firstRow; rowIndex <= lastRow; rowIndex++) {
                         Row row = sheet.getRow(rowIndex);
@@ -241,27 +259,5 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                 }
             }
         }
-    }
-
-    /**
-     * 重复单元格信息（内部类）
-     *
-     * <p>用于记录需要合并的单元格值和起始行索引</p>
-     *
-     * @author 稚名不带撇
-     */
-    @Data
-    @AllArgsConstructor
-    static class RepeatCell {
-
-        /**
-         * 列值（用于判断是否需要合并）
-         */
-        private Object value;
-
-        /**
-         * 当前行索引（合并起始行）
-         */
-        private int current;
     }
 }

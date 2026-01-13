@@ -29,7 +29,7 @@ import java.util.concurrent.*;
  * <pre>
  * // 线程休眠
  * ThreadUtil.sleep(1000);  // 休眠1秒
- * 
+ *
  * // 关闭线程池
  * ThreadUtil.shutdownAndAwaitTermination(executorService);
  * </pre>

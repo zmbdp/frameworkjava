@@ -360,12 +360,12 @@ public class MailUtil {
      *     <li>使用 Spring 容器中配置的默认邮件账号</li>
      * </ul>
      *
-     * @param to                 收件人邮箱地址，多个收件人可使用 "," 或 ";" 分隔
-     * @param subject            邮件标题
-     * @param content            HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
-     * @param imageMap           内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
+     * @param to                  收件人邮箱地址，多个收件人可使用 "," 或 ";" 分隔
+     * @param subject             邮件标题
+     * @param content             HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
+     * @param imageMap            内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
      * @param imageContentTypeMap 图片格式映射，key 为 cid，value 为 MIME 类型（如 "image/png"、"image/jpeg"），如果为 null 或某个 cid 不存在，则自动检测格式
-     * @param files              邮件附件（可选，可传入多个文件）
+     * @param files               邮件附件（可选，可传入多个文件）
      * @return message-id 邮件发送成功后返回的消息 ID
      */
     public static String sendHtml(
@@ -471,12 +471,12 @@ public class MailUtil {
      *     <li>使用 Spring 容器中配置的默认邮件账号</li>
      * </ul>
      *
-     * @param tos                收件人邮箱地址集合
-     * @param subject           邮件标题
-     * @param content           HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
-     * @param imageMap          内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
+     * @param tos                 收件人邮箱地址集合
+     * @param subject             邮件标题
+     * @param content             HTML 格式的邮件正文内容，图片占位符格式为 cid:$IMAGE_PLACEHOLDER
+     * @param imageMap            内嵌图片映射，key 为 cid（对应 content 中的占位符），value 为图片输入流
      * @param imageContentTypeMap 图片格式映射，key 为 cid，value 为 MIME 类型（如 "image/png"、"image/jpeg"），如果为 null 或某个 cid 不存在，则自动检测格式
-     * @param files             邮件附件（可选，可传入多个文件）
+     * @param files               邮件附件（可选，可传入多个文件）
      * @return message-id 邮件发送成功后返回的消息 ID
      */
     public static String sendHtml(
@@ -800,7 +800,7 @@ public class MailUtil {
                 // 创建新的 JavaMailSender（使用指定的 MailAccount）
                 mailSender = createJavaMailSender(mailAccount);
             }
-            
+
             jakarta.mail.internet.MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 

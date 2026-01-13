@@ -99,7 +99,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
     @Override
     public void onException(Exception exception, AnalysisContext context) throws Exception {
         String errMsg = null;
-        
+
         // 处理单元格数据转换异常（如类型转换错误、格式不匹配等）
         if (exception instanceof ExcelDataConvertException excelDataConvertException) {
             // 获取异常发生的行号和列号（从0开始，所以+1显示给用户）
@@ -113,7 +113,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
                 log.error(errMsg);
             }
         }
-        
+
         // 处理数据校验异常（Jakarta Validation 校验失败）
         if (exception instanceof ConstraintViolationException constraintViolationException) {
             // 获取所有校验失败的约束违规信息
@@ -127,7 +127,7 @@ public class DefaultExcelListener<T> extends AnalysisEventListener<T> implements
                 log.error(errMsg);
             }
         }
-        
+
         // 将错误信息添加到结果对象的错误列表中
         excelResult.getErrorList().add(errMsg);
         // 抛出异常以终止导入流程，避免继续处理后续数据
