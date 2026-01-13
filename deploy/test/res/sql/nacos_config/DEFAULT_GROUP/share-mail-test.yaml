@@ -1,0 +1,16 @@
+# 邮件相关配置
+mail:
+  # 是否启用邮件功能（true-开启；false-关闭）
+  isEnabled: true
+  # 发件人邮箱（可以包含显示名称，格式：\"显示名称\" <邮箱地址>）
+  from: "发件人邮箱"
+  # 登录用户名（QQ邮箱就是QQ号@qq.com）
+  user: 邮箱号
+  # 邮箱授权码（QQ邮箱授权码，不是登录密码）
+  pass: 邮箱授权码
+  # SMTP 服务器地址，qq 的服务器地址如下
+  host: smtp.qq.com
+  # SMTP 端口（465 是 SSL 端口）
+  port: 465
+  # 是否开启 SSL
+  ssl-enable: true

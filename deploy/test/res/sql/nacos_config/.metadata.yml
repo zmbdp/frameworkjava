@@ -69,3 +69,13 @@ metadata:
   desc: 异步线程相关配置
   group: DEFAULT_GROUP
   type: yaml
+- appName: 邮件公共配置
+  dataId: share-mail-test.yaml
+  desc: 邮件相关配置
+  group: DEFAULT_GROUP
+  type: yaml
+- appName: 上传文件公共配置
+  dataId: share-upload-test.yaml
+  desc: 上传文件相关配置
+  group: DEFAULT_GROUP
+  type: yaml
