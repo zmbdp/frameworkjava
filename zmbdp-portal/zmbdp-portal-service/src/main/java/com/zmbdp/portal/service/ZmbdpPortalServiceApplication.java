@@ -22,6 +22,6 @@ public class ZmbdpPortalServiceApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(ZmbdpPortalServiceApplication.class, args);
-        log.info("门户服务启动成......");
+        log.info("门户服务启动成功......");
     }
 }

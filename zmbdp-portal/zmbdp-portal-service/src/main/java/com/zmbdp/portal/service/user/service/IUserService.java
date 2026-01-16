@@ -21,12 +21,12 @@ public interface IUserService {
     TokenDTO login(LoginDTO loginDTO);
 
     /**
-     * 发送短信验证码
+     * 发送验证码（支持手机号或邮箱，根据配置自动判断）
      *
-     * @param phone 手机号
+     * @param account 手机号或邮箱地址
      * @return 验证码
      */
-    String sendCode(String phone);
+    String sendCode(String account);
 
     /**
      * 编辑 C端用户信息
