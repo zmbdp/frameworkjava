@@ -31,7 +31,8 @@ FrameworkJava是一个基于Spring Boot 3.3.3和Spring Cloud 2023.0.3的企业�
 - 📦 **模块化设计**: 清晰的模块划分，便于扩展和维护
 - 🛠️ **开箱即用**: 预置常见业务模块（用户管理、配置管理、地图服务等）
 - 📊 **Excel处理**: 完整的Excel导入导出功能，支持大数值、单元格合并等
-- 📧 **邮件服务**: 完善的邮件发送功能，支持HTML、附件、内嵌图片等
+- 📧 **智能验证码**: 根据用户输入格式（手机号/邮箱）自动选择短信或邮件发送验证码
+- 📨 **邮件服务**: 完善的邮件发送功能，支持HTML、附件、内嵌图片等
 - 🐳 **容器化部署**: 完整的Docker Compose部署方案
 - 📈 **监控友好**: 集成Docker容器健康检查和Spring Boot Actuator监控端点
 
@@ -132,8 +133,16 @@ frameworkjava
 │   │
 │   ├── zmbdp-common-message         # 消息服务
 │   │   └── src/main/java/com/zmbdp/common/message
-│   │       ├── config/AliSmsConfig.java         # 阿里云短信配置
-│   │       └── service/...                      # 短信和验证码服务
+│   │       ├── config/
+│   │       │   ├── AliSmsConfig.java            # 阿里云短信配置
+│   │       │   └── MailCodeProperties.java      # 邮件验证码配置属性
+│   │       └── service/
+│   │           ├── CaptchaService.java          # 验证码服务
+│   │           ├── CaptchaSenderFactory.java    # 验证码发送器工厂（根据格式自动选择）
+│   │           ├── ICaptchaSender.java          # 验证码发送接口
+│   │           └── impl/
+│   │               ├── AliSmsServiceImpl.java   # 阿里云短信发送实现
+│   │               └── MailCodeServiceImpl.java # 邮件验证码发送实现
 │   │
 │   ├── zmbdp-common-rabbitmq        # RabbitMQ相关
 │   │   └── src/main/java/com/zmbdp/common/rabbitmq
@@ -166,12 +175,72 @@ frameworkjava
 │   │
 ├── zmbdp-admin                      # 管理服务
 │   ├── zmbdp-admin-api              # API接口定义
+│   │   └── src/main/java/com/zmbdp/admin/api
+│   │       ├── appuser/             # C端用户API
+│   │       │   ├── domain/          # 领域对象（DTO、VO）
+│   │       │   └── feign/           # Feign接口
+│   │       ├── config/              # 字典管理服务API
+│   │       │   ├── domain/          # 领域对象（参数配置、字典配置等）
+│   │       │   └── feign/           # Feign接口
+│   │       └── map/                 # 地图服务API
+│   │           ├── constants/       # 地图常量
+│   │           ├── domain/          # 领域对象（地区、位置搜索等）
+│   │           └── feign/           # Feign接口
+│   │
 │   └── zmbdp-admin-service          # 业务实现
-│       └── user/config/RabbitConfig.java        # RabbitMQ交换机配置
+│       └── src/main/java/com/zmbdp/admin/service
+│           ├── config/              # 字典管理服务
+│           │   ├── comtroller/      # 字典管理控制器
+│           │   ├── domain/          # 领域对象（实体、DTO）
+│           │   ├── mapper/          # MyBatis Mapper
+│           │   └── service/         # 业务服务实现
+│           ├── map/                 # 地图服务
+│           │   ├── controller/      # 地图服务控制器
+│           │   ├── domain/          # 领域对象（实体、DTO）
+│           │   ├── mapper/          # MyBatis Mapper
+│           │   └── service/         # 业务服务实现
+│           ├── timedtask/           # 定时任务
+│           │   └── bloom/           # 布隆过滤器定时刷新任务
+│           ├── user/                # 用户管理服务
+│           │   ├── config/          # 用户服务配置（RabbitMQ交换机等）
+│           │   ├── controller/      # 用户管理控制器（B端、C端用户）
+│           │   ├── domain/          # 领域对象（实体、DTO、VO）
+│           │   ├── mapper/          # MyBatis Mapper
+│           │   └── service/         # 业务服务实现
+│           └── ZmbdpAdminServiceApplication.java  # 启动类
 │
 ├── zmbdp-file                       # 文件服务
+│   ├── zmbdp-file-api               # API接口定义
+│   │   └── src/main/java/com/zmbdp/file/api
+│   │       ├── domain/              # 领域对象（DTO、VO）
+│   │       └── feign/               # Feign接口
+│   │
+│   └── zmbdp-file-service           # 业务实现
+│       └── src/main/java/com/zmbdp/file/service
+│           ├── config/              # OSS配置
+│           ├── constants/           # 常量定义
+│           ├── controller/          # 文件服务控制器
+│           ├── service/             # 业务服务实现
+│           └── ZmbdpFileServiceApplication.java  # 启动类
+│
 ├── zmbdp-portal                     # 门户服务
-└── zmbdp-mstemplate                 # 微服务模板
+│   ├── zmbdp-portal-api             # API接口定义
+│   │   └── src/main/java/com/zmbdp/portal/api
+│   │
+│   └── zmbdp-portal-service         # 业务实现
+│       └── src/main/java/com/zmbdp/portal/service
+│           ├── user/                # C端用户服务
+│           │   ├── controller/      # 用户服务控制器
+│           │   ├── domain/          # 领域对象（DTO、VO）
+│           │   ├── service/         # 业务服务实现
+│           │   └── validator/       # 账号校验策略
+│           │       ├── AccountValidator.java         # 账号校验接口
+│           │       ├── AccountValidatorFactory.java  # 账号校验工厂（根据格式自动选择）
+│           │       ├── PhoneValidator.java           # 手机号校验策略
+│           │       └── EmailValidator.java           # 邮箱校验策略
+│           └── ZmbdpPortalServiceApplication.java  # 启动类
+│
+└── zmbdp-mstemplate                 # 微服务模板（模板示例，用于开发风格参考）
 </pre>
 
 ## 部署环境
@@ -310,13 +379,22 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - 定时任务自动维护
 - 支持手动扩容和自动重置功能
 
-### 8. 完整的用户管理体系
+### 8. 智能验证码系统
+
+- **自动识别格式**：根据用户输入（手机号/邮箱）自动选择发送方式
+- **策略模式设计**：账号校验和验证码发送均采用策略模式，便于扩展
+- **短信和邮件双通道**：同时支持短信验证码（阿里云）和邮件验证码发送
+- **动态配置**：邮件标题和内容模板支持多个选项，发送时随机选择
+- **统一接口**：提供统一的验证码发送接口，无需关心具体发送方式
+- **格式校验**：自动校验账号格式，确保发送到正确的目标
+
+### 9. 完整的用户管理体系
 
 - B端用户管理：登录、注册、权限控制
-- C端用户管理：微信登录、手机号登录、用户信息维护
+- C端用户管理：微信登录、手机号/邮箱登录、用户信息维护
 - 用户信息服务：用户信息获取、编辑、退出登录
 
-### 9. 配置管理服务
+### 10. 配置管理服务
 
 - 参数配置管理
 - 支持根据键值查询配置
@@ -330,7 +408,7 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - 根据关键词搜索地点
 - 根据经纬度定位城市
 
-### 11. 文件服务功能
+### 12. 文件服务功能
 
 - 文件上传功能
 - 签名信息获取
@@ -342,13 +420,13 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - 消息生产者和消费者示例
 - 支持消息的发送和接收
 
-### 13. 定时任务系统
+### 14. 定时任务系统
 
 - 布隆过滤器定时刷新任务
 - 每天凌晨4点自动执行
 - 日志记录和异常处理
 
-### 14. 完善的异常处理机制
+### 15. 完善的异常处理机制
 
 - 统一异常处理
 - 业务异常封装
@@ -363,7 +441,7 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - 支持自定义转换器和监听器
 - 提供完整的导入结果反馈机制
 
-### 16. 邮件发送功能
+### 17. 邮件发送功能
 
 - 基于Hutool Mail + Jakarta Mail的邮件发送
 - 支持文本/HTML格式邮件
@@ -378,7 +456,7 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 - RESTful API设计
 - 统一响应格式
 
-### 18. 容器化部署支持
+### 19. 容器化部署支持
 
 - Docker Compose部署方案
 - Nacos配置中心集成
@@ -397,7 +475,7 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
 2. 使用浏览器直接打开该文件即可浏览完整的SDK文档
 3. 例如：`file:///{项目路径}/javapro/javadoc/index.html`
 
-### 20. API文档和使用手册
+### 21. API文档和使用手册
 
 - **API文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn) (访问密码: zmbdp@123.com)
 - **使用手册**: [https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink](https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink)
@@ -416,9 +494,10 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持：
   - share-mysql-dev.yaml（MySQL公共配置）
   - share-map-dev.yaml（地图服务公共配置）
   - share-token-dev.yaml（Token公共配置）
-  - share-sms-dev.yaml（短信服务公共配置）
+  - share-captcha-dev.yaml（验证码服务公共配置，包含邮件验证码标题和内容模板配置）
   - share-filter-dev.yaml（布隆过滤器公共配置）
   - share-thread-dev.yaml（线程池公共配置）
+  - share-mail-dev.yaml（邮件服务公共配置）
 - **业务服务配置**: 
   - zmbdp-file-service-dev.yaml（文件服务配置）
   - zmbdp-admin-service-dev.yaml（基础服务配置）
@@ -477,9 +556,10 @@ MailUtil.send("user@example.com", "标题", "内容", false, new File("附件.pd
 
 #### 3. 认证授权扩展
 - 支持JWT Token无状态认证
-- 支持微信登录和手机号验证码登录
+- 支持微信登录、手机号验证码登录、邮箱验证码登录
+- 验证码发送根据输入格式自动选择（手机号→短信，邮箱→邮件）
 - 可自定义权限验证规则
-- 可扩展第三方登录集成（微信、手机号）
+- 可扩展第三方登录集成（微信、手机号、邮箱等）
 
 #### 4. 消息队列扩展
 - 支持多种消息模式（点对点、发布订阅）

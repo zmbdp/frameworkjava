@@ -1,5 +1,4 @@
-package com.zmbdp.common.message.service;
-
+package com.zmbdp.common.message.service.impl;
 
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
@@ -8,6 +7,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import com.google.gson.Gson;
 import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.domain.constants.MessageConstants;
+import com.zmbdp.common.message.service.ICaptchaSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +23,9 @@ import java.util.Map;
  * @author 稚名不带撇
  */
 @Slf4j
-@Component
 @RefreshScope
-public class AliSmsService {
+@Component("aliSmsService")
+public class AliSmsServiceImpl implements ICaptchaSender {
 
     /**
      * 客户端
@@ -88,7 +88,7 @@ public class AliSmsService {
         try {
             SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
             SendSmsResponseBody responseBody = sendSmsResponse.getBody();
-            if (responseBody.getCode().equals(MessageConstants.SMS_MSG_OK)) {
+            if (responseBody.getCode().equals(MessageConstants.CAPTCHA_MSG_OK)) {
                 return true;
             }
             log.error("短信: {} 发送失败, 失败原因: {}...", new Gson().toJson(sendSmsRequest), responseBody.getMessage());

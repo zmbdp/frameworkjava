@@ -1,0 +1,46 @@
+captcha:
+  # 验证码类型，1: 纯数字; 2: 大小写字母+数字; 3: 大小写字母+数字+特殊字符
+  type: 3
+  # 验证码有效期
+  code-expiration: 5
+  # 单个手机号，每日发送短信次数的限制
+  send-limit: 50
+  sender:
+    # 发送类型：sms: 阿里云短信发送，mail: 邮件发送
+    type: mail
+
+sms:
+  # 是否开启短信发送功能
+  send-message: false
+  # 短信签名
+  sign-name: FrameWork-Java
+  aliyun:
+    # 你的 accessKeyId
+    accessKeyId: # 你的 accessKeyId
+    # 你的 accessKeySecret
+    accessKeySecret: # 你的 accessKeySecret
+    # 服务器地址
+    endpoint: dysmsapi.aliyuncs.com
+    # 短信模板 ID
+    templateCode: # 你的短信模板 ID
+
+mail:
+  # 是否开启邮箱发送功能
+  send-message: false
+  code:
+    # 邮件标题列表（发送时会随机选择一个）
+    subject:
+      - "FrameworkJava 验证码"
+      - "FrameworkJava 安全验证码"
+      - "FrameworkJava 登录验证码"
+      - "【FrameworkJava】验证码通知"
+      - "【FrameworkJava】安全验证"
+      - "FrameworkJava 账户安全验证"
+      - "【FrameworkJava】登录验证通知"
+      - "FrameworkJava 系统验证码"
+    # 邮件内容模板列表（发送时会随机选择一个，支持 {code} 占位符）
+    content:
+      - "您的验证码是：{code}，请勿泄露给他人。"
+      - "验证码：{code}，5分钟内有效，请勿泄露给他人。"
+      - "您正在进行安全验证，验证码为：{code}，请妥善保管。"
+      - "您的登录验证码是 {code}，有效期为5分钟，请勿泄露。"
