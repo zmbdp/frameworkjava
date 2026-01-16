@@ -41,14 +41,14 @@ public class UserController {
     }
 
     /**
-     * 发送短信验证码
+     * 发送验证码（支持手机号或邮箱，根据配置自动判断）
      *
-     * @param phone 手机号
+     * @param account 手机号或邮箱地址
      * @return 验证码
      */
     @GetMapping("/send_code")
-    public Result<String> sendCode(@Validated @RequestParam("phone") String phone) {
-        return Result.success(userService.sendCode(phone));
+    public Result<String> sendCode(@Validated @RequestParam("account") String account) {
+        return Result.success(userService.sendCode(account));
     }
 
     /**

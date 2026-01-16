@@ -33,19 +33,19 @@ public class CaptchaService {
     /**
      * 单个手机号，每日发送短信次数的限制
      */
-    @Value("${sms.send-limit:}")
+    @Value("${captcha.send-limit:50}")
     private Integer sendLimit;
 
     /**
      * 验证码的有效期，单位是分钟
      */
-    @Value("${sms.code-expiration:}")
+    @Value("${captcha.code-expiration:5}")
     private Long phoneCodeExpiration;
 
     /**
      * 用来判断是否发送随机验证码
      */
-    @Value("${sms.send-message:true}")
+    @Value("${captcha.send-message:true}")
     private boolean sendMessage;
 
     /**
@@ -55,20 +55,20 @@ public class CaptchaService {
     private Integer captChaType;
 
     /**
-     * 阿里云短信服务
+     * 验证码发送器工厂（根据账号格式自动选择短信或邮件发送器）
      */
     @Autowired
-    private AliSmsService aliSmsService;
+    private CaptchaSenderFactory captchaSenderFactory;
 
     /**
      * 发送验证码
      *
-     * @param phone 手机号
+     * @param account 手机号 / 邮箱
      * @return 验证码
      */
-    public String sendCode(String phone) {
+    public String sendCode(String account) {
         // 先校验是否超过每日的发送限制（针对每个手机号）
-        String limitCacheKey = MessageConstants.SMS_CODE_TIMES_KEY + phone;
+        String limitCacheKey = MessageConstants.CAPTCHA_CODE_TIMES_KEY + account;
         Integer times = redisService.getCacheObject(limitCacheKey, Integer.class);
         times = times == null ? 0 : times;
         if (times >= sendLimit) {
@@ -76,7 +76,7 @@ public class CaptchaService {
         }
 
         // 然后判断是否在 1 分钟内频繁发送
-        String codeKey = MessageConstants.SMS_CODE_KEY + phone;
+        String codeKey = MessageConstants.CAPTCHA_CODE_KEY + account;
         String cacheValue = redisService.getCacheObject(codeKey, String.class);
         long expireTime = redisService.getExpire(codeKey);
         if (!StringUtil.isEmpty(cacheValue) && expireTime > phoneCodeExpiration * 60 - 60) {
@@ -86,11 +86,12 @@ public class CaptchaService {
 
         // 然后生成验证码
         // 判断 nacos 上是否开启生成验证码设置了, 不开启默认就是 123456
-        String verifyCode = sendMessage ? VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_SMS_LENGTH, captChaType) : MessageConstants.DEFAULT_SMS_CODE;
+        String verifyCode = sendMessage ? VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_CAPTCHA_LENGTH, captChaType) : MessageConstants.DEFAULT_CAPTCHA_CODE;
 
-        // 发送线上短信
+        // 发送线上短信/邮件（根据账号格式自动选择发送器）
         if (sendMessage) {
-            boolean result = aliSmsService.sendMobileCode(phone, verifyCode);
+            ICaptchaSender sender = captchaSenderFactory.getSender(account);
+            boolean result = sender.sendMobileCode(account, verifyCode);
             if (!result) {
                 throw new ServiceException(ResultCode.SEND_MSG_FAILED);
             }
@@ -111,7 +112,7 @@ public class CaptchaService {
      * @return 验证码
      */
     public String getCode(String phone) {
-        String cacheKey = MessageConstants.SMS_CODE_KEY + phone;
+        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + phone;
         return redisService.getCacheObject(cacheKey, String.class);
     }
 
@@ -122,7 +123,7 @@ public class CaptchaService {
      * @return 验证码
      */
     public boolean deleteCode(String phone) {
-        String cacheKey = MessageConstants.SMS_CODE_KEY + phone;
+        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + phone;
         return redisService.deleteObject(cacheKey);
     }
 

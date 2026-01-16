@@ -21,6 +21,8 @@ import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.UserDTO;
 import com.zmbdp.portal.service.user.domain.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
+import com.zmbdp.portal.service.user.validator.AccountValidator;
+import com.zmbdp.portal.service.user.validator.AccountValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +62,12 @@ public class UserServiceImpl implements IUserService {
      */
     @Autowired
     private CaptchaService captchaService;
+
+    /**
+     * 账号校验策略工厂
+     */
+    @Autowired
+    private AccountValidatorFactory validatorFactory;
 
     /**
      * 用户 登录/注册
@@ -173,17 +181,18 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 发送短信验证码
+     * 发送验证码（支持手机号或邮箱，根据输入格式自动判断）
      *
-     * @param phone 手机号
+     * @param account 手机号或邮箱地址
      * @return 验证码
      */
     @Override
-    public String sendCode(String phone) {
-        if (!VerifyUtil.checkPhone(phone)) {
-            throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
-        }
-        return captchaService.sendCode(phone);
+    public String sendCode(String account) {
+        // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
+        AccountValidator validator = validatorFactory.getValidator(account);
+        // 开始校验格式是否正确
+        validator.validate(account);
+        return captchaService.sendCode(account);
     }
 
     /**
