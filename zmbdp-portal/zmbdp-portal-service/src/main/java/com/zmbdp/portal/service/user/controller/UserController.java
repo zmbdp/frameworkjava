@@ -1,6 +1,5 @@
 package com.zmbdp.portal.service.user.controller;
 
-
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.TokenVO;

@@ -11,7 +11,7 @@ public interface ICaptchaSender {
      * 发送手机验证码
      *
      * @param account 手机号 / 邮箱
-     * @param code  验证码
+     * @param code    验证码
      * @return 是否发送成功
      */
     boolean sendMobileCode(String account, String code);
