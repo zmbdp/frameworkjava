@@ -103,7 +103,7 @@ public class TestIdempotentController {
      * 测试5：从请求参数获取Token - 重复请求（失败）
      * 请求参数：idempotentToken=test-token-004
      */
-    @PostMapping("/http/param/repeat") // TODO: 明天从儿开始测试
+    @PostMapping("/http/param/repeat") // TODO: 明天从这儿开始测试
     @Idempotent(
             allowParam = true,
             paramName = "idempotentToken",
