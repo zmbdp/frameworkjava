@@ -83,6 +83,7 @@ public class TestIdempotentController {
         return Result.success("不应该执行到这里");
     }
 
+    /*=============================================    从请求参数中获取    =============================================*/
     /**
      * 测试4：从请求参数获取Token - 第一次请求（成功）
      * 请求参数：idempotentToken=test-token-003
