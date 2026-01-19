@@ -169,7 +169,7 @@ public class IdempotentAspect {
             if (currentRetryCount == null) {
                 currentRetryCount = 0;
             }
-            
+
             // 检查是否超过最大重试次数
             if (currentRetryCount >= maxRetries) {
                 log.error("防重模式 - 重试次数超过限制，无法获取锁，Token: {}, 重试次数: {}/{}", idempotentToken, currentRetryCount, maxRetries);
@@ -177,7 +177,7 @@ public class IdempotentAspect {
                 redisService.deleteObject(retryCountKey);
                 throw new ServiceException("请求处理失败，请稍后重试", ResultCode.ERROR.getCode());
             }
-            
+
             Boolean success = redisService.setCacheObjectIfAbsent(redisKey, STATUS_PROCESSING, expireTime, TimeUnit.SECONDS);
             if (!success) {
                 // Token 已存在，说明是重复请求，需要检查当前状态
@@ -274,7 +274,7 @@ public class IdempotentAspect {
 
             // 执行成功，更新状态为 SUCCESS
             redisService.setCacheObject(redisKey, STATUS_SUCCESS, expireTime, TimeUnit.SECONDS);
-            
+
             // 清除重试次数记录（执行成功，不需要重试了）
             redisService.deleteObject(retryCountKey);
 
