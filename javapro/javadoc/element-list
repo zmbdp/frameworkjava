@@ -46,6 +46,9 @@ com.zmbdp.common.domain.domain
 com.zmbdp.common.domain.domain.dto
 com.zmbdp.common.domain.domain.vo
 com.zmbdp.common.domain.exception
+com.zmbdp.common.idempotent.annotation
+com.zmbdp.common.idempotent.aspect
+com.zmbdp.common.idempotent.enums
 com.zmbdp.common.message.config
 com.zmbdp.common.message.service
 com.zmbdp.common.message.service.impl
@@ -76,6 +79,7 @@ com.zmbdp.mstemplate.service.rabbit
 com.zmbdp.mstemplate.service.service
 com.zmbdp.mstemplate.service.service.impl
 com.zmbdp.mstemplate.service.test
+com.zmbdp.mstemplate.service.test.feign
 com.zmbdp.portal.service
 com.zmbdp.portal.service.user.controller
 com.zmbdp.portal.service.user.domain.dto
