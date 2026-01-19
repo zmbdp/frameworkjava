@@ -158,11 +158,26 @@ public class IdempotentAspect {
         // 尝试设置 Redis（如果已存在说明是重复请求）
         // 使用状态值 PROCESSING 标识正在执行中
         // 使用循环处理失败状态的重试逻辑（仅防重模式）
-        int maxRetries = 3; // 最多重试3次，避免无限循环
-        int retryCount = 0;
+        int maxRetries = 3; // 最多重试 3 次，避免无限循环
+        // 重试次数存储在 Redis 中，key 为 {redisKey}:retry:count
+        String retryCountKey = redisKey + ":retry:count";
         boolean lockAcquired = false;
 
-        while (!lockAcquired && retryCount < maxRetries) {
+        while (!lockAcquired) {
+            // 获取当前重试次数（从 Redis 读取，如果不存在则为 0）
+            Integer currentRetryCount = redisService.getCacheObject(retryCountKey, Integer.class);
+            if (currentRetryCount == null) {
+                currentRetryCount = 0;
+            }
+            
+            // 检查是否超过最大重试次数
+            if (currentRetryCount >= maxRetries) {
+                log.error("防重模式 - 重试次数超过限制，无法获取锁，Token: {}, 重试次数: {}/{}", idempotentToken, currentRetryCount, maxRetries);
+                // 清除重试次数记录
+                redisService.deleteObject(retryCountKey);
+                throw new ServiceException("请求处理失败，请稍后重试", ResultCode.ERROR.getCode());
+            }
+            
             Boolean success = redisService.setCacheObjectIfAbsent(redisKey, STATUS_PROCESSING, expireTime, TimeUnit.SECONDS);
             if (!success) {
                 // Token 已存在，说明是重复请求，需要检查当前状态
@@ -216,22 +231,25 @@ public class IdempotentAspect {
                         }
                     } else if (STATUS_FAILED.equals(currentStatus)) {
                         // 业务执行失败，允许重试（使用原子操作删除Token，避免并发问题）
-                        log.info("防重模式 - 检测到失败状态，尝试删除Token允许重试，Token: {}, 重试次数: {}/{}", idempotentToken, retryCount + 1, maxRetries);
+                        // 递增重试次数并存储到 Redis
+                        int newRetryCount = currentRetryCount + 1;
+                        redisService.setCacheObject(retryCountKey, newRetryCount, expireTime, TimeUnit.SECONDS);
+                        log.info("防重模式 - 检测到失败状态，尝试删除Token允许重试，Token: {}, 重试次数: {}/{}", idempotentToken, newRetryCount, maxRetries);
                         // 使用原子操作：只有当状态为 FAILED 时才删除，避免并发问题
                         boolean deleted = deleteIfStatusEquals(redisKey, STATUS_FAILED);
                         if (deleted) {
                             // 删除成功，继续循环重新尝试 SETNX
-                            retryCount++;
                             continue;
                         } else {
                             // 删除失败（可能状态已改变，如被其他请求删除或状态变为 PROCESSING），重新检查状态
                             // 继续循环，重新检查状态
-                            retryCount++;
                             continue;
                         }
                     } else {
                         // 已执行成功（SUCCESS），直接报错
                         log.warn("防重模式 - 重复请求，当前状态: {}，Token: {}", currentStatus, idempotentToken);
+                        // 清除重试次数记录（因为已经成功了，不需要重试）
+                        redisService.deleteObject(retryCountKey);
                         if (isMqConsumer) {
                             // MQ 场景：抛出 AmqpRejectAndDontRequeueException，直接丢弃消息，不重新入队
                             throw createAmqpRejectAndDontRequeueException(idempotent.message());
@@ -243,15 +261,12 @@ public class IdempotentAspect {
                 }
             } else {
                 // SETNX 成功，获取到锁，跳出循环
+                // 注意：此时不清除重试次数记录，因为方法还没有执行，可能还会失败
+                // 重试次数记录只有在执行成功时才会被清除
                 lockAcquired = true;
             }
         }
 
-        // 如果重试次数超过限制，抛出异常
-        if (!lockAcquired) {
-            log.error("防重模式 - 重试次数超过限制，无法获取锁，Token: {}", idempotentToken);
-            throw new ServiceException("请求处理失败，请稍后重试", ResultCode.ERROR.getCode());
-        }
 
         try {
             // 执行目标方法
@@ -259,6 +274,9 @@ public class IdempotentAspect {
 
             // 执行成功，更新状态为 SUCCESS
             redisService.setCacheObject(redisKey, STATUS_SUCCESS, expireTime, TimeUnit.SECONDS);
+            
+            // 清除重试次数记录（执行成功，不需要重试了）
+            redisService.deleteObject(retryCountKey);
 
             // 强幂等模式：缓存方法执行结果
             if (returnCachedResult) {
