@@ -24,6 +24,7 @@
         <module>zmbdp-common-message</module>
         <module>zmbdp-common-filter</module>
         <module>zmbdp-common-snowflake</module>
+        <module>zmbdp-common-idempotent</module>
     </modules>
 
     <properties>

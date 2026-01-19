@@ -108,6 +108,12 @@
 
         <dependency>
             <groupId>com.zmbdp</groupId>
+            <artifactId>zmbdp-common-idempotent</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-file-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

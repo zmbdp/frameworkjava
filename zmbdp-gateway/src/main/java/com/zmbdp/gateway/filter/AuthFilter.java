@@ -96,7 +96,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         String userFrom = JwtUtil.getUserFrom(claims);
         if (
                 url.contains(HttpConstants.SYS_USER_PATH) && // 如果路径是系统路径
-                        !UserConstants.USER_FROM_TU_B.equals(userFrom) // 但是用户不是系统来源的话（相当于 C端用户在 C端拿到的 jwt 想在 B端使用）
+                !UserConstants.USER_FROM_TU_B.equals(userFrom) // 但是用户不是系统来源的话（相当于 C端用户在 C端拿到的 jwt 想在 B端使用）
         ) {
             return unauthorizedResponse(exchange, ResultCode.TOKEN_CHECK_FAILED);
         }
