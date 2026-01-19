@@ -161,7 +161,7 @@ public class IdempotentAspect {
         int maxRetries = 3; // 最多重试3次，避免无限循环
         int retryCount = 0;
         boolean lockAcquired = false;
-        
+
         while (!lockAcquired && retryCount < maxRetries) {
             Boolean success = redisService.setCacheObjectIfAbsent(redisKey, STATUS_PROCESSING, expireTime, TimeUnit.SECONDS);
             if (!success) {
@@ -246,7 +246,7 @@ public class IdempotentAspect {
                 lockAcquired = true;
             }
         }
-        
+
         // 如果重试次数超过限制，抛出异常
         if (!lockAcquired) {
             log.error("防重模式 - 重试次数超过限制，无法获取锁，Token: {}", idempotentToken);
@@ -487,7 +487,7 @@ public class IdempotentAspect {
         // 从 Environment 动态读取配置值，支持配置刷新
         int maxRetryCount = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX, Integer.class, DEFAULT_MAX_RETRY_COUNT);
         long retryIntervalMs = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_RETRY_INTERVAL_MS_PREFIX, Long.class, DEFAULT_RETRY_INTERVAL_MS);
-        
+
         for (int i = 0; i < maxRetryCount; i++) {
             try {
                 Thread.sleep(retryIntervalMs);
@@ -595,17 +595,44 @@ public class IdempotentAspect {
     /**
      * 获取方法的默认返回值
      * <p>
-     * 用于 MQ 消费者场景下，当检测到重复消息时返回默认值，避免抛出异常导致消息重新入队。
+     * 根据方法的返回类型返回合适的默认值：
+     * <ul>
+     *     <li>void 类型：返回 null</li>
+     *     <li>基本类型：返回对应的默认值（0, false, 0.0 等）</li>
+     *     <li>对象类型：返回 null</li>
+     * </ul>
+     * </p>
+     * <p>
+     * 主要用于强幂等模式下，MQ 消费者检测到执行失败或等待超时时，返回默认值以避免消息重新入队。
      * </p>
      *
      * @param joinPoint 连接点
-     * @return 方法的默认返回值，void 类型返回 null，其他类型也返回 null
+     * @return 方法的默认返回值
      */
     private Object getDefaultReturnValue(ProceedingJoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        Class<?> returnType = method.getReturnType();
-        // 如果返回类型是 void，直接返回 null；否则返回 null（调用方需要处理 null 值）
+        Class<?> returnType = ((MethodSignature) joinPoint.getSignature()).getMethod().getReturnType();
+
+        // void 类型：返回 null
+        if (void.class.equals(returnType) || Void.class.equals(returnType)) {
+            return null;
+        }
+
+        // 基本类型：使用 switch 表达式返回对应的默认值
+        if (returnType.isPrimitive()) {
+            return switch (returnType.getName()) {
+                case "boolean" -> false;
+                case "byte" -> (byte) 0;
+                case "short" -> (short) 0;
+                case "int" -> 0;
+                case "long" -> 0L;
+                case "float" -> 0.0f;
+                case "double" -> 0.0d;
+                case "char" -> '\u0000';
+                default -> null;
+            };
+        }
+
+        // 对象类型：返回 null
         return null;
     }
 
@@ -616,7 +643,7 @@ public class IdempotentAspect {
      * 只有当 Token 的状态等于指定状态时，才会删除 Token。
      * </p>
      *
-     * @param redisKey Redis Key
+     * @param redisKey       Redis Key
      * @param expectedStatus 期望的状态值
      * @return true - 删除成功（状态匹配）；false - 删除失败（状态不匹配或键不存在）
      */
