@@ -1,5 +1,7 @@
 package com.zmbdp.common.idempotent.annotation;
 
+import com.zmbdp.common.idempotent.enums.IdempotentMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -110,6 +112,7 @@ import java.lang.annotation.Target;
  *     <li>Token 必须唯一，建议使用 UUID 或业务唯一标识</li>
  *     <li>Token 过期时间建议根据业务场景设置，默认 5 分钟</li>
  *     <li>强幂等模式会缓存方法执行结果，占用 Redis 存储空间</li>
+ *     <li>强幂等模式最大重试 + 等待时间为 3s，不适合高并发接口</li>
  *     <li>方法执行失败时，Token 会被删除，允许重试</li>
  *     <li>MQ 消费者使用 SpEL 表达式时，确保消息对象包含对应字段</li>
  *     <li>配置 {@code idempotent.return-cached-result} 支持动态刷新（需添加 {@code @RefreshScope}）</li>
@@ -303,61 +306,64 @@ public @interface Idempotent {
     String tokenExpression() default "";
 
     /**
-     * 是否返回缓存的结果（强幂等模式）
-     *
-     * <p>该方法适用于：</p>
+     * 幂等性模式（三态设计）
+     * <p>
+     * 控制幂等性的行为模式，支持三态设计：
      * <ul>
-     *     <li>控制幂等性模式：防重模式 vs 强幂等模式</li>
-     *     <li>可通过配置文件 {@code idempotent.return-cached-result} 全局控制</li>
-     *     <li>优先级：注解值 > 全局配置 > 默认值（false）</li>
+     *     <li><b>DEFAULT</b>：使用全局配置（Nacos 或 application.yml 中的 {@code idempotent.return-cached-result}）</li>
+     *     <li><b>TRUE</b>：强制开启强幂等模式（返回缓存结果），即使全局配置为 false</li>
+     *     <li><b>FALSE</b>：强制关闭强幂等模式（防重模式，直接报错），即使全局配置为 true</li>
      * </ul>
-     *
-     * <p>模式说明：</p>
+     * </p>
+     * <p>
+     * 优先级：注解显式指定（TRUE/FALSE） > 全局配置 > 默认值（false，即防重模式）
+     * </p>
+     * <p>
+     * 模式说明：</p>
      * <ul>
-     *     <li><b>false（防重模式，默认）</b>：重复请求直接报错，适用于支付、下单等不允许重复执行的场景</li>
-     *     <li><b>true（强幂等模式）</b>：重复请求返回第一次的结果，适用于需要保证多次调用返回相同结果的场景</li>
+     *     <li><b>防重模式</b>：重复请求直接报错，适用于支付、下单等不允许重复执行的场景</li>
+     *     <li><b>强幂等模式</b>：重复请求返回第一次的结果，适用于需要保证多次调用返回相同结果的场景</li>
      * </ul>
-     *
-     * <p>防重模式行为：</p>
+     * <p>
+     * 防重模式行为：</p>
      * <ul>
      *     <li>第一次请求：执行方法，Token 存入 Redis</li>
      *     <li>第二次请求：直接返回错误提示（使用 {@code message} 配置的提示信息）</li>
      * </ul>
-     *
-     * <p>强幂等模式行为：</p>
+     * <p>
+     * 强幂等模式行为：</p>
      * <ul>
      *     <li>第一次请求：执行方法并将结果缓存到 Redis</li>
      *     <li>第二次请求：从 Redis 返回第一次的结果，不执行方法</li>
      *     <li>结果缓存时间与 Token 过期时间相同（{@code expireTime}）</li>
      * </ul>
-     *
-     * <p>使用示例：</p>
+     * <p>
+     * 使用示例：</p>
      * <pre>
-     * // 1. 防重模式（默认）
+     * // 1. 使用全局配置（如果全局配置为 true，则开启强幂等；如果为 false，则防重模式）
      * &#64;Idempotent
      * public Result&lt;String&gt; createOrder() {
-     *     // 第一次请求：执行方法
-     *     // 第二次请求：返回错误"请勿重复提交"
      *     return Result.success("订单创建成功");
      * }
      *
-     * // 2. 强幂等模式（注解配置）
-     * &#64;Idempotent(returnCachedResult = true)
+     * // 2. 强制开启强幂等模式（即使全局配置为 false）
+     * &#64;Idempotent(returnCachedResult = IdempotentMode.TRUE)
      * public Result&lt;OrderInfo&gt; getOrderInfo() {
      *     // 第一次请求：执行方法并缓存结果
      *     // 第二次请求：返回第一次的结果，不执行方法
      *     return Result.success(orderInfo);
      * }
      *
-     * // 3. 强幂等模式（全局配置）
-     * // 在 Nacos 或 application.yml 中配置：idempotent.return-cached-result=true
-     * &#64;Idempotent  // 使用全局配置
-     * public Result&lt;String&gt; getData() {
-     *     return Result.success("数据");
+     * // 3. 强制关闭强幂等模式（即使全局配置为 true）
+     * &#64;Idempotent(returnCachedResult = IdempotentMode.FALSE)
+     * public Result&lt;String&gt; pay() {
+     *     // 第一次请求：执行方法
+     *     // 第二次请求：返回错误"请勿重复提交"
+     *     return Result.success("支付成功");
      * }
      * </pre>
-     *
-     * <p>注意事项：</p>
+     * <p>
+     * 注意事项：</p>
      * <ul>
      *     <li>强幂等模式会缓存方法执行结果，占用 Redis 存储空间</li>
      *     <li>方法返回类型为 void 时，强幂等模式不会缓存结果</li>
@@ -365,7 +371,8 @@ public @interface Idempotent {
      *     <li>全局配置支持动态刷新（需在切面类添加 {@code @RefreshScope}）</li>
      * </ul>
      *
-     * @return true-强幂等模式（返回缓存结果），false-防重模式（直接报错），默认 false
+     * @return 幂等性模式，默认 DEFAULT（使用全局配置）
+     * @see IdempotentMode
      */
-    boolean returnCachedResult() default false;
+    IdempotentMode returnCachedResult() default IdempotentMode.DEFAULT;
 }
