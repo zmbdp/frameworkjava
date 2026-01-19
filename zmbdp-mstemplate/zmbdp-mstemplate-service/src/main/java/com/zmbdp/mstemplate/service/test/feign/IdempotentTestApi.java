@@ -66,4 +66,12 @@ public interface IdempotentTestApi {
     Result<String> testHttpAdvancedFailure(
             @RequestHeader("Idempotent-Token") String token,
             @RequestParam(value = "shouldFail", defaultValue = "false") boolean shouldFail);
+
+    /**
+     * 测试重试次数功能
+     */
+    @PostMapping("/http/advanced/retry-count")
+    Result<String> testHttpAdvancedRetryCount(
+            @RequestHeader("Idempotent-Token") String token,
+            @RequestParam(value = "shouldFail", defaultValue = "false") boolean shouldFail);
 }

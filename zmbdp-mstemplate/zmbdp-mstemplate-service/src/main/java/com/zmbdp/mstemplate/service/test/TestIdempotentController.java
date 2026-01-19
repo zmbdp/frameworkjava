@@ -5,11 +5,13 @@ import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.idempotent.annotation.Idempotent;
 import com.zmbdp.common.idempotent.enums.IdempotentMode;
+import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.mstemplate.service.domain.MessageDTO;
 import com.zmbdp.mstemplate.service.rabbit.Producer;
 import com.zmbdp.mstemplate.service.test.feign.IdempotentTestApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -39,6 +41,18 @@ public class TestIdempotentController {
     @Autowired
     private IdempotentTestApi idempotentTestAPI;
 
+    /**
+     * Redis 服务（用于查询重试次数）
+     */
+    @Autowired
+    private RedisService redisService;
+
+    /**
+     * 环境配置（用于获取 Redis Key 前缀）
+     */
+    @Autowired
+    private Environment environment;
+
     /*=============================================    一键测试接口    =============================================*/
 
     /**
@@ -62,36 +76,31 @@ public class TestIdempotentController {
         try {
             // 1. 请求头方式 - 第一次请求
             Result<String> headerResult1 = idempotentTestAPI.testHttpBasicHeader(token1);
-            boolean headerSuccess1 = headerResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpBasic.put("请求头方式-第一次", headerSuccess1 ? "✅ 成功" : "❌ 失败: " + headerResult1.getErrMsg());
+            httpBasic.put("请求头方式-第一次", isSuccess(headerResult1) ? "✅ 成功" : "❌ 失败: " + headerResult1.getErrMsg());
             
             // 2. 请求头方式 - 重复请求（应该失败）
             try {
                 Result<String> headerResult2 = idempotentTestAPI.testHttpBasicHeader(token1);
-                boolean headerSuccess2 = headerResult2.getCode() == ResultCode.SUCCESS.getCode();
-                httpBasic.put("请求头方式-重复", headerSuccess2 ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
+                httpBasic.put("请求头方式-重复", isSuccess(headerResult2) ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
             } catch (Exception e) {
                 httpBasic.put("请求头方式-重复", "✅ 正确拒绝重复请求（抛出异常）");
             }
             
             // 3. 请求参数方式 - 第一次请求
             Result<String> paramResult1 = idempotentTestAPI.testHttpBasicParam(token2);
-            boolean paramSuccess1 = paramResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpBasic.put("请求参数方式-第一次", paramSuccess1 ? "✅ 成功" : "❌ 失败: " + paramResult1.getErrMsg());
+            httpBasic.put("请求参数方式-第一次", isSuccess(paramResult1) ? "✅ 成功" : "❌ 失败: " + paramResult1.getErrMsg());
             
             // 4. 请求参数方式 - 重复请求（应该失败）
             try {
                 Result<String> paramResult2 = idempotentTestAPI.testHttpBasicParam(token2);
-                boolean paramSuccess2 = paramResult2.getCode() == ResultCode.SUCCESS.getCode();
-                httpBasic.put("请求参数方式-重复", paramSuccess2 ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
+                httpBasic.put("请求参数方式-重复", isSuccess(paramResult2) ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
             } catch (Exception e) {
                 httpBasic.put("请求参数方式-重复", "✅ 正确拒绝重复请求（抛出异常）");
             }
             
             // 5. 优先级测试
             Result<String> priorityResult = idempotentTestAPI.testHttpBasicPriority(token3, "param-token");
-            boolean prioritySuccess = priorityResult.getCode() == ResultCode.SUCCESS.getCode();
-            httpBasic.put("优先级测试", prioritySuccess ? "✅ 成功（优先使用请求头）" : "❌ 失败: " + priorityResult.getErrMsg());
+            httpBasic.put("优先级测试", isSuccess(priorityResult) ? "✅ 成功（优先使用请求头）" : "❌ 失败: " + priorityResult.getErrMsg());
             
         } catch (Exception e) {
             httpBasic.put("错误", "❌ HTTP基础功能测试异常: " + e.getMessage());
@@ -105,26 +114,22 @@ public class TestIdempotentController {
             
             // 1. 强幂等模式 - 第一次请求
             Result<String> strongResult1 = idempotentTestAPI.testHttpAdvancedStrong(strongToken);
-            boolean strongSuccess1 = strongResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpAdvanced.put("强幂等模式-第一次", strongSuccess1 ? "✅ 成功（结果已缓存）" : "❌ 失败: " + strongResult1.getErrMsg());
+            httpAdvanced.put("强幂等模式-第一次", isSuccess(strongResult1) ? "✅ 成功（结果已缓存）" : "❌ 失败: " + strongResult1.getErrMsg());
             
             // 2. 强幂等模式 - 重复请求（应该返回缓存结果）
             Result<String> strongResult2 = idempotentTestAPI.testHttpAdvancedStrong(strongToken);
-            boolean strongSuccess2 = strongResult2.getCode() == ResultCode.SUCCESS.getCode();
             // 验证返回的是缓存结果（时间戳应该相同）
-            boolean isCached = strongSuccess2 && strongResult1.getData().equals(strongResult2.getData());
+            boolean isCached = isSuccess(strongResult2) && strongResult1.getData().equals(strongResult2.getData());
             httpAdvanced.put("强幂等模式-重复", isCached ? "✅ 成功返回缓存结果" : "❌ 失败: 未返回缓存结果");
             
             // 3. 三态设计 - DEFAULT（第一次 + 重复请求）
             String defaultToken = UUID.randomUUID().toString();
             Result<String> defaultResult1 = idempotentTestAPI.testHttpAdvancedModeDefault(defaultToken);
-            boolean defaultSuccess1 = defaultResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpAdvanced.put("三态设计-DEFAULT-第一次", defaultSuccess1 ? "✅ 成功（使用全局配置）" : "❌ 失败: " + defaultResult1.getErrMsg());
+            httpAdvanced.put("三态设计-DEFAULT-第一次", isSuccess(defaultResult1) ? "✅ 成功（使用全局配置）" : "❌ 失败: " + defaultResult1.getErrMsg());
             // 重复请求测试（根据全局配置决定是防重还是强幂等）
             try {
                 Result<String> defaultResult2 = idempotentTestAPI.testHttpAdvancedModeDefault(defaultToken);
-                boolean defaultSuccess2 = defaultResult2.getCode() == ResultCode.SUCCESS.getCode();
-                httpAdvanced.put("三态设计-DEFAULT-重复", defaultSuccess2 ? "✅ 成功（根据全局配置处理）" : "✅ 正确拒绝重复请求");
+                httpAdvanced.put("三态设计-DEFAULT-重复", isSuccess(defaultResult2) ? "✅ 成功（根据全局配置处理）" : "✅ 正确拒绝重复请求");
             } catch (Exception e) {
                 httpAdvanced.put("三态设计-DEFAULT-重复", "✅ 正确拒绝重复请求（抛出异常）");
             }
@@ -132,25 +137,21 @@ public class TestIdempotentController {
             // 4. 三态设计 - TRUE（第一次 + 重复请求，应该返回缓存结果）
             String trueToken = UUID.randomUUID().toString();
             Result<String> trueResult1 = idempotentTestAPI.testHttpAdvancedModeTrue(trueToken);
-            boolean trueSuccess1 = trueResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpAdvanced.put("三态设计-TRUE-第一次", trueSuccess1 ? "✅ 成功（强制开启强幂等）" : "❌ 失败: " + trueResult1.getErrMsg());
+            httpAdvanced.put("三态设计-TRUE-第一次", isSuccess(trueResult1) ? "✅ 成功（强制开启强幂等）" : "❌ 失败: " + trueResult1.getErrMsg());
             // 重复请求测试（应该返回缓存结果）
             Result<String> trueResult2 = idempotentTestAPI.testHttpAdvancedModeTrue(trueToken);
-            boolean trueSuccess2 = trueResult2.getCode() == ResultCode.SUCCESS.getCode();
             // 验证返回的是缓存结果（时间戳应该相同）
-            boolean trueIsCached = trueSuccess2 && trueResult1.getData().equals(trueResult2.getData());
+            boolean trueIsCached = isSuccess(trueResult2) && trueResult1.getData().equals(trueResult2.getData());
             httpAdvanced.put("三态设计-TRUE-重复", trueIsCached ? "✅ 成功返回缓存结果" : "❌ 失败: 未返回缓存结果");
             
             // 5. 三态设计 - FALSE（第一次 + 重复请求，应该被拒绝）
             String falseToken = UUID.randomUUID().toString();
             Result<String> falseResult1 = idempotentTestAPI.testHttpAdvancedModeFalse(falseToken);
-            boolean falseSuccess1 = falseResult1.getCode() == ResultCode.SUCCESS.getCode();
-            httpAdvanced.put("三态设计-FALSE-第一次", falseSuccess1 ? "✅ 成功（强制关闭强幂等）" : "❌ 失败: " + falseResult1.getErrMsg());
+            httpAdvanced.put("三态设计-FALSE-第一次", isSuccess(falseResult1) ? "✅ 成功（强制关闭强幂等）" : "❌ 失败: " + falseResult1.getErrMsg());
             // 重复请求测试（应该被拒绝）
             try {
                 Result<String> falseResult2 = idempotentTestAPI.testHttpAdvancedModeFalse(falseToken);
-                boolean falseSuccess2 = falseResult2.getCode() == ResultCode.SUCCESS.getCode();
-                httpAdvanced.put("三态设计-FALSE-重复", falseSuccess2 ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
+                httpAdvanced.put("三态设计-FALSE-重复", isSuccess(falseResult2) ? "❌ 应该失败但成功了" : "✅ 正确拒绝重复请求");
             } catch (Exception e) {
                 httpAdvanced.put("三态设计-FALSE-重复", "✅ 正确拒绝重复请求（抛出异常）");
             }
@@ -159,15 +160,17 @@ public class TestIdempotentController {
             String failureToken = UUID.randomUUID().toString();
             try {
                 Result<String> failureResult = idempotentTestAPI.testHttpAdvancedFailure(failureToken, true);
-                boolean failureSuccess = failureResult.getCode() == ResultCode.SUCCESS.getCode();
-                httpAdvanced.put("业务失败重试", failureSuccess ? "❌ 应该失败但成功了" : "✅ 正确抛出异常");
+                httpAdvanced.put("业务失败重试", isSuccess(failureResult) ? "❌ 应该失败但成功了" : "✅ 正确抛出异常");
             } catch (Exception e) {
                 httpAdvanced.put("业务失败重试", "✅ 正确抛出异常，Token会被删除");
                 // 验证可以重试
                 Result<String> retryResult = idempotentTestAPI.testHttpAdvancedFailure(failureToken, false);
-                boolean retrySuccess = retryResult.getCode() == ResultCode.SUCCESS.getCode();
-                httpAdvanced.put("业务失败重试-验证", retrySuccess ? "✅ 可以重试成功" : "❌ 重试失败: " + retryResult.getErrMsg());
+                httpAdvanced.put("业务失败重试-验证", isSuccess(retryResult) ? "✅ 可以重试成功" : "❌ 重试失败: " + retryResult.getErrMsg());
             }
+            
+            // 7. 重试次数测试
+            Map<String, Object> retryCountTest = testRetryCount();
+            httpAdvanced.put("重试次数测试", retryCountTest);
             
         } catch (Exception e) {
             httpAdvanced.put("错误", "❌ HTTP高级功能测试异常: " + e.getMessage());
@@ -181,42 +184,29 @@ public class TestIdempotentController {
             String mqToken2 = UUID.randomUUID().toString();
             
             // 1. SpEL表达式方式 - 第一次
-            MessageDTO message1 = new MessageDTO();
-            message1.setType("测试消息");
-            message1.setDesc("MQ基础功能测试 - SpEL表达式");
-            message1.setIdempotentToken(mqToken1);
+            MessageDTO message1 = createMessageDTO("测试消息", "MQ基础功能测试 - SpEL表达式", mqToken1);
             producer.produceMsgIdempotent(message1);
             mqBasic.put("SpEL表达式-第一次", "✅ 消息发送成功，Token: " + mqToken1);
             
             // 2. SpEL表达式方式 - 重复（应该被拒绝）
-            MessageDTO message2 = new MessageDTO();
-            message2.setType("测试消息");
-            message2.setDesc("MQ基础功能测试 - SpEL表达式重复");
-            message2.setIdempotentToken(mqToken1);
+            MessageDTO message2 = createMessageDTO("测试消息", "MQ基础功能测试 - SpEL表达式重复", mqToken1);
             producer.produceMsgIdempotent(message2);
             mqBasic.put("SpEL表达式-重复", "✅ 消息发送成功（消费者会拒绝处理）");
             
             // 3. 消息头方式 - 第一次
-            MessageDTO message3 = new MessageDTO();
-            message3.setType("测试消息");
-            message3.setDesc("MQ基础功能测试 - 消息头方式");
+            MessageDTO message3 = createMessageDTO("测试消息", "MQ基础功能测试 - 消息头方式", null);
             producer.produceMsgIdempotentHeader(message3, mqToken2);
             mqBasic.put("消息头方式-第一次", "✅ 消息发送成功，Token: " + mqToken2);
             
             // 4. 消息头方式 - 重复（应该被拒绝）
-            MessageDTO message4 = new MessageDTO();
-            message4.setType("测试消息");
-            message4.setDesc("MQ基础功能测试 - 消息头方式重复");
+            MessageDTO message4 = createMessageDTO("测试消息", "MQ基础功能测试 - 消息头方式重复", null);
             producer.produceMsgIdempotentHeader(message4, mqToken2);
             mqBasic.put("消息头方式-重复", "✅ 消息发送成功（消费者会拒绝处理）");
             
             // 5. 批量发送测试
             String batchToken = UUID.randomUUID().toString();
             for (int i = 1; i <= 3; i++) {
-                MessageDTO message = new MessageDTO();
-                message.setType("批量测试");
-                message.setDesc("MQ基础功能测试 - 第" + i + "条消息");
-                message.setIdempotentToken(batchToken);
+                MessageDTO message = createMessageDTO("批量测试", "MQ基础功能测试 - 第" + i + "条消息", batchToken);
                 producer.produceMsgIdempotent(message);
             }
             mqBasic.put("批量发送", "✅ 发送3条相同Token的消息，只有第一条会被处理，Token: " + batchToken);
@@ -230,35 +220,22 @@ public class TestIdempotentController {
         Map<String, Object> mqAdvanced = new LinkedHashMap<>();
         try {
             // 1. 业务失败测试（第一次失败 + 验证可以重试）
-            MessageDTO failureMessage1 = new MessageDTO();
-            failureMessage1.setType("测试失败");
-            failureMessage1.setDesc("MQ高级功能测试 - 模拟业务失败（第一次）");
             String failureToken = UUID.randomUUID().toString();
-            failureMessage1.setIdempotentToken(failureToken);
+            MessageDTO failureMessage1 = createMessageDTO("测试失败", "MQ高级功能测试 - 模拟业务失败（第一次）", failureToken);
             producer.produceMsgIdempotentFailure(failureMessage1);
             mqAdvanced.put("业务失败-第一次", "✅ 消息发送成功，Token: " + failureToken + "（消费者会抛出异常，Token会被删除）");
             
             // 等待一小段时间，确保第一次消息处理完成
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            sleep(500);
             
             // 验证可以重试（发送成功类型的消息，应该能正常处理）
-            MessageDTO retryMessage = new MessageDTO();
-            retryMessage.setType("测试成功");
-            retryMessage.setDesc("MQ高级功能测试 - 验证业务失败后可以重试");
-            retryMessage.setIdempotentToken(failureToken);
+            MessageDTO retryMessage = createMessageDTO("测试成功", "MQ高级功能测试 - 验证业务失败后可以重试", failureToken);
             producer.produceMsgIdempotentFailure(retryMessage);
             mqAdvanced.put("业务失败-重试验证", "✅ 消息发送成功（Token已删除，可以重试）");
             
             // 2. 自定义过期时间测试
-            MessageDTO expireMessage = new MessageDTO();
-            expireMessage.setType("测试消息");
-            expireMessage.setDesc("MQ高FAILED 级功能测试 - 自定义过期时间");
             String expireToken = UUID.randomUUID().toString();
-            expireMessage.setIdempotentToken(expireToken);
+            MessageDTO expireMessage = createMessageDTO("测试消息", "MQ高级功能测试 - 自定义过期时间", expireToken);
             producer.produceMsgIdempotent(expireMessage);
             mqAdvanced.put("自定义过期时间", "✅ 消息发送成功，Token: " + expireToken);
             
@@ -288,8 +265,7 @@ public class TestIdempotentController {
         // HTTP基础功能
         try {
             Result<String> httpResult = idempotentTestAPI.testHttpBasicHeader(token);
-            boolean httpSuccess = httpResult.getCode() == ResultCode.SUCCESS.getCode();
-            result.put("HTTP请求头方式", httpSuccess ? "✅ 成功" : "❌ 失败");
+            result.put("HTTP请求头方式", isSuccess(httpResult) ? "✅ 成功" : "❌ 失败");
         } catch (Exception e) {
             result.put("HTTP请求头方式", "❌ 异常: " + e.getMessage());
         }
@@ -299,19 +275,14 @@ public class TestIdempotentController {
             String strongToken = UUID.randomUUID().toString();
             Result<String> strongResult1 = idempotentTestAPI.testHttpAdvancedStrong(strongToken);
             Result<String> strongResult2 = idempotentTestAPI.testHttpAdvancedStrong(strongToken);
-            boolean strongSuccess1 = strongResult1.getCode() == ResultCode.SUCCESS.getCode();
-            boolean strongSuccess2 = strongResult2.getCode() == ResultCode.SUCCESS.getCode();
-            result.put("HTTP强幂等模式", strongSuccess1 && strongSuccess2 ? "✅ 成功" : "❌ 失败");
+            result.put("HTTP强幂等模式", isSuccess(strongResult1) && isSuccess(strongResult2) ? "✅ 成功" : "❌ 失败");
         } catch (Exception e) {
             result.put("HTTP强幂等模式", "❌ 异常: " + e.getMessage());
         }
         
         // MQ功能
         try {
-            MessageDTO message = new MessageDTO();
-            message.setType("快速测试");
-            message.setDesc("快速测试消息");
-            message.setIdempotentToken(UUID.randomUUID().toString());
+            MessageDTO message = createMessageDTO("快速测试", "快速测试消息", UUID.randomUUID().toString());
             producer.produceMsgIdempotent(message);
             result.put("MQ消息发送", "✅ 成功");
         } catch (Exception e) {
@@ -420,5 +391,268 @@ public class TestIdempotentController {
             throw new ServiceException("模拟业务异常，Token会被删除，允许重试", ResultCode.ERROR.getCode());
         }
         return Result.success("业务失败重试测试成功");
+    }
+
+    /**
+     * 重试次数测试专用接口
+     * 用于测试重试次数的递增、查询、删除等功能
+     */
+    @PostMapping("/http/advanced/retry-count")
+    @Idempotent(headerName = "Idempotent-Token", expireTime = 300, message = "请勿重复提交")
+    public Result<String> testHttpAdvancedRetryCount(@RequestParam(value = "shouldFail", defaultValue = "false") boolean shouldFail) {
+        if (shouldFail) {
+            throw new ServiceException("模拟业务异常，用于测试重试次数", ResultCode.ERROR.getCode());
+        }
+        return Result.success("重试次数测试成功");
+    }
+
+    /*=============================================    辅助方法    =============================================*/
+
+    /**
+     * 创建 MessageDTO 对象
+     *
+     * @param type  消息类型
+     * @param desc  消息描述
+     * @param token 幂等性Token（可为null，用于消息头方式）
+     * @return MessageDTO 对象
+     */
+    private MessageDTO createMessageDTO(String type, String desc, String token) {
+        MessageDTO message = new MessageDTO();
+        message.setType(type);
+        message.setDesc(desc);
+        if (token != null) {
+            message.setIdempotentToken(token);
+        }
+        return message;
+    }
+
+    /**
+     * 安全睡眠，处理中断异常
+     *
+     * @param millis 睡眠时间（毫秒）
+     */
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * 检查 Result 是否成功
+     *
+     * @param result Result 对象
+     * @return true - 成功；false - 失败
+     */
+    private boolean isSuccess(Result<?> result) {
+        return result != null && result.getCode() == ResultCode.SUCCESS.getCode();
+    }
+
+    /**
+     * 测试重试次数功能
+     * 测试场景：
+     * 1. 重试次数递增（1/3, 2/3, 3/3）
+     * 2. 失败时重试次数是否能正确查询到
+     * 3. 成功时重试次数是否会被删除
+     * 4. 超过最大重试次数时的行为
+     *
+     * @return 测试结果
+     */
+    private Map<String, Object> testRetryCount() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        
+        try {
+            // 获取 Redis Key 前缀（使用与IdempotentAspect相同的配置）
+            String keyPrefix = environment.getProperty(
+                    "idempotent.key-prefix",
+                    String.class,
+                    "idempotent:token:"
+            );
+            
+            // 添加日志输出，方便调试
+            log.info("重试次数测试 - Redis Key前缀: {}", keyPrefix);
+            
+            // ========== 测试场景1：重试次数递增 ==========
+            String retryToken1 = UUID.randomUUID().toString();
+            String retryCountKey1 = keyPrefix + retryToken1 + ":retry:count";
+            
+            // 第一次失败（注意：第一次失败时，重试次数还没有写入，因为重试次数是在检测到FAILED状态时递增的）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
+                result.put("场景1-第一次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景1-第一次失败", "✅ 正确抛出异常");
+            }
+            
+            // 等待一小段时间，确保第一次处理完成（状态设置为FAILED）
+            sleep(300);
+            
+            // 查询第一次失败后的状态（此时状态应该是FAILED，但重试次数还没有写入）
+            String status1 = redisService.getCacheObject(keyPrefix + retryToken1, String.class);
+            Integer retryCount1 = redisService.getCacheObject(retryCountKey1, Integer.class);
+            result.put("场景1-第一次失败后状态", "FAILED".equals(status1) ? "✅ 正确: " + status1 : "❌ 错误: " + status1);
+            result.put("场景1-第一次失败后重试次数", retryCount1 == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount1);
+            
+            // 第二次失败（此时会检测到FAILED状态，递增重试次数为1）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
+                result.put("场景1-第二次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景1-第二次失败", "✅ 正确抛出异常");
+            }
+            
+            // 等待一小段时间，确保第二次处理完成
+            sleep(300);
+            
+            // 查询重试次数（应该是1）
+            Integer retryCount2 = redisService.getCacheObject(retryCountKey1, Integer.class);
+            result.put("场景1-第二次失败后重试次数", retryCount2 != null && retryCount2 == 1 ? "✅ 正确: " + retryCount2 : "❌ 错误: " + retryCount2 + " (期望: 1)");
+            
+            // 第三次失败（此时会检测到FAILED状态，递增重试次数为2）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
+                result.put("场景1-第三次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景1-第三次失败", "✅ 正确抛出异常");
+            }
+            
+            sleep(300);
+            
+            // 查询重试次数（应该是2）
+            Integer retryCount3 = redisService.getCacheObject(retryCountKey1, Integer.class);
+            result.put("场景1-第三次失败后重试次数", retryCount3 != null && retryCount3 == 2 ? "✅ 正确: " + retryCount3 : "❌ 错误: " + retryCount3 + " (期望: 2)");
+            
+            // 第四次失败（此时会检测到FAILED状态，递增重试次数为3，然后超过限制）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
+                result.put("场景1-第四次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景1-第四次失败", "✅ 正确抛出异常（超过最大重试次数）");
+            }
+            
+            sleep(300);
+            
+            // 查询重试次数（应该被清除了）
+            Integer retryCount4 = redisService.getCacheObject(retryCountKey1, Integer.class);
+            result.put("场景1-超过限制后重试次数", retryCount4 == null ? "✅ 正确: 已被清除" : "❌ 错误: 未清除, 值=" + retryCount4);
+            
+            // ========== 测试场景2：失败后成功，验证重试次数是否被删除 ==========
+            String retryToken2 = UUID.randomUUID().toString();
+            String retryCountKey2 = keyPrefix + retryToken2 + ":retry:count";
+            
+            // 第一次失败
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken2, true);
+                result.put("场景2-第一次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景2-第一次失败", "✅ 正确抛出异常");
+            }
+            
+            // 等待一小段时间，确保第一次处理完成
+            sleep(300);
+            
+            // 查询重试次数（第一次失败时还未写入）
+            Integer retryCount2_1 = redisService.getCacheObject(retryCountKey2, Integer.class);
+            result.put("场景2-第一次失败后重试次数", retryCount2_1 == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount2_1);
+            
+            // 第二次失败（此时会检测到FAILED状态，递增重试次数为1，然后删除FAILED状态，继续执行）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken2, true);
+                result.put("场景2-第二次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景2-第二次失败", "✅ 正确抛出异常");
+            }
+            
+            sleep(300);
+            
+            // 查询重试次数（应该是1）
+            Integer retryCount2_2 = redisService.getCacheObject(retryCountKey2, Integer.class);
+            result.put("场景2-第二次失败后重试次数", retryCount2_2 != null && retryCount2_2 == 1 ? "✅ 正确: " + retryCount2_2 : "❌ 错误: " + retryCount2_2 + " (期望: 1)");
+            
+            // 第三次成功（此时会检测到FAILED状态，递增重试次数为2，然后删除FAILED状态，继续执行，成功后清除重试次数）
+            try {
+                Result<String> successResult = idempotentTestAPI.testHttpAdvancedRetryCount(retryToken2, false);
+                if (isSuccess(successResult)) {
+                    result.put("场景2-第三次成功", "✅ 成功");
+                    // 等待一小段时间，确保处理完成
+                    sleep(300);
+                    // 查询重试次数（应该被清除了）
+                    Integer retryCount2_3 = redisService.getCacheObject(retryCountKey2, Integer.class);
+                    result.put("场景2-成功后重试次数", retryCount2_3 == null ? "✅ 正确: 已被清除" : "❌ 错误: 未清除, 值=" + retryCount2_3);
+                } else {
+                    result.put("场景2-第三次成功", "❌ 失败: " + successResult.getErrMsg());
+                }
+            } catch (Exception e) {
+                result.put("场景2-第三次成功", "❌ 异常: " + e.getMessage());
+            }
+            
+            // ========== 测试场景3：连续失败3次后，验证重试次数是否正确 ==========
+            String retryToken3 = UUID.randomUUID().toString();
+            String retryCountKey3 = keyPrefix + retryToken3 + ":retry:count";
+            
+            for (int i = 1; i <= 3; i++) {
+                try {
+                    idempotentTestAPI.testHttpAdvancedRetryCount(retryToken3, true);
+                    result.put("场景3-第" + i + "次失败", "❌ 应该失败但成功了");
+                } catch (Exception e) {
+                    result.put("场景3-第" + i + "次失败", "✅ 正确抛出异常");
+                }
+                // 等待一小段时间，确保处理完成
+                sleep(300);
+                // 查询重试次数
+                // 注意：第1次失败时，重试次数还未写入（因为重试次数是在检测到FAILED状态时递增的）
+                // 第2次失败时，重试次数为1（因为检测到了第1次的FAILED状态）
+                // 第3次失败时，重试次数为2（因为检测到了第2次的FAILED状态）
+                Integer retryCount = redisService.getCacheObject(retryCountKey3, Integer.class);
+                int expectedRetryCount = i == 1 ? 0 : i - 1; // 第1次失败时重试次数为0，第2次为1，第3次为2
+                if (i == 1) {
+                    result.put("场景3-第" + i + "次失败后重试次数", retryCount == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount + " (期望: null)");
+                } else {
+                    result.put("场景3-第" + i + "次失败后重试次数", retryCount != null && retryCount == expectedRetryCount ? "✅ 正确: " + retryCount : "❌ 错误: " + retryCount + " (期望: " + expectedRetryCount + ")");
+                }
+            }
+            
+            // ========== 测试场景4：失败后立即查询，验证重试次数是否存在 ==========
+            String retryToken4 = UUID.randomUUID().toString();
+            String retryCountKey4 = keyPrefix + retryToken4 + ":retry:count";
+            
+            // 第一次失败
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken4, true);
+                result.put("场景4-第一次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景4-第一次失败", "✅ 正确抛出异常");
+            }
+            
+            // 立即查询重试次数（第一次失败时还未写入，应该为null）
+            sleep(100);
+            Integer retryCount4_1 = redisService.getCacheObject(retryCountKey4, Integer.class);
+            result.put("场景4-失败后立即查询重试次数", retryCount4_1 == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount4_1);
+            
+            // 等待一段时间后再次查询（应该仍然为null，因为第一次失败时还未写入）
+            sleep(200);
+            Integer retryCount4_2 = redisService.getCacheObject(retryCountKey4, Integer.class);
+            result.put("场景4-等待后查询重试次数", retryCount4_2 == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount4_2);
+            
+            // 第二次失败（此时会检测到FAILED状态，递增重试次数为1）
+            try {
+                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken4, true);
+                result.put("场景4-第二次失败", "❌ 应该失败但成功了");
+            } catch (Exception e) {
+                result.put("场景4-第二次失败", "✅ 正确抛出异常");
+            }
+            
+            // 等待后查询重试次数（应该为1）
+            sleep(300);
+            Integer retryCount4_3 = redisService.getCacheObject(retryCountKey4, Integer.class);
+            result.put("场景4-第二次失败后查询重试次数", retryCount4_3 != null && retryCount4_3 == 1 ? "✅ 正确: " + retryCount4_3 : "❌ 错误: " + retryCount4_3 + " (期望: 1)");
+            
+        } catch (Exception e) {
+            result.put("错误", "❌ 重试次数测试异常: " + e.getMessage());
+            log.error("重试次数测试异常", e);
+        }
+        
+        return result;
     }
 }
