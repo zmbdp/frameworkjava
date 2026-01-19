@@ -18,7 +18,58 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * redis 相关操作工具类
+ * Redis 操作服务类
+ * <p>
+ * 提供 Redis 的完整操作封装，支持 Redis 的所有数据结构类型：
+ * <ul>
+ *     <li><b>String</b>：字符串类型，支持对象序列化存储</li>
+ *     <li><b>List</b>：列表类型，支持有序列表操作</li>
+ *     <li><b>Set</b>：集合类型，支持无序集合操作</li>
+ *     <li><b>ZSet</b>：有序集合类型，支持按分数排序</li>
+ *     <li><b>Hash</b>：哈希类型，支持字段-值映射</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 特性说明：
+ * <ul>
+ *     <li>自动序列化/反序列化：使用 GenericJackson2JsonRedisSerializer 自动处理对象序列化</li>
+ *     <li>支持泛型嵌套：通过 TypeReference 支持复杂的泛型类型（如 List&lt;Map&lt;String, User&gt;&gt;）</li>
+ *     <li>异常安全：所有方法都包含异常处理，不会抛出异常，失败时返回默认值或 false</li>
+ *     <li>事务支持：提供 Redis 事务执行方法，保证操作的原子性</li>
+ *     <li>Lua 脚本：支持通过 Lua 脚本实现复杂的原子操作</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 使用示例：
+ * <pre>
+ * // 1. 基本对象存储
+ * redisService.setCacheObject("user:1", user, 3600, TimeUnit.SECONDS);
+ * User cachedUser = redisService.getCacheObject("user:1", User.class);
+ *
+ * // 2. 复杂泛型类型存储
+ * TypeReference&lt;List&lt;User&gt;&gt; typeRef = new TypeReference&lt;List&lt;User&gt;&gt;() {};
+ * redisService.setCacheList("users", userList);
+ * List&lt;User&gt; users = redisService.getCacheList("users", typeRef);
+ *
+ * // 3. 原子操作
+ * Long count = redisService.incr("counter", 1);
+ * Boolean success = redisService.setCacheObjectIfAbsent("lock:key", "value", 60, TimeUnit.SECONDS);
+ *
+ * // 4. Hash 操作
+ * redisService.setCacheMapValue("user:1:info", "name", "张三");
+ * String name = redisService.getCacheMapValue("user:1:info", "name");
+ * </pre>
+ * </p>
+ * <p>
+ * 注意事项：
+ * <ul>
+ *     <li>所有方法都是线程安全的，可以在多线程环境下使用</li>
+ *     <li>存储对象时会自动序列化为 JSON，读取时会自动反序列化</li>
+ *     <li>对于复杂泛型类型，建议使用 TypeReference 而不是 Class</li>
+ *     <li>keys() 方法在生产环境慎用，可能阻塞 Redis 服务器</li>
+ *     <li>事务操作失败时会抛出异常，需要调用方处理</li>
+ * </ul>
+ * </p>
  *
  * @author 稚名不带撇
  */
@@ -35,11 +86,14 @@ public class RedisService {
     /*=============================================    通用方法    =============================================*/
 
     /**
-     * 设置有效时间
+     * 为指定的键设置过期时间（秒）
+     * <p>
+     * 如果键不存在，操作会失败。如果键已经有过期时间，会更新为新的过期时间。
+     * </p>
      *
-     * @param key     Redis 键
-     * @param timeout 有效时间 (秒)
-     * @return true - 设置成功; false - 设置失败
+     * @param key     Redis 键，不能为 null
+     * @param timeout 过期时间（秒），必须大于 0
+     * @return true - 设置成功；false - 设置失败（键不存在或其他错误）
      */
     public Boolean expire(final String key, final long timeout) {
         try {
@@ -51,12 +105,16 @@ public class RedisService {
     }
 
     /**
-     * 设置有效时间 (并指定时间单位)
+     * 为指定的键设置过期时间（支持自定义时间单位）
+     * <p>
+     * 如果键不存在，操作会失败。如果键已经有过期时间，会更新为新的过期时间。
+     * 支持的时间单位：SECONDS（秒）、MINUTES（分钟）、HOURS（小时）、DAYS（天）等。
+     * </p>
      *
-     * @param key      Redis 键
-     * @param timeout  有效时间
-     * @param timeUnit 时间单位
-     * @return true - 设置成功; false - 设置失败
+     * @param key      Redis 键，不能为 null
+     * @param timeout  过期时间，必须大于 0
+     * @param timeUnit 时间单位，不能为 null
+     * @return true - 设置成功；false - 设置失败（键不存在或其他错误）
      */
     public Boolean expire(final String key, final long timeout, final TimeUnit timeUnit) {
         try {
@@ -68,10 +126,18 @@ public class RedisService {
     }
 
     /**
-     * 获取有效时间
+     * 获取指定键的剩余过期时间（秒）
+     * <p>
+     * 返回值说明：
+     * <ul>
+     *     <li>正数：键的剩余过期时间（秒）</li>
+     *     <li>-1：键存在但没有设置过期时间（永久有效）</li>
+     *     <li>-2：键不存在</li>
+     * </ul>
+     * </p>
      *
-     * @param key Redis键
-     * @return 有效时间, -2 - 不存在
+     * @param key Redis 键，不能为 null
+     * @return 剩余过期时间（秒），-1 表示永久有效，-2 表示键不存在
      */
     public Long getExpire(final String key) {
         try {
@@ -83,10 +149,13 @@ public class RedisService {
     }
 
     /**
-     * 判断 key是否存在
+     * 判断指定的键是否存在
+     * <p>
+     * 该方法会检查 Redis 中是否存在指定的键，无论键是否设置了过期时间。
+     * </p>
      *
-     * @param key 键
-     * @return true - 存在; false - 不存在
+     * @param key Redis 键，不能为 null
+     * @return true - 键存在；false - 键不存在或发生错误
      */
     public Boolean hasKey(final String key) {
         try {
@@ -98,10 +167,20 @@ public class RedisService {
     }
 
     /**
-     * 根据提供的键模式查找 Redis 中匹配的键
+     * 根据模式匹配查找 Redis 中所有匹配的键
+     * <p>
+     * 支持的模式：
+     * <ul>
+     *     <li>{@code *}：匹配任意多个字符，如 {@code user:*}</li>
+     *     <li>{@code ?}：匹配单个字符，如 {@code user:?}</li>
+     *     <li>{@code [abc]}：匹配指定字符中的一个，如 {@code user:[123]}</li>
+     * </ul>
+     * <b>注意：</b>在生产环境中慎用此方法，如果键数量很大可能会阻塞 Redis 服务器。
+     * 建议使用 SCAN 命令的迭代方式（本方法未实现）。
+     * </p>
      *
-     * @param pattern 要查找的键的模式
-     * @return 键列表
+     * @param pattern 键的模式，支持通配符，不能为 null
+     * @return 匹配的键集合，如果没有匹配的键或发生错误，返回空集合
      */
     public Collection<String> keys(final String pattern) {
         try {
@@ -113,10 +192,13 @@ public class RedisService {
     }
 
     /**
-     * 重命名key
+     * 重命名 Redis 键
+     * <p>
+     * 如果新键名已存在，会被覆盖。如果旧键不存在，操作会失败（但不会抛出异常）。
+     * </p>
      *
-     * @param oldKey 原来 key
-     * @param newKey 新 key
+     * @param oldKey 原键名，不能为 null
+     * @param newKey 新键名，不能为 null，如果已存在会被覆盖
      */
     public void renameKey(String oldKey, String newKey) {
         try {
@@ -127,10 +209,13 @@ public class RedisService {
     }
 
     /**
-     * 删除单个数据
+     * 删除指定的键及其关联的值
+     * <p>
+     * 如果键不存在，返回 false。删除操作是原子性的。
+     * </p>
      *
-     * @param key 缓存的键值
-     * @return 是否成功  true - 删除成功; false - 删除失败
+     * @param key 要删除的 Redis 键，不能为 null
+     * @return true - 删除成功；false - 删除失败（键不存在或其他错误）
      */
     public Boolean deleteObject(final String key) {
         try {
@@ -142,10 +227,14 @@ public class RedisService {
     }
 
     /**
-     * 删除多个数据
+     * 批量删除多个键
+     * <p>
+     * 删除集合中所有指定的键。如果某个键不存在，会被忽略。
+     * 返回实际删除的键数量。
+     * </p>
      *
-     * @param collection 多个数据对应的缓存的键值
-     * @return 是否删除了对象 true - 删除成功; false - 删除失败
+     * @param collection 要删除的键集合，不能为 null
+     * @return 实际删除的键数量，如果发生错误返回 0
      */
     public Long deleteObject(final Collection collection) {
         try {
@@ -158,12 +247,26 @@ public class RedisService {
     }
 
     /**
-     * 执行 Redis 事务
+     * 在 Redis 事务中执行多个操作
+     * <p>
+     * 所有操作会在一个事务中执行，保证原子性。如果事务执行失败，会抛出异常。
+     * 事务执行流程：MULTI → 执行操作 → EXEC 或 DISCARD（发生异常时）。
+     * </p>
+     * <p>
+     * 使用示例：
+     * <pre>
+     * List&lt;Object&gt; results = redisService.executeInTransaction(operations -&gt; {
+     *     operations.opsForValue().set("key1", "value1");
+     *     operations.opsForValue().set("key2", "value2");
+     * });
+     * </pre>
+     * </p>
      *
-     * @param action 缓存操作
-     * @return 缓存操作结果
+     * @param action 事务操作的回调函数，通过 RedisOperations 执行 Redis 命令，不能为 null
+     * @return 事务中每个命令的执行结果列表
+     * @throws RuntimeException 如果事务执行失败（命令类型错误或队列为空）
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes", "unchecked"}) // 忽略警告
     public List<Object> executeInTransaction(Consumer<RedisOperations> action) {
         try {
             return (List<Object>) redisTemplate.execute(new SessionCallback<List<Object>>() {
@@ -193,11 +296,15 @@ public class RedisService {
     /*=============================================    String    =============================================*/
 
     /**
-     * 存入 redis
+     * 将对象存储到 Redis（不设置过期时间）
+     * <p>
+     * 对象会被自动序列化为 JSON 格式存储。如果键已存在，会被覆盖。
+     * 存储的对象会永久有效，直到手动删除或 Redis 重启（取决于持久化配置）。
+     * </p>
      *
-     * @param key   缓存键
-     * @param value 缓存值
-     * @param <T>   泛型类型
+     * @param key   缓存键，不能为 null
+     * @param value 缓存值，可以是任意类型，会自动序列化
+     * @param <T>   值的类型
      */
     public <T> void setCacheObject(final String key, final T value) {
         try {
@@ -208,13 +315,17 @@ public class RedisService {
     }
 
     /**
-     * 存入 redis，设置过期时间
+     * 将对象存储到 Redis 并设置过期时间
+     * <p>
+     * 对象会被自动序列化为 JSON 格式存储。如果键已存在，会被覆盖。
+     * 到达过期时间后，键会自动从 Redis 中删除。
+     * </p>
      *
-     * @param key      缓存键
-     * @param value    缓存值
-     * @param timeout  缓存超时时间
-     * @param timeUnit 时间单位
-     * @param <T>      泛型类型
+     * @param key      缓存键，不能为 null
+     * @param value    缓存值，可以是任意类型，会自动序列化
+     * @param timeout  过期时间，必须大于 0
+     * @param timeUnit 时间单位，不能为 null（如 TimeUnit.SECONDS、TimeUnit.MINUTES 等）
+     * @param <T>      值的类型
      */
     public <T> void setCacheObject(final String key, final T value, final long timeout, final TimeUnit timeUnit) {
         try {
@@ -225,12 +336,16 @@ public class RedisService {
     }
 
     /**
-     * 存入 redis，如果键不存在则设置缓存
+     * 仅在键不存在时设置缓存（不设置过期时间）
+     * <p>
+     * 这是一个原子操作，相当于 Redis 的 SETNX 命令。常用于实现分布式锁。
+     * 如果键已存在，操作会失败，不会覆盖原有值。
+     * </p>
      *
-     * @param key   缓存键
-     * @param value 缓存值
-     * @param <T>   泛型类型
-     * @return 设置成功返回 true，否则返回 false
+     * @param key   缓存键，不能为 null
+     * @param value 缓存值，可以是任意类型，会自动序列化
+     * @param <T>   值的类型
+     * @return true - 设置成功（键不存在）；false - 设置失败（键已存在或发生错误）
      */
     public <T> Boolean setCacheObjectIfAbsent(final String key, final T value) {
         try {
@@ -242,14 +357,18 @@ public class RedisService {
     }
 
     /**
-     * 存入 redis 并设置过期时间，如果键不存在则设置缓存
+     * 仅在键不存在时设置缓存并指定过期时间
+     * <p>
+     * 这是一个原子操作，相当于 Redis 的 SETNX 命令加上过期时间。
+     * 常用于实现带过期时间的分布式锁。如果键已存在，操作会失败。
+     * </p>
      *
-     * @param key      缓存键
-     * @param value    缓存值
-     * @param timeout  缓存超时时间
-     * @param timeUnit 时间单位
-     * @param <T>      泛型类型
-     * @return 设置成功返回 true，否则返回 false
+     * @param key      缓存键，不能为 null
+     * @param value    缓存值，可以是任意类型，会自动序列化
+     * @param timeout  过期时间，必须大于 0
+     * @param timeUnit 时间单位，不能为 null
+     * @param <T>      值的类型
+     * @return true - 设置成功（键不存在）；false - 设置失败（键已存在或发生错误）
      */
     public <T> Boolean setCacheObjectIfAbsent(final String key, final T value, final long timeout, final TimeUnit timeUnit) {
         try {
@@ -261,12 +380,19 @@ public class RedisService {
     }
 
     /**
-     * 获取缓存对象
+     * 从 Redis 获取缓存对象
+     * <p>
+     * 如果键不存在，返回 null。如果对象类型匹配，直接返回；否则会进行 JSON 转换。
+     * 适用于简单的对象类型（非泛型嵌套）。
+     * </p>
+     * <p>
+     * 对于复杂泛型类型（如 List&lt;User&gt;），请使用 {@link #getCacheObject(String, TypeReference)} 方法。
+     * </p>
      *
-     * @param key   缓存键
-     * @param clazz 缓存对象类型
-     * @param <T>   泛型类型
-     * @return 缓存对象
+     * @param key   缓存键，不能为 null
+     * @param clazz 缓存对象的类型，不能为 null
+     * @param <T>   对象的类型
+     * @return 缓存的对象，如果键不存在或发生错误，返回 null
      */
     public <T> T getCacheObject(final String key, Class<T> clazz) {
         try {
@@ -291,12 +417,23 @@ public class RedisService {
     }
 
     /**
-     * 获取复杂的泛型嵌套缓存对象
+     * 从 Redis 获取复杂泛型嵌套的缓存对象
+     * <p>
+     * 使用 TypeReference 可以正确处理泛型类型，如 List&lt;User&gt;、Map&lt;String, List&lt;Order&gt;&gt; 等。
+     * 如果键不存在，返回 null。
+     * </p>
+     * <p>
+     * 使用示例：
+     * <pre>
+     * TypeReference&lt;List&lt;User&gt;&gt; typeRef = new TypeReference&lt;List&lt;User&gt;&gt;() {};
+     * List&lt;User&gt; users = redisService.getCacheObject("users", typeRef);
+     * </pre>
+     * </p>
      *
-     * @param key          缓存键值
-     * @param valueTypeRef 缓存对象类型
-     * @param <T>          泛型类型
-     * @return 缓存对象
+     * @param key          缓存键，不能为 null
+     * @param valueTypeRef 类型引用，用于指定泛型类型，不能为 null
+     * @param <T>          对象的类型
+     * @return 缓存的对象，如果键不存在或发生错误，返回 null
      */
     public <T> T getCacheObject(final String key, TypeReference<T> valueTypeRef) {
         try {
@@ -315,10 +452,14 @@ public class RedisService {
     }
 
     /**
-     * 对 key 对应的 value 进行原子递增（+1）
+     * 对指定键的值进行原子递增（+1）
+     * <p>
+     * 这是一个原子操作，线程安全。如果键不存在，会先初始化为 0 再递增。
+     * 键的值必须是数字类型（整数），否则会失败。
+     * </p>
      *
-     * @param key Redis 键, value 必须为数字类型
-     * @return 递增后的值（失败返回 -1）
+     * @param key Redis 键，不能为 null 或空字符串
+     * @return 递增后的值，如果失败返回 -1
      */
     public Long incr(final String key) {
         if (StringUtil.isEmpty(key)) {
@@ -333,11 +474,15 @@ public class RedisService {
     }
 
     /**
-     * 对 key 对应的 value 进行原子递增（指定增量）
+     * 对指定键的值进行原子递增（指定增量）
+     * <p>
+     * 这是一个原子操作，线程安全。如果键不存在，会先初始化为 0 再递增。
+     * 键的值必须是数字类型（整数），否则会失败。
+     * </p>
      *
-     * @param key   Redis 键, value 必须为数字类型
-     * @param delta 增加的数值
-     * @return 递增后的值（失败返回 -1）
+     * @param key   Redis 键，不能为 null 或空字符串
+     * @param delta 增加的数值，可以为负数（相当于递减）
+     * @return 递增后的值，如果失败返回 -1
      */
     public Long incr(final String key, final long delta) {
         if (StringUtil.isEmpty(key)) {
@@ -352,10 +497,14 @@ public class RedisService {
     }
 
     /**
-     * 对 key 对应的 value 进行原子递减（-1）
+     * 对指定键的值进行原子递减（-1）
+     * <p>
+     * 这是一个原子操作，线程安全。如果键不存在，会先初始化为 0 再递减。
+     * 键的值必须是数字类型（整数），否则会失败。
+     * </p>
      *
-     * @param key Redis 键, value 必须为数字类型
-     * @return 递减后的值（失败返回 -1）
+     * @param key Redis 键，不能为 null 或空字符串
+     * @return 递减后的值，如果失败返回 -1
      */
     public Long decr(final String key) {
         if (StringUtil.isEmpty(key)) {
@@ -370,11 +519,15 @@ public class RedisService {
     }
 
     /**
-     * 对 key 对应的 value 进行原子递减（指定减量）
+     * 对指定键的值进行原子递减（指定减量）
+     * <p>
+     * 这是一个原子操作，线程安全。如果键不存在，会先初始化为 0 再递减。
+     * 键的值必须是数字类型（整数），否则会失败。
+     * </p>
      *
-     * @param key   Redis 键, value 必须为数字类型
-     * @param delta 减少的数值
-     * @return 递减后的值（失败返回 -1）
+     * @param key   Redis 键，不能为 null 或空字符串
+     * @param delta 减少的数值，必须大于 0
+     * @return 递减后的值，如果失败返回 -1
      */
     public Long decr(final String key, final long delta) {
         if (StringUtil.isEmpty(key)) {
@@ -391,12 +544,16 @@ public class RedisService {
     /*=============================================    List    =============================================*/
 
     /**
-     * 将 List 数据保持原有顺序存入缓存
+     * 将列表数据按原有顺序存入 Redis（从右侧批量插入）
+     * <p>
+     * 如果键不存在，会创建新的列表。如果键已存在，会将新元素追加到列表末尾。
+     * 列表保持插入顺序，支持重复元素。
+     * </p>
      *
-     * @param key      缓存键
-     * @param dataList 缓存数据
-     * @param <T>      泛型类型
-     * @return 保存成功返回保存的条数，失败返回 -1
+     * @param key      缓存键，不能为 null
+     * @param dataList 要存储的列表数据，不能为 null
+     * @param <T>      元素的类型
+     * @return 保存成功返回列表长度，失败返回 -1
      */
     public <T> Long setCacheList(final String key, final List<T> dataList) {
         try {
@@ -409,12 +566,15 @@ public class RedisService {
     }
 
     /**
-     * 从 List 结构左侧插入数据（头插、插入单个数据）
+     * 从列表左侧插入单个元素（头插）
+     * <p>
+     * 元素会被插入到列表的最前面（索引 0）。如果键不存在，会创建新的列表。
+     * </p>
      *
-     * @param key  缓存键
-     * @param data 缓存数据
-     * @param <T>  泛型类型
-     * @return 插入成功返回插入的条数，失败返回 -1
+     * @param key  缓存键，不能为 null
+     * @param data 要插入的元素，不能为 null
+     * @param <T>  元素的类型
+     * @return 插入成功返回列表长度，失败返回 -1
      */
     public <T> Long leftPushForList(final String key, final T data) {
         try {
@@ -427,12 +587,15 @@ public class RedisService {
     }
 
     /**
-     * 从 List 结构右侧插入数据（尾插、插入单个数据）
+     * 从列表右侧插入单个元素（尾插）
+     * <p>
+     * 元素会被插入到列表的最后面。如果键不存在，会创建新的列表。
+     * </p>
      *
-     * @param key   key
-     * @param value 缓存的对象
-     * @param <T>   值类型
-     * @return 插入成功返回插入的条数，失败返回 -1
+     * @param key   缓存键，不能为 null
+     * @param value 要插入的元素，不能为 null
+     * @param <T>   元素的类型
+     * @return 插入成功返回列表长度，失败返回 -1
      */
     public <T> Long rightPushForList(final String key, final T value) {
         try {
@@ -641,14 +804,19 @@ public class RedisService {
     }
 
     /**
-     * 获得缓存的 List 对象
+     * 获取完整的列表数据
+     * <p>
+     * 返回列表中所有元素，保持原有顺序。适用于简单的对象类型（非泛型嵌套）。
+     * </p>
+     * <p>
+     * 对于复杂泛型类型（如 List&lt;Map&lt;String, User&gt;&gt;），请使用 {@link #getCacheList(String, TypeReference)} 方法。
+     * </p>
      *
-     * @param key   key 缓存的键值
-     * @param clazz 对象的类
-     * @param <T>   对象类型
-     * @return 列表
+     * @param key   缓存键，不能为 null
+     * @param clazz 元素的类型，不能为 null
+     * @param <T>   元素的类型
+     * @return 列表数据，如果键不存在或发生错误，返回 null
      */
-    //有序性
     public <T> List<T> getCacheList(final String key, Class<T> clazz) {
         try {
             List list = redisTemplate.opsForList().range(key, 0, -1);
@@ -660,12 +828,22 @@ public class RedisService {
     }
 
     /**
-     * 获得缓存的 List 对象 （支持复杂的泛型嵌套）
+     * 获取完整的列表数据（支持复杂泛型嵌套）
+     * <p>
+     * 使用 TypeReference 可以正确处理泛型类型，如 List&lt;User&gt;、List&lt;Map&lt;String, Order&gt;&gt; 等。
+     * </p>
+     * <p>
+     * 使用示例：
+     * <pre>
+     * TypeReference&lt;List&lt;User&gt;&gt; typeRef = new TypeReference&lt;List&lt;User&gt;&gt;() {};
+     * List&lt;User&gt; users = redisService.getCacheList("users", typeRef);
+     * </pre>
+     * </p>
      *
-     * @param key           key 信息
-     * @param typeReference 类型模板
-     * @param <T>           对象类型
-     * @return List 对象
+     * @param key           缓存键，不能为 null
+     * @param typeReference 类型引用，用于指定泛型类型，不能为 null
+     * @param <T>           元素的类型
+     * @return 列表数据，如果键不存在或发生错误，返回 null
      */
     public <T> List<T> getCacheList(final String key, TypeReference<List<T>> typeReference) {
         try {
@@ -1157,11 +1335,15 @@ public class RedisService {
     /*=============================================    Hash    =============================================*/
 
     /**
-     * 缓存 Map 数据
+     * 将 Map 数据批量存入 Redis Hash
+     * <p>
+     * 如果键不存在，会创建新的 Hash。如果键已存在，会覆盖所有字段。
+     * Hash 结构适合存储对象的多个属性。
+     * </p>
      *
-     * @param key     key
-     * @param dataMap map
-     * @param <T>     对象类型
+     * @param key     Redis 键，不能为 null
+     * @param dataMap 要存储的 Map 数据，key 为字段名，value 为字段值，不能为 null
+     * @param <T>     值的类型
      */
     public <T> void setCacheMap(final String key, final Map<String, T> dataMap) {
         if (dataMap != null) {
@@ -1174,12 +1356,15 @@ public class RedisService {
     }
 
     /**
-     * 往 Hash 中存入单个数据（如果key不存在，则创建key添加map中的数据）
+     * 往 Hash 中存入单个字段
+     * <p>
+     * 如果 Hash 键不存在，会创建新的 Hash。如果字段已存在，会被覆盖。
+     * </p>
      *
-     * @param key   Redis 键
-     * @param hKey  Hash 键
-     * @param value 值
-     * @param <T>   对象类型
+     * @param key   Redis 键（Hash 的键），不能为 null
+     * @param hKey  Hash 字段名，不能为 null
+     * @param value 字段值，可以是任意类型，会自动序列化
+     * @param <T>   值的类型
      */
     public <T> void setCacheMapValue(final String key, final String hKey, final T value) {
         try {
@@ -1223,12 +1408,18 @@ public class RedisService {
     }
 
     /**
-     * 获取缓存的 map 数据
+     * 获取 Hash 中的所有字段和值
+     * <p>
+     * 返回 Hash 中所有字段的 Map。适用于简单的对象类型（非泛型嵌套）。
+     * </p>
+     * <p>
+     * 对于复杂泛型类型（如 Map&lt;String, List&lt;User&gt;&gt;），请使用 {@link #getCacheMap(String, TypeReference)} 方法。
+     * </p>
      *
-     * @param key   key
-     * @param clazz 值的类型
-     * @param <T>   对象类型
-     * @return hash 对应的 map
+     * @param key   Redis 键（Hash 的键），不能为 null
+     * @param clazz 值的类型，不能为 null
+     * @param <T>   值的类型
+     * @return Hash 对应的 Map，如果键不存在或发生错误，返回 null
      */
     public <T> Map<String, T> getCacheMap(final String key, Class<T> clazz) {
         try {
@@ -1241,12 +1432,15 @@ public class RedisService {
     }
 
     /**
-     * 获取缓存的 map 数据（支持复杂的泛型嵌套）
+     * 获取 Hash 中的所有字段和值（支持复杂泛型嵌套）
+     * <p>
+     * 使用 TypeReference 可以正确处理泛型类型，如 Map&lt;String, User&gt;、Map&lt;String, List&lt;Order&gt;&gt; 等。
+     * </p>
      *
-     * @param key           key
-     * @param typeReference 类型模板
-     * @param <T>           对象类型
-     * @return hash 对应的 map
+     * @param key           Redis 键（Hash 的键），不能为 null
+     * @param typeReference 类型引用，用于指定泛型类型，不能为 null
+     * @param <T>           值的类型
+     * @return Hash 对应的 Map，如果键不存在或发生错误，返回 null
      */
     public <T> Map<String, T> getCacheMap(final String key, TypeReference<Map<String, T>> typeReference) {
         try {
@@ -1259,12 +1453,15 @@ public class RedisService {
     }
 
     /**
-     * 获取 Hash 中的单个数据
+     * 获取 Hash 中指定字段的值
+     * <p>
+     * 如果字段不存在，返回 null。适用于简单的对象类型（非泛型嵌套）。
+     * </p>
      *
-     * @param key  Redis 键
-     * @param hKey Hash 键
-     * @param <T>  对象类型
-     * @return Hash中的对象
+     * @param key  Redis 键（Hash 的键），不能为 null
+     * @param hKey Hash 字段名，不能为 null
+     * @param <T>  值的类型
+     * @return 字段值，如果字段不存在或发生错误，返回 null
      */
     public <T> T getCacheMapValue(final String key, final String hKey) {
         try {
@@ -1411,12 +1608,16 @@ public class RedisService {
     }
 
     /**
-     * 为 Hash 中的值增加指定数值（整型）
+     * 为 Hash 中指定字段的值增加指定数值（整型）
+     * <p>
+     * 这是一个原子操作，线程安全。如果字段不存在，会先初始化为 0 再增加。
+     * 如果直接 increment 失败（值不是数字类型），会尝试获取当前值并手动转换后计算。
+     * </p>
      *
-     * @param key   Redis 键
-     * @param hKey  Hash 键
-     * @param delta 增加的数值
-     * @return 增加后的数值
+     * @param key   Redis 键（Hash 的键），不能为 null
+     * @param hKey  Hash 字段名，不能为 null
+     * @param delta 增加的数值，可以为负数（相当于减少）
+     * @return 增加后的数值，如果发生错误返回 0
      */
     public Long incrementCacheMapValue(final String key, final String hKey, final long delta) {
         try {
@@ -1453,12 +1654,16 @@ public class RedisService {
     }
 
     /**
-     * 为 Hash 中的值增加指定数值（浮点型）
+     * 为 Hash 中指定字段的值增加指定数值（浮点型）
+     * <p>
+     * 这是一个原子操作，线程安全。如果字段不存在，会先初始化为 0.0 再增加。
+     * 如果直接 increment 失败（值不是数字类型），会尝试获取当前值并手动转换后计算。
+     * </p>
      *
-     * @param key   Redis 键
-     * @param hKey  Hash 键
-     * @param delta 增加的数值
-     * @return 增加后的数值
+     * @param key   Redis 键（Hash 的键），不能为 null
+     * @param hKey  Hash 字段名，不能为 null
+     * @param delta 增加的数值，可以为负数（相当于减少）
+     * @return 增加后的数值，如果发生错误返回 0.0
      */
     public Double incrementCacheMapValue(final String key, final String hKey, final double delta) {
         try {
@@ -1497,12 +1702,32 @@ public class RedisService {
     /*=============================================    LUA脚本    =============================================*/
 
     /**
-     * 删除指定值对应的 Redis 中的键值（Compare And Delete）
-     * 先对 value 进行比较，成功了再进行删除（所有的操作通过 lua 脚本原子性实现）
+     * 比较并删除（Compare And Delete，CAD）
+     * <p>
+     * 这是一个原子操作，通过 Lua 脚本实现。只有当键的值等于期望值时，才会删除该键。
+     * 常用于实现分布式锁的释放，确保只有持有锁的线程才能释放锁。
+     * </p>
+     * <p>
+     * 注意：key 和 value 中不能包含空格，否则操作会失败。
+     * </p>
+     * <p>
+     * 使用示例（分布式锁释放）：
+     * <pre>
+     * String lockValue = UUID.randomUUID().toString();
+     * if (redisService.setCacheObjectIfAbsent("lock:key", lockValue, 60, TimeUnit.SECONDS)) {
+     *     try {
+     *         // 执行业务逻辑
+     *     } finally {
+     *         // 只有锁的值匹配时才释放
+     *         redisService.compareAndDelete("lock:key", lockValue);
+     *     }
+     * }
+     * </pre>
+     * </p>
      *
-     * @param key   缓存 key
-     * @param value 期望的值
-     * @return 是否完成了删除操作，true - 表示删除成功; false - 表示删除失败
+     * @param key   缓存键，不能为 null，不能包含空格
+     * @param value 期望的值，只有当键的值等于此值时才会删除，不能为 null，不能包含空格
+     * @return true - 删除成功（值匹配）；false - 删除失败（值不匹配、键不存在或包含空格）
      */
     public boolean compareAndDelete(String key, String value) {
         // 验证 key 和 value 中不能包含空格
