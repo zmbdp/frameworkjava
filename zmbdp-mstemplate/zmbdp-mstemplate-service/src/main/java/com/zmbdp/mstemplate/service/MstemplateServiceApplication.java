@@ -5,6 +5,7 @@ import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
 import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;
 import com.zmbdp.file.api.feign.FileServiceApi;
+import com.zmbdp.mstemplate.service.test.feign.IdempotentTestApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,8 +25,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 }) // 禁用数据源自动配置
 @EnableFeignClients(clients = {
         FileServiceApi.class, MapServiceApi.class,
-        DictionaryServiceApi.class, ArgumentServiceApi.class
-}) // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
+        DictionaryServiceApi.class, ArgumentServiceApi.class,
+        IdempotentTestApi.class
+}, basePackages = "com.zmbdp.mstemplate.service.test.feign") // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
 public class MstemplateServiceApplication {
 
     /**

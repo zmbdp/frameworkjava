@@ -71,6 +71,7 @@ public class Consumer {
     /**
      * 幂等性消费者 - 从消息头获取Token（方式二）
      * 使用消息头方式传递Token
+     * 注意：需要添加 org.springframework.amqp.core.Message 参数以便从消息头获取Token
      */
     @RabbitListener(queuesToDeclare = @Queue("testQueueIdempotentHeader"))
     @Idempotent(
@@ -78,7 +79,7 @@ public class Consumer {
             expireTime = 300,
             message = "消息重复消费"
     )
-    public void listenerQueueIdempotentHeader(MessageDTO messageDTO) {
+    public void listenerQueueIdempotentHeader(MessageDTO messageDTO, org.springframework.amqp.core.Message message) {
         log.info("=== MQ幂等性消费者（消息头方式） - 收到消息: {} ===", messageDTO);
         // 模拟业务处理
         log.info("业务处理完成：type={}, desc={}", messageDTO.getType(), messageDTO.getDesc());

@@ -1,9 +1,6 @@
 package com.zmbdp.mstemplate.service.rabbit;
 
-import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.mstemplate.service.domain.MessageDTO;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,18 +48,11 @@ public class Producer {
      * @param idempotentToken 幂等性Token（放入消息头）
      */
     public void produceMsgIdempotentHeader(MessageDTO messageDTO, String idempotentToken) {
-        // 创建消息属性
-        MessageProperties properties = new MessageProperties();
-        properties.setHeader("Idempotent-Token", idempotentToken);
-        properties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
-        
-        // 将对象转为字节数组
-        byte[] body = JsonUtil.classToJson(messageDTO).getBytes();
-        
-        // 创建消息
-        Message message = new Message(body, properties);
-        
-        // 发送消息
-        rabbitTemplate.send("testQueueIdempotentHeader", message);
+        // 使用 convertAndSend 方法，让 RabbitTemplate 自动处理序列化
+        // 通过 MessagePostProcessor 设置消息头
+        rabbitTemplate.convertAndSend("testQueueIdempotentHeader", messageDTO, message -> {
+            message.getMessageProperties().setHeader("Idempotent-Token", idempotentToken);
+            return message;
+        });
     }
 }
