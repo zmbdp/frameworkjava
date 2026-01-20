@@ -40,7 +40,7 @@ public class CaptchaService {
      * 验证码的有效期，单位是分钟
      */
     @Value("${captcha.code-expiration:5}")
-    private Long phoneCodeExpiration;
+    private Long accountCodeExpiration;
 
     /**
      * 用来判断是否发送随机验证码
@@ -79,7 +79,7 @@ public class CaptchaService {
      * @return 验证码
      */
     public String sendCode(String account) {
-        // 先校验是否超过每日的发送限制（针对每个手机号）
+        // 先校验是否超过每日的发送限制（针对每个手机号/邮箱）
         String limitCacheKey = MessageConstants.CAPTCHA_CODE_TIMES_KEY + account;
         Integer times = redisService.getCacheObject(limitCacheKey, Integer.class);
         times = times == null ? 0 : times;
@@ -91,8 +91,8 @@ public class CaptchaService {
         String codeKey = MessageConstants.CAPTCHA_CODE_KEY + account;
         String cacheValue = redisService.getCacheObject(codeKey, String.class);
         long expireTime = redisService.getExpire(codeKey);
-        if (!StringUtil.isEmpty(cacheValue) && expireTime > phoneCodeExpiration * 60 - 60) {
-            long time = expireTime - phoneCodeExpiration * 60 + 60;
+        if (!StringUtil.isEmpty(cacheValue) && expireTime > accountCodeExpiration * 60 - 60) {
+            long time = expireTime - accountCodeExpiration * 60 + 60;
             throw new ServiceException("操作频繁, 请在 " + time + " 秒之后重试", ResultCode.INVALID_PARA.getCode());
         }
 
@@ -111,7 +111,7 @@ public class CaptchaService {
             }
         }
         // 设置验证码的缓存
-        redisService.setCacheObject(codeKey, verifyCode, phoneCodeExpiration, TimeUnit.MINUTES);
+        redisService.setCacheObject(codeKey, verifyCode, accountCodeExpiration, TimeUnit.MINUTES);
         // 设置发送次数限制的缓存 （无法预先设置缓存，只能先读后写）
         long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(),
                 LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0));
@@ -120,39 +120,39 @@ public class CaptchaService {
     }
 
     /**
-     * 从缓存中获取手机号的验证码
+     * 从缓存中获取手机号/邮箱的验证码
      *
-     * @param phone 手机号
+     * @param account 手机号/邮箱
      * @return 验证码
      */
-    public String getCode(String phone) {
-        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + phone;
+    public String getCode(String account) {
+        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + account;
         return redisService.getCacheObject(cacheKey, String.class);
     }
 
     /**
-     * 从缓存中删除手机号的验证码
+     * 从缓存中删除手机号/邮箱的验证码
      *
-     * @param phone 手机号
+     * @param account 手机号/邮箱
      * @return 验证码
      */
-    public boolean deleteCode(String phone) {
-        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + phone;
+    public boolean deleteCode(String account) {
+        String cacheKey = MessageConstants.CAPTCHA_CODE_KEY + account;
         return redisService.deleteObject(cacheKey);
     }
 
     /**
-     * 校验手机号与验证码是否匹配
+     * 校验手机号/邮箱与验证码是否匹配
      *
-     * @param phone 手机号
+     * @param account 手机号/邮箱
      * @param code  验证码
      * @return 布尔类型
      */
-    public boolean checkCode(String phone, String code) {
-        if (getCode(phone) == null || StringUtil.isEmpty(getCode(phone))) {
+    public boolean checkCode(String account, String code) {
+        if (getCode(account) == null || StringUtil.isEmpty(getCode(account))) {
             throw new ServiceException(ResultCode.INVALID_CODE);
         }
-        return getCode(phone).equals(code);
+        return getCode(account).equals(code);
     }
 
     /**
