@@ -24,9 +24,9 @@ public class UserDTO extends LoginUserDTO {
      * @return VO 对象
      */
     public UserVO convertToVO() {
-        UserVO userVo = new UserVO();
-        BeanCopyUtil.copyProperties(this, userVo);
-        userVo.setNickName(this.getUserName());
-        return userVo;
+        UserVO userVO = new UserVO();
+        BeanCopyUtil.copyProperties(this, userVO);
+        userVO.setNickName(this.getUserName());
+        return userVO;
     }
 }

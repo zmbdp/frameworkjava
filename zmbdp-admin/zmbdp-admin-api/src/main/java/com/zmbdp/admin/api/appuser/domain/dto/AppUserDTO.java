@@ -35,6 +35,11 @@ public class AppUserDTO implements Serializable {
     private String openId;
 
     /**
+     * 用户邮箱
+     */
+    private String email;
+
+    /**
      * 用户头像
      */
     private String avatar;
@@ -44,8 +49,8 @@ public class AppUserDTO implements Serializable {
      * @return VO 对象
      */
     public AppUserVO convertToVO() {
-        AppUserVO appUserVo = new AppUserVO();
-        BeanUtils.copyProperties(this, appUserVo);
-        return appUserVo;
+        AppUserVO appUserVO = new AppUserVO();
+        BeanUtils.copyProperties(this, appUserVO);
+        return appUserVO;
     }
 }

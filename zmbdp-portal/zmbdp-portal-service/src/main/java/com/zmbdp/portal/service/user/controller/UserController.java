@@ -36,7 +36,7 @@ public class UserController {
      */
     @PostMapping("/login/wechat")
     public Result<TokenVO> login(@Validated @RequestBody WechatLoginDTO wechatLoginDTO) {
-        return Result.success(userService.login(wechatLoginDTO).convertToVo());
+        return Result.success(userService.login(wechatLoginDTO).convertToVO());
     }
 
     /**
@@ -51,14 +51,14 @@ public class UserController {
     }
 
     /**
-     * 手机号登录 / 注册
+     * 手机号或邮箱登录 / 注册
      *
      * @param codeLoginDTO 验证码登录信息
      * @return token 信息 VO
      */
     @PostMapping("/login/code")
     public Result<TokenVO> login(@Validated @RequestBody CodeLoginDTO codeLoginDTO) {
-        return Result.success(userService.login(codeLoginDTO).convertToVo());
+        return Result.success(userService.login(codeLoginDTO).convertToVO());
     }
 
     /**

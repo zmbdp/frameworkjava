@@ -1,16 +1,18 @@
 use frameworkjava_dev;
 drop table if exists `app_user`;
-create table `app_user`
+CREATE TABLE `app_user`
 (
-    `id`           bigint(20) unsigned not null auto_increment comment '自增主键',
-    `nick_name`    varchar(64) null default null comment '昵称',
-    `phone_number` varchar(64) null default null comment '电话',
-    `open_id`      varchar(64) null default null comment '微信openid',
-    `avatar`       varchar(255) null default null comment '头像',
-    primary key (`id`) using btree,
-    unique index `uk_phone`(`phone_number`) using btree,
-    unique index `uk_open_id`(`open_id`) using btree
-) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '应用端人员表';
+    `id`           bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+    `nick_name`    varchar(64) NULL DEFAULT NULL COMMENT '昵称',
+    `phone_number` varchar(64) NULL DEFAULT NULL COMMENT '电话',
+    `open_id`      varchar(64) NULL DEFAULT NULL COMMENT '微信openId',
+    `email` varchar(64) NULL DEFAULT NULL COMMENT '用户邮箱',
+    `avatar`       varchar(255) NULL DEFAULT NULL COMMENT '头像',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE INDEX `uk_phone`(`phone_number`) USING BTREE,
+    UNIQUE INDEX `uk_open_id`(`open_id`) USING BTREE,
+    UNIQUE KEY `uk_email` (`email`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 10000001 CHARACTER SET = utf8mb4 COMMENT = '应用端人员表';
 
 insert into app_user(id, nick_name, phone_number, avatar)
 values (10000001, '张三', 'a18068623144ba94f3bd274b5fa03960',

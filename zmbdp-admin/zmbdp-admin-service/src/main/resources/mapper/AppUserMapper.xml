@@ -11,6 +11,10 @@
         select * from app_user where phone_number = #{phoneNumber}
     </select>
 
+    <select id="selectByEmail" parameterType="java.lang.String"  resultType="com.zmbdp.admin.service.user.domain.entity.AppUser">
+        select * from app_user where email = #{email}
+    </select>
+
     <select id="selectCount" parameterType="com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO" resultType="java.lang.Long">
         select count(1) from app_user
         <where>
