@@ -425,12 +425,12 @@ mvn spring-boot:run
 
 服务启动成功后，可通过以下地址访问：
 
-| 服务 | 地址 | 用户名/密码 | 说明 |
-|------|------|------------|------|
-| Nacos控制台 | http://localhost:8848/nacos | nacos / Hf@173503494 | 配置中心和服务发现 |
-| RabbitMQ管理界面 | http://localhost:15672 | zmbdp / Hf@173503494 | 消息队列管理 |
-| Redis | localhost:6379 | - | 缓存服务 |
-| MySQL | localhost:3306 | - | 数据库服务 |
+| 服务 | 地址 | 用户名/密码                                | 说明 |
+|------|------|---------------------------------------|------|
+| Nacos控制台 | http://localhost:8848/nacos | nacos / Hf@173503494                  | 配置中心和服务发现 |
+| RabbitMQ管理界面 | http://localhost:15672 | zmbdp / Hf@173503494                  | 消息队列管理 |
+| Redis | localhost:6379 | - / Hf@173503494 | 缓存服务 |
+| MySQL | localhost:3306 | root / Hf@173503494 <br/> zmbdpdev / Hf@173503494 | 数据库服务 |
 
 > 💡 **提示**：首次启动需要等待2-3分钟，确保所有中间件服务完全启动后再访问。
 
