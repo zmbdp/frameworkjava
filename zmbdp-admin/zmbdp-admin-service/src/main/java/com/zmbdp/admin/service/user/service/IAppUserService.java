@@ -49,6 +49,22 @@ public interface IAppUserService {
     AppUserDTO registerByPhone(String phoneNumber);
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return C端用户 DTO
+     */
+    AppUserDTO findByEmail(String email);
+
+    /**
+     * 根据邮箱注册用户
+     *
+     * @param email 邮箱
+     * @return C端用户 DTO
+     */
+    AppUserDTO registerByEmail(String email);
+
+    /**
      * 编辑 C端用户
      *
      * @param userEditReqDTO C端用户 DTO

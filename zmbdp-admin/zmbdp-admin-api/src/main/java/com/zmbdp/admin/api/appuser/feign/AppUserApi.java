@@ -56,6 +56,24 @@ public interface AppUserApi {
     Result<AppUserVO> registerByPhone(@RequestParam("phoneNumber") String phoneNumber);
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return C端用户 VO
+     */
+    @GetMapping("/email_find")
+    Result<AppUserVO> findByEmail(@RequestParam("email") String email);
+
+    /**
+     * 根据邮箱注册用户
+     *
+     * @param email 邮箱
+     * @return C端用户 VO
+     */
+    @GetMapping("/register/email")
+    Result<AppUserVO> registerByEmail(@RequestParam("email") String email);
+
+    /**
      * 编辑 C端用户
      *
      * @param userEditReqDTO C端用户 DTO

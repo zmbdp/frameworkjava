@@ -17,6 +17,7 @@ import java.util.List;
 public interface AppUserMapper extends BaseMapper<AppUser> {
     /**
      * 根据 openId 查询用户信息
+     *
      * @param openId 用户微信 ID
      * @return C端用户
      */
@@ -24,13 +25,23 @@ public interface AppUserMapper extends BaseMapper<AppUser> {
 
     /**
      * 根据手机号查询用户信息
+     *
      * @param phoneNumber 手机号
      * @return C端用户
      */
     AppUser selectByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return C端用户
+     */
+    AppUser selectByEmail(@Param("email") String email);
+
+    /**
      * 查询总数
+     *
      * @param appUserListReqDTO 查询 C端用户 DTO
      * @return 用户总数
      */
@@ -38,6 +49,7 @@ public interface AppUserMapper extends BaseMapper<AppUser> {
 
     /**
      * 分页查询 C端用户
+     *
      * @param appUserListReqDTO 查询 C端用户 DTO
      * @return 用户列表
      */

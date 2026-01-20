@@ -40,7 +40,7 @@ public class SysUserController {
     @PostMapping("/login/password")
     public Result<TokenVO> login(@Validated @RequestBody PasswordLoginDTO passwordLoginDTO) {
         TokenDTO tokenDTO = sysUserService.login(passwordLoginDTO);
-        return Result.success(tokenDTO.convertToVo());
+        return Result.success(tokenDTO.convertToVO());
     }
 
     /**

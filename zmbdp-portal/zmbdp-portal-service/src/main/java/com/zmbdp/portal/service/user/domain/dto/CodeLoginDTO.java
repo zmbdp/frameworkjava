@@ -14,10 +14,10 @@ import lombok.EqualsAndHashCode;
 public class CodeLoginDTO extends LoginDTO {
 
     /**
-     * 手机号
+     * 手机号/邮箱
      */
-    @NotBlank(message = "手机号不能为空")
-    private String phone;
+    @NotBlank(message = "手机号/邮箱不能为空")
+    private String account;
 
     /**
      * 验证码

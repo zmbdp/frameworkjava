@@ -33,5 +33,6 @@
     <file url="file://$PROJECT_DIR$/zmbdp-portal/zmbdp-portal-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-portal/zmbdp-portal-service/src/main/java" charset="UTF-8" />
     <file url="file://$APPLICATION_HOME_DIR$/bin/src/main/java" charset="UTF-8" />
+    <file url="file://$APPLICATION_HOME_DIR$/bin/src/main/resources" charset="UTF-8" />
   </component>
 </project>

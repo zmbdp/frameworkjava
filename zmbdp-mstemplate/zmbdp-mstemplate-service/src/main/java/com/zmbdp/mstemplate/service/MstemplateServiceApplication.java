@@ -1,6 +1,5 @@
 package com.zmbdp.mstemplate.service;
 
-
 import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
 import com.zmbdp.admin.api.config.feign.DictionaryServiceApi;
 import com.zmbdp.admin.api.map.feign.MapServiceApi;

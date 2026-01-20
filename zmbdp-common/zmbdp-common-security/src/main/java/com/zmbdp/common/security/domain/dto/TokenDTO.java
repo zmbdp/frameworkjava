@@ -22,11 +22,11 @@ public class TokenDTO {
     private Long expires;
 
     /**
-     * 转换 tokenVo
+     * 转换 tokenVO
      *
-     * @return tokenVo
+     * @return tokenVO
      */
-    public TokenVO convertToVo() {
+    public TokenVO convertToVO() {
         TokenVO tokenVO = new TokenVO();
         tokenVO.setAccessToken(this.accessToken);
         tokenVO.setExpires(this.expires);

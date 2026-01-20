@@ -55,6 +55,11 @@ public class AppUserServiceImpl implements IAppUserService {
     private static final String APP_USER_OPEN_ID_PREFIX = BloomFilterConstants.APP_USER_OPEN_ID_PREFIX;
 
     /**
+     * 用户邮箱前缀
+     */
+    private static final String APP_USER_EMAIL_PREFIX = BloomFilterConstants.APP_USER_EMAIL_PREFIX;
+
+    /**
      * C端用户的 mapper
      */
     @Autowired
@@ -193,6 +198,45 @@ public class AppUserServiceImpl implements IAppUserService {
     }
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return C端用户 DTO
+     */
+    @Override
+    public AppUserDTO findByEmail(String email) {
+        if (StringUtil.isEmpty(email) || !bloomFilterService.mightContain(APP_USER_EMAIL_PREFIX + AESUtil.encryptHex(email))) {
+            return null;
+        }
+        AppUser appUser = appUserMapper.selectByEmail(AESUtil.encryptHex(email));
+        return appUser == null ? null : appUserToAppUserDTO(appUser);
+    }
+
+    /**
+     * 根据邮箱注册用户
+     *
+     * @param email 邮箱
+     * @return C端用户 DTO
+     */
+    @Override
+    public AppUserDTO registerByEmail(String email) {
+        if (StringUtil.isEmpty(email)) {
+            throw new ServiceException("待注册邮箱为空", ResultCode.INVALID_PARA.getCode());
+        }
+        AppUser appUser = new AppUser();
+        appUser.setEmail(AESUtil.encryptHex(email));
+        appUser.setNickName("Java脚手架用户" + (int) (Math.random() * 9000) + 1000);
+        appUser.setAvatar(defaultAvatar);
+        appUserMapper.insert(appUser);
+        bloomFilterService.put(APP_USER_EMAIL_PREFIX + appUser.getEmail());
+        bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+        AppUserDTO appUserDTO = new AppUserDTO();
+        BeanCopyUtil.copyProperties(appUser, appUserDTO);
+        appUserDTO.setUserId(appUser.getId());
+        return appUserDTO;
+    }
+
+    /**
      * 编辑 C端用户
      *
      * @param userEditReqDTO C端用户 DTO
@@ -234,8 +278,9 @@ public class AppUserServiceImpl implements IAppUserService {
         // 转换对象赋值
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
-        // 额外处理手机号
+        // 额外处理手机号和邮箱
         appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+        appUserDTO.setEmail(AESUtil.decryptHex(appUser.getEmail()));
         appUserDTO.setUserId(appUser.getId());
         return appUserDTO;
     }
@@ -276,8 +321,9 @@ public class AppUserServiceImpl implements IAppUserService {
         return appUserList.stream().map(appUser -> {
             AppUserDTO appUserDTO = new AppUserDTO();
             BeanCopyUtil.copyProperties(appUser, appUserDTO);
-            // 特殊处理手机号和 id
+            // 特殊处理手机号、邮箱和 id
             appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+            appUserDTO.setEmail(AESUtil.decryptHex(appUser.getEmail()));
             appUserDTO.setUserId(appUser.getId());
             return appUserDTO;
         }).collect(Collectors.toList());
@@ -293,8 +339,9 @@ public class AppUserServiceImpl implements IAppUserService {
      */
     @Override
     public BasePageDTO<AppUserDTO> getUserList(AppUserListReqDTO appUserListReqDTO) {
-        // 先转变手机号
+        // 先转变手机号和邮箱
         appUserListReqDTO.setPhoneNumber(AESUtil.encryptHex(appUserListReqDTO.getPhoneNumber()));
+        appUserListReqDTO.setEmail(AESUtil.encryptHex(appUserListReqDTO.getEmail()));
         BasePageDTO<AppUserDTO> result = new BasePageDTO<>();
         // 查询总数
         Long totals = appUserMapper.selectCount(appUserListReqDTO);
@@ -320,6 +367,7 @@ public class AppUserServiceImpl implements IAppUserService {
                     BeanCopyUtil.copyProperties(appUser, appUserDTO);
                     appUserDTO.setUserId(appUser.getId());
                     appUserDTO.setPhoneNumber(AESUtil.decryptHex(appUser.getPhoneNumber()));
+                    appUserDTO.setEmail(AESUtil.decryptHex(appUser.getEmail()));
                     return appUserDTO;
                 }).collect(Collectors.toList())
         );
