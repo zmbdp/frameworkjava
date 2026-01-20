@@ -78,12 +78,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public TokenDTO login(LoginDTO loginDTO) {
         LoginUserDTO loginUserDTO = new LoginUserDTO();
-        // 针对入参进行分发，看看到底是微信登录还是手机登录
+        // 针对入参进行分发，看看到底是微信登录还是手机/邮箱登录
         if (loginDTO instanceof WechatLoginDTO wechatLoginDTO) {
             // 微信登录
             loginByWechat(wechatLoginDTO, loginUserDTO);
         } else if (loginDTO instanceof CodeLoginDTO codeLoginDTO) {
-            // 手机登录
+            // 手机/邮箱 登录
             loginByCode(codeLoginDTO, loginUserDTO);
         }
         // 这时候数据表里面肯定有数据的，直接设置缓存，返回给前端就可以了
@@ -117,27 +117,41 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 手机号登录处理逻辑
+     * 验证码登录处理逻辑（支持手机号/邮箱）
      *
      * @param codeLoginDTO 验证码登录 DTO
      * @param loginUserDTO 用户信息上下文 DTO
      */
     private void loginByCode(CodeLoginDTO codeLoginDTO, LoginUserDTO loginUserDTO) {
-        // 校验手机号
-        if (!VerifyUtil.checkPhone(codeLoginDTO.getPhone())) {
-            throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
-        }
+        String account = codeLoginDTO.getAccount();
+        // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
+        AccountValidator validator = validatorFactory.getValidator(account);
+        // 开始校验格式是否正确
+        validator.validate(account);
+        
         AppUserVO appUserVo;
-        // 查询是否存在
-        Result<AppUserVO> result = appUserApi.findByPhone(codeLoginDTO.getPhone());
+        Result<AppUserVO> result;
+        
+        // 根据账号类型查询用户（使用策略模式判断是手机号还是邮箱）
+        if (VerifyUtil.checkPhone(account)) {
+            // 手机号：查询手机号用户
+            result = appUserApi.findByPhone(account);
+        } else if (VerifyUtil.checkEmail(account)) {
+            // 邮箱：查询邮箱用户
+            result = appUserApi.findByEmail(account);
+        } else {
+            throw new ServiceException("账号格式错误，请输入手机号或邮箱", ResultCode.INVALID_PARA.getCode());
+        }
+        
         // 查不到就注册，查得到就赋值
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
             appUserVo = register(codeLoginDTO);
         } else {
             appUserVo = result.getData();
         }
+        
         // 然后从缓存中获取验证码
-        String cacheCode = captchaService.getCode(codeLoginDTO.getPhone());
+        String cacheCode = captchaService.getCode(account);
         // 再校验验证码
         if (cacheCode == null) {
             throw new ServiceException("验证码无效", ResultCode.INVALID_PARA.getCode());
@@ -146,7 +160,7 @@ public class UserServiceImpl implements IUserService {
             throw new ServiceException("验证码错误", ResultCode.INVALID_PARA.getCode());
         }
         // 走到这里表示通过了，从缓存中删除
-        captchaService.deleteCode(codeLoginDTO.getPhone());
+        captchaService.deleteCode(account);
         // 设置登录信息
         if (appUserVo != null) {
             BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
@@ -155,14 +169,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 根据入参来注册
+     * 根据入参来注册（支持微信/手机号/邮箱）
      *
      * @param loginDTO 用户生命周期信息
      * @return 用户 VO
      */
     private AppUserVO register(LoginDTO loginDTO) {
         Result<AppUserVO> result = null;
-        // 判断一下是微信还是手机号
+        // 判断一下是微信还是手机号/邮箱
         if (loginDTO instanceof WechatLoginDTO wechatLoginDTO) {
             // 如果是微信的，就直接找微信登录的 api 就行了
             result = appUserApi.registerByOpenId(wechatLoginDTO.getOpenId());
@@ -171,10 +185,19 @@ public class UserServiceImpl implements IUserService {
                 log.error("用户注册失败! {}", wechatLoginDTO.getOpenId());
             }
         } else if (loginDTO instanceof CodeLoginDTO codeLoginDTO) {
-            // 3 处理手机号注册逻辑
-            result = appUserApi.registerByPhone(codeLoginDTO.getPhone());
+            // 使用策略模式判断是手机号还是邮箱，然后调用相应的注册方法
+            String account = codeLoginDTO.getAccount();
+            if (VerifyUtil.checkPhone(account)) {
+                // 手机号注册
+                result = appUserApi.registerByPhone(account);
+            } else if (VerifyUtil.checkEmail(account)) {
+                // 邮箱注册
+                result = appUserApi.registerByEmail(account);
+            } else {
+                log.error("账号格式错误，无法注册! {}", account);
+            }
             if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
-                log.error("用户注册失败! {}", codeLoginDTO.getPhone());
+                log.error("用户注册失败! {}", account);
             }
         }
         return result == null ? null : result.getData();

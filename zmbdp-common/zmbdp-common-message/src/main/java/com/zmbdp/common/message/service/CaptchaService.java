@@ -55,6 +55,18 @@ public class CaptchaService {
     private Integer captChaType;
 
     /**
+     * 短信服务是否发送线上短信（AliSmsServiceImpl 的 sendMessage 配置）
+     */
+    @Value("${sms.send-message:false}")
+    private boolean smsSendMessage;
+
+    /**
+     * 邮件服务是否发送邮件（MailCodeServiceImpl 的 sendMessage 配置）
+     */
+    @Value("${mail.send-message:false}")
+    private boolean mailSendMessage;
+
+    /**
      * 验证码发送器工厂（根据账号格式自动选择短信或邮件发送器）
      */
     @Autowired
@@ -84,15 +96,17 @@ public class CaptchaService {
             throw new ServiceException("操作频繁, 请在 " + time + " 秒之后重试", ResultCode.INVALID_PARA.getCode());
         }
 
-        // 然后生成验证码
-        // 判断 nacos 上是否开启生成验证码设置了, 不开启默认就是 123456
-        String verifyCode = sendMessage ? VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_CAPTCHA_LENGTH, captChaType) : MessageConstants.DEFAULT_CAPTCHA_CODE;
+        // 生成验证码（根据配置决定使用固定验证码还是随机验证码）
+        String verifyCode = shouldUseFixedCode(account)
+                ? MessageConstants.DEFAULT_CAPTCHA_CODE
+                : VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_CAPTCHA_LENGTH, captChaType);
 
         // 发送线上短信/邮件（根据账号格式自动选择发送器）
         if (sendMessage) {
             ICaptchaSender sender = captchaSenderFactory.getSender(account);
             boolean result = sender.sendMobileCode(account, verifyCode);
-            if (!result) {
+            // 发送失败时，如果使用了固定验证码，则不抛异常（允许失败）
+            if (!result && !shouldIgnoreSendFailure(account)) {
                 throw new ServiceException(ResultCode.SEND_MSG_FAILED);
             }
         }
@@ -139,5 +153,39 @@ public class CaptchaService {
             throw new ServiceException(ResultCode.INVALID_CODE);
         }
         return getCode(phone).equals(code);
+    }
+
+    /**
+     * 判断是否应该使用固定验证码
+     * 使用固定验证码的情况：
+     * 1. sendMessage 为 false（总开关关闭）
+     * 2. sendMessage 为 true，但手机号的 sms.send-message 为 false（短信通道关闭）
+     * 3. sendMessage 为 true，但邮箱的 mail.send-message 为 false（邮件通道关闭）
+     *
+     * @param account 账号（手机号或邮箱）
+     * @return true 表示使用固定验证码，false 表示生成随机验证码
+     */
+    private boolean shouldUseFixedCode(String account) {
+        // 总开关关闭，使用固定验证码
+        if (!sendMessage) {
+            return true;
+        }
+        // 用户输入的是手机号且短信通道关闭，使用固定验证码
+        if (VerifyUtil.checkPhone(account) && !smsSendMessage) {
+            return true;
+        }
+        // 用户输入的是邮箱且邮件通道关闭，使用固定验证码
+        return VerifyUtil.checkEmail(account) && !mailSendMessage;
+    }
+
+    /**
+     * 判断发送失败时是否应该忽略异常
+     * 如果使用了固定验证码，则发送失败时应该忽略异常（因为验证码已经固定，用户可以直接使用）
+     *
+     * @param account 账号（手机号或邮箱）
+     * @return true 表示忽略发送失败，false 表示抛出异常
+     */
+    private boolean shouldIgnoreSendFailure(String account) {
+        return shouldUseFixedCode(account);
     }
 }

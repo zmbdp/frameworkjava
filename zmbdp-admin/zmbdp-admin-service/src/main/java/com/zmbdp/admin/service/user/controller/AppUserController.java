@@ -100,6 +100,37 @@ public class AppUserController implements AppUserApi {
     }
 
     /**
+     * 根据邮箱查询用户信息
+     *
+     * @param email 邮箱
+     * @return C端用户 VO
+     */
+    @Override
+    public Result<AppUserVO> findByEmail(String email) {
+        AppUserDTO appUserDTO = appUserService.findByEmail(email);
+        if (appUserDTO == null) {
+            return Result.success();
+        }
+        return Result.success(appUserDTO.convertToVO());
+    }
+
+    /**
+     * 根据邮箱注册用户
+     *
+     * @param email 邮箱
+     * @return C端用户 VO
+     */
+    @Override
+    public Result<AppUserVO> registerByEmail(String email) {
+        AppUserDTO appUserDTO = appUserService.registerByEmail(email);
+        if (appUserDTO == null) {
+            throw new ServiceException("注册失败");
+        }
+        return Result.success(appUserDTO.convertToVO());
+    }
+
+
+    /**
      * 编辑 C端用户
      *
      * @param userEditReqDTO C端用户 DTO

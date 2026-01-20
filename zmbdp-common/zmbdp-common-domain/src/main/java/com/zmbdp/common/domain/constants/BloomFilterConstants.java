@@ -21,4 +21,9 @@ public class BloomFilterConstants {
      * 用户微信 ID 前缀
      */
     public static final String APP_USER_OPEN_ID_PREFIX = "app_user:open_id:";
+
+    /**
+     * 用户邮箱前缀
+     */
+    public static final String APP_USER_EMAIL_PREFIX = "app_user:email:";
 }

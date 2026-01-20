@@ -26,6 +26,11 @@ public class AppUser extends BaseDO {
     private String phoneNumber;
 
     /**
+     * 用户邮箱
+     */
+    private String email;
+
+    /**
      * 微信ID
      */
     private String openId;

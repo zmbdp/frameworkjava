@@ -42,6 +42,11 @@ public class ResetBloomFilterTimedTask {
     private static final String APP_USER_OPEN_ID_PREFIX = BloomFilterConstants.APP_USER_OPEN_ID_PREFIX;
 
     /**
+     * 用户邮箱前缀
+     */
+    private static final String APP_USER_EMAIL_PREFIX = BloomFilterConstants.APP_USER_EMAIL_PREFIX;
+
+    /**
      * 布隆过滤器锁 key
      */
     private static final String BLOOM_FILTER_TASK_LOCK = "bloom:filter:task:lock";
@@ -132,6 +137,12 @@ public class ResetBloomFilterTimedTask {
             // 添加微信 ID（如果存在）
             if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
                 bloomFilterService.put(APP_USER_OPEN_ID_PREFIX + appUser.getOpenId());
+                count++;
+            }
+
+            // 添加邮箱（如果存在）
+            if (appUser.getEmail() != null && !appUser.getEmail().isEmpty()) {
+                bloomFilterService.put(APP_USER_EMAIL_PREFIX + appUser.getEmail());
                 count++;
             }
 
