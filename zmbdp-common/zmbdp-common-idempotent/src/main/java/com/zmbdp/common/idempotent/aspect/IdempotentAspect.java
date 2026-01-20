@@ -158,7 +158,7 @@ public class IdempotentAspect {
         // 尝试设置 Redis（如果已存在说明是重复请求）
         // 使用状态值 PROCESSING 标识正在执行中
         // 使用循环处理失败状态的重试逻辑（仅防重模式）
-        int maxRetries = 3; // 最多重试 3 次，避免无限循环
+        int maxRetries = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX, Integer.class, DEFAULT_MAX_RETRY_COUNT); // 最多重试 3 次，避免无限循环
         // 重试次数存储在 Redis 中，key 为 {redisKey}:retry:count
         String retryCountKey = redisKey + ":retry:count";
         boolean lockAcquired = false;
@@ -182,87 +182,26 @@ public class IdempotentAspect {
             if (!success) {
                 // Token 已存在，说明是重复请求，需要检查当前状态
                 String currentStatus = redisService.getCacheObject(redisKey, String.class);
-                boolean isMqConsumer = isMqConsumer(joinPoint);
 
                 if (returnCachedResult) {
-                    // 强幂等模式：根据状态处理（不需要循环，直接返回或等待）
-                    if (STATUS_SUCCESS.equals(currentStatus)) {
-                        // 执行成功，返回缓存结果
-                        String resultKey = redisKey + ":result";
-                        Object cachedResult = getCachedResult(joinPoint, resultKey);
-                        if (cachedResult != null) {
-                            log.info("强幂等模式 - 返回缓存结果，Token: {}", idempotentToken);
-                            return cachedResult;
-                        } else {
-                            // 状态是SUCCESS但结果不存在，可能是过期了，允许重新执行
-                            log.warn("强幂等模式 - 状态为SUCCESS但结果不存在，可能已过期，Token: {}", idempotentToken);
-                            // 不删除token，让过期时间自然失效，或者等待当前执行完成
-                            return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
-                        }
-                    } else if (STATUS_PROCESSING.equals(currentStatus)) {
-                        // 正在执行中，等待结果
-                        String resultKey = redisKey + ":result";
-                        log.debug("强幂等模式 - 检测到正在执行中，等待结果，Token: {}", idempotentToken);
-                        return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
-                    } else if (STATUS_FAILED.equals(currentStatus)) {
-                        // 执行失败，可以重新执行（但需要先删除token，让下一个请求能获取锁）
-                        // 注意：这里不能直接删除，因为可能其他请求正在等待
-                        // 应该等待一段时间，如果还是FAILED，说明确实失败了，可以重新执行
-                        log.warn("强幂等模式 - 检测到失败状态，等待后重试，Token: {}", idempotentToken);
-                        String resultKey = redisKey + ":result";
-                        return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
-                    } else {
-                        // 状态未知或已过期，等待结果或返回默认值
-                        log.warn("强幂等模式 - 状态未知: {}，等待结果，Token: {}", currentStatus, idempotentToken);
-                        String resultKey = redisKey + ":result";
-                        return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
+                    // 强幂等模式：根据状态处理
+                    Object result = handleStrongIdempotentMode(joinPoint, redisKey, currentStatus, idempotentToken);
+                    if (result != null) {
+                        return result;
                     }
                 } else {
                     // 防重模式：检测到重复请求
-                    if (STATUS_PROCESSING.equals(currentStatus)) {
-                        // 正在执行中，直接报错（不允许并发执行）
-                        log.warn("防重模式 - 检测到正在执行中，拒绝重复请求，Token: {}", idempotentToken);
-                        if (isMqConsumer) {
-                            // MQ 场景：抛出 AmqpRejectAndDontRequeueException，直接丢弃消息，不重新入队
-                            throw createAmqpRejectAndDontRequeueException(idempotent.message());
-                        } else {
-                            // HTTP 场景：抛出 ServiceException
-                            throw new ServiceException(idempotent.message(), ResultCode.INVALID_PARA.getCode());
-                        }
-                    } else if (STATUS_FAILED.equals(currentStatus)) {
-                        // 业务执行失败，允许重试（使用原子操作删除Token，避免并发问题）
-                        // 递增重试次数并存储到 Redis
-                        int newRetryCount = currentRetryCount + 1;
-                        redisService.setCacheObject(retryCountKey, newRetryCount, expireTime, TimeUnit.SECONDS);
-                        log.info("防重模式 - 检测到失败状态，尝试删除Token允许重试，Token: {}, 重试次数: {}/{}", idempotentToken, newRetryCount, maxRetries);
-                        // 使用原子操作：只有当状态为 FAILED 时才删除，避免并发问题
-                        boolean deleted = deleteIfStatusEquals(redisKey, STATUS_FAILED);
-                        if (deleted) {
-                            // 删除成功，继续循环重新尝试 SETNX
-                            continue;
-                        } else {
-                            // 删除失败（可能状态已改变，如被其他请求删除或状态变为 PROCESSING），重新检查状态
-                            // 继续循环，重新检查状态
-                            continue;
-                        }
-                    } else {
-                        // 已执行成功（SUCCESS），直接报错
-                        log.warn("防重模式 - 重复请求，当前状态: {}，Token: {}", currentStatus, idempotentToken);
-                        // 清除重试次数记录（因为已经成功了，不需要重试）
-                        redisService.deleteObject(retryCountKey);
-                        if (isMqConsumer) {
-                            // MQ 场景：抛出 AmqpRejectAndDontRequeueException，直接丢弃消息，不重新入队
-                            throw createAmqpRejectAndDontRequeueException(idempotent.message());
-                        } else {
-                            // HTTP 场景：抛出 ServiceException
-                            throw new ServiceException(idempotent.message(), ResultCode.INVALID_PARA.getCode());
-                        }
+                    boolean shouldContinue = handlePreventDuplicateMode(
+                            joinPoint, redisKey, retryCountKey, currentStatus,
+                            currentRetryCount, maxRetries, expireTime, idempotentToken, idempotent
+                    );
+                    if (shouldContinue) {
+                        continue; // 允许重试，继续循环
                     }
+                    // 如果返回 false，说明已经抛出了异常，不会执行到这里
                 }
             } else {
                 // SETNX 成功，获取到锁，跳出循环
-                // 注意：此时不清除重试次数记录，因为方法还没有执行，可能还会失败
-                // 重试次数记录只有在执行成功时才会被清除
                 lockAcquired = true;
             }
         }
@@ -673,6 +612,120 @@ public class IdempotentAspect {
         } catch (Exception e) {
             log.warn("原子删除Token失败: {}, 错误: {}", redisKey, e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * 处理强幂等模式的重复请求
+     * 根据当前状态返回缓存结果或等待执行完成
+     *
+     * @param joinPoint       连接点
+     * @param redisKey        Redis Key
+     * @param currentStatus   当前状态
+     * @param idempotentToken 幂等性 Token
+     * @return 缓存的结果，如果应该继续执行则返回 null
+     * @throws Throwable 等待过程中的异常
+     */
+    private Object handleStrongIdempotentMode(ProceedingJoinPoint joinPoint, String redisKey,
+                                              String currentStatus, String idempotentToken) throws Throwable {
+        String resultKey = redisKey + ":result";
+        boolean isMqConsumer = isMqConsumer(joinPoint);
+
+        if (STATUS_SUCCESS.equals(currentStatus)) {
+            // 执行成功，返回缓存结果
+            Object cachedResult = getCachedResult(joinPoint, resultKey);
+            if (cachedResult != null) {
+                log.info("强幂等模式 - 返回缓存结果，Token: {}", idempotentToken);
+                return cachedResult;
+            } else {
+                // 状态是SUCCESS但结果不存在，可能是过期了，等待当前执行完成
+                log.warn("强幂等模式 - 状态为SUCCESS但结果不存在，可能已过期，Token: {}", idempotentToken);
+                return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
+            }
+        } else if (STATUS_PROCESSING.equals(currentStatus)) {
+            // 正在执行中，等待结果
+            log.debug("强幂等模式 - 检测到正在执行中，等待结果，Token: {}", idempotentToken);
+            return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
+        } else if (STATUS_FAILED.equals(currentStatus)) {
+            // 执行失败，等待后重试
+            log.warn("强幂等模式 - 检测到失败状态，等待后重试，Token: {}", idempotentToken);
+            return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
+        } else {
+            // 状态未知或已过期，等待结果
+            log.warn("强幂等模式 - 状态未知: {}，等待结果，Token: {}", currentStatus, idempotentToken);
+            return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
+        }
+    }
+
+    /**
+     * 处理防重模式的重复请求
+     * 根据当前状态决定是否允许重试或直接拒绝
+     *
+     * @param joinPoint         连接点
+     * @param redisKey          Redis Key
+     * @param retryCountKey     重试次数 Key
+     * @param currentStatus     当前状态
+     * @param currentRetryCount 当前重试次数
+     * @param maxRetries        最大重试次数
+     * @param expireTime        过期时间
+     * @param idempotentToken   幂等性 Token
+     * @param idempotent        幂等性注解
+     * @return true - 应该继续循环重试；false - 应该抛出异常（已在方法内处理）
+     * @throws Throwable 重复请求异常
+     */
+    private boolean handlePreventDuplicateMode(
+            ProceedingJoinPoint joinPoint, String redisKey, String retryCountKey,
+            String currentStatus, int currentRetryCount, int maxRetries, long expireTime,
+            String idempotentToken, Idempotent idempotent
+    ) throws Throwable {
+        boolean isMqConsumer = isMqConsumer(joinPoint);
+
+        if (STATUS_PROCESSING.equals(currentStatus)) {
+            // 正在执行中，直接报错（不允许并发执行）
+            log.warn("防重模式 - 检测到正在执行中，拒绝重复请求，Token: {}", idempotentToken);
+            throwDuplicateRequestException(idempotent.message(), isMqConsumer);
+            return false; // 不会执行到这里，但为了编译通过
+        } else if (STATUS_FAILED.equals(currentStatus)) {
+            // 业务执行失败，允许重试
+            int newRetryCount = currentRetryCount + 1;
+            redisService.setCacheObject(retryCountKey, newRetryCount, expireTime, TimeUnit.SECONDS);
+            log.info("防重模式 - 检测到失败状态，尝试删除Token允许重试，Token: {}, 重试次数: {}/{}",
+                    idempotentToken, newRetryCount, maxRetries);
+
+            // 使用原子操作：只有当状态为 FAILED 时才删除，避免并发问题
+            boolean deleted = deleteIfStatusEquals(redisKey, STATUS_FAILED);
+            if (deleted) {
+                // 删除成功，继续循环重新尝试 SETNX
+                return true;
+            } else {
+                // 删除失败（可能状态已改变），继续循环重新检查状态
+                return true;
+            }
+        } else {
+            // 已执行成功（SUCCESS）或其他状态，直接报错
+            log.warn("防重模式 - 重复请求，当前状态: {}，Token: {}", currentStatus, idempotentToken);
+            // 清除重试次数记录（因为已经成功了，不需要重试）
+            redisService.deleteObject(retryCountKey);
+            throwDuplicateRequestException(idempotent.message(), isMqConsumer);
+            return false; // 不会执行到这里，但为了编译通过
+        }
+    }
+
+    /**
+     * 抛出重复请求异常
+     * 根据场景选择抛出 MQ 异常或 HTTP 异常
+     *
+     * @param message      异常消息
+     * @param isMqConsumer 是否是 MQ 消费者场景
+     * @throws Throwable 重复请求异常
+     */
+    private void throwDuplicateRequestException(String message, boolean isMqConsumer) throws Throwable {
+        if (isMqConsumer) {
+            // MQ 场景：抛出 AmqpRejectAndDontRequeueException，直接丢弃消息，不重新入队
+            throw createAmqpRejectAndDontRequeueException(message);
+        } else {
+            // HTTP 场景：抛出 ServiceException
+            throw new ServiceException(message, ResultCode.INVALID_PARA.getCode());
         }
     }
 
