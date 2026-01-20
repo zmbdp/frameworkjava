@@ -4585,10 +4585,12 @@ CREATE TABLE `app_user`
     `nick_name`    varchar(64) NULL DEFAULT NULL COMMENT '昵称',
     `phone_number` varchar(64) NULL DEFAULT NULL COMMENT '电话',
     `open_id`      varchar(64) NULL DEFAULT NULL COMMENT '微信openId',
+    `email` varchar(64) NULL DEFAULT NULL COMMENT '用户邮箱',
     `avatar`       varchar(255) NULL DEFAULT NULL COMMENT '头像',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `uk_phone`(`phone_number`) USING BTREE,
-    UNIQUE INDEX `uk_open_id`(`open_id`) USING BTREE
+    UNIQUE INDEX `uk_open_id`(`open_id`) USING BTREE,
+    UNIQUE KEY `uk_email` (`email`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 10000001 CHARACTER SET = utf8mb4 COMMENT = '应用端人员表';
 
 -- sys_user definition
