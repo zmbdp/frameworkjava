@@ -36,7 +36,7 @@ public class UserController {
      */
     @PostMapping("/login/wechat")
     public Result<TokenVO> login(@Validated @RequestBody WechatLoginDTO wechatLoginDTO) {
-        return Result.success(userService.login(wechatLoginDTO).convertToVo());
+        return Result.success(userService.login(wechatLoginDTO).convertToVO());
     }
 
     /**
@@ -58,7 +58,7 @@ public class UserController {
      */
     @PostMapping("/login/code")
     public Result<TokenVO> login(@Validated @RequestBody CodeLoginDTO codeLoginDTO) {
-        return Result.success(userService.login(codeLoginDTO).convertToVo());
+        return Result.success(userService.login(codeLoginDTO).convertToVO());
     }
 
     /**

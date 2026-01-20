@@ -49,8 +49,8 @@ public class AppUserDTO implements Serializable {
      * @return VO 对象
      */
     public AppUserVO convertToVO() {
-        AppUserVO appUserVo = new AppUserVO();
-        BeanUtils.copyProperties(this, appUserVo);
-        return appUserVo;
+        AppUserVO appUserVO = new AppUserVO();
+        BeanUtils.copyProperties(this, appUserVO);
+        return appUserVO;
     }
 }

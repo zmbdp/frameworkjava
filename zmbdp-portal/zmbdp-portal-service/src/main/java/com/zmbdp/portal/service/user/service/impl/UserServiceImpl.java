@@ -98,21 +98,21 @@ public class UserServiceImpl implements IUserService {
      * @param loginUserDTO   用户生命周期对象
      */
     private void loginByWechat(WechatLoginDTO wechatLoginDTO, LoginUserDTO loginUserDTO) {
-        AppUserVO appUserVo;
+        AppUserVO appUserVO;
         // 先进行查询是否存在
         Result<AppUserVO> result = appUserApi.findByOpenId(wechatLoginDTO.getOpenId());
         // 对查询结果进行判断
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
             // 没查到，需要进行注册
-            appUserVo = register(wechatLoginDTO);
+            appUserVO = register(wechatLoginDTO);
         } else {
             // 说明查到了，直接拼装结果
-            appUserVo = result.getData();
+            appUserVO = result.getData();
         }
         // 设置登录信息
-        if (appUserVo != null) {
-            BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
-            loginUserDTO.setUserName(appUserVo.getNickName());
+        if (appUserVO != null) {
+            BeanCopyUtil.copyProperties(appUserVO, loginUserDTO);
+            loginUserDTO.setUserName(appUserVO.getNickName());
         }
     }
 
@@ -128,10 +128,10 @@ public class UserServiceImpl implements IUserService {
         AccountValidator validator = validatorFactory.getValidator(account);
         // 开始校验格式是否正确
         validator.validate(account);
-        
-        AppUserVO appUserVo;
+
+        AppUserVO appUserVO;
         Result<AppUserVO> result;
-        
+
         // 根据账号类型查询用户（使用策略模式判断是手机号还是邮箱）
         if (VerifyUtil.checkPhone(account)) {
             // 手机号：查询手机号用户
@@ -142,29 +142,26 @@ public class UserServiceImpl implements IUserService {
         } else {
             throw new ServiceException("账号格式错误，请输入手机号或邮箱", ResultCode.INVALID_PARA.getCode());
         }
-        
+
         // 查不到就注册，查得到就赋值
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
-            appUserVo = register(codeLoginDTO);
+            appUserVO = register(codeLoginDTO);
         } else {
-            appUserVo = result.getData();
+            appUserVO = result.getData();
         }
-        
-        // 然后从缓存中获取验证码
-        String cacheCode = captchaService.getCode(account);
+
         // 再校验验证码
-        if (cacheCode == null) {
-            throw new ServiceException("验证码无效", ResultCode.INVALID_PARA.getCode());
-        }
-        if (!cacheCode.equals(codeLoginDTO.getCode())) {
-            throw new ServiceException("验证码错误", ResultCode.INVALID_PARA.getCode());
+        if (!captchaService.checkCode(account, codeLoginDTO.getCode())) {
+            throw new ServiceException(ResultCode.ERROR_CODE);
         }
         // 走到这里表示通过了，从缓存中删除
-        captchaService.deleteCode(account);
+        if (!captchaService.deleteCode(account)) {
+            log.warn("验证码删除失败！手机号/邮箱: {}", account);
+        }
         // 设置登录信息
-        if (appUserVo != null) {
-            BeanCopyUtil.copyProperties(appUserVo, loginUserDTO);
-            loginUserDTO.setUserName(appUserVo.getNickName());
+        if (appUserVO != null) {
+            BeanCopyUtil.copyProperties(appUserVO, loginUserDTO);
+            loginUserDTO.setUserName(appUserVO.getNickName());
         }
     }
 

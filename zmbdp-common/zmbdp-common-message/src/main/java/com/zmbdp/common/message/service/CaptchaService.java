@@ -145,14 +145,15 @@ public class CaptchaService {
      * 校验手机号/邮箱与验证码是否匹配
      *
      * @param account 手机号/邮箱
-     * @param code  验证码
+     * @param code    用户输入的验证码
      * @return 布尔类型
      */
     public boolean checkCode(String account, String code) {
-        if (getCode(account) == null || StringUtil.isEmpty(getCode(account))) {
+        String cacheCode = getCode(account);
+        if (code == null || StringUtil.isEmpty(code) || cacheCode == null || StringUtil.isEmpty(cacheCode)) {
             throw new ServiceException(ResultCode.INVALID_CODE);
         }
-        return getCode(account).equals(code);
+        return cacheCode.equals(code);
     }
 
     /**
