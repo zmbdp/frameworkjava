@@ -12,7 +12,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @Slf4j
 @SpringBootApplication
-@EnableFeignClients(basePackages = {"com.zmbdp.**.feign"})
+@EnableFeignClients(
+        clients = {com.zmbdp.admin.api.appuser.feign.AppUserApi.class}
+)
 public class ZmbdpPortalServiceApplication {
 
     /**
