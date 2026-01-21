@@ -1623,16 +1623,16 @@ public class RedisService {
         try {
             return redisTemplate.opsForHash().increment(key, hKey, delta);
         } catch (Exception e) {
-            // 如果直接increment失败，尝试获取当前值并手动转换后计算
+            // 如果直接 increment 失败，尝试获取当前值并手动转换后计算
             try {
                 Object currentValue = redisTemplate.opsForHash().get(key, hKey);
                 if (currentValue == null) {
-                    // 如果字段不存在，直接设置delta值
+                    // 如果字段不存在，直接设置 delta 值
                     redisTemplate.opsForHash().put(key, hKey, String.valueOf(delta));
                     return delta;
                 }
 
-                // 尝试将当前值转换为Long
+                // 尝试将当前值转换为 Long
                 Long currentLongValue;
                 if (currentValue instanceof String) {
                     currentLongValue = Long.parseLong((String) currentValue);
