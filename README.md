@@ -511,10 +511,10 @@ RedisService 提供了对 Redis 各种数据结构的增强操作支持，包括
 
 #### 服务配置
 
-| 配置文件 | 说明 |
-|---------|------|
-| `zmbdp-mstemplate-service-dev.yaml` | 微服务模板配置 |
-| `zmbdp-gateway-service-dev.yaml` | 网关服务配置 |
+| 配置文件 | 说明              |
+|---------|-----------------|
+| `zmbdp-mstemplate-service-dev.yaml` | 模板微服务（用于参考代码风格） |
+| `zmbdp-gateway-service-dev.yaml` | 网关服务配置          |
 
 #### 公共组件配置
 
