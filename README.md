@@ -21,7 +21,7 @@
   - [为什么选择FrameworkJava？](#为什么选择frameworkjava)
   - [适用场景](#适用场景)
   - [系统架构](#系统架构)
-- [核心特性](#-核心特性)
+- [核心特性](#核心特性)
 - [技术栈](#-技术栈)
 - [项目结构](#-项目结构)
 - [部署环境](#-部署环境)
@@ -35,7 +35,7 @@
 - [常见问题](#-常见问题)
 - [性能优化](#-性能优化)
 - [贡献指南](#-贡献指南)
-- [API文档和使用手册](#21-api文档和使用手册)
+- [API文档和使用手册](#22-api文档和使用手册)
 - [许可证](#-许可证)
 - [联系方式](#-联系方式)
 
@@ -663,7 +663,7 @@ public void handleOrder(MessageDTO messageDTO) {
 - 支持Nacos动态刷新配置
 - 业务失败时自动删除Token，允许重试，最多重试3次（Nacos上可配置）
 
-### 21. API文档和使用手册
+### 22. API文档和使用手册
 
 - **API文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn) (访问密码: zmbdp@123.com)
 - **使用手册**: [https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink](https://gcnrxp4nkh9d.feishu.cn/docx/GVUPdzmLJoWhMNxygsQc1F3Enyd?from=from_copylink)

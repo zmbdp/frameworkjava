@@ -1,8 +1,8 @@
 package com.zmbdp.common.security.handler;
 
+import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
-import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -60,7 +60,6 @@ public class GlobalExceptionHandler {
         setResponseCode(response, ResultCode.REQUEST_METNHOD_NOT_SUPPORTED.getCode());
         return Result.fail(ResultCode.REQUEST_METNHOD_NOT_SUPPORTED.getCode(), ResultCode.REQUEST_METNHOD_NOT_SUPPORTED.getErrMsg());
     }
-
 
     /**
      * 类型不匹配异常
@@ -175,7 +174,6 @@ public class GlobalExceptionHandler {
         return Result.fail(ResultCode.INVALID_PARA.getCode(), message);
     }
 
-
     /**
      * 拦截运行时异常
      *
@@ -211,5 +209,4 @@ public class GlobalExceptionHandler {
         setResponseCode(response, ResultCode.ERROR.getCode());
         return Result.fail(ResultCode.ERROR.getCode(), ResultCode.ERROR.getErrMsg());
     }
-
 }

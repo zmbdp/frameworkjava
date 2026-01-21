@@ -17,6 +17,7 @@ public class SecurityUtil {
 
     /**
      * 获取请求 token
+     *
      * @return token 信息
      */
     public static String getToken() {
@@ -25,6 +26,7 @@ public class SecurityUtil {
 
     /**
      * 根据 request 获取请求 token
+     *
      * @param request 请求
      * @return token信息
      */
@@ -35,6 +37,7 @@ public class SecurityUtil {
 
     /**
      * 裁剪 token 前缀
+     *
      * @param token 前端可能设置了令牌的前缀
      * @return token 信息
      */

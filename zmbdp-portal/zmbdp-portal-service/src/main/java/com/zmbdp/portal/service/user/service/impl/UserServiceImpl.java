@@ -21,7 +21,6 @@ import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.UserDTO;
 import com.zmbdp.portal.service.user.domain.dto.WechatLoginDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
-import com.zmbdp.portal.service.user.validator.AccountValidator;
 import com.zmbdp.portal.service.user.validator.AccountValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,9 +124,7 @@ public class UserServiceImpl implements IUserService {
     private void loginByCode(CodeLoginDTO codeLoginDTO, LoginUserDTO loginUserDTO) {
         String account = codeLoginDTO.getAccount();
         // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
-        AccountValidator validator = validatorFactory.getValidator(account);
-        // 开始校验格式是否正确
-        validator.validate(account);
+        validatorFactory.validate(account);
 
         AppUserVO appUserVO;
         Result<AppUserVO> result;
@@ -209,9 +206,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String sendCode(String account) {
         // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
-        AccountValidator validator = validatorFactory.getValidator(account);
-        // 开始校验格式是否正确
-        validator.validate(account);
+        validatorFactory.validate(account);
         return captchaService.sendCode(account);
     }
 
