@@ -148,7 +148,7 @@ public class IdempotentAspect {
         // 如果是 Http 请求，然后还要启动强幂等模式，就警告一下用户说很消耗性能
         if (!isMqConsumer(joinPoint) && returnCachedResult) {
             log.warn(
-                    "Http 场景启用了 returnCachedResult=true（强幂等模式），可能导致 Tomcat 线程阻塞（Thread.sleep 轮询等待结果），建议仅在 MQ 场景使用，Token={}",
+                    "Http 场景启用了 returnCachedResult = true（强幂等模式），可能导致 Tomcat 线程阻塞（Thread.sleep 轮询等待结果），建议仅在 MQ 场景使用，Token = {}",
                     idempotentToken
             );
         }
@@ -248,14 +248,14 @@ public class IdempotentAspect {
 
     /**
      * 获取幂等性 Token
-     * 优先级：<code>SpEL</code>表达式 > Http 请求头 > Http 请求参数 > RabbitMQ 消息头
+     * 优先级：<code>SpEL</code>表达式 > Http请求头 > Http请求参数 > RabbitMQ消息头
      *
      * @param joinPoint  连接点
      * @param idempotent 幂等性注解
      * @return 幂等性 Token
      */
     private String getIdempotentToken(ProceedingJoinPoint joinPoint, Idempotent idempotent) {
-        // 优先级 1：从 SpEL 表达式获取，适合 MQ 场景
+        // 优先级 1：从 SpEL表达式 获取，适合 MQ 场景
         if (StringUtil.isNotEmpty(idempotent.tokenExpression())) {
             String token = getTokenFromExpression(joinPoint, idempotent.tokenExpression());
             if (StringUtil.isNotEmpty(token)) {
@@ -305,7 +305,7 @@ public class IdempotentAspect {
             String[] parameterNames = parameterNameDiscoverer.getParameterNames(signature.getMethod());
             Object[] args = joinPoint.getArgs();
 
-            // 创建SpEL上下文
+            // 创建 SpEL 上下文
             EvaluationContext context = new StandardEvaluationContext();
 
             // 把方法参数设置到上下文，支持 参数名 和 args[index] 两种方式
@@ -344,12 +344,12 @@ public class IdempotentAspect {
         try {
             Object[] args = joinPoint.getArgs();
             if (args != null && args.length > 0) {
-                // 先尝试从AMQP Message获取，用反射避免编译依赖
+                // 先尝试从 AMQP Message 获取，用反射避免编译依赖
                 try {
                     Class<?> amqpMessageClass = Class.forName("org.springframework.amqp.core.Message");
                     for (Object arg : args) {
-                        if (arg != null && amqpMessageClass.isInstance(arg)) {
-                            // 反射调用getMessageProperties().getHeaders().get(headerName)
+                        if (amqpMessageClass.isInstance(arg)) {
+                            // 反射调用 getMessageProperties().getHeaders().get(headerName)
                             Object messageProperties = amqpMessageClass.getMethod("getMessageProperties").invoke(arg);
                             Object headers = messageProperties.getClass().getMethod("getHeaders").invoke(messageProperties);
                             Object token = ((java.util.Map<?, ?>) headers).get(headerName);
@@ -359,14 +359,14 @@ public class IdempotentAspect {
                         }
                     }
                 } catch (ClassNotFoundException e) {
-                    // 没引入spring-amqp，继续尝试其他方式
+                    // 没引入 spring-amqp，继续尝试其他方式
                 }
 
-                // 再尝试从Spring Messaging Message获取
+                // 再尝试从 Spring Messaging Message 获取
                 try {
                     Class<?> messagingMessageClass = Class.forName("org.springframework.messaging.Message");
                     for (Object arg : args) {
-                        if (arg != null && messagingMessageClass.isInstance(arg)) {
+                        if (messagingMessageClass.isInstance(arg)) {
                             // 反射调用getHeaders().get(headerName)
                             Object headers = messagingMessageClass.getMethod("getHeaders").invoke(arg);
                             Object token = ((java.util.Map<?, ?>) headers).get(headerName);
@@ -469,7 +469,7 @@ public class IdempotentAspect {
                 } else if (STATUS_FAILED.equals(status)) {
                     // 执行失败了
                     if (isMqConsumer) {
-                        // MQ场景静默处理，避免消息重新入队
+                        // MQ 场景就静默处理，避免消息重新入队
                         log.info("强幂等模式 - MQ 检测到执行失败，跳过消费，Token: {}", redisKey);
                         return getDefaultReturnValue(joinPoint);
                     } else {
@@ -566,12 +566,11 @@ public class IdempotentAspect {
     private Object getDefaultReturnValue(ProceedingJoinPoint joinPoint) {
         // 获取方法返回类型，返回对应的默认值
         Class<?> returnType = ((MethodSignature) joinPoint.getSignature()).getMethod().getReturnType();
-
+        // 如果方法没有返回值，就返回 null
         if (void.class.equals(returnType) || Void.class.equals(returnType)) {
             return null;
         }
-
-        // 基本类型返回默认值，对象类型返回null
+        // 基本类型返回默认值，对象类型返回 null
         if (returnType.isPrimitive()) {
             return switch (returnType.getName()) {
                 case "boolean" -> false;
@@ -585,7 +584,6 @@ public class IdempotentAspect {
                 default -> null;
             };
         }
-
         return null;
     }
 
@@ -604,13 +602,14 @@ public class IdempotentAspect {
         try {
             return redisService.compareAndDelete(redisKey, expectedStatus);
         } catch (Exception e) {
-            log.warn("原子删除Token失败: {}, 错误: {}", redisKey, e.getMessage());
+            log.warn("原子删除 Token 失败: {}, 错误: {}", redisKey, e.getMessage());
             return false;
         }
     }
 
     /**
      * 处理强幂等模式的重复请求
+     * <p>
      * 根据当前状态返回缓存结果或等待执行完成
      *
      * @param joinPoint       连接点
@@ -618,10 +617,9 @@ public class IdempotentAspect {
      * @param currentStatus   当前状态
      * @param idempotentToken 幂等性 Token
      * @return 缓存的结果，如果应该继续执行则返回 null
-     * @throws Throwable 等待过程中的异常
      */
-    private Object handleStrongIdempotentMode(ProceedingJoinPoint joinPoint, String redisKey,
-                                              String currentStatus, String idempotentToken) throws Throwable {
+    private Object handleStrongIdempotentMode(ProceedingJoinPoint joinPoint, String redisKey, String currentStatus, String idempotentToken) {
+        // 先拼接 Redis 的 key
         String resultKey = redisKey + ":result";
         boolean isMqConsumer = isMqConsumer(joinPoint);
 
@@ -632,8 +630,8 @@ public class IdempotentAspect {
                 log.info("强幂等模式 - 返回缓存结果，Token: {}", idempotentToken);
                 return cachedResult;
             } else {
-                // 状态是SUCCESS但结果不存在，可能过期了，等待一下
-                log.warn("强幂等模式 - 状态为SUCCESS但结果不存在，可能已过期，Token: {}", idempotentToken);
+                // 状态是 SUCCESS 但结果不存在，可能过期了，等待一下
+                log.warn("强幂等模式 - 状态为 SUCCESS 但结果不存在，可能已过期，Token: {}", idempotentToken);
                 return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
             }
         } else if (STATUS_PROCESSING.equals(currentStatus)) {
@@ -653,6 +651,7 @@ public class IdempotentAspect {
 
     /**
      * 处理防重模式的重复请求
+     * <p>
      * 根据当前状态决定是否允许重试或直接拒绝
      *
      * @param joinPoint         连接点
@@ -680,11 +679,11 @@ public class IdempotentAspect {
             throwDuplicateRequestException(idempotent.message(), isMqConsumer);
             return false;
         } else if (STATUS_FAILED.equals(currentStatus)) {
-            // 业务执行失败，允许重试，用incr原子操作增加重试次数
+            // 业务执行失败，允许重试，用 incr 原子操作增加重试次数
             Long newRetryCountLong = redisService.incr(retryCountKey, 1);
             int newRetryCount;
             if (newRetryCountLong == null || newRetryCountLong < 0) {
-                // incr失败，降级处理
+                // incr 失败，降级处理
                 log.warn("防重模式 - incr 操作失败，回退到非原子操作，Token: {}", idempotentToken);
                 newRetryCount = currentRetryCount + 1;
                 redisService.setCacheObject(retryCountKey, newRetryCount, expireTime, TimeUnit.SECONDS);
@@ -695,7 +694,7 @@ public class IdempotentAspect {
                     redisService.expire(retryCountKey, expireTime, TimeUnit.SECONDS);
                 }
             }
-            log.info("防重模式 - 检测到失败状态，尝试删除Token允许重试，Token: {}, 重试次数: {}/{}",
+            log.info("防重模式 - 检测到失败状态，尝试删除 Token 允许重试，Token: {}, 重试次数: {}/{}",
                     idempotentToken, newRetryCount, maxRetries);
 
             // 用原子操作删除，只有状态是 FAILED 时才删除
