@@ -6,7 +6,11 @@ import com.zmbdp.common.domain.exception.ServiceException;
 import org.springframework.stereotype.Component;
 
 /**
- * 手机号校验策略
+ * 手机号校验策略实现类
+ * <p>
+ * 负责手机号格式的校验逻辑，实现 {@link AccountValidator} 接口。
+ * 当账号格式为手机号时，此策略会被 {@link AccountValidatorFactory} 选中并执行校验。
+ * </p>
  *
  * @author 稚名不带撇
  */
@@ -14,25 +18,34 @@ import org.springframework.stereotype.Component;
 public class PhoneValidator implements AccountValidator {
 
     /**
-     * 校验手机号格式
+     * 判断是否支持手机号格式的校验
+     * <p>
+     * 通过调用工具类验证账号是否为手机号格式。
+     * </p>
      *
-     * @param account 手机号
-     * @throws ServiceException 格式错误时抛出异常
+     * @param account 待判断的账号
+     * @return true-账号为手机号格式，支持校验；false-不是手机号格式，不支持
+     */
+    @Override
+    public boolean supports(String account) {
+        return VerifyUtil.checkPhone(account);
+    }
+
+    /**
+     * 执行手机号格式校验
+     * <p>
+     * 对账号进行手机号格式验证，如果格式不正确则抛出异常。
+     * 注意：此方法被调用时，通常 {@link #supports(String)} 已返回 true，
+     * 但为了防御性编程和业务完整性，此处仍进行二次校验。
+     * </p>
+     *
+     * @param account 待校验的手机号
+     * @throws ServiceException 当手机号格式不正确时抛出异常，异常信息为"手机号格式错误"
      */
     @Override
     public void validate(String account) {
         if (!VerifyUtil.checkPhone(account)) {
             throw new ServiceException("手机号格式错误", ResultCode.INVALID_PARA.getCode());
         }
-    }
-
-    /**
-     * 获取支持的校验类型
-     *
-     * @return sms
-     */
-    @Override
-    public String getType() {
-        return "sms";
     }
 }

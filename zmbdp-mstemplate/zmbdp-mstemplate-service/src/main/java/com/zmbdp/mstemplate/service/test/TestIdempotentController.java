@@ -1,5 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
+import com.zmbdp.common.domain.constants.CommonConstants;
+import com.zmbdp.common.domain.constants.IdempotentConstants;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -11,12 +13,18 @@ import com.zmbdp.mstemplate.service.rabbit.Producer;
 import com.zmbdp.mstemplate.service.test.feign.IdempotentTestApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 幂等性功能测试控制器
@@ -52,6 +60,13 @@ public class TestIdempotentController {
      */
     @Autowired
     private Environment environment;
+
+    /**
+     * 线程池执行器（用于高并发测试）
+     */
+    @Autowired
+    @Qualifier(CommonConstants.ASYNCHRONOUS_THREADS_BEAN_NAME)
+    private Executor threadPoolExecutor;
 
     /*=============================================    一键测试接口    =============================================*/
 
@@ -251,6 +266,42 @@ public class TestIdempotentController {
     }
 
     /**
+     * 高并发测试
+     * 通过params传入并发量参数，测试高并发场景下幂等性是否正常工作
+     *
+     * @param concurrency 并发量，默认100
+     * @return 测试结果
+     */
+    @PostMapping("/concurrent")
+    public Result<Map<String, Object>> testConcurrent(@RequestParam(value = "concurrency", defaultValue = "100") int concurrency) {
+        log.info("=== 高并发测试，并发量: {} ===", concurrency);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("并发量", concurrency);
+        result.put("说明", "测试同一token的并发请求，验证幂等性是否正常工作");
+
+        try {
+            // 测试场景1：防重模式 - 同一token并发请求，只有一个应该成功
+            Map<String, Object> preventDuplicateTest = testPreventDuplicateConcurrent(concurrency);
+            result.put("防重模式-并发测试", preventDuplicateTest);
+
+            // 测试场景2：强幂等模式 - 同一token并发请求，第一个成功后其他返回缓存结果
+            Map<String, Object> strongIdempotentTest = testStrongIdempotentConcurrent(concurrency);
+            result.put("强幂等模式-并发测试", strongIdempotentTest);
+
+            // 测试场景3：不同token并发请求，验证互不干扰
+            Map<String, Object> differentTokenTest = testDifferentTokenConcurrent(concurrency);
+            result.put("不同Token-并发测试", differentTokenTest);
+
+        } catch (Exception e) {
+            result.put("错误", "❌ 高并发测试异常: " + e.getMessage());
+            log.error("高并发测试异常", e);
+        }
+
+        System.err.println(result);
+        return Result.success(result);
+    }
+
+    /**
      * 快速测试 - 只测试核心功能
      *
      * @return 测试结果
@@ -314,6 +365,236 @@ public class TestIdempotentController {
         help.append("======================================================================\n");
 
         return Result.success(help.toString());
+    }
+
+    /**
+     * 防重模式并发测试
+     * 测试同一token的并发请求，只有一个应该成功
+     */
+    private Map<String, Object> testPreventDuplicateConcurrent(int concurrency) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        String token = UUID.randomUUID().toString();
+
+        // 用于统计结果
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger rejectCount = new AtomicInteger(0);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(concurrency);
+
+        log.info("防重模式并发测试开始，Token: {}, 并发量: {}", token, concurrency);
+        long startTime = System.currentTimeMillis();
+
+        // 并发执行请求
+        for (int i = 0; i < concurrency; i++) {
+            final int index = i;
+            threadPoolExecutor.execute(() -> {
+                try {
+                    Result<String> response = idempotentTestAPI.testHttpBasicHeader(token);
+                    if (isSuccess(response)) {
+                        successCount.incrementAndGet();
+                        log.debug("防重模式并发测试 - 线程{}成功", index);
+                    } else {
+                        rejectCount.incrementAndGet();
+                        log.debug("防重模式并发测试 - 线程{}被拒绝: {}", index, response.getErrMsg());
+                    }
+                } catch (Exception e) {
+                    // 如果是重复请求异常，也算正常
+                    if (e.getMessage() != null && e.getMessage().contains("重复")) {
+                        rejectCount.incrementAndGet();
+                        log.debug("防重模式并发测试 - 线程{}被拒绝（异常）: {}", index, e.getMessage());
+                    } else {
+                        errorCount.incrementAndGet();
+                        log.warn("防重模式并发测试 - 线程{}异常: {}", index, e.getMessage());
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        // 等待所有任务完成
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("防重模式并发测试等待被中断");
+        }
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        result.put("成功数", successCount.get());
+        result.put("拒绝数", rejectCount.get());
+        result.put("错误数", errorCount.get());
+        result.put("总请求数", concurrency);
+        result.put("耗时(ms)", duration);
+
+        // 验证结果：只有一个应该成功
+        if (successCount.get() == 1 && rejectCount.get() == concurrency - 1 && errorCount.get() == 0) {
+            result.put("结果", "✅ 通过（只有1个成功，其他都被正确拒绝）");
+        } else if (successCount.get() == 1) {
+            result.put("结果", "✅ 通过（只有1个成功），但有" + errorCount.get() + "个错误");
+        } else {
+            result.put("结果", "❌ 失败（成功数: " + successCount.get() + "，期望: 1）");
+        }
+
+        log.info("防重模式并发测试完成，成功: {}, 拒绝: {}, 错误: {}, 耗时: {}ms",
+                successCount.get(), rejectCount.get(), errorCount.get(), duration);
+
+        return result;
+    }
+
+    /**
+     * 强幂等模式并发测试
+     * 测试同一token的并发请求，第一个成功后其他返回缓存结果
+     */
+    private Map<String, Object> testStrongIdempotentConcurrent(int concurrency) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        String token = UUID.randomUUID().toString();
+
+        // 用于统计结果
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger cachedCount = new AtomicInteger(0);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(concurrency);
+
+        // 用于记录第一个成功的结果，其他请求的结果应该和它一样
+        AtomicReference<String> firstResult = new AtomicReference<>();
+
+        log.info("强幂等模式并发测试开始，Token: {}, 并发量: {}", token, concurrency);
+        long startTime = System.currentTimeMillis();
+
+        // 并发执行请求
+        for (int i = 0; i < concurrency; i++) {
+            final int index = i;
+            threadPoolExecutor.execute(() -> {
+                try {
+                    Result<String> response = idempotentTestAPI.testHttpAdvancedStrong(token);
+                    if (isSuccess(response)) {
+                        // 原子性地设置第一个结果，只有一个线程能成功
+                        if (firstResult.compareAndSet(null, response.getData())) {
+                            successCount.incrementAndGet();
+                            log.debug("强幂等模式并发测试 - 线程{}首次成功，结果: {}", index, response.getData());
+                        } else {
+                            // 检查是否返回的是缓存结果（时间戳应该相同）
+                            String cached = firstResult.get();
+                            if (cached != null && cached.equals(response.getData())) {
+                                cachedCount.incrementAndGet();
+                                log.debug("强幂等模式并发测试 - 线程{}返回缓存结果", index);
+                            } else {
+                                errorCount.incrementAndGet();
+                                log.warn("强幂等模式并发测试 - 线程{}结果不一致，期望: {}，实际: {}",
+                                        index, cached, response.getData());
+                            }
+                        }
+                    } else {
+                        errorCount.incrementAndGet();
+                        log.warn("强幂等模式并发测试 - 线程{}失败: {}", index, response.getErrMsg());
+                    }
+                } catch (Exception e) {
+                    errorCount.incrementAndGet();
+                    log.warn("强幂等模式并发测试 - 线程{}异常: {}", index, e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        // 等待所有任务完成
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("强幂等模式并发测试等待被中断");
+        }
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        result.put("首次成功数", successCount.get());
+        result.put("返回缓存数", cachedCount.get());
+        result.put("错误数", errorCount.get());
+        result.put("总请求数", concurrency);
+        result.put("耗时(ms)", duration);
+
+        // 验证结果：只有一个首次成功，其他都返回缓存结果
+        if (successCount.get() == 1 && cachedCount.get() == concurrency - 1 && errorCount.get() == 0) {
+            result.put("结果", "✅ 通过（1个首次成功，" + cachedCount.get() + "个返回缓存结果）");
+        } else {
+            result.put("结果", "❌ 失败（首次成功: " + successCount.get() + "，返回缓存: " + cachedCount.get() + "，错误: " + errorCount.get() + "）");
+        }
+
+        log.info("强幂等模式并发测试完成，首次成功: {}, 返回缓存: {}, 错误: {}, 耗时: {}ms",
+                successCount.get(), cachedCount.get(), errorCount.get(), duration);
+
+        return result;
+    }
+
+    /**
+     * 不同Token并发测试
+     * 测试不同token的并发请求，验证互不干扰
+     */
+    private Map<String, Object> testDifferentTokenConcurrent(int concurrency) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // 用于统计结果
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(concurrency);
+
+        log.info("不同Token并发测试开始，并发量: {}", concurrency);
+        long startTime = System.currentTimeMillis();
+
+        // 并发执行请求，每个请求使用不同的token
+        for (int i = 0; i < concurrency; i++) {
+            final int index = i;
+            final String token = UUID.randomUUID().toString();
+            threadPoolExecutor.execute(() -> {
+                try {
+                    Result<String> response = idempotentTestAPI.testHttpBasicHeader(token);
+                    if (isSuccess(response)) {
+                        successCount.incrementAndGet();
+                        log.debug("不同Token并发测试 - 线程{}成功，Token: {}", index, token);
+                    } else {
+                        errorCount.incrementAndGet();
+                        log.warn("不同Token并发测试 - 线程{}失败，Token: {}, 错误: {}", index, token, response.getErrMsg());
+                    }
+                } catch (Exception e) {
+                    errorCount.incrementAndGet();
+                    log.warn("不同Token并发测试 - 线程{}异常，Token: {}, 错误: {}", index, token, e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        // 等待所有任务完成
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("不同Token并发测试等待被中断");
+        }
+
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+
+        result.put("成功数", successCount.get());
+        result.put("错误数", errorCount.get());
+        result.put("总请求数", concurrency);
+        result.put("耗时(ms)", duration);
+
+        // 验证结果：所有不同token的请求都应该成功
+        if (successCount.get() == concurrency && errorCount.get() == 0) {
+            result.put("结果", "✅ 通过（所有不同Token的请求都成功）");
+        } else {
+            result.put("结果", "❌ 失败（成功: " + successCount.get() + "，错误: " + errorCount.get() + "）");
+        }
+
+        log.info("不同Token并发测试完成，成功: {}, 错误: {}, 耗时: {}ms",
+                successCount.get(), errorCount.get(), duration);
+
+        return result;
     }
 
     /*=============================================    Feign 客户端调用的测试接口    =============================================*/
@@ -452,7 +733,7 @@ public class TestIdempotentController {
     /**
      * 测试重试次数功能
      * 测试场景：
-     * 1. 重试次数递增（1/3, 2/3, 3/3）
+     * 1. 重试次数递增（根据配置的最大重试次数动态测试）
      * 2. 失败时重试次数是否能正确查询到
      * 3. 成功时重试次数是否会被删除
      * 4. 超过最大重试次数时的行为
@@ -463,17 +744,25 @@ public class TestIdempotentController {
         Map<String, Object> result = new LinkedHashMap<>();
 
         try {
+            // 从配置中心读取实际的最大重试次数（与IdempotentAspect使用相同的配置）
+            int maxRetries = environment.getProperty(
+                    IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX,
+                    Integer.class,
+                    3 // 默认值
+            );
+
             // 获取 Redis Key 前缀（使用与IdempotentAspect相同的配置）
             String keyPrefix = environment.getProperty(
-                    "idempotent.key-prefix",
+                    IdempotentConstants.NACOS_IDEMPOTENT_KEY_PREFIX_PREFIX,
                     String.class,
-                    "idempotent:token:"
+                    IdempotentConstants.IDEMPOTENT_KEY_PREFIX
             );
 
             // 添加日志输出，方便调试
-            log.info("重试次数测试 - Redis Key前缀: {}", keyPrefix);
+            log.info("重试次数测试 - 最大重试次数: {}, Redis Key前缀: {}", maxRetries, keyPrefix);
+            result.put("配置的最大重试次数", maxRetries);
 
-            // ========== 测试场景1：重试次数递增 ==========
+            // ========== 测试场景1：重试次数递增，测试到超过最大重试次数 ==========
             String retryToken1 = UUID.randomUUID().toString();
             String retryCountKey1 = keyPrefix + retryToken1 + ":retry:count";
 
@@ -494,48 +783,37 @@ public class TestIdempotentController {
             result.put("场景1-第一次失败后状态", "FAILED".equals(status1) ? "✅ 正确: " + status1 : "❌ 错误: " + status1);
             result.put("场景1-第一次失败后重试次数", retryCount1 == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount1);
 
-            // 第二次失败（此时会检测到FAILED状态，递增重试次数为1）
-            try {
-                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
-                result.put("场景1-第二次失败", "❌ 应该失败但成功了");
-            } catch (Exception e) {
-                result.put("场景1-第二次失败", "✅ 正确抛出异常");
+            // 动态测试重试次数递增：从第2次失败到超过最大重试次数
+            for (int attempt = 2; attempt <= maxRetries + 1; attempt++) {
+                // 第attempt次失败（检测到FAILED状态，递增重试次数）
+                try {
+                    idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
+                    result.put("场景1-第" + attempt + "次失败", "❌ 应该失败但成功了");
+                } catch (Exception e) {
+                    if (attempt <= maxRetries) {
+                        result.put("场景1-第" + attempt + "次失败", "✅ 正确抛出异常（重试次数: " + (attempt - 1) + "/" + maxRetries + "）");
+                    } else {
+                        result.put("场景1-第" + attempt + "次失败", "✅ 正确抛出异常（超过最大重试次数）");
+                    }
+                }
+
+                sleep(300);
+
+                // 查询重试次数
+                Integer retryCount = redisService.getCacheObject(retryCountKey1, Integer.class);
+                if (attempt <= maxRetries) {
+                    // 在限制内，重试次数应该是 attempt-1
+                    int expectedCount = attempt - 1;
+                    result.put("场景1-第" + attempt + "次失败后重试次数",
+                            retryCount != null && retryCount == expectedCount
+                                    ? "✅ 正确: " + retryCount + "/" + maxRetries
+                                    : "❌ 错误: " + retryCount + " (期望: " + expectedCount + ")");
+                } else {
+                    // 超过限制，重试次数应该被清除了
+                    result.put("场景1-超过限制后重试次数",
+                            retryCount == null ? "✅ 正确: 已被清除" : "❌ 错误: 未清除, 值=" + retryCount);
+                }
             }
-
-            // 等待一小段时间，确保第二次处理完成
-            sleep(300);
-
-            // 查询重试次数（应该是1）
-            Integer retryCount2 = redisService.getCacheObject(retryCountKey1, Integer.class);
-            result.put("场景1-第二次失败后重试次数", retryCount2 != null && retryCount2 == 1 ? "✅ 正确: " + retryCount2 : "❌ 错误: " + retryCount2 + " (期望: 1)");
-
-            // 第三次失败（此时会检测到FAILED状态，递增重试次数为2）
-            try {
-                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
-                result.put("场景1-第三次失败", "❌ 应该失败但成功了");
-            } catch (Exception e) {
-                result.put("场景1-第三次失败", "✅ 正确抛出异常");
-            }
-
-            sleep(300);
-
-            // 查询重试次数（应该是2）
-            Integer retryCount3 = redisService.getCacheObject(retryCountKey1, Integer.class);
-            result.put("场景1-第三次失败后重试次数", retryCount3 != null && retryCount3 == 2 ? "✅ 正确: " + retryCount3 : "❌ 错误: " + retryCount3 + " (期望: 2)");
-
-            // 第四次失败（此时会检测到FAILED状态，递增重试次数为3，然后超过限制）
-            try {
-                idempotentTestAPI.testHttpAdvancedRetryCount(retryToken1, true);
-                result.put("场景1-第四次失败", "❌ 应该失败但成功了");
-            } catch (Exception e) {
-                result.put("场景1-第四次失败", "✅ 正确抛出异常（超过最大重试次数）");
-            }
-
-            sleep(300);
-
-            // 查询重试次数（应该被清除了）
-            Integer retryCount4 = redisService.getCacheObject(retryCountKey1, Integer.class);
-            result.put("场景1-超过限制后重试次数", retryCount4 == null ? "✅ 正确: 已被清除" : "❌ 错误: 未清除, 值=" + retryCount4);
 
             // ========== 测试场景2：失败后成功，验证重试次数是否被删除 ==========
             String retryToken2 = UUID.randomUUID().toString();
@@ -587,11 +865,14 @@ public class TestIdempotentController {
                 result.put("场景2-第三次成功", "❌ 异常: " + e.getMessage());
             }
 
-            // ========== 测试场景3：连续失败3次后，验证重试次数是否正确 ==========
+            // ========== 测试场景3：连续失败多次后，验证重试次数是否正确（测试次数不超过最大重试次数） ==========
             String retryToken3 = UUID.randomUUID().toString();
             String retryCountKey3 = keyPrefix + retryToken3 + ":retry:count";
 
-            for (int i = 1; i <= 3; i++) {
+            // 测试次数取maxRetries和3的较小值，避免测试时间过长
+            int testCount = Math.min(maxRetries, 3);
+
+            for (int i = 1; i <= testCount; i++) {
                 try {
                     idempotentTestAPI.testHttpAdvancedRetryCount(retryToken3, true);
                     result.put("场景3-第" + i + "次失败", "❌ 应该失败但成功了");
@@ -603,13 +884,13 @@ public class TestIdempotentController {
                 // 查询重试次数
                 // 注意：第1次失败时，重试次数还未写入（因为重试次数是在检测到FAILED状态时递增的）
                 // 第2次失败时，重试次数为1（因为检测到了第1次的FAILED状态）
-                // 第3次失败时，重试次数为2（因为检测到了第2次的FAILED状态）
+                // 第i次失败时，重试次数为i-1（因为检测到了第i-1次的FAILED状态）
                 Integer retryCount = redisService.getCacheObject(retryCountKey3, Integer.class);
-                int expectedRetryCount = i == 1 ? 0 : i - 1; // 第1次失败时重试次数为0，第2次为1，第3次为2
+                int expectedRetryCount = i == 1 ? 0 : i - 1; // 第1次失败时重试次数为0，第i次为i-1
                 if (i == 1) {
                     result.put("场景3-第" + i + "次失败后重试次数", retryCount == null ? "✅ 正确: null（第一次失败时还未写入）" : "❌ 错误: " + retryCount + " (期望: null)");
                 } else {
-                    result.put("场景3-第" + i + "次失败后重试次数", retryCount != null && retryCount == expectedRetryCount ? "✅ 正确: " + retryCount : "❌ 错误: " + retryCount + " (期望: " + expectedRetryCount + ")");
+                    result.put("场景3-第" + i + "次失败后重试次数", retryCount != null && retryCount == expectedRetryCount ? "✅ 正确: " + retryCount + "/" + maxRetries : "❌ 错误: " + retryCount + " (期望: " + expectedRetryCount + ")");
                 }
             }
 

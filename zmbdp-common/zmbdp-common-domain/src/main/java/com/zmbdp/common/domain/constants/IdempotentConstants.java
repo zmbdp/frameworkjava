@@ -36,5 +36,4 @@ public class IdempotentConstants {
      * Nacos 上强幂等模式重试间隔时间配置名称（毫秒）
      */
     public static final String NACOS_IDEMPOTENT_RETRY_INTERVAL_MS_PREFIX = "idempotent.retry-interval-ms";
-
 }
