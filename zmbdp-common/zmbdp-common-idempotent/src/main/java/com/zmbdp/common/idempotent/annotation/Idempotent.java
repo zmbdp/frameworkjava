@@ -154,7 +154,7 @@ public @interface Idempotent {
      *
      * @return 过期时间（秒），默认 300（5 分钟）
      */
-    long expireTime() default 300;
+    long expireTime() default 300L;
 
     /**
      * 幂等性 Token 的请求头名称
