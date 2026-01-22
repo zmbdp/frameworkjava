@@ -4,6 +4,7 @@
 
 ## 基础说明
 - [项目结构与模块职责](PROJECT_STRUCTURE.md)
+- [工具类使用指南](UTILS.md)
 - [配置中心与多环境管理](CONFIGURATION.md)
 
 ## 核心能力

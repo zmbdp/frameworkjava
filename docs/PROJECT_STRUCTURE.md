@@ -42,7 +42,7 @@ frameworkjava/
 ### zmbdp-common
 **职责**：公共能力下沉
 - **cache**：三级缓存实现（布隆过滤器 + Caffeine + Redis）
-- **core**：基础工具类、常量、异常定义
+- **core**：基础工具类（23 个）、常量、异常定义
 - **domain**：领域模型、实体基类
 - **filter**：通用过滤器
 - **idempotent**：分布式幂等性控制
