@@ -3,8 +3,8 @@ package com.zmbdp.portal.service.user.strategy.validator.impl;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.portal.service.user.strategy.validator.IAccountValidatorStrategy;
 import com.zmbdp.portal.service.user.strategy.validator.AccountValidatorRouter;
+import com.zmbdp.portal.service.user.strategy.validator.IAccountValidatorStrategy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author 稚名不带撇
  */
 @Component
-public class PhoneValidatorIStrategy implements IAccountValidatorStrategy {
+public class PhoneValidatorStrategy implements IAccountValidatorStrategy {
 
     /**
      * 判断是否支持手机号格式的校验

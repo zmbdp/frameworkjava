@@ -1,6 +1,6 @@
 com.zmbdp.common.message.config.AliSmsConfig
 com.zmbdp.common.message.config.MailCodeProperties
-com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl
-com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl
+com.zmbdp.common.message.strategy.impl.AliSmsServiceStrategy
+com.zmbdp.common.message.strategy.impl.MailCodeServiceStrategy
 com.zmbdp.common.message.service.CaptchaService
 com.zmbdp.common.message.strategy.CaptchaSenderRouter
