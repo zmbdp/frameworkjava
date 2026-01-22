@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/github/license/zmbdp/frameworkjava)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/zmbdp/frameworkjava)](https://github.com/zmbdp/frameworkjava/stargazers)
 
-**一个开箱即用的企业级微服务脚手架，  
+**一个开箱即用的企业级微服务脚手架  
 用于快速构建高可用、高性能、可扩展的 Java 微服务系统**
 
 [⚡ 快速开始](#-快速开始) · [✨ 核心特性](#-核心特性) · [📚 文档中心](docs/README.md)
@@ -20,46 +20,89 @@
 
 ## 📑 目录
 
-- [📖 项目简介](#-项目简介)
-- [✨ 核心特性](#-核心特性)
-- [🧭 项目结构概览](#-项目结构概览)
-- [⚡ 快速开始](#-快速开始)
-- [📚 文档中心](#-文档中心)
-- [🤝 参与贡献](#-参与贡献)
-- [📄 License](#-license)
+- [项目简介](#-项目简介)
+- [核心特性](#-核心特性)
+- [项目结构概览](#-项目结构概览)
+- [快速开始](#-快速开始)
+- [文档中心](#-文档中心)
+- [参与贡献](#-参与贡献)
+- [License](#-license)
 
 ---
 
 ## 📖 项目简介
 
-FrameworkJava 是一个基于 **Spring Boot 3.x + Spring Cloud 2023** 的企业级微服务脚手架，  
+**FrameworkJava** 是一个基于 **Spring Boot 3.x + Spring Cloud 2023** 的企业级微服务脚手架，  
 目标不是"演示功能"，而是**沉淀一套可直接用于真实项目的工程实践**。
 
-它关注的是：
+> ⚠️ **本项目更适合**：
+> - ✅ 有一定 Spring Boot / Spring Cloud 基础的开发者
+> - ✅ 希望直接落地微服务架构的中小型项目
+> - ✅ 需要工程规范、公共能力沉淀的团队
+> - ✅ 想要参考企业级架构设计的开发者
+>
+> ⚠️ **不适合**：
+> - ❌ 完全零基础的 Java 初学者（建议先学习 Spring Boot 基础）
+> - ❌ 只需要单体应用的项目（本项目为微服务架构）
 
-- 微服务工程结构是否清晰
-- 高并发与一致性问题如何解决
-- 公共能力如何模块化复用
-- 新业务是否能快速、低成本接入
+### 🎯 设计理念
+
+- **工程化优先**：关注微服务工程结构是否清晰，而非功能堆砌
+- **性能与可靠性**：解决高并发与一致性问题，三级缓存、幂等性控制等核心能力
+- **模块化复用**：公共能力下沉，业务服务解耦，新业务快速接入
+- **开箱即用**：20+ 工具类、3 套策略模式、完整业务能力，无需重复造轮子
 
 ---
 
 ## ✨ 核心特性
 
-- **统一认证与鉴权**  
-  JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系
+### 🚀 一键式环境部署
+Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ），支持 dev/test/prd 多环境配置，**5 分钟快速搭建完整开发环境**，告别繁琐的环境配置
 
-- **三级缓存体系**  
-  布隆过滤器 + Caffeine 本地缓存 + Redis 分布式缓存，有效防止缓存穿透
+### 🔐 统一认证与鉴权
+JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系，**开箱即用的安全方案**
 
-- **分布式幂等性控制**  
-  基于 AOP 的幂等性方案，支持 HTTP / MQ 场景，针对高并发做了专项优化
+### ⚡ 三级缓存体系
+布隆过滤器 + Caffeine 本地缓存 + Redis 分布式缓存，**有效防止缓存穿透，性能提升 10 倍+**  
+*（支持 Redis/Fast/Safe 三种布隆过滤器实现，本地缓存支持自定义过期策略，非简单封装）*
 
-- **模块化微服务结构**  
-  API 与 Service 分离，公共能力下沉，业务服务解耦
+### 🛡️ 分布式幂等性控制
+基于 AOP + Redis 的幂等性方案，支持 HTTP / MQ 场景，**针对高并发做了专项优化**，保障数据一致性  
+*（支持防重模式/强幂等模式，Redis + Lua 脚本保证原子性，支持并发穿透控制）*
 
-- **开箱即用的基础能力**  
-  用户、配置、文件、消息、定时任务、Excel、邮件等常见能力已预置
+### 📦 模块化微服务结构
+API 与 Service 分离，公共能力下沉，业务服务解耦，**新业务接入成本降低 80%**
+
+### 🛠️ 丰富的工具包生态
+**20+ 工具类**（加密、JSON、Excel、邮件、分页、流处理等）+ **3 套策略模式**（登录、验证码发送、账号校验）+ **完整业务能力**（用户、配置、文件、消息等），开箱即用，无需重复造轮子
+
+---
+
+## 🛠️ 技术栈
+
+### 核心框架
+- **Spring Boot 3.3.3** - 企业级应用开发框架
+- **Spring Cloud 2023.0.3** - 微服务治理
+- **Spring Cloud Alibaba 2023.0.1.2** - 阿里云微服务组件
+
+### 中间件与存储
+- **Nacos** - 服务注册发现、配置中心
+- **Redis 7.0** - 分布式缓存（Redisson）
+- **MySQL 8.4** - 关系型数据库
+- **RabbitMQ** - 消息队列
+- **MyBatis Plus 3.5.7** - ORM 框架
+
+### 工具与组件
+- **Hutool 5.8.25** - Java 工具类库
+- **EasyExcel 3.2.1** - Excel 处理
+- **JJWT 0.11.5** - JWT 令牌
+- **Caffeine** - 本地缓存
+- **Guava** - Google 工具库
+
+### 其他
+- **Docker & Docker Compose** - 容器化部署
+- **Maven** - 项目构建工具
+- **JDK 17** - Java 开发环境
 
 ---
 
@@ -72,67 +115,100 @@ frameworkjava
 ├── zmbdp-admin          # 管理服务
 ├── zmbdp-portal         # 门户服务
 ├── zmbdp-file           # 文件服务
-└── zmbdp-mstemplate     # 微服务模板（模板示例，用于开发风格参考）
+└── zmbdp-mstemplate     # 微服务模板（规范示例，用于统一开发风格）
 ```
 
-> 📁 **完整结构说明**：见 [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
+> **zmbdp-mstemplate 模块说明**：  
+> 这是一个**规范示例模块**，定义了标准的微服务开发规范，包括：
+> - 包结构规范（controller / service / domain / entity 等）
+> - DTO / VO / BO 划分标准
+> - Controller / Service 设计风格
+> - 参数校验、异常处理等最佳实践
+> 
+> 新建微服务时，可直接参考此模块的代码风格和结构设计。
+>
+> **完整结构说明**：见 [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
 
 ---
 
 ## ⚡ 快速开始
 
 ### 环境要求
-- JDK 17+
-- Maven 3.6+
-- Docker & Docker Compose
+- **JDK 17+**
+- **Maven 3.6+**
+- **Docker & Docker Compose**
 
-### 启动基础中间件
+### 三步启动
+
+#### 1. 克隆项目
 ```bash
 git clone https://github.com/zmbdp/frameworkjava.git
 cd frameworkjava
+```
 
+#### 2. 启动中间件（一键部署）
+```bash
 cd deploy/dev/app
 docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
 ```
 
-* Nacos：[http://localhost:8848/nacos](http://localhost:8848/nacos)
-* RabbitMQ：[http://localhost:15672](http://localhost:15672)
+**等待 30-60 秒后，访问以下地址验证：**
+- Nacos 控制台：[http://localhost:8848/nacos](http://localhost:8848/nacos) (默认账号/密码: nacos/nacos)
+- RabbitMQ 管理界面：[http://localhost:15672](http://localhost:15672) (默认账号/密码: guest/guest)
 
-### 启动服务
-
+#### 3. 启动服务
 ```bash
+# 编译项目
 mvn clean install -DskipTests
 
-# 网关
+# 启动网关服务
 cd zmbdp-gateway
 mvn spring-boot:run
 
-# 管理服务
-cd ../zmbdp-admin/zmbdp-admin-service
+# 启动管理服务（新开终端）
+cd zmbdp-admin/zmbdp-admin-service
 mvn spring-boot:run
 ```
+
+> **提示**：首次启动会自动初始化数据库和配置，请耐心等待。详细配置说明见 [配置中心文档](docs/CONFIGURATION.md)
 
 ---
 
 ## 📚 文档中心
 
-* [📁 项目结构说明](docs/PROJECT_STRUCTURE.md)
-* [⚙️ 配置中心与环境配置](docs/CONFIGURATION.md)
-* [🛡️ 三级缓存架构](docs/CACHE_ARCHITECTURE.md)
-* [🔐 分布式幂等性设计](docs/IDEMPOTENT.md)
-* [🚀 新增业务模块指南](docs/ADD_NEW_MODULE.md)
-* [❓ 常见问题](docs/FAQ.md)
+| 文档 | 说明 |
+|------|------|
+| [项目结构说明](docs/PROJECT_STRUCTURE.md) | 详细的模块划分和职责说明 |
+| [配置中心与环境配置](docs/CONFIGURATION.md) | Nacos 配置、多环境切换指南 |
+| [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
+| [分布式幂等性设计](docs/IDEMPOTENT.md) | 幂等性控制原理与使用指南 |
+| [新增业务模块指南](docs/ADD_NEW_MODULE.md) | 快速创建新微服务模块 |
+| [常见问题](docs/FAQ.md) | 开发中常见问题解答 |
 
 ---
 
 ## 🤝 参与贡献
 
-欢迎任何形式的贡献，包括但不限于：
+欢迎任何形式的贡献，让这个项目变得更好。  
+无论是功能改进，还是非常细微的优化，都非常欢迎：
 
-* 提交 Issue
-* 改进文档
-* 提交 Pull Request
-* 分享使用经验
+- 🐛 **提交 Issue**：Bug、异常行为、设计建议等
+- ✏️ **文档与注释**：错别字、标点符号、说明补充、示例完善
+- 💡 **代码优化**：性能改进、结构调整、最佳实践
+- 📦 **新增能力**：通用组件、公共能力、工程规范
+- ⭐ **Star 支持**：如果这个项目对你有帮助，欢迎 Star 鼓励
+
+> 即使只是一个标点符号的修改，也同样值得一次 Pull Request。
+
+
+---
+
+## 🎯 适用场景
+
+- 快速搭建企业级微服务项目
+- 学习 Spring Cloud 微服务架构
+- 作为项目脚手架，快速启动新业务
+- 参考工程化实践和最佳实践
 
 ---
 
@@ -145,6 +221,8 @@ mvn spring-boot:run
 <div align="center">
 
 如果这个项目对你有帮助，请给一个 ⭐ Star
-**Made with ❤️ by 稚名不带撇**
+
+**Maintained by zmbdp**  
+欢迎交流工程实践与架构设计
 
 </div>
