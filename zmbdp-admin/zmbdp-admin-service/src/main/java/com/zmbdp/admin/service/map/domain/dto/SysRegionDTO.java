@@ -51,5 +51,4 @@ public class SysRegionDTO {
      * 纬度
      */
     private Double latitude;
-
 }

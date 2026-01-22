@@ -65,7 +65,6 @@ public interface ISysDictionaryService {
      */
     Long editData(DictionaryDataEditReqDTO dictionaryDataEditReqDTO);
 
-
     /*=============================================    远程调用    =============================================*/
 
     /**

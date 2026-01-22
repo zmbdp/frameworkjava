@@ -40,5 +40,4 @@ public class BasePageDTO<T> {
         }
         return (int) Math.ceil((double) totals / pageSize);
     }
-
 }

@@ -23,7 +23,7 @@ public class ServiceException extends RuntimeException {
      */
     private String message;
 
-    //推荐的使用方法
+    // 推荐的使用方法
 
     /**
      * 响应构造异常

@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUser> {
+
     /**
      * 根据手机号查询用户信息
      *

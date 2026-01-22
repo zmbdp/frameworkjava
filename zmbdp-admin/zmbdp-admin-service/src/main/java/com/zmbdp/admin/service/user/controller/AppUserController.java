@@ -129,7 +129,6 @@ public class AppUserController implements AppUserApi {
         return Result.success(appUserDTO.convertToVO());
     }
 
-
     /**
      * 编辑 C端用户
      *

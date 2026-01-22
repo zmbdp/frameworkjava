@@ -20,12 +20,13 @@ public enum ResultCode {
     SUCCESS(200000, "操作成功"),
 
     //------------------------4xx
-    //400
+    // 400
 
     /**
      * 无效的参数
      */
     INVALID_PARA(400000, "无效的参数"),
+
     /**
      * 无效的验证码
      */
@@ -61,7 +62,7 @@ public enum ResultCode {
      */
     USER_DISABLE(400007, "账号已停用，登录失败"),
 
-    //401
+    // 401
 
     /**
      * 令牌不能为空
@@ -88,7 +89,6 @@ public enum ResultCode {
      */
     TOKEN_CHECK_FAILED(401004, "令牌验证失败！"),
 
-
     //404
 
     /**
@@ -106,7 +106,7 @@ public enum ResultCode {
     /**
      * 请求方法不支持！
      */
-    REQUEST_METNHOD_NOT_SUPPORTED(405000, "请求方法不支持"),
+    REQUEST_METHOD_NOT_SUPPORTED(405000, "请求方法不支持"),
 
     //---------------------5xx
 

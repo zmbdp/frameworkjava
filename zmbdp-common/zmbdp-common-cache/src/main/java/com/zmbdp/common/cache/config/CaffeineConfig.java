@@ -36,7 +36,6 @@ public class CaffeineConfig {
     @Value("${caffeine.build.expire:30}")
     private Long expire;
 
-
     /**
      * 构造本地缓存对象
      *
