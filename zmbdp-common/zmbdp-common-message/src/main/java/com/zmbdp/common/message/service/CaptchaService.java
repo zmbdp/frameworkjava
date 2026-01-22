@@ -132,7 +132,7 @@ public class CaptchaService {
     private boolean smsSendMessage;
 
     /**
-     * 邮件服务是否发送邮件（MailCodeServiceStrategy 的 sendMessage 配置）
+     * 邮件服务是否发送邮件（EmailCodeServiceStrategy 的 sendMessage 配置）
      */
     @Value("${mail.send-message:false}")
     private boolean mailSendMessage;
@@ -143,7 +143,7 @@ public class CaptchaService {
      * 根据账号格式（手机号或邮箱）自动选择对应的发送器：
      * <ul>
      *     <li>手机号：使用短信发送器（AliSmsServiceStrategy）</li>
-     *     <li>邮箱：使用邮件发送器（MailCodeServiceStrategy）</li>
+     *     <li>邮箱：使用邮件发送器（EmailCodeServiceStrategy）</li>
      * </ul>
      */
     @Autowired
