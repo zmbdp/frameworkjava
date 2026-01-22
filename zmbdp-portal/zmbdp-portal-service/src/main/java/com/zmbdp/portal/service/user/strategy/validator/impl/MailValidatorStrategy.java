@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author 稚名不带撇
  */
 @Component
-public class EmailValidatorStrategy implements IAccountValidatorStrategy {
+public class MailValidatorStrategy implements IAccountValidatorStrategy {
 
     /**
      * 判断是否支持邮箱格式的校验

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 账号校验策略上下文（Context）
+ * 账号校验策略路由器
  * <p>
  * 采用策略模式设计，作为策略上下文，负责：
  * <ul>
@@ -33,7 +33,7 @@ public class AccountValidatorRouter {
      * 所有注册的校验策略实现类列表
      * <p>
      * Spring 会自动注入所有实现了 {@link IAccountValidatorStrategy} 接口的 Bean，
-     * 如：PhoneValidatorStrategy、EmailValidatorStrategy 等。
+     * 如：PhoneValidatorStrategy、MailValidatorStrategy 等。
      * </p>
      */
     private final List<IAccountValidatorStrategy> accountValidatorStrategies;
