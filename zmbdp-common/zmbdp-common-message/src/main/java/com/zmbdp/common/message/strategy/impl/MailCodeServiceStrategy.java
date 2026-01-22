@@ -83,7 +83,7 @@ import java.util.Random;
 @Slf4j
 @Component
 @RefreshScope
-public class MailCodeServiceImpl implements ICaptchaSenderStrategy {
+public class MailCodeServiceStrategy implements ICaptchaSenderStrategy {
 
     /**
      * 随机数生成器
