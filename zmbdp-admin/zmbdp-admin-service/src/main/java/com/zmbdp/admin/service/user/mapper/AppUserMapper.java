@@ -15,6 +15,7 @@ import java.util.List;
  */
 @Mapper
 public interface AppUserMapper extends BaseMapper<AppUser> {
+
     /**
      * 根据 openId 查询用户信息
      *

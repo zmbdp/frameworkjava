@@ -1,6 +1,5 @@
 package com.zmbdp.admin.api.config.feign;
 
-
 import com.zmbdp.admin.api.config.domain.dto.DictionaryDataDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

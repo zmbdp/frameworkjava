@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
- *  do 基类
+ * do 基类
  *
- *  @author 稚名不带撇
+ * @author 稚名不带撇
  */
 @Data
 public class BaseDO {
@@ -17,5 +17,4 @@ public class BaseDO {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
 }

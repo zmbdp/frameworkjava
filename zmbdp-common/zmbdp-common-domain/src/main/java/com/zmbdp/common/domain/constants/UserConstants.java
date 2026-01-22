@@ -6,6 +6,7 @@ package com.zmbdp.common.domain.constants;
  * @author 稚名不带撇
  */
 public class UserConstants {
+
     /**
      * 表示用户状态为停用
      */

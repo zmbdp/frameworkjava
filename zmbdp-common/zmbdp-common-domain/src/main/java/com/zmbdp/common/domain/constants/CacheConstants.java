@@ -6,11 +6,11 @@ package com.zmbdp.common.domain.constants;
  * @author 稚名不带撇
  */
 public class CacheConstants {
+
     /**
      * 缓存分割符
      */
     public final static String CACHE_SPLIT_COLON = ":";
-
 
     /**
      * 缓存 token 的有效期，默认 720（分钟）

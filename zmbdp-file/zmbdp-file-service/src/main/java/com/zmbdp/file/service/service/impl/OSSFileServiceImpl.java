@@ -64,15 +64,13 @@ public class OSSFileServiceImpl implements IFileService {
             // 初始化 HMAC 密钥规格，指定算法为 HMAC-SHA256 并使用提供的密钥
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "HmacSHA256");
 
-            // 获取 Mac 实例，并通过 getInstance 方法指定使用HMAC-SHA256算法
+            // 获取 Mac 实例，并通过 getInstance 方法指定使用 HMAC-SHA256 算法
             Mac mac = Mac.getInstance("HmacSHA256");
             // 使用密钥初始化 Mac 对象
             mac.init(secretKeySpec);
 
             // 执行 HMAC 计算，通过 doFinal 方法接收需要计算的数据并返回计算结果的数组
-            byte[] hmacBytes = mac.doFinal(data.getBytes());
-
-            return hmacBytes;
+            return mac.doFinal(data.getBytes());
         } catch (Exception e) {
             log.error("生成直传签名失败: {}", e.getMessage(), e);
             throw new ServiceException(ResultCode.PRE_SIGN_URL_FAILED);

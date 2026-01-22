@@ -6,6 +6,7 @@ package com.zmbdp.common.domain.constants;
  * @author 稚名不带撇
  */
 public class CommonConstants {
+
     /**
      * 标准时间格式
      */
