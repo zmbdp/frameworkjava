@@ -36,16 +36,16 @@ public class AccountValidatorFactory {
      * 如：PhoneValidator、EmailValidator 等。
      * </p>
      */
-    private final List<AccountValidator> validators;
+    private final List<AccountValidator> validatorStrategies;
 
     /**
      * 构造方法，自动注入所有校验策略实现类
      *
-     * @param validators Spring 容器中所有 {@link AccountValidator} 的实现类
+     * @param validatorStrategies Spring 容器中所有 {@link AccountValidator} 的实现类
      */
     @Autowired
-    public AccountValidatorFactory(List<AccountValidator> validators) {
-        this.validators = validators;
+    public AccountValidatorFactory(List<AccountValidator> validatorStrategies) {
+        this.validatorStrategies = validatorStrategies;
     }
 
     /**
@@ -65,7 +65,7 @@ public class AccountValidatorFactory {
      */
     public void validate(String account) {
         // 从所有策略中筛选出支持该账号格式的策略
-        AccountValidator validator = validators.stream()
+        AccountValidator validator = validatorStrategies.stream()
                 // 遍历所有策略，调用 supports() 方法判断是否支持该账号格式
                 // 如果 supports() 返回 true，说明该策略支持此账号格式，会被筛选出来
                 .filter(v -> v.supports(account))

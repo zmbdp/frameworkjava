@@ -61,7 +61,7 @@ public class CaptchaSenderRouter {
      * </ul>
      */
     @Autowired
-    private List<ICaptchaSender> senders;
+    private List<ICaptchaSender> captchaSenderStrategies;
 
     /**
      * 发送验证码
@@ -104,7 +104,7 @@ public class CaptchaSenderRouter {
      * @see ICaptchaSender#sendCode(String, String)
      */
     public boolean send(String account, String code) {
-        for (ICaptchaSender sender : senders) {
+        for (ICaptchaSender sender : captchaSenderStrategies) {
             if (sender.supports(account)) {
                 return sender.sendCode(account, code);
             }
