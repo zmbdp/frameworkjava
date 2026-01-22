@@ -1,4 +1,4 @@
-package com.zmbdp.common.message.service;
+package com.zmbdp.common.message.strategy;
 
 /**
  * 验证码发送服务接口
@@ -16,13 +16,13 @@ package com.zmbdp.common.message.service;
  * <p>
  * <b>实现类：</b>
  * <ul>
- *     <li>{@link com.zmbdp.common.message.service.impl.AliSmsServiceImpl}：阿里云短信服务实现（用于手机号）</li>
- *     <li>{@link com.zmbdp.common.message.service.impl.MailCodeServiceImpl}：邮件验证码服务实现（用于邮箱）</li>
+ *     <li>{@link com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl}：阿里云短信服务实现（用于手机号）</li>
+ *     <li>{@link com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl}：邮件验证码服务实现（用于邮箱）</li>
  * </ul>
  * <p>
  * <b>使用方式：</b>
  * <ul>
- *     <li>通过路由器获取：使用 {@link com.zmbdp.common.message.service.CaptchaSenderRouter#send(String, String)} 根据账号类型自动选择</li>
+ *     <li>通过路由器获取：使用 {@link CaptchaSenderRouter#send(String, String)} 根据账号类型自动选择</li>
  *     <li>直接注入实现类：通过 {@code @Qualifier} 指定实现类</li>
  * </ul>
  * <p>
@@ -34,7 +34,7 @@ package com.zmbdp.common.message.service;
  * // 直接注入指定实现类
  * @Autowired
  * @Qualifier("aliSmsService")
- * private ICaptchaSender smsSender;
+ * private ICaptchaSenderStrategy smsSender;
  * boolean result = smsSender.sendCode("13800138000", "123456");
  * }</pre>
  * <p>
@@ -43,15 +43,15 @@ package com.zmbdp.common.message.service;
  *     <li>每个实现类需要实现 supports 方法来判断是否支持当前账号类型</li>
  *     <li>发送失败不会抛出异常，只返回 false</li>
  *     <li>实现类需要标注 {@code @Component} 注解，并指定 Bean 名称</li>
- *     <li>建议通过 {@link com.zmbdp.common.message.service.CaptchaSenderRouter} 获取发送器</li>
+ *     <li>建议通过 {@link CaptchaSenderRouter} 获取发送器</li>
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.message.service.CaptchaSenderRouter
- * @see com.zmbdp.common.message.service.impl.AliSmsServiceImpl
- * @see com.zmbdp.common.message.service.impl.MailCodeServiceImpl
+ * @see CaptchaSenderRouter
+ * @see com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl
+ * @see com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl
  */
-public interface ICaptchaSender {
+public interface ICaptchaSenderStrategy {
 
     /**
      * 是否支持当前账号类型
@@ -99,8 +99,8 @@ public interface ICaptchaSender {
      * <p>
      * <b>实现类说明：</b>
      * <ul>
-     *     <li>{@link com.zmbdp.common.message.service.impl.AliSmsServiceImpl}：account 应为手机号</li>
-     *     <li>{@link com.zmbdp.common.message.service.impl.MailCodeServiceImpl}：account 应为邮箱地址</li>
+     *     <li>{@link com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl}：account 应为手机号</li>
+     *     <li>{@link com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl}：account 应为邮箱地址</li>
      * </ul>
      * <p>
      * <b>注意事项：</b>

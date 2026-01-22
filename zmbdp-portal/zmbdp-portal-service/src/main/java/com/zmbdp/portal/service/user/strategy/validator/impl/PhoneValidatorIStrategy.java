@@ -1,21 +1,23 @@
-package com.zmbdp.portal.service.user.validator;
+package com.zmbdp.portal.service.user.strategy.validator.impl;
 
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.portal.service.user.strategy.validator.IAccountValidatorStrategy;
+import com.zmbdp.portal.service.user.strategy.validator.AccountValidatorRouter;
 import org.springframework.stereotype.Component;
 
 /**
  * 手机号校验策略实现类
  * <p>
- * 负责手机号格式的校验逻辑，实现 {@link AccountValidator} 接口。
- * 当账号格式为手机号时，此策略会被 {@link AccountValidatorFactory} 选中并执行校验。
+ * 负责手机号格式的校验逻辑，实现 {@link IAccountValidatorStrategy} 接口。
+ * 当账号格式为手机号时，此策略会被 {@link AccountValidatorRouter} 选中并执行校验。
  * </p>
  *
  * @author 稚名不带撇
  */
 @Component
-public class PhoneValidator implements AccountValidator {
+public class PhoneValidatorIStrategy implements IAccountValidatorStrategy {
 
     /**
      * 判断是否支持手机号格式的校验

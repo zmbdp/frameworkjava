@@ -1,11 +1,11 @@
-package com.zmbdp.common.message.service.impl;
+package com.zmbdp.common.message.strategy.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.google.gson.Gson;
 import com.zmbdp.common.core.utils.MailUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.message.config.MailCodeProperties;
-import com.zmbdp.common.message.service.ICaptchaSender;
+import com.zmbdp.common.message.strategy.ICaptchaSenderStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * 邮件验证码服务实现
  * <p>
- * 实现 {@link ICaptchaSender} 接口，提供基于邮件的验证码发送功能。
+ * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于邮件的验证码发送功能。
  * 支持通过邮件发送验证码，支持随机选择邮件标题和内容模板。
  * <p>
  * <b>核心功能：</b>
@@ -41,7 +41,7 @@ import java.util.Random;
  * // 方式2：直接注入指定实现类
  * @Autowired
  * @Qualifier("mailCodeService")
- * private ICaptchaSender mailSender;
+ * private ICaptchaSenderStrategy mailSender;
  * boolean result = mailSender.sendCode("user@example.com", "123456");
  * }</pre>
  * <p>
@@ -76,14 +76,14 @@ import java.util.Random;
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.message.service.ICaptchaSender
+ * @see ICaptchaSenderStrategy
  * @see com.zmbdp.common.message.config.MailCodeProperties
  * @see com.zmbdp.common.core.utils.MailUtil
  */
 @Slf4j
+@Component
 @RefreshScope
-@Component("mailCodeService")
-public class MailCodeServiceImpl implements ICaptchaSender {
+public class MailCodeServiceImpl implements ICaptchaSenderStrategy {
 
     /**
      * 随机数生成器
@@ -143,7 +143,7 @@ public class MailCodeServiceImpl implements ICaptchaSender {
      * // 通过注入的 Bean 发送验证码
      * @Autowired
      * @Qualifier("mailCodeService")
-     * private ICaptchaSender mailSender;
+     * private ICaptchaSenderStrategy mailSender;
      * boolean result = mailSender.sendCode("user@example.com", "123456");
      * }</pre>
      * <p>
