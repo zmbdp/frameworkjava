@@ -68,7 +68,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RefreshScope
-public class AliSmsServiceImpl implements ICaptchaSenderStrategy {
+public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
 
     /**
      * 阿里云短信服务客户端

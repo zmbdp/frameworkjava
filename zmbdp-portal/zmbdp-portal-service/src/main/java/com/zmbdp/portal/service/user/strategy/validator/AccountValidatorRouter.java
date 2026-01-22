@@ -33,7 +33,7 @@ public class AccountValidatorRouter {
      * 所有注册的校验策略实现类列表
      * <p>
      * Spring 会自动注入所有实现了 {@link IAccountValidatorStrategy} 接口的 Bean，
-     * 如：PhoneValidatorIStrategy、EmailValidatorIStrategy 等。
+     * 如：PhoneValidatorStrategy、EmailValidatorStrategy 等。
      * </p>
      */
     private final List<IAccountValidatorStrategy> accountValidatorStrategies;

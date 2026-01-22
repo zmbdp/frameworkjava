@@ -1,5 +1,8 @@
 package com.zmbdp.common.message.strategy;
 
+import com.zmbdp.common.message.strategy.impl.AliSmsServiceStrategy;
+import com.zmbdp.common.message.strategy.impl.MailCodeServiceStrategy;
+
 /**
  * 验证码发送服务接口
  * <p>
@@ -16,8 +19,8 @@ package com.zmbdp.common.message.strategy;
  * <p>
  * <b>实现类：</b>
  * <ul>
- *     <li>{@link com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl}：阿里云短信服务实现（用于手机号）</li>
- *     <li>{@link com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl}：邮件验证码服务实现（用于邮箱）</li>
+ *     <li>{@link AliSmsServiceStrategy}：阿里云短信服务实现（用于手机号）</li>
+ *     <li>{@link MailCodeServiceStrategy}：邮件验证码服务实现（用于邮箱）</li>
  * </ul>
  * <p>
  * <b>使用方式：</b>
@@ -48,8 +51,8 @@ package com.zmbdp.common.message.strategy;
  *
  * @author 稚名不带撇
  * @see CaptchaSenderRouter
- * @see com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl
- * @see com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl
+ * @see AliSmsServiceStrategy
+ * @see MailCodeServiceStrategy
  */
 public interface ICaptchaSenderStrategy {
 
@@ -99,8 +102,8 @@ public interface ICaptchaSenderStrategy {
      * <p>
      * <b>实现类说明：</b>
      * <ul>
-     *     <li>{@link com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl}：account 应为手机号</li>
-     *     <li>{@link com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl}：account 应为邮箱地址</li>
+     *     <li>{@link AliSmsServiceStrategy}：account 应为手机号</li>
+     *     <li>{@link MailCodeServiceStrategy}：account 应为邮箱地址</li>
      * </ul>
      * <p>
      * <b>注意事项：</b>

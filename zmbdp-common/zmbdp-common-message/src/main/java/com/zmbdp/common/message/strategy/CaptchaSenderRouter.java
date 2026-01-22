@@ -1,5 +1,7 @@
 package com.zmbdp.common.message.strategy;
 
+import com.zmbdp.common.message.strategy.impl.AliSmsServiceStrategy;
+import com.zmbdp.common.message.strategy.impl.MailCodeServiceStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,8 +58,8 @@ public class CaptchaSenderRouter {
      * Spring 会自动注入所有实现了 {@link ICaptchaSenderStrategy} 接口的 Bean。
      * 当前包含的发送器：
      * <ul>
-     *     <li>{@link com.zmbdp.common.message.strategy.impl.AliSmsServiceImpl}：手机号发送器</li>
-     *     <li>{@link com.zmbdp.common.message.strategy.impl.MailCodeServiceImpl}：邮箱发送器</li>
+     *     <li>{@link AliSmsServiceStrategy}：手机号发送器</li>
+     *     <li>{@link MailCodeServiceStrategy}：邮箱发送器</li>
      * </ul>
      */
     @Autowired
@@ -81,11 +83,11 @@ public class CaptchaSenderRouter {
      * <pre>{@code
      * // 手机号账号
      * boolean result = captchaSenderRouter.send("13800138000", "123456");
-     * // 自动使用 AliSmsServiceImpl 发送短信
+     * // 自动使用 AliSmsServiceStrategy 发送短信
      *
      * // 邮箱账号
      * boolean result = captchaSenderRouter.send("user@example.com", "123456");
-     * // 自动使用 MailCodeServiceImpl 发送邮件
+     * // 自动使用 MailCodeServiceStrategy 发送邮件
      * }</pre>
      * <p>
      * <b>注意事项：</b>

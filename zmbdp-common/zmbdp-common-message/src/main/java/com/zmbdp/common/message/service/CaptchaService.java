@@ -126,13 +126,13 @@ public class CaptchaService {
      *     <li>true：发送真实短信（生产环境）</li>
      *     <li>false：不发送短信，使用固定验证码（开发/测试环境）</li>
      * </ul>
-     * 此配置对应 AliSmsServiceImpl 的 sendMessage 配置。
+     * 此配置对应 AliSmsServiceStrategy 的 sendMessage 配置。
      */
     @Value("${sms.send-message:false}")
     private boolean smsSendMessage;
 
     /**
-     * 邮件服务是否发送邮件（MailCodeServiceImpl 的 sendMessage 配置）
+     * 邮件服务是否发送邮件（MailCodeServiceStrategy 的 sendMessage 配置）
      */
     @Value("${mail.send-message:false}")
     private boolean mailSendMessage;
@@ -142,8 +142,8 @@ public class CaptchaService {
      * <p>
      * 根据账号格式（手机号或邮箱）自动选择对应的发送器：
      * <ul>
-     *     <li>手机号：使用短信发送器（AliSmsServiceImpl）</li>
-     *     <li>邮箱：使用邮件发送器（MailCodeServiceImpl）</li>
+     *     <li>手机号：使用短信发送器（AliSmsServiceStrategy）</li>
+     *     <li>邮箱：使用邮件发送器（MailCodeServiceStrategy）</li>
      * </ul>
      */
     @Autowired
