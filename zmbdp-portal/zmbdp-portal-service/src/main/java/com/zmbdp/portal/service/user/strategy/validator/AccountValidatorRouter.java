@@ -1,4 +1,4 @@
-package com.zmbdp.portal.service.user.validator;
+package com.zmbdp.portal.service.user.strategy.validator;
 
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -27,25 +27,25 @@ import java.util.List;
  * @author 稚名不带撇
  */
 @Component
-public class AccountValidatorFactory {
+public class AccountValidatorRouter {
 
     /**
      * 所有注册的校验策略实现类列表
      * <p>
-     * Spring 会自动注入所有实现了 {@link AccountValidator} 接口的 Bean，
-     * 如：PhoneValidator、EmailValidator 等。
+     * Spring 会自动注入所有实现了 {@link IAccountValidatorStrategy} 接口的 Bean，
+     * 如：PhoneValidatorIStrategy、EmailValidatorIStrategy 等。
      * </p>
      */
-    private final List<AccountValidator> validatorStrategies;
+    private final List<IAccountValidatorStrategy> accountValidatorStrategies;
 
     /**
      * 构造方法，自动注入所有校验策略实现类
      *
-     * @param validatorStrategies Spring 容器中所有 {@link AccountValidator} 的实现类
+     * @param accountValidatorStrategies Spring 容器中所有 {@link IAccountValidatorStrategy} 的实现类
      */
     @Autowired
-    public AccountValidatorFactory(List<AccountValidator> validatorStrategies) {
-        this.validatorStrategies = validatorStrategies;
+    public AccountValidatorRouter(List<IAccountValidatorStrategy> accountValidatorStrategies) {
+        this.accountValidatorStrategies = accountValidatorStrategies;
     }
 
     /**
@@ -54,9 +54,9 @@ public class AccountValidatorFactory {
      * 工作流程：
      * <ol>
      *     <li>遍历所有注册的校验策略实现类</li>
-     *     <li>通过 {@link AccountValidator#supports(String)} 方法筛选出支持该账号格式的策略</li>
+     *     <li>通过 {@link IAccountValidatorStrategy#supports(String)} 方法筛选出支持该账号格式的策略</li>
      *     <li>选择第一个匹配的策略（通常只有一个匹配）</li>
-     *     <li>调用策略的 {@link AccountValidator#validate(String)} 方法执行校验</li>
+     *     <li>调用策略的 {@link IAccountValidatorStrategy#validate(String)} 方法执行校验</li>
      * </ol>
      * </p>
      *
@@ -65,7 +65,7 @@ public class AccountValidatorFactory {
      */
     public void validate(String account) {
         // 从所有策略中筛选出支持该账号格式的策略
-        AccountValidator validator = validatorStrategies.stream()
+        IAccountValidatorStrategy validator = accountValidatorStrategies.stream()
                 // 遍历所有策略，调用 supports() 方法判断是否支持该账号格式
                 // 如果 supports() 返回 true，说明该策略支持此账号格式，会被筛选出来
                 .filter(v -> v.supports(account))
