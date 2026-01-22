@@ -1,4 +1,4 @@
-package com.zmbdp.common.message.service.impl;
+package com.zmbdp.common.message.strategy.impl;
 
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.MessageConstants;
-import com.zmbdp.common.message.service.ICaptchaSender;
+import com.zmbdp.common.message.strategy.ICaptchaSenderStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 阿里云短信服务实现
  * <p>
- * 实现 {@link ICaptchaSender} 接口，提供基于阿里云短信服务的验证码发送功能。
+ * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于阿里云短信服务的验证码发送功能。
  * 支持通过阿里云短信服务 API 发送验证码短信。
  * <p>
  * <b>核心功能：</b>
@@ -41,7 +41,7 @@ import java.util.Map;
  * // 方式2：直接注入指定实现类
  * @Autowired
  * @Qualifier("aliSmsService")
- * private ICaptchaSender smsSender;
+ * private ICaptchaSenderStrategy smsSender;
  * boolean result = smsSender.sendCode("13800138000", "123456");
  * }</pre>
  * <p>
@@ -62,13 +62,13 @@ import java.util.Map;
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.message.service.ICaptchaSender
+ * @see ICaptchaSenderStrategy
  * @see com.aliyun.dysmsapi20170525.Client
  */
 @Slf4j
+@Component
 @RefreshScope
-@Component("aliSmsService")
-public class AliSmsServiceImpl implements ICaptchaSender {
+public class AliSmsServiceImpl implements ICaptchaSenderStrategy {
 
     /**
      * 阿里云短信服务客户端
@@ -137,7 +137,7 @@ public class AliSmsServiceImpl implements ICaptchaSender {
      * // 通过注入的 Bean 发送验证码
      * @Autowired
      * @Qualifier("aliSmsService")
-     * private ICaptchaSender smsSender;
+     * private ICaptchaSenderStrategy smsSender;
      * boolean result = smsSender.sendCode("13800138000", "123456");
      * }</pre>
      * <p>

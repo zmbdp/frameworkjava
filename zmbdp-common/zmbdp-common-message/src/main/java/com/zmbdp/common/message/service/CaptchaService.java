@@ -5,6 +5,8 @@ import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.MessageConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.common.message.strategy.CaptchaSenderRouter;
+import com.zmbdp.common.message.strategy.ICaptchaSenderStrategy;
 import com.zmbdp.common.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,8 +67,8 @@ import java.util.concurrent.TimeUnit;
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.message.service.CaptchaSenderRouter
- * @see com.zmbdp.common.message.service.ICaptchaSender
+ * @see CaptchaSenderRouter
+ * @see ICaptchaSenderStrategy
  */
 @Service
 @RefreshScope

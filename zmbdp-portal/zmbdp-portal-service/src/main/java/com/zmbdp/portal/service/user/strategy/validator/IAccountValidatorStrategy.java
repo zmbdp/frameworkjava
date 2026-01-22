@@ -1,4 +1,4 @@
-package com.zmbdp.portal.service.user.validator;
+package com.zmbdp.portal.service.user.strategy.validator;
 
 import com.zmbdp.common.domain.exception.ServiceException;
 
@@ -11,12 +11,12 @@ import com.zmbdp.common.domain.exception.ServiceException;
  *
  * @author 稚名不带撇
  */
-public interface AccountValidator {
+public interface IAccountValidatorStrategy {
 
     /**
      * 判断当前策略是否支持该账号格式的校验
      * <p>
-     * 此方法用于策略选择阶段，由策略上下文（AccountValidatorFactory）调用，
+     * 此方法用于策略选择阶段，由策略上下文（AccountValidatorRouter）调用，
      * 用于从多个策略实现中筛选出合适的策略。
      * </p>
      *

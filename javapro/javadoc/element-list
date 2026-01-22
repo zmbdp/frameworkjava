@@ -51,7 +51,8 @@ com.zmbdp.common.idempotent.aspect
 com.zmbdp.common.idempotent.enums
 com.zmbdp.common.message.config
 com.zmbdp.common.message.service
-com.zmbdp.common.message.service.impl
+com.zmbdp.common.message.strategy
+com.zmbdp.common.message.strategy.impl
 com.zmbdp.common.rabbitmq.config
 com.zmbdp.common.redis.config
 com.zmbdp.common.redis.service
@@ -86,4 +87,7 @@ com.zmbdp.portal.service.user.domain.dto
 com.zmbdp.portal.service.user.domain.vo
 com.zmbdp.portal.service.user.service
 com.zmbdp.portal.service.user.service.impl
-com.zmbdp.portal.service.user.validator
+com.zmbdp.portal.service.user.strategy.login
+com.zmbdp.portal.service.user.strategy.login.impl
+com.zmbdp.portal.service.user.strategy.validator
+com.zmbdp.portal.service.user.strategy.validator.impl
