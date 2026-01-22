@@ -179,6 +179,7 @@ mvn spring-boot:run
 | 文档 | 说明 |
 |------|------|
 | [项目结构说明](docs/PROJECT_STRUCTURE.md) | 详细的模块划分和职责说明 |
+| [工具类使用指南](docs/UTILS.md) | 23 个工具类完整说明与使用示例 |
 | [配置中心与环境配置](docs/CONFIGURATION.md) | Nacos 配置、多环境切换指南 |
 | [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
 | [分布式幂等性设计](docs/IDEMPOTENT.md) | 幂等性控制原理与使用指南 |
