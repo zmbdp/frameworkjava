@@ -28,37 +28,68 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * 邮件工具类（基于 Spring JavaMailSender + Jakarta Mail）<br>
- *
+ * 邮件工具类（基于 Spring JavaMailSender + Jakarta Mail）
  * <p>
- * 功能说明：
+ * 提供便捷的邮件发送功能，支持文本邮件、HTML 邮件、附件、内嵌图片等。
+ * 基于 Spring 的 JavaMailSender 和 Jakarta Mail 实现，支持使用默认配置或自定义邮件账号。
+ * <p>
+ * <b>功能特性：</b>
  * <ul>
- *     <li>基于 Spring 容器中的 {@link MailAccount} 和 {@link JavaMailSender} 发送邮件</li>
- *     <li>支持文本 / HTML 邮件</li>
- *     <li>支持抄送（CC）、密送（BCC）</li>
- *     <li>支持附件、内嵌图片（cid）</li>
- *     <li>支持自定义 MailAccount 或使用全局配置</li>
+ *     <li>支持文本邮件和 HTML 邮件</li>
+ *     <li>支持单个或多个收件人（逗号或分号分隔）</li>
+ *     <li>支持抄送（CC）和密送（BCC）</li>
+ *     <li>支持文件附件（多个附件）</li>
+ *     <li>支持内嵌图片（cid 方式）</li>
+ *     <li>支持自定义邮件账号或使用 Spring 容器中的默认配置</li>
+ *     <li>自动检测图片格式（PNG、JPEG、GIF、WebP、BMP）</li>
+ *     <li>自动处理输入流关闭</li>
  * </ul>
- *
  * <p>
- * 使用前准备：
+ * <b>使用前准备：</b>
  * <ol>
  *     <li>在 Spring 容器中注册 {@link MailAccount} 和 {@link JavaMailSender} Bean</li>
+ *     <li>配置 SMTP 服务器地址、端口、用户名、授权码等信息</li>
  *     <li>引入 zmbdp-common-core 相关依赖</li>
  * </ol>
  * <p>
- * 示例：
- * <pre>
- * MailUtil.sendHtml("a@b.com", "标题", "&lt;h1&gt;内容&lt;/h1&gt;");
- * </pre>
+ * <b>使用示例：</b>
+ * <pre>{@code
+ * // 1. 发送简单 HTML 邮件
+ * MailUtil.sendHtml("user@example.com", "邮件标题", "<h1>邮件内容</h1>");
+ *
+ * // 2. 发送带附件的邮件
+ * File attachment = new File("report.pdf");
+ * MailUtil.sendHtml("user@example.com", "报告", "请查看附件", attachment);
+ *
+ * // 3. 发送带内嵌图片的邮件
+ * Map<String, InputStream> images = new HashMap<>();
+ * images.put("logo", new FileInputStream("logo.png"));
+ * String html = "<img src='cid:logo' />";
+ * MailUtil.sendHtml("user@example.com", "带图片的邮件", html, images);
+ *
+ * // 4. 发送带抄送和密送的邮件
+ * MailUtil.send("to@example.com", "cc@example.com", "bcc@example.com",
+ *     "标题", "内容", true);
+ *
+ * // 5. 使用自定义邮件账号发送
+ * MailAccount customAccount = new MailAccount();
+ * // 设置账号信息...
+ * MailUtil.send(customAccount, "user@example.com", "标题", "内容", true);
+ * }</pre>
  * <p>
- * 工具类说明：
+ * <b>注意事项：</b>
  * <ul>
- *     <li>不允许实例化</li>
- *     <li>所有方法均为静态方法</li>
+ *     <li>所有方法均为静态方法，不允许实例化</li>
+ *     <li>使用默认账号时，需要在 Spring 容器中配置 MailAccount 和 JavaMailSender</li>
+ *     <li>内嵌图片的 cid 必须在 HTML 内容中使用 cid:xxx 格式引用</li>
+ *     <li>图片输入流会自动关闭，无需手动处理</li>
+ *     <li>如果收件人为空，会抛出 IllegalArgumentException</li>
+ *     <li>邮件发送失败会抛出 ServiceException</li>
  * </ul>
  *
  * @author 稚名不带撇
+ * @see MailAccount
+ * @see org.springframework.mail.javamail.JavaMailSender
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MailUtil {

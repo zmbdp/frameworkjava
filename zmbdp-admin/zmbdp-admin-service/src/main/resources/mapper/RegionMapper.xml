@@ -8,5 +8,4 @@
         select id, code, parent_code, parent_id, name, full_name, pinyin, level, longitude, latitude
         from sys_region order by pinyin
     </select>
-
 </mapper>

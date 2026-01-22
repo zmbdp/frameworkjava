@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "oss")
 @ConditionalOnProperty(value = "storage.type", havingValue = "oss")
 // 当括号中条件成立时，微服务启动的时候就会加载当前类。
-public class OSSProperties  {
+public class OSSProperties {
 
     /**
      * oss是否内网上传
@@ -52,7 +52,7 @@ public class OSSProperties  {
     private String accessKeySecret;
 
     /**
-     *存储桶
+     * 存储桶
      */
     private String bucketName;
 
@@ -94,5 +94,4 @@ public class OSSProperties  {
     public String getInternalBaseUrl() {
         return "http://" + bucketName + "." + intEndpoint + "/";
     }
-
 }

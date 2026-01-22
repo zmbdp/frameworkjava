@@ -46,6 +46,7 @@ public class AppUserDTO implements Serializable {
 
     /**
      * DTO 对象转换 VO 对象
+     *
      * @return VO 对象
      */
     public AppUserVO convertToVO() {

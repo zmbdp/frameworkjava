@@ -1,8 +1,10 @@
 package com.zmbdp.admin.service.map.service.impl;
 
 import com.zmbdp.admin.api.map.constants.MapConstants;
-import com.zmbdp.admin.service.map.domain.dto.*;
-import com.zmbdp.admin.service.map.domain.entity.SysRegion;
+import com.zmbdp.admin.service.map.domain.dto.GeoResultDTO;
+import com.zmbdp.admin.service.map.domain.dto.LocationDTO;
+import com.zmbdp.admin.service.map.domain.dto.PoiListDTO;
+import com.zmbdp.admin.service.map.domain.dto.SuggestSearchDTO;
 import com.zmbdp.admin.service.map.service.IMapProvider;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -48,6 +50,7 @@ public class QQMapServiceImpl implements IMapProvider {
 
     /**
      * 根据关键词搜索地点
+     *
      * @param suggestSearchDTO 搜索条件
      * @return 搜索结果
      */
@@ -58,7 +61,7 @@ public class QQMapServiceImpl implements IMapProvider {
                 apiServer + MapConstants.QQMAP_API_PLACE_SUGGESTION +
                         "?key=%s&region=%s&region_fix=%s&page_index=%s&page_size=%s&keyword=%s",
                 key, suggestSearchDTO.getId(), suggestSearchDTO.getRegionFix(),
-                suggestSearchDTO.getPageIndex(), suggestSearchDTO.getPageSize(),suggestSearchDTO.getKeyword()
+                suggestSearchDTO.getPageIndex(), suggestSearchDTO.getPageSize(), suggestSearchDTO.getKeyword()
         );
         // 使用 RestTemplate 发送请求
         ResponseEntity<PoiListDTO> response = restTemplate.getForEntity(url, PoiListDTO.class);
@@ -86,7 +89,7 @@ public class QQMapServiceImpl implements IMapProvider {
                 key, locationDTO.formatInfo()
         );
         // 使用 RestTemplate 发送请求
-        ResponseEntity<GeoResultDTO> response =  restTemplate.getForEntity(url, GeoResultDTO.class);
+        ResponseEntity<GeoResultDTO> response = restTemplate.getForEntity(url, GeoResultDTO.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
             log.error("[QQMapServiceImpl.getQQMapDistrictByLonLat 根据经纬度来获取区域信息服务]请求失败，返回结果: {}", response.getBody());
             throw new ServiceException(ResultCode.QQMAP_QUERY_FAILED);

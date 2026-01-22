@@ -1,7 +1,7 @@
 package com.zmbdp.common.domain.constants;
 
 /**
- * http 常量
+ * Http 常量
  *
  * @author 稚名不带撇
  */

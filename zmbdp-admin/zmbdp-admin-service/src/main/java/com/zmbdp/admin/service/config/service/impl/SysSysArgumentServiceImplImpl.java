@@ -164,5 +164,4 @@ public class SysSysArgumentServiceImplImpl implements ISysArgumentServiceImpl {
         List<ArgumentDTO> result = BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
         return result;
     }
-
 }

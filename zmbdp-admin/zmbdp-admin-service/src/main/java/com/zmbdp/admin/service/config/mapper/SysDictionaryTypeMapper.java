@@ -1,6 +1,5 @@
 package com.zmbdp.admin.service.config.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zmbdp.admin.service.config.domain.entity.SysDictionaryType;
 import org.apache.ibatis.annotations.Mapper;

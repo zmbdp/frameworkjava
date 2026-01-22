@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @FeignClient(contextId = "fileServiceApi", name = "zmbdp-file-service", path = "/file")
 public interface FileServiceApi {
+
     /**
      * 文件上传
      *

@@ -80,7 +80,6 @@ public class MailConfig {
             props.put("mail.smtp.socketFactory.port", String.valueOf(port));
         }
         props.put("mail.mime.charset", "UTF-8");
-
         return mailSender;
     }
 

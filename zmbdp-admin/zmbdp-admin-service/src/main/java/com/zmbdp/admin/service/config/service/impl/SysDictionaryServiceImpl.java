@@ -116,8 +116,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         // 查询数据库中是否存在
         SysDictionaryType sysDictionaryType = sysDictionaryTypeMapper.selectOne(
                 new LambdaQueryWrapper<SysDictionaryType>()
-                        .eq(SysDictionaryType::getTypeKey,
-                                dictionaryTypeWriteReqDTO.getTypeKey())
+                        .eq(SysDictionaryType::getTypeKey, dictionaryTypeWriteReqDTO.getTypeKey())
         );
         if (sysDictionaryType == null) {
             log.warn("SysDictionaryServiceImpl.editType: [字典类型不存在: {} ]", dictionaryTypeWriteReqDTO);
@@ -156,8 +155,8 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 sysDictionaryTypeMapper.selectOne(
                         new LambdaQueryWrapper<SysDictionaryType>()
                                 // 看看 字典类型的 key 是否存在，不存在的话就不能加
-                                .eq(SysDictionaryType::getTypeKey, dictionaryDataAddReqDTO.getTypeKey()
-                                )) == null
+                                .eq(SysDictionaryType::getTypeKey, dictionaryDataAddReqDTO.getTypeKey())
+                ) == null
         ) {
             log.warn("SysDictionaryServiceImpl.addData: [字典类型不存在: {} ]", dictionaryDataAddReqDTO);
             throw new ServiceException("字典类型不存在");
@@ -267,8 +266,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 .eq(SysDictionaryData::getTypeKey, typeKey)
         );
         // 然后直接 BeanCopy 转换
-        List<DictionaryDataDTO> result = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
-        return result;
+        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
     }
 
     /**
@@ -313,9 +311,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 .eq(SysDictionaryData::getDataKey, dataKey)
         );
         // 对象转换
-        DictionaryDataDTO result = new DictionaryDataDTO();
-        BeanCopyUtil.copyProperties(dictionaryData, result);
-        return result;
+        return BeanCopyUtil.copyProperties(dictionaryData, DictionaryDataDTO::new);
     }
 
     /**
@@ -334,8 +330,6 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 .in(SysDictionaryData::getDataKey, dataKeys)
         );
         // 然后直接转换对象
-        List<DictionaryDataDTO> result = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
-        return result;
+        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
     }
-
 }

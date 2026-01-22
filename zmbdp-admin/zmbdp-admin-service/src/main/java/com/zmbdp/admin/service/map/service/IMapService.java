@@ -2,7 +2,6 @@ package com.zmbdp.admin.service.map.service;
 
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
-import com.zmbdp.admin.api.map.domain.vo.RegionVO;
 import com.zmbdp.admin.service.map.domain.dto.RegionCityDTO;
 import com.zmbdp.admin.service.map.domain.dto.SearchPoiDTO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;

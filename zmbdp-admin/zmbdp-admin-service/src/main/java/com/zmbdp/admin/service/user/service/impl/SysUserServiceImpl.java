@@ -227,7 +227,6 @@ public class SysUserServiceImpl implements ISysUserService {
                     sysUserDTO.setUserId(sysUser.getId());
                     return sysUserDTO;
                 }).collect(Collectors.toList());
-
     }
 
     /**
