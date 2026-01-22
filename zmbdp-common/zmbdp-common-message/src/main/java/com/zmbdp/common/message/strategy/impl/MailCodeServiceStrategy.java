@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 邮件验证码服务实现
+ * 邮件验证码策略
  * <p>
  * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于邮件的验证码发送功能。
  * 支持通过邮件发送验证码，支持随机选择邮件标题和内容模板。
