@@ -26,6 +26,7 @@ FrameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理�
 - `share-rabbitmq-{env}.yaml` - RabbitMQ 配置
 - `share-caffeine-{env}.yaml` - 本地缓存配置
 - `share-idempotent-{env}.yaml` - 幂等性配置
+- `share-ratelimit-{env}.yaml` - 频控 / 防刷配置
 - `share-token-{env}.yaml` - Token 配置
 - `share-filter-{env}.yaml` - 过滤器配置
 - `share-upload-{env}.yaml` - 文件上传配置

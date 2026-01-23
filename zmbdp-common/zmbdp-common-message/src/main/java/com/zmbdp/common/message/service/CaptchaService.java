@@ -7,6 +7,8 @@ import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.message.strategy.CaptchaSenderRouter;
 import com.zmbdp.common.message.strategy.ICaptchaSenderStrategy;
+import com.zmbdp.common.ratelimit.annotation.RateLimit;
+import com.zmbdp.common.ratelimit.enums.RateLimitDimension;
 import com.zmbdp.common.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * </ul>
  * <p>
  * <b>使用示例：</b>
+ *
  * <pre>{@code
  * // 发送验证码
  * String code = captchaService.sendCode("13800138000");
@@ -151,10 +154,31 @@ public class CaptchaService {
 
     /**
      * 发送验证码
+     * <p>
+     * <b>限流说明：</b>
+     * <ul>
+     *     <li>双维度限流（IP + 账号），任一维度超限即拒绝</li>
+     *     <li>限流阈值：每分钟 3 次</li>
+     *     <li>未登录时自动退化为 IP 限流</li>
+     *     <li><b>内部调用行为：</b>
+     * <ul>
+     *     <li>使用 AspectJ 切面，可以拦截内部调用（如 {@code this.sendCode()} 或 {@code captchaService.sendCode()}）</li>
+     *     <li>但如果没有 HTTP 请求上下文（如定时任务、异步任务、单元测试），会跳过限流，直接放行</li>
+     *     <li>只有通过 HTTP 请求调用（Controller -> Service）时，限流才会生效</li>
+     * </ul>
+     * </li>
+     * </ul>
      *
      * @param account 手机号 / 邮箱
      * @return 验证码
      */
+    @RateLimit(
+            limit = 3, // windowSec 时间内 阈值
+            windowSec = 6000, // 限流时间窗口，单位秒
+            dimensions = RateLimitDimension.BOTH, // 限流维度
+            ipHeaderName = "X-Send-Code-IP", // IP 限流时使用的 HTTP 头名称
+            message = "操作过于频繁，请稍后重试" // 限流提示语
+    )
     public String sendCode(String account) {
         // 先校验是否超过每日的发送限制（针对每个手机号/邮箱）
         String limitCacheKey = MessageConstants.CAPTCHA_CODE_TIMES_KEY + account;
@@ -168,10 +192,10 @@ public class CaptchaService {
         String codeKey = MessageConstants.CAPTCHA_CODE_KEY + account;
         String cacheValue = redisService.getCacheObject(codeKey, String.class);
         long expireTime = redisService.getExpire(codeKey);
-        if (!StringUtil.isEmpty(cacheValue) && expireTime > accountCodeExpiration * 60 - 60) {
-            long time = expireTime - accountCodeExpiration * 60 + 60;
-            throw new ServiceException("操作频繁, 请在 " + time + " 秒之后重试", ResultCode.INVALID_PARA.getCode());
-        }
+//        if (!StringUtil.isEmpty(cacheValue) && expireTime > accountCodeExpiration * 60 - 60) {
+//            long time = expireTime - accountCodeExpiration * 60 + 60;
+//            throw new ServiceException("操作频繁, 请在 " + time + " 秒之后重试", ResultCode.INVALID_PARA.getCode());
+//        }
 
         // 生成验证码（根据配置决定使用固定验证码还是随机验证码）
         String verifyCode = shouldUseFixedCode(account)

@@ -43,36 +43,6 @@ import java.util.concurrent.TimeUnit;
 public class IdempotentAspect {
 
     /**
-     * 幂等性 Redis 上默认过期时间（秒）
-     */
-    public static final long IDEMPOTENT_EXPIRE_TIME_DEFAULT = 300L;
-
-    /**
-     * 幂等性状态：正在执行中
-     */
-    private static final String STATUS_PROCESSING = "PROCESSING";
-
-    /**
-     * 幂等性状态：执行成功
-     */
-    private static final String STATUS_SUCCESS = "SUCCESS";
-
-    /**
-     * 幂等性状态：执行失败
-     */
-    private static final String STATUS_FAILED = "FAILED";
-
-    /**
-     * 强幂等模式：等待结果的最大重试次数（默认值）
-     */
-    private static final int DEFAULT_MAX_RETRY_COUNT = 3;
-
-    /**
-     * 强幂等模式：每次重试的等待时间（毫秒，默认值）
-     */
-    private static final long DEFAULT_RETRY_INTERVAL_MS = 100;
-
-    /**
      * SpEL 表达式解析器
      */
     private final ExpressionParser parser = new SpelExpressionParser();
@@ -139,8 +109,11 @@ public class IdempotentAspect {
         String redisKey = keyPrefix + idempotentToken;
 
         // 过期时间优先级：注解显示传参的值 > 全局配置的值 > 默认值（300s）
-        long globalExpireTime = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_EXPIRE_TIME_PREFIX, Long.class, IDEMPOTENT_EXPIRE_TIME_DEFAULT);
-        long expireTime = (idempotent.expireTime() == IDEMPOTENT_EXPIRE_TIME_DEFAULT) ? globalExpireTime : idempotent.expireTime();
+        long globalExpireTime = environment.getProperty(
+                IdempotentConstants.NACOS_IDEMPOTENT_EXPIRE_TIME_PREFIX, Long.class,
+                IdempotentConstants.IDEMPOTENT_EXPIRE_TIME_DEFAULT
+        );
+        long expireTime = (idempotent.expireTime() == IdempotentConstants.IDEMPOTENT_EXPIRE_TIME_DEFAULT) ? globalExpireTime : idempotent.expireTime();
 
         // 判断是否启用强幂等模式，优先级：注解显示传参的值 > 全局配置的值 > 默认值（false）
         boolean globalReturnCachedResult = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_RETURN_CACHED_RESULT_PREFIX, Boolean.class, false);
@@ -164,7 +137,10 @@ public class IdempotentAspect {
         }
 
         // 强幂等模式下，最大重试次数
-        int maxRetries = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX, Integer.class, DEFAULT_MAX_RETRY_COUNT);
+        int maxRetries = environment.getProperty(
+                IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX,
+                Integer.class, IdempotentConstants.DEFAULT_MAX_RETRY_COUNT
+        );
         // 先从 Redis 中获取重复次数
         String retryCountKey = redisKey + ":retry:count";
         boolean lockAcquired = false; // 锁是否获取成功
@@ -184,7 +160,7 @@ public class IdempotentAspect {
             }
 
             // 然后用 SETNX 获取锁，设置 PROCESSING 状态，表示正在执行
-            Boolean success = redisService.setCacheObjectIfAbsent(redisKey, STATUS_PROCESSING, expireTime, TimeUnit.SECONDS);
+            Boolean success = redisService.setCacheObjectIfAbsent(redisKey, IdempotentConstants.STATUS_PROCESSING, expireTime, TimeUnit.SECONDS);
             if (!success) {
                 // Token已存在，说明有并发，检查当前状态决定怎么处理
                 String currentStatus = redisService.getCacheObject(redisKey, String.class);
@@ -226,7 +202,7 @@ public class IdempotentAspect {
             Object result = joinPoint.proceed();
 
             // 执行成功，更新状态为 SUCCESS，清除重试计数
-            redisService.setCacheObject(redisKey, STATUS_SUCCESS, expireTime, TimeUnit.SECONDS);
+            redisService.setCacheObject(redisKey, IdempotentConstants.STATUS_SUCCESS, expireTime, TimeUnit.SECONDS);
             redisService.deleteObject(retryCountKey);
 
             // 强幂等模式的话，就把结果缓存起来，后续相同请求方便直接返回
@@ -237,7 +213,7 @@ public class IdempotentAspect {
             return result;
         } catch (Exception e) {
             // 执行失败，更新状态为 FAILED，不删除 Token 让其他等待的请求知道失败了
-            redisService.setCacheObject(redisKey, STATUS_FAILED, expireTime, TimeUnit.SECONDS);
+            redisService.setCacheObject(redisKey, IdempotentConstants.STATUS_FAILED, expireTime, TimeUnit.SECONDS);
             // 强幂等模式删除结果缓存，因为失败了
             if (returnCachedResult) {
                 redisService.deleteObject(redisKey + ":result");
@@ -448,8 +424,14 @@ public class IdempotentAspect {
      */
     private Object waitForResult(ProceedingJoinPoint joinPoint, String redisKey, String resultKey, boolean isMqConsumer) {
         // 从配置中心读取重试次数和间隔，支持动态刷新
-        int maxRetryCount = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX, Integer.class, DEFAULT_MAX_RETRY_COUNT);
-        long retryIntervalMs = environment.getProperty(IdempotentConstants.NACOS_IDEMPOTENT_RETRY_INTERVAL_MS_PREFIX, Long.class, DEFAULT_RETRY_INTERVAL_MS);
+        int maxRetryCount = environment.getProperty(
+                IdempotentConstants.NACOS_IDEMPOTENT_MAX_RETRY_COUNT_PREFIX,
+                Integer.class, IdempotentConstants.DEFAULT_MAX_RETRY_COUNT
+        );
+        long retryIntervalMs = environment.getProperty(
+                IdempotentConstants.NACOS_IDEMPOTENT_RETRY_INTERVAL_MS_PREFIX,
+                Long.class, IdempotentConstants.DEFAULT_RETRY_INTERVAL_MS
+        );
 
         // 轮询等待结果，最多重试 maxRetryCount 次
         for (int i = 0; i < maxRetryCount; i++) {
@@ -459,14 +441,14 @@ public class IdempotentAspect {
                 // 检查当前状态
                 String status = redisService.getCacheObject(redisKey, String.class);
 
-                if (STATUS_SUCCESS.equals(status)) {
+                if (IdempotentConstants.STATUS_SUCCESS.equals(status)) {
                     // 执行成功了，从缓存拿结果
                     Object cachedResult = getCachedResult(joinPoint, resultKey);
                     if (cachedResult != null) {
                         log.info("强幂等模式 - 等待后获取到结果，Token: {}", redisKey);
                         return cachedResult;
                     }
-                } else if (STATUS_FAILED.equals(status)) {
+                } else if (IdempotentConstants.STATUS_FAILED.equals(status)) {
                     // 执行失败了
                     if (isMqConsumer) {
                         // MQ 场景就静默处理，避免消息重新入队
@@ -476,7 +458,7 @@ public class IdempotentAspect {
                         log.warn("强幂等模式 - Http 检测到执行失败，等待超时，Token: {}", redisKey);
                         throw new ServiceException("请求处理失败，请稍后重试", ResultCode.ERROR.getCode());
                     }
-                } else if (STATUS_PROCESSING.equals(status)) {
+                } else if (IdempotentConstants.STATUS_PROCESSING.equals(status)) {
                     // 还在执行中，继续等
                     log.debug("强幂等模式 - 仍在执行中，继续等待，Token: {}, 重试次数: {}/{}", redisKey, i + 1, maxRetryCount);
                     continue;
@@ -623,7 +605,7 @@ public class IdempotentAspect {
         String resultKey = redisKey + ":result";
         boolean isMqConsumer = isMqConsumer(joinPoint);
 
-        if (STATUS_SUCCESS.equals(currentStatus)) {
+        if (IdempotentConstants.STATUS_SUCCESS.equals(currentStatus)) {
             // 执行成功了，从缓存拿结果
             Object cachedResult = getCachedResult(joinPoint, resultKey);
             if (cachedResult != null) {
@@ -634,11 +616,11 @@ public class IdempotentAspect {
                 log.warn("强幂等模式 - 状态为 SUCCESS 但结果不存在，可能已过期，Token: {}", idempotentToken);
                 return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
             }
-        } else if (STATUS_PROCESSING.equals(currentStatus)) {
+        } else if (IdempotentConstants.STATUS_PROCESSING.equals(currentStatus)) {
             // 还在执行中，等待结果
             log.debug("强幂等模式 - 检测到正在执行中，等待结果，Token: {}", idempotentToken);
             return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
-        } else if (STATUS_FAILED.equals(currentStatus)) {
+        } else if (IdempotentConstants.STATUS_FAILED.equals(currentStatus)) {
             // 执行失败了，也等待一下看看
             log.warn("强幂等模式 - 检测到失败状态，等待后重试，Token: {}", idempotentToken);
             return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
@@ -673,12 +655,12 @@ public class IdempotentAspect {
     ) throws Throwable {
         boolean isMqConsumer = isMqConsumer(joinPoint);
 
-        if (STATUS_PROCESSING.equals(currentStatus)) {
+        if (IdempotentConstants.STATUS_PROCESSING.equals(currentStatus)) {
             // 正在执行中，不允许并发执行
             log.warn("防重模式 - 检测到正在执行中，拒绝重复请求，Token: {}", idempotentToken);
             throwDuplicateRequestException(idempotent.message(), isMqConsumer);
             return false;
-        } else if (STATUS_FAILED.equals(currentStatus)) {
+        } else if (IdempotentConstants.STATUS_FAILED.equals(currentStatus)) {
             // 业务执行失败，允许重试，用 incr 原子操作增加重试次数
             Long newRetryCountLong = redisService.incr(retryCountKey, 1);
             int newRetryCount;
@@ -699,7 +681,7 @@ public class IdempotentAspect {
 
             // 用原子操作删除，只有状态是 FAILED 时才删除
             // 注意：删除 key 和下一次 SETNX 之间存在时间窗，其他实例可能插队，但 SETNX 是最终裁决者，这是可接受的竞争窗口
-            boolean deleted = deleteIfStatusEquals(redisKey, STATUS_FAILED);
+            boolean deleted = deleteIfStatusEquals(redisKey, IdempotentConstants.STATUS_FAILED);
             // 无论删除成功失败都继续循环，删除失败说明状态已改变，下次循环会重新检查状态
             return true;
         } else {

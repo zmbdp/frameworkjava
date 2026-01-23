@@ -36,4 +36,34 @@ public class IdempotentConstants {
      * Nacos 上强幂等模式重试间隔时间配置名称（毫秒）
      */
     public static final String NACOS_IDEMPOTENT_RETRY_INTERVAL_MS_PREFIX = "idempotent.retry-interval-ms";
+
+    /**
+     * 幂等性 Redis 上默认过期时间（秒）
+     */
+    public static final long IDEMPOTENT_EXPIRE_TIME_DEFAULT = 300L;
+
+    /**
+     * 幂等性状态：正在执行中
+     */
+    public static final String STATUS_PROCESSING = "PROCESSING";
+
+    /**
+     * 幂等性状态：执行成功
+     */
+    public static final String STATUS_SUCCESS = "SUCCESS";
+
+    /**
+     * 幂等性状态：执行失败
+     */
+    public static final String STATUS_FAILED = "FAILED";
+
+    /**
+     * 强幂等模式：等待结果的最大重试次数（默认值）
+     */
+    public static final int DEFAULT_MAX_RETRY_COUNT = 3;
+
+    /**
+     * 强幂等模式：每次重试的等待时间（毫秒，默认值）
+     */
+    public static final long DEFAULT_RETRY_INTERVAL_MS = 100;
 }
