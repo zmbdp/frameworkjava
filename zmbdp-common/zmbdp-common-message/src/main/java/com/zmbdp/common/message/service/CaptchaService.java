@@ -190,6 +190,8 @@ public class CaptchaService {
 
         // 然后判断是否在 1 分钟内频繁发送
         String codeKey = MessageConstants.CAPTCHA_CODE_KEY + account;
+        // 如果不想用注解的话用下面注释起来的这个也行，
+        // 如果就只是限制验证码发送频率的话，强行用注解有点过度设计了
 //        String cacheValue = redisService.getCacheObject(codeKey, String.class);
 //        long expireTime = redisService.getExpire(codeKey);
 //        if (!StringUtil.isEmpty(cacheValue) && expireTime > accountCodeExpiration * 60 - 60) {
