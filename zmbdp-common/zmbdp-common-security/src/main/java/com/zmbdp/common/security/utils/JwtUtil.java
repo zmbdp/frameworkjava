@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import javax.crypto.SecretKey;
 import java.util.Map;
@@ -65,6 +67,7 @@ import java.util.Map;
  * @see io.jsonwebtoken.Jwts
  * @see io.jsonwebtoken.Claims
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtUtil {
 
     /**

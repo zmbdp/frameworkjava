@@ -5,6 +5,8 @@ import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.SecurityConstants;
 import com.zmbdp.common.domain.constants.TokenConstants;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
@@ -48,6 +50,7 @@ import java.util.Objects;
  * @see com.zmbdp.common.domain.constants.SecurityConstants#AUTHENTICATION
  * @see com.zmbdp.common.domain.constants.TokenConstants#PREFIX
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtil {
 
     /**

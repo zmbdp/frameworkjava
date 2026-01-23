@@ -21,13 +21,6 @@
 
     <dependencies>
 
-        <!--        &lt;!&ndash; Spring Web &ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework</groupId>-->
-        <!--            <artifactId>spring-web</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
