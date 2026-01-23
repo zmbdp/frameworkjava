@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.utils;
+package com.zmbdp.common.excel.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
@@ -10,10 +10,17 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.metadata.fill.FillConfig;
 import com.alibaba.excel.write.metadata.fill.FillWrapper;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import com.zmbdp.common.core.excel.*;
+import com.zmbdp.common.core.utils.FileUtil;
+import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.common.excel.annotation.CellMerge;
+import com.zmbdp.common.excel.converter.ExcelBigNumberConverter;
+import com.zmbdp.common.excel.listener.DefaultExcelListener;
+import com.zmbdp.common.excel.listener.ExcelListener;
+import com.zmbdp.common.excel.result.ExcelResult;
+import com.zmbdp.common.excel.strategy.CellMergeStrategy;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -30,7 +37,7 @@ import java.util.Map;
 /**
  * Excel 工具类（基于 EasyExcel）
  * <p>
- * 提供 Excel 文件的导入、导出、模板填充等功能，基于阿里巴巴的 EasyExcel 库实现。
+ * 提供 Excel 文件的导入、导出、模板填充等功能，基于阿里巴巴的 EasyExcel 库实现。<br>
  * 支持大数据量处理、数据校验、单元格合并、模板导出等高级特性。
  * <p>
  * <b>功能特性：</b>
@@ -290,7 +297,7 @@ public class ExcelUtil {
      * 导出 Excel 文件到 HTTP 响应（支持单元格合并）
      * <p>
      * 将数据列表导出为 Excel 文件并直接响应给前端，支持合并相同值的单元格。
-     * 需要在实体类字段上使用 {@link com.zmbdp.common.core.annotation.excel.CellMerge} 注解标记需要合并的列。
+     * 需要在实体类字段上使用 {@link CellMerge} 注解标记需要合并的列。
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
@@ -313,7 +320,7 @@ public class ExcelUtil {
      * <ul>
      *     <li>导出数据到 Excel 文件并直接响应给前端</li>
      *     <li>需要合并相同值的单元格的场景（如分组数据）</li>
-     *     <li>实体类字段使用了 {@link com.zmbdp.common.core.annotation.excel.CellMerge} 注解</li>
+     *     <li>实体类字段使用了 {@link CellMerge} 注解</li>
      *     <li>需要美化 Excel 格式的场景</li>
      * </ul>
      * <p>
@@ -332,7 +339,7 @@ public class ExcelUtil {
      * @param response  HTTP 响应对象，不能为 null
      * @param <T>       数据对象泛型
      * @throws ServiceException 当响应设置失败或导出失败时抛出异常
-     * @see com.zmbdp.common.core.annotation.excel.CellMerge
+     * @see CellMerge
      */
     public static <T> void outputExcel(List<T> list, String sheetName, Class<T> clazz, boolean merge, HttpServletResponse response) {
         try {
@@ -371,7 +378,7 @@ public class ExcelUtil {
      * <ul>
      *     <li>导出数据到指定的输出流</li>
      *     <li>需要合并相同值的单元格的场景</li>
-     *     <li>实体类字段使用了 {@link com.zmbdp.common.core.annotation.excel.CellMerge} 注解</li>
+     *     <li>实体类字段使用了 {@link CellMerge} 注解</li>
      *     <li>需要自定义输出目标的场景（如文件、内存等）</li>
      * </ul>
      *

@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * 文件处理工具类
  * <p>
- * 扩展 Hutool 的 FileUtil，提供文件下载相关的 HTTP 响应头设置功能。
+ * 扩展 Hutool 的 FileUtil，提供文件下载相关的 HTTP 响应头设置功能。<br>
  * 主要解决中文文件名编码问题，支持跨域文件下载。
  * <p>
  * <b>功能特性：</b>

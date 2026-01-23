@@ -6,38 +6,40 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * 频控工具类
+ * 客户端 IP 解析工具类
  * <p>
- * 提供频控相关的工具方法，主要用于从 HTTP 请求中提取客户端真实 IP。
+ * 提供从 HTTP 请求中解析客户端真实 IP 的通用工具方法。<br>
+ * 适用于代理、反向代理、CDN 等多种部署场景。
  * <p>
  * <b>使用场景：</b>
  * <ul>
- *     <li>频控限流：需要根据客户端 IP 进行限流控制</li>
- *     <li>日志记录：记录请求的真实客户端 IP</li>
- *     <li>安全审计：追踪请求来源</li>
+ *     <li>请求频控 / 限流：基于客户端 IP 进行访问控制</li>
+ *     <li>日志记录：记录请求的真实来源 IP</li>
+ *     <li>安全审计：追踪和分析请求来源</li>
+ *     <li>风控与防刷：识别异常访问行为</li>
  * </ul>
  * <p>
  * <b>IP 获取优先级：</b>
  * <ol>
- *     <li><b>X-Forwarded-For</b>：代理服务器转发的原始客户端 IP（取第一个，因为可能有多层代理）</li>
- *     <li><b>X-Real-IP</b>：Nginx 等反向代理设置的客户端真实 IP</li>
- *     <li><b>getRemoteAddr()</b>：直接连接的客户端 IP（可能是代理服务器 IP）</li>
+ *     <li><b>X-Forwarded-For</b>：代理链中最原始的客户端 IP（取第一个）</li>
+ *     <li><b>X-Real-IP</b>：由 Nginx 等反向代理设置的客户端真实 IP</li>
+ *     <li><b>{@link HttpServletRequest#getRemoteAddr()}</b>：直接连接的客户端地址</li>
  * </ol>
  * <p>
  * <b>注意事项：</b>
  * <ul>
- *     <li>工具类设计为不可实例化（私有构造方法）</li>
+ *     <li>设计为不可实例化（私有构造方法）</li>
  *     <li>所有方法均为静态方法，可直接调用</li>
- *     <li>自动过滤 "unknown" 等无效 IP 值</li>
- *     <li>无法获取 IP 时返回 "0.0.0.0"（避免 null）</li>
- *     <li>X-Forwarded-For 可能包含多个 IP（逗号分隔），只取第一个（最原始的客户端 IP）</li>
+ *     <li>自动过滤 {@code unknown} 等无效 IP 值</li>
+ *     <li>X-Forwarded-For 可能包含多个 IP（逗号分隔），仅取第一个</li>
+ *     <li>无法解析时返回 {@code 0.0.0.0}，避免返回 {@code null}</li>
  * </ul>
  *
  * @author 稚名不带撇
  * @see HttpServletRequest
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RateLimitUtil {
+public class ClientIpUtil {
 
     /**
      * 获取客户端真实 IP 地址
@@ -64,7 +66,7 @@ public class RateLimitUtil {
      * <pre>{@code
      * // 在频控切面中使用
      * HttpServletRequest request = ServletUtil.getRequest();
-     * String clientIp = RateLimitUtil.getClientIp(request);
+     * String clientIp = ClientIpUtil.getClientIp(request);
      * // 结果可能是：192.168.1.100 或 0.0.0.0（无法获取时）
      * }</pre>
      * <p>

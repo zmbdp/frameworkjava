@@ -1,6 +1,7 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.listener;
 
 import com.alibaba.excel.read.listener.ReadListener;
+import com.zmbdp.common.excel.result.ExcelResult;
 
 /**
  * Excel 导入监听器接口<br>
@@ -17,8 +18,8 @@ import com.alibaba.excel.read.listener.ReadListener;
  * 使用方式：
  * <ol>
  *     <li>实现该接口创建自定义监听器</li>
- *     <li>或使用 {@link DefaultExcelListener} 默认实现</li>
- *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#inputExcel} 方法中使用</li>
+ *     <li>或使用 {@link com.zmbdp.common.excel.listener.DefaultExcelListener} 默认实现</li>
+ *     <li>在 {@link com.zmbdp.common.excel.util.ExcelUtil#inputExcel} 方法中使用</li>
  * </ol>
  *
  * <p>

@@ -30,7 +30,7 @@ import java.util.Properties;
 /**
  * 邮件工具类（基于 Spring JavaMailSender + Jakarta Mail）
  * <p>
- * 提供便捷的邮件发送功能，支持文本邮件、HTML 邮件、附件、内嵌图片等。
+ * 提供便捷的邮件发送功能，支持文本邮件、HTML 邮件、附件、内嵌图片等。<br>
  * 基于 Spring 的 JavaMailSender 和 Jakarta Mail 实现，支持使用默认配置或自定义邮件账号。
  * <p>
  * <b>功能特性：</b>

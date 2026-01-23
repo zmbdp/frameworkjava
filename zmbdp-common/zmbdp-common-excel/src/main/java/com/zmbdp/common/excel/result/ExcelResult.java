@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.result;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * <p>
  * 使用方式：
  * <ol>
- *     <li>通过 {@link ExcelListener#getExcelResult()} 获取实现类实例</li>
+ *     <li>通过 {@link com.zmbdp.common.excel.listener.ExcelListener#getExcelResult()} 获取实现类实例</li>
  *     <li>调用 {@link #getList()} 获取成功导入的数据</li>
  *     <li>调用 {@link #getErrorList()} 获取错误信息</li>
  *     <li>调用 {@link #getAnalysis()} 获取导入回执</li>
