@@ -25,6 +25,7 @@
         <module>zmbdp-common-filter</module>
         <module>zmbdp-common-snowflake</module>
         <module>zmbdp-common-idempotent</module>
+        <module>zmbdp-common-ratelimit</module>
     </modules>
 
     <properties>

@@ -1,0 +1,34 @@
+# 频控 / 防刷配置（支持 Nacos 热更新）
+ratelimit:
+  # 全局开关，false 时关闭所有 @RateLimit 限流
+  enabled: true
+
+  # Redis Key 前缀，用于区分限流相关的 Key。
+  key-prefix: "ratelimit:"
+
+  # 全局默认：时间窗口内最大请求数（注解未配置时使用）
+  default-limit: 30
+
+  # 全局默认：时间窗口秒数（注解未配置时使用）
+  default-window-sec: 60
+
+  # 全局默认：触发限流时的提示信息（注解未配置时使用）
+  default-message: "请求过于频繁，请稍后重试"
+
+  # Redis 异常时的降级策略
+  # true = 失败放行（fail-open，保证可用性，但可能被刷）
+  # false = 失败拒绝（fail-close，保证安全性，但可能影响可用性）
+  # 建议：生产环境 false（安全优先），测试环境 true（可用性优先）
+  fail-open: false
+
+  # IP 获取配置
+  # IP 请求头名称（如 X-Forwarded-For、X-Real-IP、X-Client-IP）
+  ip-header-name: "X-Forwarded-For"
+
+  # 是否允许从请求参数获取 IP（当请求头中没有时）
+  # true = 允许从请求参数获取，false = 仅从请求头获取
+  ip-allow-param: false
+
+  # IP 请求参数名称（当 ip-allow-param=true 时使用）
+  # 支持 GET 请求的查询参数和 POST 请求的表单参数
+  ip-param-name: "clientIp"
