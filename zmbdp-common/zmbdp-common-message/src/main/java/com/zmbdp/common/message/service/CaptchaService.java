@@ -173,8 +173,8 @@ public class CaptchaService {
      * @return 验证码
      */
     @RateLimit(
-            limit = 3, // windowSec 时间内 阈值
-            windowSec = 6000, // 限流时间窗口，单位秒
+            limit = 1, // windowSec 时间内 阈值
+            windowSec = 60, // 限流时间窗口，单位秒
             dimensions = RateLimitDimension.BOTH, // 限流维度
             ipHeaderName = "X-Send-Code-IP", // IP 限流时使用的 HTTP 头名称
             message = "操作过于频繁，请稍后重试" // 限流提示语
