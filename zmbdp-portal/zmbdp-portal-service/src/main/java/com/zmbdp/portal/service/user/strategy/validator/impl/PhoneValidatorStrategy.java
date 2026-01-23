@@ -8,11 +8,11 @@ import com.zmbdp.portal.service.user.strategy.validator.IAccountValidatorStrateg
 import org.springframework.stereotype.Component;
 
 /**
- * 手机号校验策略实现类
- * <p>
- * 负责手机号格式的校验逻辑，实现 {@link IAccountValidatorStrategy} 接口。
- * 当账号格式为手机号时，此策略会被 {@link AccountValidatorRouter} 选中并执行校验。
- * </p>
+ * 手机号校验策略
+ * <ul>
+ *     <li>负责手机号格式的校验逻辑，实现 {@link IAccountValidatorStrategy} 接口。</li>
+ *     <li>当账号格式为手机号时，此策略会被 {@link AccountValidatorRouter} 选中并执行校验。</li>
+ * </ul>
  *
  * @author 稚名不带撇
  */

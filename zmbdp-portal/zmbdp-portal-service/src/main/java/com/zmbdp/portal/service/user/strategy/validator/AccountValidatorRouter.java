@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 账号校验策略上下文（Context）
+ * 账号校验策略路由器
  * <p>
  * 采用策略模式设计，作为策略上下文，负责：
  * <ul>

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 阿里云短信服务实现
+ * 阿里云短信发送策略
  * <p>
  * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于阿里云短信服务的验证码发送功能。
  * 支持通过阿里云短信服务 API 发送验证码短信。
