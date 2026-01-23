@@ -58,6 +58,11 @@ public enum ResultCode {
     PARA_TYPE_MISMATCH(400006, "参数类型不匹配"),
 
     /**
+     * 请求过于频繁（频控 / 防刷）
+     */
+    REQUEST_TOO_FREQUENT(400020, "请求过于频繁，请稍后重试"),
+
+    /**
      * 账号已停用，登录失败
      */
     USER_DISABLE(400007, "账号已停用，登录失败"),

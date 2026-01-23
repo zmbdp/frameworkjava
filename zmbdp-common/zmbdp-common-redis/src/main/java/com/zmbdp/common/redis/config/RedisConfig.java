@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -54,6 +55,27 @@ public class RedisConfig {
         redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer); // 配置 hash 的 value 的序列化方式
         redisTemplate.afterPropertiesSet(); // 初始化 redisTemplate
         return redisTemplate;
+    }
+
+    /**
+     * 配置 StringRedisTemplate（用于 Lua 脚本执行，避免序列化问题）
+     * <p>
+     * StringRedisTemplate 专门用于字符串操作，所有 key 和 value 都使用 StringRedisSerializer 序列化。
+     * 这对于执行 Lua 脚本非常重要，因为 Lua 脚本需要接收纯字符串参数，而不是 JSON 格式。
+     * <p>
+     * <b>使用场景：</b>
+     * <ul>
+     *     <li>执行 Lua 脚本（如限流、分布式锁等）</li>
+     *     <li>需要纯字符串操作的场景</li>
+     *     <li>避免序列化问题导致的 Lua 脚本参数解析错误</li>
+     * </ul>
+     *
+     * @param redisConnectionFactory redis连接工厂
+     * @return StringRedisTemplate
+     */
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        return new StringRedisTemplate(redisConnectionFactory);
     }
 
     /**
