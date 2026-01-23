@@ -2,17 +2,18 @@
 
 FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮件、分页、流处理等常用场景，开箱即用，无需重复造轮子。
 
+> **注意**：Excel 相关工具类位于 `zmbdp-common-excel` 模块，使用前需要添加该模块依赖。
+
 ## 工具类分类
 
 ### 核心工具类（17 个）
 
-#### zmbdp-common-core 模块（14 个）
+#### zmbdp-common-core 模块（13 个）
 
 | 工具类 | 功能说明 | 主要方法 |
 |--------|---------|---------|
 | `AESUtil` | AES 加密/解密 | `encrypt()`, `decrypt()` |
 | `BeanCopyUtil` | Bean 属性拷贝 | `copyProperties()`, `copyListProperties()` |
-| `ExcelUtil` | Excel 导入/导出 | `read()`, `write()` |
 | `FileUtil` | 文件操作 | `read()`, `write()`, `delete()` |
 | `JsonUtil` | JSON 处理 | `toJson()`, `parseObject()`, `parseArray()` |
 | `MailUtil` | 邮件发送 | `sendText()`, `sendHtml()` |
@@ -25,18 +26,20 @@ FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮�
 | `ValidatorUtil` | 数据校验 | `validate()`, `validateObject()` |
 | `VerifyUtil` | 格式验证 | `checkPhone()`, `checkEmail()`, `checkIdCard()` |
 
-#### 其他模块（3 个）
+#### 其他模块（4 个）
 
 | 工具类 | 模块 | 功能说明 |
 |--------|------|---------|
+| `ExcelUtil` | zmbdp-common-excel | Excel 导入/导出工具 |
 | `CacheUtil` | zmbdp-common-cache | 三级缓存工具（布隆过滤器 + Caffeine + Redis） |
 | `JwtUtil` | zmbdp-common-security | JWT Token 创建、解析、信息提取 |
 | `SecurityUtil` | zmbdp-common-security | Token 提取和处理 |
 
-### Excel 工具类（6 个）
+### Excel 工具类（zmbdp-common-excel 模块）
 
 | 工具类 | 功能说明 |
 |--------|---------|
+| `ExcelUtil` | Excel 导入/导出工具类 | `inputExcel()`, `outputExcel()`, `exportTemplate()` |
 | `CellMergeStrategy` | 单元格合并策略 |
 | `DefaultExcelListener` | 默认 Excel 监听器（用于导入） |
 | `DefaultExcelResult` | 默认 Excel 结果处理 |
@@ -55,7 +58,7 @@ FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮�
 
 #### 文件操作
 - **文件操作**：`FileUtil` - 文件读写、删除
-- **Excel 处理**：`ExcelUtil` + Excel 工具类 - Excel 导入导出
+- **Excel 处理**：`ExcelUtil` + Excel 工具类（zmbdp-common-excel 模块）- Excel 导入导出
 
 #### 字符串与验证
 - **字符串处理**：`StringUtil` - 字符串工具方法
@@ -107,12 +110,20 @@ List<User> users = JsonUtil.parseArray(json, User.class);
 ### Excel 导入导出
 
 ```java
-// 导出 Excel
+// 导出 Excel 到 HTTP 响应
 List<User> users = userService.findAll();
-ExcelUtil.write("用户列表.xlsx", User.class, users);
+ExcelUtil.outputExcel(users, "用户列表", User.class, response);
 
-// 导入 Excel
-List<User> users = ExcelUtil.read("用户列表.xlsx", User.class);
+// 导出 Excel（支持单元格合并）
+ExcelUtil.outputExcel(users, "用户列表", User.class, true, response);
+
+// 导入 Excel（同步，小数据量）
+List<User> users = ExcelUtil.inputExcel(inputStream, User.class);
+
+// 导入 Excel（带校验）
+ExcelResult<User> result = ExcelUtil.inputExcel(inputStream, User.class, true);
+List<User> successList = result.getList();
+List<String> errorList = result.getErrorList();
 ```
 
 ### 格式验证
@@ -197,11 +208,12 @@ String decrypted = AESUtil.decrypt(encrypted, "密钥");
 
 如果需要新增工具类：
 
-1. 在 `zmbdp-common-core/src/main/java/com/zmbdp/common/core/utils/` 下创建
-2. 使用 `@NoArgsConstructor(access = AccessLevel.PRIVATE)` 防止实例化
-3. 所有方法使用 `public static` 修饰
-4. 添加完整的 Javadoc 注释
-5. 更新本文档的工具类列表
+1. **核心工具类**：在 `zmbdp-common-core/src/main/java/com/zmbdp/common/core/utils/` 下创建
+2. **功能模块化工具类**：如果功能较复杂或需要独立依赖，可创建独立模块（参考 `zmbdp-common-excel`）
+3. 使用 `@NoArgsConstructor(access = AccessLevel.PRIVATE)` 防止实例化
+4. 所有方法使用 `public static` 修饰
+5. 添加完整的 Javadoc 注释
+6. 更新本文档的工具类列表
 
 ## 相关文档
 

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 字符串工具类
  * <p>
- * 继承自 Apache Commons Lang 的 StringUtils，提供字符串匹配相关的扩展功能。
+ * 继承自 Apache Commons Lang 的 StringUtils，提供字符串匹配相关的扩展功能。<br>
  * 支持 URL 路径匹配、模式匹配等场景。
  * <p>
  * <b>功能特性：</b>

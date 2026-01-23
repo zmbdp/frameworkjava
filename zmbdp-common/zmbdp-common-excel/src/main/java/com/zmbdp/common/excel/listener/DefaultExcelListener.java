@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.listener;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.context.AnalysisContext;
@@ -8,6 +8,8 @@ import com.alibaba.excel.exception.ExcelDataConvertException;
 import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.core.utils.StreamUtil;
 import com.zmbdp.common.core.utils.ValidatorUtil;
+import com.zmbdp.common.excel.result.DefaultExcelResult;
+import com.zmbdp.common.excel.result.ExcelResult;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.NoArgsConstructor;
@@ -32,7 +34,7 @@ import java.util.Set;
  * 使用方式：
  * <ol>
  *     <li>创建 {@link DefaultExcelListener} 实例，传入是否校验参数</li>
- *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil#inputExcel} 方法中使用</li>
+ *     <li>在 {@link com.zmbdp.common.excel.util.ExcelUtil#inputExcel} 方法中使用</li>
  *     <li>通过 {@link #getExcelResult()} 获取导入结果</li>
  * </ol>
  *

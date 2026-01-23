@@ -1,6 +1,6 @@
 package com.zmbdp.common.ratelimit.aspect;
 
-import com.zmbdp.common.core.utils.RateLimitUtil;
+import com.zmbdp.common.core.utils.ClientIpUtil;
 import com.zmbdp.common.core.utils.ServletUtil;
 import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.RateLimitConstants;
@@ -313,7 +313,7 @@ public class RateLimitAspect {
         }
 
         // 如果都失败，回退到标准 IP 获取逻辑（X-Forwarded-For → X-Real-IP → getRemoteAddr()）
-        return RateLimitUtil.getClientIp(request);
+        return ClientIpUtil.getClientIp(request);
     }
 
     /**

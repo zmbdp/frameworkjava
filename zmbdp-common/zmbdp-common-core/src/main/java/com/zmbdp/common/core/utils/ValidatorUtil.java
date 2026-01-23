@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Validator 校验框架工具类
  * <p>
- * 基于 Jakarta Validation（Bean Validation）提供数据校验功能。
+ * 基于 Jakarta Validation（Bean Validation）提供数据校验功能。<br>
  * 使用 Spring 容器中的 Validator Bean 进行校验，支持分组校验。
  * <p>
  * <b>功能特性：</b>

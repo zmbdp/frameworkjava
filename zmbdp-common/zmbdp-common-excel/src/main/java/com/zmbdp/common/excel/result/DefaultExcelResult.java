@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.result;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Setter;
@@ -21,8 +21,8 @@ import java.util.List;
  * <p>
  * 使用方式：
  * <ol>
- *     <li>通常由 {@link DefaultExcelListener} 内部创建和使用</li>
- *     <li>通过 {@link ExcelListener#getExcelResult()} 获取实例</li>
+ *     <li>通常由 {@link com.zmbdp.common.excel.listener.DefaultExcelListener} 内部创建和使用</li>
+ *     <li>通过 {@link com.zmbdp.common.excel.listener.ExcelListener#getExcelResult()} 获取实例</li>
  *     <li>调用 {@link #getAnalysis()} 获取导入回执信息</li>
  * </ol>
  *

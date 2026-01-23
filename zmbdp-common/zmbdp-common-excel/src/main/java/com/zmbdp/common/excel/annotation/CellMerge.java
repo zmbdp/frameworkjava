@@ -1,6 +1,6 @@
-package com.zmbdp.common.core.annotation.excel;
+package com.zmbdp.common.excel.annotation;
 
-import com.zmbdp.common.core.excel.CellMergeStrategy;
+import com.zmbdp.common.excel.strategy.CellMergeStrategy;
 
 import java.lang.annotation.*;
 

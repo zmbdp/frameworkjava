@@ -1,8 +1,8 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.strategy;
 
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.write.merge.AbstractMergeStrategy;
-import com.zmbdp.common.core.annotation.excel.CellMerge;
+import com.zmbdp.common.excel.annotation.CellMerge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -65,28 +65,6 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
      * 是否有标题行（true 表示第一行是标题，从第二行开始合并）
      */
     private boolean hasTitle;
-
-    /**
-     * 重复单元格信息（内部类）
-     *
-     * <p>用于记录需要合并的单元格值和起始行索引</p>
-     *
-     * @author 稚名不带撇
-     */
-    @Data
-    @AllArgsConstructor
-    static class RepeatCell {
-
-        /**
-         * 列值（用于判断是否需要合并）
-         */
-        private Object value;
-
-        /**
-         * 当前行索引（合并起始行）
-         */
-        private int current;
-    }
 
     /**
      * 处理单元格合并逻辑
@@ -259,5 +237,27 @@ public class CellMergeStrategy extends AbstractMergeStrategy {
                 }
             }
         }
+    }
+
+    /**
+     * 重复单元格信息（内部类）
+     *
+     * <p>用于记录需要合并的单元格值和起始行索引</p>
+     *
+     * @author 稚名不带撇
+     */
+    @Data
+    @AllArgsConstructor
+    static class RepeatCell {
+
+        /**
+         * 列值（用于判断是否需要合并）
+         */
+        private Object value;
+
+        /**
+         * 当前行索引（合并起始行）
+         */
+        private int current;
     }
 }
