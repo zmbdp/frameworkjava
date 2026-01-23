@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Stream 流工具类
  * <p>
- * 提供常用的 Stream API 封装，简化集合操作，提高代码可读性。
+ * 提供常用的 Stream API 封装，简化集合操作，提高代码可读性。<br>
  * 所有方法都自动处理空集合情况，避免 NPE，返回空集合或空 Map。
  * <p>
  * <b>功能特性：</b>

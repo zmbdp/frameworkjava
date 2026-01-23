@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * JSON 工具类
  * <p>
- * 基于 Jackson 提供的 JSON 序列化和反序列化功能，封装了常用的 JSON 转换方法。
+ * 基于 Jackson 提供的 JSON 序列化和反序列化功能，封装了常用的 JSON 转换方法。<br>
  * 配置了日期格式、空值处理、类型容错等常用设置，开箱即用。
  * <p>
  * <b>功能特性：</b>

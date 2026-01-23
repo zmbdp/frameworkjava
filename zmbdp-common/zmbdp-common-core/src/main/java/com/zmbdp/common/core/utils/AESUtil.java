@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * AES 加密工具类
  * <p>
- * 提供基于 AES（Advanced Encryption Standard）算法的加密和解密功能。
+ * 提供基于 AES（Advanced Encryption Standard）算法的加密和解密功能。<br>
  * 使用固定的密钥进行加密解密，适用于前后端数据传输加密场景。
  * <p>
  * <b>使用场景：</b>

@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.excel;
+package com.zmbdp.common.excel.converter;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
@@ -27,7 +27,7 @@ import java.math.BigDecimal;
  * <p>
  * 使用方式：
  * <ol>
- *     <li>在 {@link com.zmbdp.common.core.utils.ExcelUtil} 中已自动注册</li>
+ *     <li>在 {@link com.zmbdp.common.excel.util.ExcelUtil} 中已自动注册</li>
  *     <li>导出时自动应用，无需手动配置</li>
  *     <li>适用于包含 Long 类型字段的实体类</li>
  * </ol>

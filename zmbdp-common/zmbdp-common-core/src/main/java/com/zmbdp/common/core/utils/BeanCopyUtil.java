@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * Bean 拷贝工具类
  * <p>
- * 提供便捷的 Bean 属性拷贝功能，支持单个对象、List 集合、Map 集合等多种场景的批量拷贝。
+ * 提供便捷的 Bean 属性拷贝功能，支持单个对象、List 集合、Map 集合等多种场景的批量拷贝。<br>
  * 基于 Spring 的 BeanUtils 实现，自动处理同名属性的拷贝。
  * <p>
  * <b>使用场景：</b>
