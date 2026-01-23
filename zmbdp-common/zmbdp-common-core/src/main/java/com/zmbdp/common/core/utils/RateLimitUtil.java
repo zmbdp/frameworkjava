@@ -37,7 +37,7 @@ import lombok.NoArgsConstructor;
  * @see HttpServletRequest
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RateLimitUtil {
+public class RateLimitUtil {
 
     /**
      * 获取客户端真实 IP 地址
