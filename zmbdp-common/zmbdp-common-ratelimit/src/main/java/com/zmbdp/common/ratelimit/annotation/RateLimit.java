@@ -76,7 +76,7 @@ import java.lang.annotation.Target;
  * <b>注意事项：</b>
  * <ul>
  *     <li>无 HTTP 请求上下文时（如内部调用、单元测试）会跳过限流，直接放行</li>
- *     <li>账号维度（{@code ACCOUNT} 或 {@code BOTH}）未登录时（无 {@code userId} 请求头）会退化为 IP 限流</li>
+ *     <li>账号维度（{@code ACCOUNT} 或 {@code BOTH}）未登录时（无 {@code userId} 请求头或无 {@code account} 请求参数）会退化为 IP 限流</li>
  *     <li>双维度限流时，如果未登录，{@code identityKey == ipKey}，只限流一次，避免重复计数</li>
  *     <li>限流基于 Redis，确保 Redis 可用性，建议配置降级策略（{@code ratelimit.fail-open}）</li>
  *     <li>滑动窗口算法使用 ZSET 存储，每个请求会生成一个 UUID 作为 member，注意 Redis 内存占用</li>
