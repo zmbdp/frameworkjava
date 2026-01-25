@@ -23,7 +23,7 @@ import java.util.List;
  * </ul>
  *
  * <p>
- * <b>使用方式：</b>
+ * <b>使用示例：</b>
  * <ol>
  *     <li>在实体类字段上添加 {@code @CellMerge} 注解（通常与 {@code @ExcelProperty} 一起使用）</li>
  *     <li>调用 {@code ExcelUtil.outputExcel()} 时设置 {@code merge=true}</li>

@@ -14,7 +14,7 @@ import java.util.List;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>通过 {@link com.zmbdp.common.excel.listener.ExcelListener#getExcelResult()} 获取实现类实例</li>
  *     <li>调用 {@link #getList()} 获取成功导入的数据</li>

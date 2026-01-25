@@ -25,7 +25,7 @@ import java.math.BigDecimal;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>在 {@link com.zmbdp.common.excel.util.ExcelUtil} 中已自动注册</li>
  *     <li>导出时自动应用，无需手动配置</li>

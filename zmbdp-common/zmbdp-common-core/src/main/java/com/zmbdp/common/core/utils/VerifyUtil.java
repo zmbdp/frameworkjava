@@ -69,7 +69,7 @@ public class VerifyUtil {
      *     <li>13x、14x、15x、16x、17x、18x、19x（x 为 0-9）</li>
      * </ul>
      */
-    public static final Pattern PHONE_PATTERN = Pattern.compile("^1[2|3|4|5|6|7|8|9][0-9]\\d{8}$");
+    public static final Pattern PHONE_PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
 
     /**
      * 邮箱的正则校验 Pattern

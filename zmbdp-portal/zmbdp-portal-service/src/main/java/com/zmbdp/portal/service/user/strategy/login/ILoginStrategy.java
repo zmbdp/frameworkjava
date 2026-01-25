@@ -22,7 +22,7 @@ import com.zmbdp.common.security.domain.dto.LoginUserDTO;
  *     <li>{@link com.zmbdp.portal.service.user.strategy.login.impl.CodeLoginStrategy}：验证码登录策略（支持手机号/邮箱）</li>
  * </ul>
  * <p>
- * <b>使用方式：</b>
+ * <b>使用示例：</b>
  * <ul>
  *     <li>通过路由器获取：使用 {@link LoginRouter#login(LoginDTO)} 根据登录类型自动选择</li>
  *     <li>直接注入实现类：通过 {@code @Qualifier} 指定实现类</li>

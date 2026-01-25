@@ -31,7 +31,7 @@ import java.util.Map;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>在实体类的字段上添加 {@link CellMerge} 注解</li>
  *     <li>在导出 Excel 时传入 {@link CellMergeStrategy} 策略</li>

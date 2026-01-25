@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 阿里云短信发送策略
  * <p>
- * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于阿里云短信服务的验证码发送功能。
+ * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于阿里云短信服务的验证码发送功能。<br>
  * 支持通过阿里云短信服务 API 发送验证码短信。
  * <p>
  * <b>核心功能：</b>
@@ -73,7 +73,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 阿里云短信服务客户端
      * <p>
-     * 用于调用阿里云短信服务 API 发送短信。
+     * 用于调用阿里云短信服务 API 发送短信。<br>
      * 需要在 Spring 容器中配置该 Bean。
      */
     @Autowired
@@ -83,7 +83,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
      * 短信模板代码
      * <p>
      * 配置项：sms.aliyun.templateCode。
-     * 在阿里云短信服务控制台创建的短信模板代码，用于发送验证码短信。
+     * 在阿里云短信服务控制台创建的短信模板代码，用于发送验证码短信。<br>
      * 模板中需要包含 {code} 占位符，用于替换验证码。
      */
     @Value("${sms.aliyun.templateCode:}")
@@ -93,7 +93,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
      * 短信签名
      * <p>
      * 配置项：sms.sign-name。
-     * 在阿里云短信服务控制台申请的短信签名，用于标识发送方。
+     * 在阿里云短信服务控制台申请的短信签名，用于标识发送方。<br>
      * 签名需要审核通过后才能使用。
      */
     @Value("${sms.sign-name:}")
@@ -164,6 +164,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
      */
     @Override
     public boolean sendCode(String phone, String code) {
+        log.info("开始发送短信验证码, 账号：{}", phone);
         Map<String, String> params = new HashMap<>();
         params.put("code", code);
         return sendTemMessage(phone, templateCode, params);

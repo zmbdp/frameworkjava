@@ -15,7 +15,7 @@ import com.zmbdp.common.excel.result.ExcelResult;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>实现该接口创建自定义监听器</li>
  *     <li>或使用 {@link com.zmbdp.common.excel.listener.DefaultExcelListener} 默认实现</li>

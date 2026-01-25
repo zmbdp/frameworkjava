@@ -19,7 +19,7 @@ import java.util.List;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>通常由 {@link com.zmbdp.common.excel.listener.DefaultExcelListener} 内部创建和使用</li>
  *     <li>通过 {@link com.zmbdp.common.excel.listener.ExcelListener#getExcelResult()} 获取实例</li>
