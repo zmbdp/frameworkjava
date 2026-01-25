@@ -66,7 +66,7 @@ public class AccountStrategyContext {
      * 如：{@link PhoneAccountStrategy}、{@link EmailAccountStrategy} 等。
      * </p>
      */
-    private final List<IAccountStrategy> accountHandlerStrategies;
+    private final List<IAccountStrategy> accountStrategies;
 
     /**
      * 构造方法，自动注入所有账号策略实现类
@@ -74,11 +74,11 @@ public class AccountStrategyContext {
      * Spring 会通过构造函数注入所有实现了 {@link IAccountStrategy} 接口的 Bean。
      * </p>
      *
-     * @param accountHandlerStrategies Spring 容器中所有 {@link IAccountStrategy} 的实现类，不能为 null
+     * @param accountStrategies Spring 容器中所有 {@link IAccountStrategy} 的实现类，不能为 null
      */
     @Autowired
-    public AccountStrategyContext(List<IAccountStrategy> accountHandlerStrategies) {
-        this.accountHandlerStrategies = accountHandlerStrategies;
+    public AccountStrategyContext(List<IAccountStrategy> accountStrategies) {
+        this.accountStrategies = accountStrategies;
     }
 
     /**
@@ -257,7 +257,7 @@ public class AccountStrategyContext {
      * @throws ServiceException 如果没有找到匹配的策略，错误码为 {@code ResultCode.INVALID_PARA}，错误信息为"账号格式错误，请输入手机号或邮箱"
      */
     private IAccountStrategy findHandler(String account) {
-        return accountHandlerStrategies.stream()
+        return accountStrategies.stream()
                 .filter(h -> h.supports(account))
                 .findFirst()
                 .orElseThrow(() -> {
