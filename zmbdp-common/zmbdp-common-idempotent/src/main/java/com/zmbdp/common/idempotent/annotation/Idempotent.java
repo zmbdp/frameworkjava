@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  * </ul>
  * </p>
  * <p>
- * <b>使用方式：</b>
+ * <b>使用示例：</b>
  * <ol>
  *     <li>在需要保证幂等性的方法上添加 {@code @Idempotent} 注解</li>
  *     <li>客户端在请求时携带幂等性 Token（请求头或参数）</li>

@@ -6,8 +6,8 @@ import com.zmbdp.common.message.strategy.impl.EmailCodeServiceStrategy;
 /**
  * 验证码发送服务接口
  * <p>
- * 定义验证码发送的统一规范，支持多种发送方式（短信、邮件等）。
- * 每个实现类通过 {@link #supports(String)} 方法判断是否支持当前账号类型，
+ * 定义验证码发送的统一规范，支持多种发送方式（短信、邮件等）。<br>
+ * 每个实现类通过 {@link #supports(String)} 方法判断是否支持当前账号类型。<br>
  * 路由器会根据账号类型自动选择合适的发送器实现。
  * <p>
  * <b>设计目的：</b>
@@ -23,7 +23,7 @@ import com.zmbdp.common.message.strategy.impl.EmailCodeServiceStrategy;
  *     <li>{@link EmailCodeServiceStrategy}：邮件验证码服务实现（用于邮箱）</li>
  * </ul>
  * <p>
- * <b>使用方式：</b>
+ * <b>使用示例：</b>
  * <ul>
  *     <li>通过路由器获取：使用 {@link CaptchaSenderRouter#send(String, String)} 根据账号类型自动选择</li>
  *     <li>直接注入实现类：通过 {@code @Qualifier} 指定实现类</li>
@@ -59,7 +59,7 @@ public interface ICaptchaSenderStrategy {
     /**
      * 是否支持当前账号类型
      * <p>
-     * 判断当前发送器是否支持指定的账号类型（如手机号、邮箱等）。
+     * 判断当前发送器是否支持指定的账号类型（如手机号、邮箱等）。<br>
      * 每个实现类根据自己的业务逻辑判断是否支持该账号。
      * <p>
      * <b>使用示例：</b>

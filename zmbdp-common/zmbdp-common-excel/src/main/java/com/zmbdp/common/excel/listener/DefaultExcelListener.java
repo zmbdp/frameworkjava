@@ -31,7 +31,7 @@ import java.util.Set;
  * </ul>
  *
  * <p>
- * 使用方式：
+ * <b>使用示例：</b>
  * <ol>
  *     <li>创建 {@link DefaultExcelListener} 实例，传入是否校验参数</li>
  *     <li>在 {@link com.zmbdp.common.excel.util.ExcelUtil#inputExcel} 方法中使用</li>

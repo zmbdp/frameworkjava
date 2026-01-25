@@ -18,8 +18,8 @@ import com.zmbdp.common.security.utils.SecurityUtil;
 import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.UserDTO;
 import com.zmbdp.portal.service.user.service.IUserService;
+import com.zmbdp.portal.service.user.strategy.account.AccountStrategyContext;
 import com.zmbdp.portal.service.user.strategy.login.LoginRouter;
-import com.zmbdp.portal.service.user.strategy.validator.AccountValidatorRouter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,10 +61,10 @@ public class UserServiceImpl implements IUserService {
     private CaptchaService captchaService;
 
     /**
-     * 账号校验策略工厂
+     * 账号处理策略路由器
      */
     @Autowired
-    private AccountValidatorRouter validatorFactory;
+    private AccountStrategyContext accountStrategyContext;
 
     /**
      * 登录策略路由器
@@ -99,8 +99,8 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public String sendCode(String account) {
-        // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
-        validatorFactory.validate(account);
+        // 使用策略模式进行账号格式校验（根据输入格式自动选择处理策略）
+        accountStrategyContext.validate(account);
         return captchaService.sendCode(account);
     }
 

@@ -5,7 +5,7 @@ package com.zmbdp.common.domain.constants;
  *
  * @author 稚名不带撇
  */
-public final class RateLimitConstants {
+public class RateLimitConstants {
 
     /**
      * Redis Key 前缀默认值

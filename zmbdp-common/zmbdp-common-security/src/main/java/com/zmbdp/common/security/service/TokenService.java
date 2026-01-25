@@ -490,7 +490,7 @@ public class TokenService {
      *     private TokenService tokenService;
      *
      *     @Override
-     *     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+     *     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object account) {
      *         // 获取用户信息
      *         LoginUserDTO user = tokenService.getLoginUser(request, "your-secret-key");
      *         if (user != null) {

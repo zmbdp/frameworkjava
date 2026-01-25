@@ -94,7 +94,7 @@ public class SecurityUtil {
      * <pre>{@code
      * // 在拦截器中获取 Token
      * @Override
-     * public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+     * public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object account) {
      *     String token = SecurityUtil.getToken(request);
      *     if (token != null) {
      *         // Token 存在，验证 Token

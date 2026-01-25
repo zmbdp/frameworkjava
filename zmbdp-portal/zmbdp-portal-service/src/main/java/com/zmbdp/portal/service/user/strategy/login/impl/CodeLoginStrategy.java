@@ -1,9 +1,7 @@
 package com.zmbdp.portal.service.user.strategy.login.impl;
 
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
-import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
-import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -11,9 +9,9 @@ import com.zmbdp.common.message.service.CaptchaService;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.portal.service.user.domain.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
+import com.zmbdp.portal.service.user.strategy.account.AccountStrategyContext;
 import com.zmbdp.portal.service.user.strategy.login.ILoginStrategy;
 import com.zmbdp.portal.service.user.strategy.login.LoginRouter;
-import com.zmbdp.portal.service.user.strategy.validator.AccountValidatorRouter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -64,22 +62,16 @@ import org.springframework.stereotype.Component;
 public class CodeLoginStrategy implements ILoginStrategy {
 
     /**
-     * C端用户服务
-     */
-    @Autowired
-    private AppUserApi appUserApi;
-
-    /**
      * 验证码服务
      */
     @Autowired
     private CaptchaService captchaService;
 
     /**
-     * 账号校验策略工厂
+     * 账号处理策略路由器
      */
     @Autowired
-    private AccountValidatorRouter validatorFactory;
+    private AccountStrategyContext accountStrategyContext;
 
     /**
      * 是否支持当前登录类型
@@ -103,9 +95,7 @@ public class CodeLoginStrategy implements ILoginStrategy {
      * <b>执行流程：</b>
      * <ol>
      *     <li>将 loginDTO 转换为 CodeLoginDTO</li>
-     *     <li>校验账号格式（手机号或邮箱）</li>
-     *     <li>根据账号类型查询用户（手机号或邮箱）</li>
-     *     <li>如果用户不存在，调用注册接口</li>
+     *     <li>校验账号格式并查询用户，如果不存在则自动注册（策略自动处理手机号/邮箱）</li>
      *     <li>校验验证码</li>
      *     <li>删除验证码缓存</li>
      *     <li>将用户信息填充到 LoginUserDTO</li>
@@ -140,29 +130,8 @@ public class CodeLoginStrategy implements ILoginStrategy {
         LoginUserDTO loginUserDTO = new LoginUserDTO();
 
         String account = codeLoginDTO.getAccount();
-        // 使用策略模式进行账号格式校验（根据输入格式自动选择校验器）
-        validatorFactory.validate(account);
-
-        AppUserVO appUserVO;
-        Result<AppUserVO> result;
-
-        // 根据账号类型查询用户（使用策略模式判断是手机号还是邮箱）
-        if (VerifyUtil.checkPhone(account)) {
-            // 手机号：查询手机号用户
-            result = appUserApi.findByPhone(account);
-        } else if (VerifyUtil.checkEmail(account)) {
-            // 邮箱：查询邮箱用户
-            result = appUserApi.findByEmail(account);
-        } else {
-            throw new ServiceException("账号格式错误，请输入手机号或邮箱", ResultCode.INVALID_PARA.getCode());
-        }
-
-        // 查不到就注册，查得到就赋值
-        if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
-            appUserVO = register(codeLoginDTO);
-        } else {
-            appUserVO = result.getData();
-        }
+        // 使用策略模式校验账号格式并查询用户，如果不存在则自动注册（策略自动处理手机号/邮箱）
+        AppUserVO appUserVO = accountStrategyContext.validateAndFindOrRegisterUser(account);
 
         // 再校验验证码
         if (!captchaService.checkCode(account, codeLoginDTO.getCode())) {
@@ -179,36 +148,5 @@ public class CodeLoginStrategy implements ILoginStrategy {
         }
 
         return loginUserDTO;
-    }
-
-    /**
-     * 注册用户（支持手机号/邮箱）
-     * <p>
-     * 根据账号类型（手机号或邮箱）调用相应的注册接口。
-     *
-     * @param codeLoginDTO 验证码登录 DTO，不能为 null
-     * @return 用户 VO，如果注册失败返回 null
-     */
-    private AppUserVO register(CodeLoginDTO codeLoginDTO) {
-        String account = codeLoginDTO.getAccount();
-        Result<AppUserVO> result = null;
-
-        // 使用策略模式判断是手机号还是邮箱，然后调用相应的注册方法
-        if (VerifyUtil.checkPhone(account)) {
-            // 手机号注册
-            result = appUserApi.registerByPhone(account);
-        } else if (VerifyUtil.checkEmail(account)) {
-            // 邮箱注册
-            result = appUserApi.registerByEmail(account);
-        } else {
-            log.error("账号格式错误，无法注册! {}", account);
-            return null;
-        }
-        // 如果说返回的值是 null 或者 状态码不是 200 或者 数据为 null，就注册失败
-        if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
-            log.error("用户注册失败! {}", account);
-            return null;
-        }
-        return result.getData();
     }
 }

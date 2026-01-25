@@ -88,7 +88,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 随机数生成器
      * <p>
-     * 用于从邮件标题和内容模板列表中随机选择元素。
+     * 用于从邮件标题和内容模板列表中随机选择元素。<br>
      * 使用静态实例，避免频繁创建 Random 对象。
      */
     private static final Random RANDOM = new Random();
@@ -96,7 +96,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 邮件验证码配置属性
      * <p>
-     * 包含邮件标题列表和内容模板列表。
+     * 包含邮件标题列表和内容模板列表。<br>
      * 支持从配置文件中读取多个标题和内容模板，发送时会随机选择。
      */
     @Autowired
@@ -135,7 +135,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 发送验证码
      * <p>
-     * 通过邮件发送验证码到指定邮箱地址。
+     * 通过邮件发送验证码到指定邮箱地址。<br>
      * 从配置的标题和内容模板列表中随机选择，替换验证码占位符后发送。
      * <p>
      * <b>使用示例：</b>
@@ -176,6 +176,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
      */
     @Override
     public boolean sendCode(String email, String code) {
+        log.info("开始发送邮件验证码, 账号: {}", email);
         // 把是否发送邮件交给 nacos 管理
         if (!sendMessage) {
             log.error("邮件发送通道关闭, {}", email);
@@ -203,7 +204,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 从列表中随机选择一个元素
      * <p>
-     * 从配置的标题或内容模板列表中随机选择一个元素。
+     * 从配置的标题或内容模板列表中随机选择一个元素。<br>
      * 如果列表为空或无效，返回默认值。
      * <p>
      * <b>处理逻辑：</b>

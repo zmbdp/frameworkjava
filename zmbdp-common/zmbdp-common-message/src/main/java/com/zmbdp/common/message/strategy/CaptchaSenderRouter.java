@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 验证码发送器路由器
  * <p>
- * 根据账号类型自动选择合适的验证码发送器。
+ * 根据账号类型自动选择合适的验证码发送器。<br>
  * 遍历所有实现了 {@link ICaptchaSenderStrategy} 接口的发送器，找到支持当前账号类型的发送器并调用。
  * <p>
  * <b>工作流程：</b>
@@ -55,7 +55,7 @@ public class CaptchaSenderRouter {
     /**
      * 验证码发送器列表
      * <p>
-     * Spring 会自动注入所有实现了 {@link ICaptchaSenderStrategy} 接口的 Bean。
+     * Spring 会自动注入所有实现了 {@link ICaptchaSenderStrategy} 接口的 Bean。<br>
      * 当前包含的发送器：
      * <ul>
      *     <li>{@link AliSmsServiceStrategy}：手机号发送器</li>
