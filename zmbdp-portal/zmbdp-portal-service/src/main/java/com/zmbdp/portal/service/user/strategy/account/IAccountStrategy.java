@@ -3,6 +3,7 @@ package com.zmbdp.portal.service.user.strategy.account;
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.portal.service.user.manager.AccountManager;
 import com.zmbdp.portal.service.user.strategy.account.impl.EmailAccountStrategy;
 import com.zmbdp.portal.service.user.strategy.account.impl.PhoneAccountStrategy;
 
@@ -30,15 +31,15 @@ import com.zmbdp.portal.service.user.strategy.account.impl.PhoneAccountStrategy;
  * <p>
  * <b>使用示例：</b>
  * <pre>{@code
- * // 通过 AccountStrategyContext 自动选择合适的策略
+ * // 通过 AccountManager 自动选择合适的策略
  * @Autowired
- * private AccountStrategyContext accountStrategyContext;
+ * private AccountManager accountStrategyContext;
  * Result<AppUserVO> result = accountStrategyContext.validateAndFindUser(account);
  * }</pre>
  * </p>
  *
  * @author 稚名不带撇
- * @see AccountStrategyContext
+ * @see AccountManager
  * @see PhoneAccountStrategy
  * @see EmailAccountStrategy
  */
@@ -47,7 +48,7 @@ public interface IAccountStrategy {
     /**
      * 判断当前策略是否支持该账号格式的处理
      * <p>
-     * 此方法用于策略选择阶段，由策略上下文（{@link AccountStrategyContext}）调用。<br>
+     * 此方法用于策略选择阶段，由策略上下文（{@link AccountManager}）调用。<br>
      * 用于从多个策略实现中筛选出合适的策略。
      * <p>
      * <b>工作流程：</b>

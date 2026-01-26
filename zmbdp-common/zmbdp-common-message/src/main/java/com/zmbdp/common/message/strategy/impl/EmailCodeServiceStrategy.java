@@ -36,7 +36,7 @@ import java.util.Random;
  * // 方式1：通过路由器自动选择发送器（推荐）
  * @Autowired
  * private CaptchaSenderRouter captchaSenderRouter;
- * boolean result = captchaSenderRouter.send("user@example.com", "123456");
+ * boolean result = captchaSenderRouter.sendCode("user@example.com", "123456");
  *
  * // 方式2：直接注入指定实现类
  * @Autowired

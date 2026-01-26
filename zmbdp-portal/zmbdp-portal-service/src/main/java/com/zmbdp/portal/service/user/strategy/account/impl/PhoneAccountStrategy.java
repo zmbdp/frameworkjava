@@ -6,7 +6,7 @@ import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.portal.service.user.strategy.account.AccountStrategyContext;
+import com.zmbdp.portal.service.user.manager.AccountManager;
 import com.zmbdp.portal.service.user.strategy.account.IAccountStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * 手机号账号策略
  * <p>
  * 负责手机号格式的校验、查询、注册等逻辑，实现 {@link IAccountStrategy} 接口。<br>
- * 当账号格式为手机号时，此策略会被 {@link AccountStrategyContext} 选中并执行处理。
+ * 当账号格式为手机号时，此策略会被 {@link AccountManager} 选中并执行处理。
  * <p>
  * <b>核心功能：</b>
  * <ul>
@@ -37,9 +37,9 @@ import org.springframework.stereotype.Component;
  * <p>
  * <b>使用示例：</b>
  * <pre>{@code
- * // 方式1：通过 AccountStrategyContext 使用（推荐）
+ * // 方式1：通过 AccountManager 使用（推荐）
  * @Autowired
- * private AccountStrategyContext accountStrategyContext;
+ * private AccountManager accountStrategyContext;
  * AppUserVO user = accountStrategyContext.validateAndFindOrRegisterUser("13800138000");
  *
  * // 方式2：直接注入使用（不推荐，通常不需要）
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
  *
  * @author 稚名不带撇
  * @see IAccountStrategy
- * @see AccountStrategyContext
+ * @see AccountManager
  */
 @Slf4j
 @Component

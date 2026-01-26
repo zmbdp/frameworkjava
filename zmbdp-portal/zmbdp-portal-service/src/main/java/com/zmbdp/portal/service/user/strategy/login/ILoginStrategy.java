@@ -1,7 +1,8 @@
 package com.zmbdp.portal.service.user.strategy.login;
 
-import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
+import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
+import com.zmbdp.portal.service.user.facade.LoginRouter;
 
 /**
  * 登录策略接口
