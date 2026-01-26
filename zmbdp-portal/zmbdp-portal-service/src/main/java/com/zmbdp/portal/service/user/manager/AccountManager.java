@@ -1,9 +1,10 @@
-package com.zmbdp.portal.service.user.strategy.account;
+package com.zmbdp.portal.service.user.manager;
 
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
+import com.zmbdp.portal.service.user.strategy.account.IAccountStrategy;
 import com.zmbdp.portal.service.user.strategy.account.impl.EmailAccountStrategy;
 import com.zmbdp.portal.service.user.strategy.account.impl.PhoneAccountStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -13,40 +14,52 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 账号策略上下文
+ * 账号管理器
  * <p>
- * 采用策略模式设计，作为策略上下文（Context），负责：
+ * 负责账号相关的业务操作管理，采用策略模式设计，提供统一的业务接口。
+ * <p>
+ * <b>核心职责：</b>
  * <ul>
- *     <li>管理所有账号策略实现类</li>
- *     <li>根据账号格式自动选择合适的处理策略</li>
- *     <li>执行校验、查询、注册等逻辑</li>
+ *     <li><b>策略路由：</b>根据账号格式（手机号/邮箱）自动选择合适的处理策略</li>
+ *     <li><b>业务编排：</b>组合多个策略方法，提供高级业务操作（如校验+查询、查询+注册等）</li>
+ *     <li><b>结果处理：</b>封装策略返回的 {@code Result} 对象，转换为业务对象并处理异常情况</li>
+ *     <li><b>统一接口：</b>对外提供简化的业务方法，隐藏策略选择的复杂性</li>
  * </ul>
  * </p>
  * <p>
  * <b>使用示例：</b>
  * <pre>{@code
+ * @Autowired
+ * private AccountManager accountManager;
+ *
  * // 方式1：仅校验账号格式
- * accountStrategyContext.validate(account);
+ * accountManager.validate(account);
  *
  * // 方式2：校验账号格式并查询用户（推荐，避免重复判断）
- * Result<AppUserVO> result = accountStrategyContext.validateAndFindUser(account);
+ * AppUserVO user = accountManager.validateAndFindUser(account);
  *
  * // 方式3：注册用户
- * Result<AppUserVO> registerResult = accountStrategyContext.registerUser(account);
+ * AppUserVO newUser = accountManager.registerUser(account);
  *
  * // 方式4：校验账号格式并查询用户，如果不存在则注册（推荐，一站式处理）
- * Result<AppUserVO> result = accountStrategyContext.validateAndFindOrRegisterUser(account);
+ * AppUserVO user = accountManager.validateAndFindOrRegisterUser(account);
  * }</pre>
  * </p>
  * <p>
- * 系统会自动根据账号格式（手机号/邮箱）选择合适的处理策略并执行相应操作。
+ * <b>设计说明：</b>
+ * <ul>
+ *     <li>内部采用策略模式，根据账号格式自动选择合适的策略实现</li>
+ *     <li>封装了策略选择、结果转换、异常处理等细节，对外提供简洁的业务接口</li>
+ *     <li>所有方法都会先校验账号格式，格式不正确会抛出异常</li>
+ *     <li>策略选择基于 {@link IAccountStrategy#supports(String)} 方法</li>
+ * </ul>
  * </p>
  * <p>
  * <b>注意事项：</b>
  * <ul>
  *     <li>所有方法都会先校验账号格式，格式不正确会抛出异常</li>
  *     <li>推荐使用 {@link #validateAndFindOrRegisterUser(String)} 方法，实现查询或注册的一站式处理</li>
- *     <li>策略选择基于 {@link IAccountStrategy#supports(String)} 方法</li>
+ *     <li>如果账号格式无法识别（既不是手机号也不是邮箱），会抛出 {@link ServiceException} 异常</li>
  * </ul>
  * </p>
  *
@@ -57,7 +70,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class AccountStrategyContext {
+public class AccountManager {
 
     /**
      * 所有注册的账号策略实现类列表
@@ -77,7 +90,7 @@ public class AccountStrategyContext {
      * @param accountStrategies Spring 容器中所有 {@link IAccountStrategy} 的实现类，不能为 null
      */
     @Autowired
-    public AccountStrategyContext(List<IAccountStrategy> accountStrategies) {
+    public AccountManager(List<IAccountStrategy> accountStrategies) {
         this.accountStrategies = accountStrategies;
     }
 
@@ -106,8 +119,8 @@ public class AccountStrategyContext {
      * @throws ServiceException 当无法识别账号格式或账号格式不符合要求时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
      */
     public void validate(String account) {
-        IAccountStrategy handler = findHandler(account);
-        handler.validate(account);
+        IAccountStrategy strategy = getStrategy(account);
+        strategy.validate(account);
     }
 
     /**
@@ -118,17 +131,18 @@ public class AccountStrategyContext {
      * <p>
      * <b>工作流程：</b>
      * <ol>
-     *     <li>根据账号格式选择合适的策略</li>
-     *     <li>校验账号格式</li>
+     *     <li>根据账号格式自动选择合适的策略（路由）</li>
+     *     <li>调用策略的校验方法校验账号格式</li>
      *     <li>调用策略的查询用户方法</li>
+     *     <li>处理策略返回的 {@code Result} 对象，转换为 {@code AppUserVO} 并处理异常</li>
      * </ol>
      * </p>
      * <p>
      * <b>返回值说明：</b>
      * <ul>
-     *     <li>如果用户存在：返回 {@code Result.success(userVO)}</li>
-     *     <li>如果用户不存在：返回 {@code Result.success()}（data 为 null）</li>
-     *     <li>如果查询失败：返回 {@code Result.fail(...)}</li>
+     *     <li>如果用户存在：返回用户信息对象</li>
+     *     <li>如果用户不存在：返回 null（不会抛出异常）</li>
+     *     <li>如果查询失败：抛出 {@link ServiceException} 异常</li>
      * </ul>
      * </p>
      * <p>
@@ -140,11 +154,11 @@ public class AccountStrategyContext {
      * </p>
      *
      * @param account 待处理的账号（手机号或邮箱等），不能为 null
-     * @return 用户查询结果，如果用户不存在则返回成功结果但 data 为 null
-     * @throws ServiceException 当无法识别账号格式或账号格式不符合要求时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
+     * @return 用户信息对象，如果用户不存在则返回 null
+     * @throws ServiceException 当无法识别账号格式、账号格式不符合要求或查询失败时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
      */
     public AppUserVO validateAndFindUser(String account) {
-        IAccountStrategy strategy = findHandler(account);
+        IAccountStrategy strategy = getStrategy(account);
         strategy.validate(account);
         Result<AppUserVO> result = strategy.findUser(account);
         // 如果说返回回来的整个 result 都是空 或者 压根不等于 SUCCESS，说明系统内部出问题了
@@ -167,16 +181,17 @@ public class AccountStrategyContext {
      * <p>
      * <b>工作流程：</b>
      * <ol>
-     *     <li>根据账号格式选择合适的策略</li>
-     *     <li>校验账号格式</li>
+     *     <li>根据账号格式自动选择合适的策略（路由）</li>
+     *     <li>调用策略的校验方法校验账号格式</li>
      *     <li>调用策略的注册用户方法</li>
+     *     <li>处理策略返回的 {@code Result} 对象，转换为 {@code AppUserVO} 并处理异常</li>
      * </ol>
      * </p>
      * <p>
      * <b>返回值说明：</b>
      * <ul>
-     *     <li>如果注册成功：返回 {@code Result.success(userVO)}</li>
-     *     <li>如果注册失败：返回 {@code Result.fail(...)} 或抛出异常</li>
+     *     <li>如果注册成功：返回注册后的用户信息对象</li>
+     *     <li>如果注册失败：抛出 {@link ServiceException} 异常</li>
      * </ul>
      * </p>
      * <p>
@@ -188,11 +203,11 @@ public class AccountStrategyContext {
      * </p>
      *
      * @param account 待注册的账号（手机号或邮箱等），不能为 null
-     * @return 用户注册结果，如果注册失败则返回失败结果或抛出异常
-     * @throws ServiceException 当无法识别账号格式或账号格式不符合要求时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
+     * @return 注册后的用户信息对象
+     * @throws ServiceException 当无法识别账号格式、账号格式不符合要求或注册失败时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
      */
     public AppUserVO registerUser(String account) {
-        IAccountStrategy strategy = findHandler(account);
+        IAccountStrategy strategy = getStrategy(account);
         strategy.validate(account);
         Result<AppUserVO> result = strategy.registerUser(account);
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
@@ -209,17 +224,18 @@ public class AccountStrategyContext {
      * <p>
      * <b>工作流程：</b>
      * <ol>
-     *     <li>根据账号格式选择合适的策略</li>
-     *     <li>校验账号格式</li>
+     *     <li>根据账号格式自动选择合适的策略（路由）</li>
+     *     <li>调用策略的校验方法校验账号格式</li>
      *     <li>调用策略的查询或注册方法（策略内部会先查询，不存在则注册）</li>
+     *     <li>处理策略返回的 {@code Result} 对象，转换为 {@code AppUserVO} 并处理异常</li>
      * </ol>
      * </p>
      * <p>
      * <b>返回值说明：</b>
      * <ul>
-     *     <li>如果用户存在：返回查询到的用户信息</li>
-     *     <li>如果用户不存在但注册成功：返回注册后的用户信息</li>
-     *     <li>如果用户不存在且注册失败：返回失败结果或抛出异常</li>
+     *     <li>如果用户存在：返回查询到的用户信息对象</li>
+     *     <li>如果用户不存在但注册成功：返回注册后的用户信息对象</li>
+     *     <li>如果用户不存在且注册失败：抛出 {@link ServiceException} 异常</li>
      * </ul>
      * </p>
      * <p>
@@ -231,11 +247,11 @@ public class AccountStrategyContext {
      * </p>
      *
      * @param account 待处理的账号（手机号或邮箱等），不能为 null
-     * @return 用户信息结果，如果查询和注册都失败则返回失败结果或抛出异常
-     * @throws ServiceException 当无法识别账号格式或账号格式不符合要求时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
+     * @return 用户信息对象（查询到的或新注册的）
+     * @throws ServiceException 当无法识别账号格式、账号格式不符合要求或查询/注册失败时抛出异常，错误码为 {@code ResultCode.INVALID_PARA}
      */
     public AppUserVO validateAndFindOrRegisterUser(String account) {
-        IAccountStrategy strategy = findHandler(account);
+        IAccountStrategy strategy = getStrategy(account);
         strategy.validate(account);
         Result<AppUserVO> result = strategy.findOrRegisterUser(account);
         if (result == null || result.getCode() != ResultCode.SUCCESS.getCode() || result.getData() == null) {
@@ -246,24 +262,23 @@ public class AccountStrategyContext {
     }
 
     /**
-     * 查找支持该账号格式的策略
+     * 查找支持该账号格式的策略（路由选择）
      * <p>
      * 从所有注册的策略实现类中，查找支持指定账号格式的策略。<br>
-     * 如果找不到匹配的策略，会抛出异常。
+     * 这是策略模式中的路由选择逻辑，根据账号格式自动查找合适的策略实现。
      * </p>
      *
      * @param account 账号（手机号或邮箱等），不能为 null
      * @return 账号策略，不会为 null
      * @throws ServiceException 如果没有找到匹配的策略，错误码为 {@code ResultCode.INVALID_PARA}，错误信息为"账号格式错误，请输入手机号或邮箱"
      */
-    private IAccountStrategy findHandler(String account) {
-        return accountStrategies.stream()
-                .filter(h -> h.supports(account))
-                .findFirst()
-                .orElseThrow(() -> {
-                            log.error("账号格式错误，请输入手机号或邮箱: {}", account);
-                            return new ServiceException("账号格式错误，请输入手机号或邮箱", ResultCode.INVALID_PARA.getCode());
-                        }
-                );
+    private IAccountStrategy getStrategy(String account) {
+        for (IAccountStrategy strategy : accountStrategies) {
+            if (strategy.supports(account)) {
+                return strategy;
+            }
+        }
+        log.error("账号格式错误，请输入手机号或邮箱: {}", account);
+        throw new ServiceException("账号格式错误，请输入手机号或邮箱", ResultCode.INVALID_PARA.getCode());
     }
 }

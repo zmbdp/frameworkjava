@@ -5,7 +5,7 @@ import com.zmbdp.common.core.utils.VerifyUtil;
 import com.zmbdp.common.domain.constants.MessageConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
-import com.zmbdp.common.message.strategy.CaptchaSenderRouter;
+import com.zmbdp.common.message.router.CaptchaSenderRouter;
 import com.zmbdp.common.message.strategy.ICaptchaSenderStrategy;
 import com.zmbdp.common.ratelimit.annotation.RateLimit;
 import com.zmbdp.common.ratelimit.enums.RateLimitDimension;
@@ -206,7 +206,7 @@ public class CaptchaService {
 
         // 发送线上短信/邮件（根据账号格式自动选择发送器）
         if (sendMessage) {
-            boolean result = captchaSenderRouter.send(account, verifyCode);
+            boolean result = captchaSenderRouter.sendCode(account, verifyCode);
             // 发送失败时，如果使用了固定验证码，则不抛异常（允许失败）
             if (!result && !shouldIgnoreSendFailure(account)) {
                 throw new ServiceException(ResultCode.SEND_MSG_FAILED);
