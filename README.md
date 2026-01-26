@@ -138,12 +138,15 @@ frameworkjava
 └── zmbdp-mstemplate     # 微服务模板（示例，参考用）
 ```
 
-**模块说明**：
-
-- **必须模块**：`zmbdp-gateway`（网关）、`zmbdp-common`（公共能力）是核心基础设施，必须部署
-- **业务模块**：`zmbdp-admin`、`zmbdp-portal`、`zmbdp-file` 是示例业务服务，可根据需要修改或删除
-- **模板模块**：`zmbdp-mstemplate` 定义了标准的微服务开发规范，新建微服务时可直接参考
-
+> **zmbdp-mstemplate 模块说明**：  
+> 这是一个**规范示例模块**，定义了标准的微服务开发规范，包括：
+> - 包结构规范（controller / service / domain / entity 等）
+> - DTO / VO / BO 划分标准
+> - Controller / Service 设计风格
+> - 参数校验、异常处理等最佳实践
+>
+> 新建微服务时，可直接参考此模块的代码风格和结构设计。
+>
 > **完整结构说明**：见 [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
 
 ---
@@ -248,7 +251,7 @@ SDK 开发文档位于项目 `javapro/javadoc` 目录下，基于 JavaDoc 自动
 
 1. **分支规范**：从 `main` 分支创建 `feature/xxx` 或 `fix/xxx` 分支
 2. **提交规范**：使用清晰的提交信息，格式：`type: description`（如：`feat: 新增限流组件`）
-3. **代码规范**：遵循项目现有代码风格，参考 `zmbdp-mstemplate` 模块
+3. **代码规范**：遵循现有项目代码风格，参考 `zmbdp-mstemplate` 模块
 4. **文档完善**：如有新增功能，请同步更新相关文档
 
 > 即使只是一个标点符号的修改，也同样值得一次 Pull Request。
