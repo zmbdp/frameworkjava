@@ -39,3 +39,4 @@ build/
 /deploy/test/app/config/cert/ca.pem
 /deploy/test/app/config/cert/cert.pem
 /deploy/test/app/config/cert/key.pem
+/PROJECT_STRUCTURE_DETAILED.md

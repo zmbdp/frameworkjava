@@ -6,7 +6,7 @@ import com.zmbdp.admin.api.config.domain.dto.ArgumentEditReqDTO;
 import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.api.config.feign.ArgumentServiceApi;
-import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
+import com.zmbdp.admin.service.config.service.ISysArgumentService;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ArgumentController implements ArgumentServiceApi {
      * 参数服务
      */
     @Autowired
-    private ISysArgumentServiceImpl argumentService;
+    private ISysArgumentService argumentService;
 
     /*=============================================    前端调用    =============================================*/
 

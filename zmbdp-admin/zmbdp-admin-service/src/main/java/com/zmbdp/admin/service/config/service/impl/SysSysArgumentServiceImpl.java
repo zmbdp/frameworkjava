@@ -9,7 +9,7 @@ import com.zmbdp.admin.api.config.domain.dto.ArgumentListReqDTO;
 import com.zmbdp.admin.api.config.domain.vo.ArgumentVO;
 import com.zmbdp.admin.service.config.domain.entity.SysArgument;
 import com.zmbdp.admin.service.config.mapper.SysArgumentMapper;
-import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
+import com.zmbdp.admin.service.config.service.ISysArgumentService;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class SysSysArgumentServiceImplImpl implements ISysArgumentServiceImpl {
+public class SysSysArgumentServiceImpl implements ISysArgumentService {
 
     /**
      * 参数表 Mapper

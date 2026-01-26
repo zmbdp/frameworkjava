@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author 稚名不带撇
  */
-public interface ISysArgumentServiceImpl {
+public interface ISysArgumentService {
 
     /*=============================================    前端调用    =============================================*/
 
