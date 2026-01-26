@@ -54,6 +54,7 @@ com.zmbdp.common.idempotent.annotation
 com.zmbdp.common.idempotent.aspect
 com.zmbdp.common.idempotent.enums
 com.zmbdp.common.message.config
+com.zmbdp.common.message.router
 com.zmbdp.common.message.service
 com.zmbdp.common.message.strategy
 com.zmbdp.common.message.strategy.impl
@@ -97,6 +98,8 @@ com.zmbdp.portal.service
 com.zmbdp.portal.service.user.controller
 com.zmbdp.portal.service.user.domain.dto
 com.zmbdp.portal.service.user.domain.vo
+com.zmbdp.portal.service.user.facade
+com.zmbdp.portal.service.user.manager
 com.zmbdp.portal.service.user.service
 com.zmbdp.portal.service.user.service.impl
 com.zmbdp.portal.service.user.strategy.account
