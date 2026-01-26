@@ -115,6 +115,7 @@ A:
 1. 查看文档中心
 2. 提交 GitHub Issue
 3. 发送邮件至：JavaFH@163.com
+4. 查看技术博客：[稚名不带撇](https://blog.51cto.com/bitzmbdp)
 
 ### Q: 项目更新频率？
 
