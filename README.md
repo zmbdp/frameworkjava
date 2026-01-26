@@ -1,6 +1,7 @@
 <div align="center">
 
-# FrameworkJava  
+# FrameworkJava
+
 ### 企业级 Spring Boot 微服务脚手架
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.3-green.svg)](https://spring.io/projects/spring-boot)
@@ -9,8 +10,12 @@
 [![License](https://img.shields.io/github/license/zmbdp/frameworkjava)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/zmbdp/frameworkjava)](https://github.com/zmbdp/frameworkjava/stargazers)
 
-**一个开箱即用的企业级微服务脚手架  
-用于快速构建高可用、高性能、可扩展的 Java 微服务系统**
+**面向真实生产环境的 Spring Boot 微服务工程脚手架，解决"能跑"和"能长期维护"之间的鸿沟。**
+
+**你可以直接获得：**<br>
+一套经过工程化拆分的微服务目录结构<br>
+可直接复用的缓存 / 幂等 / 认证等基础能力<br>
+新服务 10 分钟落地的标准模板<br>
 
 [⚡ 快速开始](#-快速开始) · [✨ 核心特性](#-核心特性) · [📚 文档中心](docs/README.md)
 
@@ -25,7 +30,6 @@
 - [项目结构概览](#-项目结构概览)
 - [快速开始](#-快速开始)
 - [文档中心](#-文档中心)
-- [API 文档](#-api-文档)
 - [SDK 开发文档](#-sdk-开发文档)
 - [参与贡献](#-参与贡献)
 - [联系方式](#-联系方式)
@@ -35,8 +39,9 @@
 
 ## 📖 项目简介
 
-**FrameworkJava** 是一个基于 **Spring Boot 3.x + Spring Cloud 2023** 的企业级微服务脚手架，  
-目标不是"演示功能"，而是**沉淀一套可直接用于真实项目的工程实践**。
+**FrameworkJava** 是一个基于 **Spring Boot 3.x + Spring Cloud 2023** 的企业级微服务脚手架。
+
+本项目并非示例代码，而是从实际业务项目中不断抽象、拆分和沉淀而来，目标是形成一套**长期可维护、可扩展的微服务工程基线**。
 
 > ⚠️ **本项目更适合**：
 > - ✅ 有一定 Spring Boot / Spring Cloud 基础的开发者
@@ -60,35 +65,45 @@
 ## ✨ 核心特性
 
 ### 🚀 一键式环境部署
-Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ），支持 dev/test/prd 多环境配置，**5 分钟快速搭建完整开发环境**，告别繁琐的环境配置
+
+Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ），支持 dev/test/prd 多环境配置，**5 分钟快速搭建完整开发环境
+**，告别繁琐的环境配置
 
 ### 🔐 统一认证与鉴权
+
 JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系，**开箱即用的安全方案**
 
 ### ⚡ 三级缓存体系
+
 布隆过滤器 + Caffeine 本地缓存 + Redis 分布式缓存，**有效防止缓存穿透，性能提升 10 倍+**  
 *（支持 Redis/Fast/Safe 三种布隆过滤器实现，本地缓存支持自定义过期策略，非简单封装）*
 
 ### 🛡️ 分布式幂等性控制
+
 基于 AOP + Redis 的幂等性方案，支持 HTTP / MQ 场景，**针对高并发做了专项优化**，保障数据一致性  
 *（支持防重模式/强幂等模式，Redis + Lua 脚本保证原子性，支持并发穿透控制）*
 
 ### 📦 模块化微服务结构
+
 API 与 Service 分离，公共能力下沉，业务服务解耦，**新业务接入成本降低 80%**
 
 ### 🛠️ 丰富的工具包生态
-**20+ 工具类**（加密、JSON、Excel、邮件、分页、流处理等）+ **3 套策略模式**（登录、验证码发送、账号校验）+ **完整业务能力**（用户、配置、文件、消息等），开箱即用，无需重复造轮子
+
+**20+ 工具类**（加密、JSON、Excel、邮件、分页、流处理等）+ **3 套策略模式**（登录、验证码发送、账号校验）+ **完整业务能力**
+（用户、配置、文件、消息等），开箱即用，无需重复造轮子
 
 ---
 
 ## 🛠️ 技术栈
 
 ### 核心框架
+
 - **Spring Boot 3.3.3** - 企业级应用开发框架
 - **Spring Cloud 2023.0.3** - 微服务治理
 - **Spring Cloud Alibaba 2023.0.1.2** - 阿里云微服务组件
 
 ### 中间件与存储
+
 - **Nacos** - 服务注册发现、配置中心
 - **Redis 7.0** - 分布式缓存（Redisson）
 - **MySQL 8.4** - 关系型数据库
@@ -96,6 +111,7 @@ API 与 Service 分离，公共能力下沉，业务服务解耦，**新业务�
 - **MyBatis Plus 3.5.7** - ORM 框架
 
 ### 工具与组件
+
 - **Hutool 5.8.25** - Java 工具类库
 - **EasyExcel 3.2.1** - Excel 处理
 - **JJWT 0.11.5** - JWT 令牌
@@ -103,6 +119,7 @@ API 与 Service 分离，公共能力下沉，业务服务解耦，**新业务�
 - **Guava** - Google 工具库
 
 ### 其他
+
 - **Docker & Docker Compose** - 容器化部署
 - **Maven** - 项目构建工具
 - **JDK 17** - Java 开发环境
@@ -113,23 +130,20 @@ API 与 Service 分离，公共能力下沉，业务服务解耦，**新业务�
 
 ```
 frameworkjava
-├── zmbdp-gateway        # 网关服务
-├── zmbdp-common         # 公共基础模块
-├── zmbdp-admin          # 管理服务
-├── zmbdp-portal         # 门户服务
-├── zmbdp-file           # 文件服务
-└── zmbdp-mstemplate     # 微服务模板（规范示例，用于统一开发风格）
+├── zmbdp-gateway        # 网关服务（必须）
+├── zmbdp-common         # 公共基础模块（必须）
+├── zmbdp-admin          # 管理服务（业务模块）
+├── zmbdp-portal         # 门户服务（业务模块）
+├── zmbdp-file           # 文件服务（业务模块）
+└── zmbdp-mstemplate     # 微服务模板（示例，参考用）
 ```
 
-> **zmbdp-mstemplate 模块说明**：  
-> 这是一个**规范示例模块**，定义了标准的微服务开发规范，包括：
-> - 包结构规范（controller / service / domain / entity 等）
-> - DTO / VO / BO 划分标准
-> - Controller / Service 设计风格
-> - 参数校验、异常处理等最佳实践
-> 
-> 新建微服务时，可直接参考此模块的代码风格和结构设计。
->
+**模块说明**：
+
+- **必须模块**：`zmbdp-gateway`（网关）、`zmbdp-common`（公共能力）是核心基础设施，必须部署
+- **业务模块**：`zmbdp-admin`、`zmbdp-portal`、`zmbdp-file` 是示例业务服务，可根据需要修改或删除
+- **模板模块**：`zmbdp-mstemplate` 定义了标准的微服务开发规范，新建微服务时可直接参考
+
 > **完整结构说明**：见 [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
 
 ---
@@ -137,6 +151,7 @@ frameworkjava
 ## ⚡ 快速开始
 
 ### 环境要求
+
 - **JDK 17+**
 - **Maven 3.6+**
 - **Docker & Docker Compose**
@@ -144,22 +159,26 @@ frameworkjava
 ### 三步启动
 
 #### 1. 克隆项目
+
 ```bash
 git clone https://github.com/zmbdp/frameworkjava.git
 cd frameworkjava
 ```
 
 #### 2. 启动中间件（一键部署）
+
 ```bash
 cd deploy/dev/app
 docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
 ```
 
 **等待 30-60 秒后，访问以下地址验证：**
+
 - Nacos 控制台：[http://localhost:8848/nacos](http://localhost:8848/nacos) (默认账号/密码: nacos/nacos)
 - RabbitMQ 管理界面：[http://localhost:15672](http://localhost:15672) (默认账号/密码: guest/guest)
 
 #### 3. 启动服务
+
 ```bash
 # 编译项目
 mvn clean install -DskipTests
@@ -175,6 +194,14 @@ mvn spring-boot:run
 
 > **提示**：首次启动会自动初始化数据库和配置，请耐心等待。详细配置说明见 [配置中心文档](docs/CONFIGURATION.md)
 
+### 🎉 启动成功后你可以做什么？
+
+- **统一认证**：通过网关访问登录接口，体验 JWT 无状态认证
+- **配置管理**：在 Nacos 控制台查看完整的配置结构和管理方式
+- **缓存体验**：测试三级缓存（布隆过滤器 + Caffeine + Redis）的命中与降级效果
+- **快速开发**：使用 `zmbdp-mstemplate` 模块作为模板，10 分钟快速新建一个业务微服务
+- **能力验证**：体验幂等性控制、限流防刷、消息发送等核心能力
+
 ---
 
 ## 📚 文档中心
@@ -185,27 +212,16 @@ mvn spring-boot:run
 
 ### 📋 技术文档
 
-| 文档 | 说明 |
-|------|------|
-| [项目结构说明](docs/PROJECT_STRUCTURE.md) | 详细的模块划分和职责说明 |
-| [工具类使用指南](docs/UTILS.md) | 23 个工具类完整说明与使用示例 |
-| [配置中心与环境配置](docs/CONFIGURATION.md) | Nacos 配置、多环境切换指南 |
+| 文档                                   | 说明                            |
+|--------------------------------------|-------------------------------|
+| [项目结构说明](docs/PROJECT_STRUCTURE.md)  | 详细的模块划分和职责说明                  |
+| [工具类使用指南](docs/UTILS.md)             | 23 个工具类完整说明与使用示例              |
+| [配置中心与环境配置](docs/CONFIGURATION.md)   | Nacos 配置、多环境切换指南              |
 | [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
-| [分布式幂等性设计](docs/IDEMPOTENT.md) | 幂等性控制原理与使用指南 |
-| [新增业务模块指南](docs/ADD_NEW_MODULE.md) | 快速创建新微服务模块 |
-| [性能与并发设计](docs/PERFORMANCE.md) | 性能优化策略与并发设计 |
-| [常见问题](docs/FAQ.md) | 开发中常见问题解答 |
-
----
-
-## 📡 API 文档
-
-项目提供完整的 API 文档，方便开发者快速了解和使用接口：
-
-- **在线 API 文档**: [https://zmbdpframeworkjava.apifox.cn](https://zmbdpframeworkjava.apifox.cn)
-- **访问密码**: `zmbdp@123.com`
-
-> 💡 **提示**：API 文档包含所有接口的详细说明、请求参数、响应示例等信息，支持在线测试和调试。
+| [分布式幂等性设计](docs/IDEMPOTENT.md)       | 幂等性控制原理与使用指南                  |
+| [新增业务模块指南](docs/ADD_NEW_MODULE.md)   | 快速创建新微服务模块                    |
+| [性能与并发设计](docs/PERFORMANCE.md)       | 性能优化策略与并发设计                   |
+| [常见问题](docs/FAQ.md)                  | 开发中常见问题解答                     |
 
 ---
 
@@ -227,6 +243,13 @@ SDK 开发文档位于项目 `javapro/javadoc` 目录下，基于 JavaDoc 自动
 - **代码优化**：性能改进、结构调整、最佳实践
 - **新增能力**：通用组件、公共能力、工程规范
 - **Star 支持**：如果这个项目对你有帮助，欢迎 Star 鼓励
+
+### 贡献规范
+
+1. **分支规范**：从 `main` 分支创建 `feature/xxx` 或 `fix/xxx` 分支
+2. **提交规范**：使用清晰的提交信息，格式：`type: description`（如：`feat: 新增限流组件`）
+3. **代码规范**：遵循项目现有代码风格，参考 `zmbdp-mstemplate` 模块
+4. **文档完善**：如有新增功能，请同步更新相关文档
 
 > 即使只是一个标点符号的修改，也同样值得一次 Pull Request。
 
@@ -265,3 +288,50 @@ SDK 开发文档位于项目 `javapro/javadoc` 目录下，基于 JavaDoc 自动
 欢迎交流工程实践与架构设计
 
 </div>
+
+## 📸 架构与界面预览
+
+### 系统整体架构
+
+<table>
+  <tr>
+    <td align="center">
+      <b>功能概述</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E5%8A%9F%E8%83%BD%E6%A6%82%E8%BF%B0.PNG" style="max-width: 100%; height: auto;">
+    </td>
+    <td align="center">
+      <b>系统架构</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E9%A1%B5%E9%9D%A2.png" style="max-width: 100%; height: auto;">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <b>使用手册</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C%E6%88%AA%E5%9B%BE.png" style="max-width: 100%; height: auto;">
+    </td>
+    <td align="center">
+      <b>API文档</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/API%E6%96%87%E6%A1%A3%E6%88%AA%E5%9B%BE.png" style="max-width: 100%; height: auto;">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <b>SDK文档</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/SDK%E6%88%AA%E5%9B%BE.png" style="max-width: 100%; height: auto;">
+    </td>
+    <td align="center">
+      <b>管理端登录页</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E7%99%BB%E5%BD%95%E9%A1%B5.png" style="max-width: 100%; height: auto;">
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <b>管理端管理页</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86%E9%A1%B5.png" style="max-width: 100%; height: auto;">
+    </td>
+    <td align="center">
+      <b>字典管理页</b><br>
+      <img src="https://framework-java-web.oss-cn-shanghai.aliyuncs.com/FrameworkJava/%E5%AD%97%E5%85%B8%E8%AE%BE%E7%BD%AE%E9%A1%B5.png" style="max-width: 100%; height: auto;">
+    </td>
+  </tr>
+</table>
