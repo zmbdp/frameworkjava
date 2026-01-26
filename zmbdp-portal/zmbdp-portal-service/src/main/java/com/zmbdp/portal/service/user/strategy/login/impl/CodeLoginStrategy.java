@@ -2,16 +2,15 @@ package com.zmbdp.portal.service.user.strategy.login.impl;
 
 import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
-import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.message.service.CaptchaService;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import com.zmbdp.portal.service.user.domain.dto.CodeLoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
-import com.zmbdp.portal.service.user.strategy.account.AccountStrategyContext;
+import com.zmbdp.portal.service.user.facade.LoginRouter;
+import com.zmbdp.portal.service.user.manager.AccountManager;
 import com.zmbdp.portal.service.user.strategy.login.ILoginStrategy;
-import com.zmbdp.portal.service.user.strategy.login.LoginRouter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,7 +70,7 @@ public class CodeLoginStrategy implements ILoginStrategy {
      * 账号处理策略路由器
      */
     @Autowired
-    private AccountStrategyContext accountStrategyContext;
+    private AccountManager accountManager;
 
     /**
      * 是否支持当前登录类型
@@ -131,7 +130,7 @@ public class CodeLoginStrategy implements ILoginStrategy {
 
         String account = codeLoginDTO.getAccount();
         // 使用策略模式校验账号格式并查询用户，如果不存在则自动注册（策略自动处理手机号/邮箱）
-        AppUserVO appUserVO = accountStrategyContext.validateAndFindOrRegisterUser(account);
+        AppUserVO appUserVO = accountManager.validateAndFindOrRegisterUser(account);
 
         // 再校验验证码
         if (!captchaService.checkCode(account, codeLoginDTO.getCode())) {

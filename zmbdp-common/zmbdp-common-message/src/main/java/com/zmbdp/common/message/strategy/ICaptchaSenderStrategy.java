@@ -1,5 +1,6 @@
 package com.zmbdp.common.message.strategy;
 
+import com.zmbdp.common.message.router.CaptchaSenderRouter;
 import com.zmbdp.common.message.strategy.impl.AliSmsServiceStrategy;
 import com.zmbdp.common.message.strategy.impl.EmailCodeServiceStrategy;
 
@@ -25,14 +26,14 @@ import com.zmbdp.common.message.strategy.impl.EmailCodeServiceStrategy;
  * <p>
  * <b>使用示例：</b>
  * <ul>
- *     <li>通过路由器获取：使用 {@link CaptchaSenderRouter#send(String, String)} 根据账号类型自动选择</li>
+ *     <li>通过路由器获取：使用 {@link CaptchaSenderRouter#sendCode(String, String)} 根据账号类型自动选择</li>
  *     <li>直接注入实现类：通过 {@code @Qualifier} 指定实现类</li>
  * </ul>
  * <p>
  * <b>使用示例：</b>
  * <pre>{@code
  * // 通过路由器自动选择发送器
- * boolean result = captchaSenderRouter.send("13800138000", "123456");
+ * boolean result = captchaSenderRouter.sendCode("13800138000", "123456");
  *
  * // 直接注入指定实现类
  * @Autowired
