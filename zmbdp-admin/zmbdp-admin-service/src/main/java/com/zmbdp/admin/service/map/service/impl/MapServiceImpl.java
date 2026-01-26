@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.zmbdp.admin.api.map.constants.MapConstants;
 import com.zmbdp.admin.api.map.domain.dto.LocationReqDTO;
 import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
-import com.zmbdp.admin.service.config.service.ISysArgumentServiceImpl;
+import com.zmbdp.admin.service.config.service.ISysArgumentService;
 import com.zmbdp.admin.service.map.domain.dto.*;
 import com.zmbdp.admin.service.map.domain.entity.SysRegion;
 import com.zmbdp.admin.service.map.mapper.RegionMapper;
@@ -46,7 +46,7 @@ public class MapServiceImpl implements IMapService {
      * 参数服务对象
      */
     @Autowired
-    private ISysArgumentServiceImpl sysArgumentService;
+    private ISysArgumentService sysArgumentService;
 
     /**
      * redis 服务对象
