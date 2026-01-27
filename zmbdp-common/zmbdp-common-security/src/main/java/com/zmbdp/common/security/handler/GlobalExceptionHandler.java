@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * 全局异常处理器
  * <p>
- * 统一处理应用程序中抛出的各种异常，将异常信息转换为标准的响应格式返回给客户端。
+ * 统一处理应用程序中抛出的各种异常，将异常信息转换为标准的响应格式返回给客户端。<br>
  * 使用 {@code @RestControllerAdvice} 注解，自动拦截所有控制器抛出的异常。
  * <p>
  * <b>功能特性：</b>
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
     /**
      * 设置 HTTP 响应状态码
      * <p>
-     * 从错误码中提取前三位数字作为 HTTP 状态码。
+     * 从错误码中提取前三位数字作为 HTTP 状态码。<br>
      * 例如：错误码 400001 会设置 HTTP 状态码为 400。
      * <p>
      * <b>使用示例：</b>
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理请求方式不支持异常
      * <p>
-     * 当客户端使用了不支持的 HTTP 请求方式（如 GET、POST、PUT、DELETE 等）时触发。
+     * 当客户端使用了不支持的 HTTP 请求方式（如 GET、POST、PUT、DELETE 等）时触发。<br>
      * 例如：接口只支持 POST 请求，但客户端发送了 GET 请求。
      * <p>
      * <b>使用示例：</b>
@@ -168,7 +168,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理参数类型不匹配异常
      * <p>
-     * 当方法参数类型与请求参数类型不匹配时触发。
+     * 当方法参数类型与请求参数类型不匹配时触发。<br>
      * 例如：接口期望 Long 类型参数，但客户端传递了字符串 "abc"。
      * <p>
      * <b>使用示例：</b>
@@ -209,7 +209,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理 URL 未找到异常
      * <p>
-     * 当请求的 URL 路径不存在时触发。
+     * 当请求的 URL 路径不存在时触发。<br>
      * 例如：客户端请求了不存在的接口路径。
      * <p>
      * <b>使用示例：</b>
@@ -246,7 +246,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理业务异常
      * <p>
-     * 处理应用程序中抛出的业务异常，返回自定义的错误码和错误信息。
+     * 处理应用程序中抛出的业务异常，返回自定义的错误码和错误信息。<br>
      * 业务异常通常用于处理业务逻辑错误，如数据不存在、操作不允许等。
      * <p>
      * <b>使用示例：</b>
@@ -292,7 +292,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理参数校验异常（@Valid 注解）
      * <p>
-     * 处理使用 {@code @Valid} 注解进行参数校验时抛出的异常。
+     * 处理使用 {@code @Valid} 注解进行参数校验时抛出的异常。<br>
      * 当请求参数不符合校验规则时触发，会合并所有校验错误信息。
      * <p>
      * <b>使用示例：</b>
@@ -347,7 +347,7 @@ public class GlobalExceptionHandler {
     /**
      * 合并参数校验异常信息
      * <p>
-     * 将 {@code MethodArgumentNotValidException} 中的所有校验错误信息合并为一个字符串。
+     * 将 {@code MethodArgumentNotValidException} 中的所有校验错误信息合并为一个字符串。<br>
      * 多个错误信息用分号（{@code ;}）分隔。
      * <p>
      * <b>使用示例：</b>
@@ -387,7 +387,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理参数校验异常（@Validated 注解）
      * <p>
-     * 处理使用 {@code @Validated} 注解进行参数校验时抛出的异常。
+     * 处理使用 {@code @Validated} 注解进行参数校验时抛出的异常。<br>
      * 当方法参数或路径变量不符合校验规则时触发。
      * <p>
      * <b>使用示例：</b>
@@ -445,7 +445,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理运行时异常
      * <p>
-     * 处理所有 {@code RuntimeException} 及其子类异常（不包括 {@code ServiceException}）。
+     * 处理所有 {@code RuntimeException} 及其子类异常（不包括 {@code ServiceException}）。<br>
      * 作为系统异常的兜底处理，返回通用错误信息。
      * <p>
      * <b>使用示例：</b>
@@ -495,7 +495,7 @@ public class GlobalExceptionHandler {
     /**
      * 处理系统异常（兜底处理）
      * <p>
-     * 处理所有未被其他异常处理器捕获的异常，作为最后的兜底处理。
+     * 处理所有未被其他异常处理器捕获的异常，作为最后的兜底处理。<br>
      * 确保所有异常都能被正确处理，不会直接暴露给客户端。
      * <p>
      * <b>使用示例：</b>

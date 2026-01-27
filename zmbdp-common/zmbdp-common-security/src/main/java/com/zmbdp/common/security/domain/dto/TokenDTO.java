@@ -1,5 +1,6 @@
 package com.zmbdp.common.security.domain.dto;
 
+import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.vo.TokenVO;
 import lombok.Data;
 
@@ -28,8 +29,7 @@ public class TokenDTO {
      */
     public TokenVO convertToVO() {
         TokenVO tokenVO = new TokenVO();
-        tokenVO.setAccessToken(this.accessToken);
-        tokenVO.setExpires(this.expires);
+        BeanCopyUtil.copyProperties(this, tokenVO);
         return tokenVO;
     }
 }
