@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * JWT（JSON Web Token）工具类
  * <p>
- * 提供 JWT Token 的创建、解析、信息提取等功能。
+ * 提供 JWT Token 的创建、解析、信息提取等功能。<br>
  * 基于 {@code io.jsonwebtoken} 库实现，使用 HS512 算法进行签名。
  * <p>
  * <b>功能特性：</b>
@@ -38,20 +38,20 @@ import java.util.Map;
  * claims.put("user_key", "uuid-123");
  * claims.put("user_id", "123");
  * claims.put("username", "admin");
- * String token = JwtUtil.createToken(claims, "your-secret-key");
+ * String token = JwtUtil.createToken(claims, "your-secret");
  *
  * // 2. 解析 Token
- * Claims parsedClaims = JwtUtil.parseToken(token, "your-secret-key");
+ * Claims parsedClaims = JwtUtil.parseToken(token, "your-secret");
  * String userId = parsedClaims.get("user_id", String.class);
  *
  * // 3. 提取用户标识
- * String userKey = JwtUtil.getUserKey(token, "your-secret-key");
+ * String userKey = JwtUtil.getUserKey(token, "your-secret");
  *
  * // 4. 提取用户ID
- * String userId = JwtUtil.getUserId(token, "your-secret-key");
+ * String userId = JwtUtil.getUserId(token, "your-secret");
  *
  * // 5. 提取用户名
- * String username = JwtUtil.getUserName(token, "your-secret-key");
+ * String username = JwtUtil.getUserName(token, "your-secret");
  * }</pre>
  * <p>
  * <b>注意事项：</b>
@@ -85,7 +85,7 @@ public class JwtUtil {
      * claims.put(SecurityConstants.USER_FROM, "admin");
      *
      * // 生成 Token
-     * String token = JwtUtil.createToken(claims, "your-secret-key-min-64-chars");
+     * String token = JwtUtil.createToken(claims, "your-secret-min-64-chars");
      * // 返回：eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2tleSI6InV1aWQtMTIzLTQ1NiIsInVzZXJfaWQiOiIxMjMifQ...
      * }</pre>
      * <p>
@@ -118,7 +118,7 @@ public class JwtUtil {
      * <pre>{@code
      * // 解析 Token
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
-     * Claims claims = JwtUtil.parseToken(token, "your-secret-key");
+     * Claims claims = JwtUtil.parseToken(token, "your-secret");
      *
      * // 从 Claims 中获取数据
      * String userKey = claims.get("user_key", String.class);
@@ -155,7 +155,7 @@ public class JwtUtil {
      * <pre>{@code
      * // 从 Token 中获取用户标识
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
-     * String userKey = JwtUtil.getUserKey(token, "your-secret-key");
+     * String userKey = JwtUtil.getUserKey(token, "your-secret");
      * // 返回：uuid-123-456
      *
      * // 使用用户标识从 Redis 中获取用户信息
@@ -191,7 +191,7 @@ public class JwtUtil {
      * <b>使用示例：</b>
      * <pre>{@code
      * // 先解析 Token 获取 Claims
-     * Claims claims = JwtUtil.parseToken(token, "your-secret-key");
+     * Claims claims = JwtUtil.parseToken(token, "your-secret");
      *
      * // 从 Claims 中获取用户标识（避免重复解析）
      * String userKey = JwtUtil.getUserKey(claims);
@@ -223,7 +223,7 @@ public class JwtUtil {
      * <pre>{@code
      * // 从 Token 中获取用户ID
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
-     * String userId = JwtUtil.getUserId(token, "your-secret-key");
+     * String userId = JwtUtil.getUserId(token, "your-secret");
      * // 返回：123
      * }</pre>
      * <p>
@@ -252,7 +252,7 @@ public class JwtUtil {
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
-     * Claims claims = JwtUtil.parseToken(token, "your-secret-key");
+     * Claims claims = JwtUtil.parseToken(token, "your-secret");
      * String userId = JwtUtil.getUserId(claims);
      * }</pre>
      *
@@ -273,7 +273,7 @@ public class JwtUtil {
      * <b>使用示例：</b>
      * <pre>{@code
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
-     * String username = JwtUtil.getUserName(token, "your-secret-key");
+     * String username = JwtUtil.getUserName(token, "your-secret");
      * // 返回：admin
      * }</pre>
      *
@@ -308,7 +308,7 @@ public class JwtUtil {
      * <b>使用示例：</b>
      * <pre>{@code
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
-     * String userFrom = JwtUtil.getUserFrom(token, "your-secret-key");
+     * String userFrom = JwtUtil.getUserFrom(token, "your-secret");
      * // 返回：admin
      * }</pre>
      *
@@ -343,7 +343,7 @@ public class JwtUtil {
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
-     * Claims claims = JwtUtil.parseToken(token, "your-secret-key");
+     * Claims claims = JwtUtil.parseToken(token, "your-secret");
      * String userKey = getValue(claims, SecurityConstants.USER_KEY);
      * String userId = getValue(claims, SecurityConstants.USER_ID);
      * }</pre>

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Token 服务类
  * <p>
- * 提供 Token 的创建、验证、刷新、删除等功能，用于管理用户登录状态。
+ * 提供 Token 的创建、验证、刷新、删除等功能，用于管理用户登录状态。<br>
  * 基于 JWT（JSON Web Token）和 Redis 实现，支持 Token 的自动续期机制。
  * <p>
  * <b>功能特性：</b>
@@ -51,14 +51,14 @@ import java.util.concurrent.TimeUnit;
  *
  * public TokenDTO login(LoginUserDTO loginUser) {
  *     // 创建 Token，返回 JWT Token 和过期时间
- *     TokenDTO tokenDTO = tokenService.createToken(loginUser, "your-secret-key");
+ *     TokenDTO tokenDTO = tokenService.createToken(loginUser, "your-secret");
  *     // tokenDTO.getAccessToken() - JWT Token
  *     // tokenDTO.getExpires() - 过期时间（分钟）
  *     return tokenDTO;
  * }
  *
  * // 2. 获取用户信息（验证 Token）
- * LoginUserDTO user = tokenService.getLoginUser("jwt-token-string", "your-secret-key");
+ * LoginUserDTO user = tokenService.getLoginUser("jwt-token-string", "your-secret");
  * if (user != null) {
  *     // 用户已登录，可以使用用户信息
  *     Long userId = user.getUserId();
@@ -70,7 +70,7 @@ import java.util.concurrent.TimeUnit;
  * // 如果 Token 剩余时间少于 120 分钟，会自动续期到 720 分钟
  *
  * // 4. 删除 Token（用户登出时）
- * tokenService.delLoginUser("jwt-token-string", "your-secret-key");
+ * tokenService.delLoginUser("jwt-token-string", "your-secret");
  *
  * // 5. 删除指定用户的登录状态（管理员操作）
  * tokenService.delLoginUser(userId, "admin");
@@ -112,7 +112,7 @@ public class TokenService {
     /**
      * Token 续期阈值（120 分钟）
      * <p>
-     * 当 Token 剩余时间少于 120 分钟时，会自动续期到 720 分钟。
+     * 当 Token 剩余时间少于 120 分钟时，会自动续期到 720 分钟。<br>
      * 计算公式：{@code CacheConstants.REFRESH_TIME * MILLIS_MINUTE}
      */
     private final static Long MILLIS_MINUTE_TEN = CacheConstants.REFRESH_TIME * MILLIS_MINUTE;
@@ -120,7 +120,7 @@ public class TokenService {
     /**
      * Token 过期时间（默认 720 分钟）
      * <p>
-     * Token 在 Redis 中的过期时间，默认值为 720 分钟（12 小时）。
+     * Token 在 Redis 中的过期时间，默认值为 720 分钟（12 小时）。<br>
      * 从 {@link com.zmbdp.common.domain.constants.CacheConstants#EXPIRATION} 获取。
      */
     private final static Long EXPIRE_TIME = CacheConstants.EXPIRATION;
@@ -128,7 +128,7 @@ public class TokenService {
     /**
      * Token 在 Redis 中的 Key 前缀
      * <p>
-     * 完整的 Key 格式：{@code logintoken:uuid}，其中 uuid 是用户登录时生成的唯一标识。
+     * 完整的 Key 格式：{@code logintoken:uuid}，其中 uuid 是用户登录时生成的唯一标识。<br>
      * 从 {@link com.zmbdp.common.domain.constants.TokenConstants#LOGIN_TOKEN_KEY} 获取。
      */
     private final static String ACCESS_TOKEN = TokenConstants.LOGIN_TOKEN_KEY;
@@ -160,7 +160,7 @@ public class TokenService {
      * loginUser.setUserName("admin");
      * loginUser.setUserFrom("admin");
      *
-     * TokenDTO tokenDTO = tokenService.createToken(loginUser, "your-secret-key");
+     * TokenDTO tokenDTO = tokenService.createToken(loginUser, "your-secret");
      * // tokenDTO.getAccessToken() - JWT Token 字符串
      * // tokenDTO.getExpires() - 过期时间（720 分钟）
      *
@@ -228,7 +228,7 @@ public class TokenService {
      * }
      *
      * // 获取用户信息
-     * LoginUserDTO user = tokenService.getLoginUser(token, "your-secret-key");
+     * LoginUserDTO user = tokenService.getLoginUser(token, "your-secret");
      * if (user != null) {
      *     // 用户已登录，可以使用用户信息
      *     Long userId = user.getUserId();
@@ -294,7 +294,7 @@ public class TokenService {
      * private TokenService tokenService;
      *
      * public void doFilter(HttpServletRequest request, HttpServletResponse response) {
-     *     LoginUserDTO user = tokenService.getLoginUser(request, "your-secret-key");
+     *     LoginUserDTO user = tokenService.getLoginUser(request, "your-secret");
      *     if (user != null) {
      *         // 用户已登录，继续处理请求
      *         // 可以将用户信息存储到 ThreadLocal 中
@@ -328,7 +328,7 @@ public class TokenService {
     /**
      * 从当前请求中获取登录用户信息（便捷方法）
      * <p>
-     * 从当前线程的 HTTP 请求中提取 Token，然后获取用户信息。
+     * 从当前线程的 HTTP 请求中提取 Token，然后获取用户信息。<br>
      * 内部调用 {@link com.zmbdp.common.core.utils.ServletUtil#getRequest()} 获取当前请求。
      * <p>
      * <b>使用示例：</b>
@@ -339,7 +339,7 @@ public class TokenService {
      *
      * @GetMapping("/user/info")
      * public Result<LoginUserDTO> getCurrentUser() {
-     *     LoginUserDTO user = tokenService.getLoginUser("your-secret-key");
+     *     LoginUserDTO user = tokenService.getLoginUser("your-secret");
      *     if (user != null) {
      *         return Result.success(user);
      *     } else {
@@ -368,7 +368,7 @@ public class TokenService {
     /**
      * 根据 Token 删除用户登录状态
      * <p>
-     * 从 JWT Token 中解析用户标识，然后删除 Redis 中对应的用户信息。
+     * 从 JWT Token 中解析用户标识，然后删除 Redis 中对应的用户信息。<br>
      * 通常用于用户登出操作。
      * <p>
      * <b>使用示例：</b>
@@ -377,14 +377,14 @@ public class TokenService {
      * @PostMapping("/logout")
      * public Result<String> logout(HttpServletRequest request) {
      *     String token = SecurityUtil.getToken(request);
-     *     tokenService.delLoginUser(token, "your-secret-key");
+     *     tokenService.delLoginUser(token, "your-secret");
      *     return Result.success("登出成功");
      * }
      *
      * // 强制下线（管理员操作）
      * @PostMapping("/admin/forceLogout")
      * public Result<String> forceLogout(@RequestParam String token) {
-     *     tokenService.delLoginUser(token, "your-secret-key");
+     *     tokenService.delLoginUser(token, "your-secret");
      *     return Result.success("强制下线成功");
      * }
      * }</pre>
@@ -419,7 +419,7 @@ public class TokenService {
     /**
      * 根据用户ID和用户来源删除用户登录状态（管理员操作）
      * <p>
-     * 查找所有匹配用户ID和用户来源的登录 Token，并删除对应的用户信息。
+     * 查找所有匹配用户ID和用户来源的登录 Token，并删除对应的用户信息。<br>
      * 用于管理员强制下线指定用户的所有登录会话。
      * <p>
      * <b>使用示例：</b>
@@ -478,7 +478,7 @@ public class TokenService {
     /**
      * 验证并续期 Token
      * <p>
-     * 检查 Token 的剩余时间，如果剩余时间少于 120 分钟，则自动续期到 720 分钟。
+     * 检查 Token 的剩余时间，如果剩余时间少于 120 分钟，则自动续期到 720 分钟。<br>
      * 通常在每个请求的拦截器中调用，确保活跃用户的 Token 不会过期。
      * <p>
      * <b>使用示例：</b>
@@ -492,7 +492,7 @@ public class TokenService {
      *     @Override
      *     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object account) {
      *         // 获取用户信息
-     *         LoginUserDTO user = tokenService.getLoginUser(request, "your-secret-key");
+     *         LoginUserDTO user = tokenService.getLoginUser(request, "your-secret");
      *         if (user != null) {
      *             // 验证并续期 Token（如果剩余时间少于 120 分钟，自动续期）
      *             tokenService.verifyToken(user);
@@ -539,7 +539,7 @@ public class TokenService {
     /**
      * 设置用户身份信息（允许登录）
      * <p>
-     * 将用户信息存储到 Redis 中，用于设置或更新用户登录状态。
+     * 将用户信息存储到 Redis 中，用于设置或更新用户登录状态。<br>
      * 如果用户信息不为空且包含 Token，则刷新 Token 到 Redis。
      * <p>
      * <b>使用示例：</b>
@@ -573,7 +573,7 @@ public class TokenService {
     /**
      * 刷新 Token（缓存用户信息并设置过期时间）
      * <p>
-     * 将用户信息存储到 Redis 中，并设置 Token 的有效期。
+     * 将用户信息存储到 Redis 中，并设置 Token 的有效期。<br>
      * 会更新用户的登录时间和过期时间。
      * <p>
      * <b>执行流程：</b>
