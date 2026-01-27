@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * 安全工具类
  * <p>
- * 提供 Token 提取和处理相关的工具方法。
+ * 提供 Token 提取和处理相关的工具方法。<br>
  * 主要用于从 HTTP 请求中提取 Token，并处理 Token 前缀。
  * <p>
  * <b>功能特性：</b>
@@ -56,7 +56,7 @@ public class SecurityUtil {
     /**
      * 从当前请求中获取 Token
      * <p>
-     * 从当前线程的 HTTP 请求中提取 Token。
+     * 从当前线程的 HTTP 请求中提取 Token。<br>
      * 内部调用 {@link com.zmbdp.common.core.utils.ServletUtil#getRequest()} 获取当前请求。
      * <p>
      * <b>使用示例：</b>
@@ -65,7 +65,7 @@ public class SecurityUtil {
      * String token = SecurityUtil.getToken();
      * if (token != null) {
      *     // Token 存在，可以使用
-     *     LoginUserDTO user = tokenService.getLoginUser(token, "your-secret-key");
+     *     LoginUserDTO user = tokenService.getLoginUser(token, "your-secret");
      * }
      * }</pre>
      * <p>
@@ -98,7 +98,7 @@ public class SecurityUtil {
      *     String token = SecurityUtil.getToken(request);
      *     if (token != null) {
      *         // Token 存在，验证 Token
-     *         LoginUserDTO user = tokenService.getLoginUser(token, "your-secret-key");
+     *         LoginUserDTO user = tokenService.getLoginUser(token, "your-secret");
      *         if (user != null) {
      *             // Token 有效，继续处理请求
      *             return true;
@@ -131,7 +131,7 @@ public class SecurityUtil {
     /**
      * 移除 Token 前缀
      * <p>
-     * 如果 Token 以配置的前缀开头（如 "Bearer "），则移除该前缀。
+     * 如果 Token 以配置的前缀开头（如 "Bearer "），则移除该前缀。<br>
      * 用于处理前端可能添加的 Token 前缀。
      * <p>
      * <b>使用示例：</b>
