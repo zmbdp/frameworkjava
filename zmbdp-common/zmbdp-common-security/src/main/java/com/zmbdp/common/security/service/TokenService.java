@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * <b>Token 结构：</b>
  * <ul>
  *     <li>JWT Token：包含用户标识、用户ID、用户名、用户来源等信息</li>
- *     <li>Redis Key：{@code login_tokens:uuid}，存储完整的用户信息（{@link LoginUserDTO}）</li>
+ *     <li>Redis Key：{@code logintoken:uuid}，存储完整的用户信息（{@link LoginUserDTO}）</li>
  *     <li>UUID：每个用户登录时生成唯一的 UUID 作为用户标识</li>
  * </ul>
  * <p>
@@ -80,7 +80,7 @@ import java.util.concurrent.TimeUnit;
  * <ul>
  *     <li>Token 默认有效期为 720 分钟（12 小时）</li>
  *     <li>当 Token 剩余时间少于 120 分钟时，会自动续期到 720 分钟</li>
- *     <li>Token 存储在 Redis 中，Key 格式：{@code login_tokens:uuid}</li>
+ *     <li>Token 存储在 Redis 中，Key 格式：{@code logintoken:uuid}</li>
  *     <li>每个用户登录时会生成唯一的 UUID 作为用户标识</li>
  *     <li>JWT Token 中包含用户基本信息，但不包含敏感信息</li>
  *     <li>删除用户登录状态时，需要同时匹配用户ID和用户来源</li>
@@ -128,7 +128,7 @@ public class TokenService {
     /**
      * Token 在 Redis 中的 Key 前缀
      * <p>
-     * 完整的 Key 格式：{@code login_tokens:uuid}，其中 uuid 是用户登录时生成的唯一标识。
+     * 完整的 Key 格式：{@code logintoken:uuid}，其中 uuid 是用户登录时生成的唯一标识。
      * 从 {@link com.zmbdp.common.domain.constants.TokenConstants#LOGIN_TOKEN_KEY} 获取。
      */
     private final static String ACCESS_TOKEN = TokenConstants.LOGIN_TOKEN_KEY;
@@ -147,7 +147,7 @@ public class TokenService {
      * 为用户创建登录 Token，包括：
      * <ol>
      *     <li>生成唯一的 UUID 作为用户标识</li>
-     *     <li>将用户信息存储到 Redis（Key：{@code login_tokens:uuid}）</li>
+     *     <li>将用户信息存储到 Redis（Key：{@code logintoken:uuid}）</li>
      *     <li>生成 JWT Token（包含用户标识、用户ID、用户名、用户来源等信息）</li>
      *     <li>返回 Token 和过期时间</li>
      * </ol>
@@ -181,7 +181,7 @@ public class TokenService {
      * <b>注意事项：</b>
      * <ul>
      *     <li>每个用户登录时会生成唯一的 UUID，确保不同登录会话的 Token 不冲突</li>
-     *     <li>用户信息存储在 Redis 中，Key 格式：{@code login_tokens:uuid}</li>
+     *     <li>用户信息存储在 Redis 中，Key 格式：{@code logintoken:uuid}</li>
      *     <li>JWT Token 中包含用户基本信息，但不包含敏感信息</li>
      *     <li>Token 默认有效期为 720 分钟（12 小时）</li>
      *     <li>密钥必须与验证 Token 时使用的密钥一致</li>
@@ -243,7 +243,7 @@ public class TokenService {
      * <ol>
      *     <li>验证 Token 是否为空</li>
      *     <li>从 JWT Token 中解析用户标识（UUID）</li>
-     *     <li>根据用户标识构建 Redis Key：{@code login_tokens:uuid}</li>
+     *     <li>根据用户标识构建 Redis Key：{@code logintoken:uuid}</li>
      *     <li>从 Redis 中获取用户信息（{@link LoginUserDTO}）</li>
      *     <li>返回用户信息，如果 Token 无效或已过期返回 null</li>
      * </ol>
@@ -393,7 +393,7 @@ public class TokenService {
      * <ol>
      *     <li>验证 Token 是否为空</li>
      *     <li>从 JWT Token 中解析用户标识（UUID）</li>
-     *     <li>根据用户标识构建 Redis Key：{@code login_tokens:uuid}</li>
+     *     <li>根据用户标识构建 Redis Key：{@code logintoken:uuid}</li>
      *     <li>从 Redis 中删除用户信息</li>
      * </ol>
      * <p>
@@ -440,7 +440,7 @@ public class TokenService {
      * <b>执行流程：</b>
      * <ol>
      *     <li>验证用户ID是否为空</li>
-     *     <li>查找 Redis 中所有以 {@code login_tokens:} 开头的 Key</li>
+     *     <li>查找 Redis 中所有以 {@code logintoken:} 开头的 Key</li>
      *     <li>遍历所有 Key，获取对应的用户信息</li>
      *     <li>如果用户ID和用户来源都匹配，删除该 Key</li>
      * </ol>
@@ -581,7 +581,7 @@ public class TokenService {
      *     <li>设置登录时间：{@code System.currentTimeMillis()}</li>
      *     <li>计算过期时间：登录时间 + 720 分钟</li>
      *     <li>设置过期时间到用户信息中</li>
-     *     <li>构建 Redis Key：{@code login_tokens:uuid}</li>
+     *     <li>构建 Redis Key：{@code logintoken:uuid}</li>
      *     <li>将用户信息存储到 Redis，过期时间为 720 分钟</li>
      * </ol>
      * <p>
@@ -590,7 +590,7 @@ public class TokenService {
      *     <li>Token 有效期为 720 分钟（{@code EXPIRE_TIME}）</li>
      *     <li>登录时间设置为当前时间（毫秒）</li>
      *     <li>过期时间 = 登录时间 + 720 分钟</li>
-     *     <li>Redis Key 格式：{@code login_tokens:uuid}（uuid 来自 {@code loginUserDTO.getToken()}）</li>
+     *     <li>Redis Key 格式：{@code logintoken:uuid}（uuid 来自 {@code loginUserDTO.getToken()}）</li>
      *     <li>如果 Redis Key 已存在，会覆盖原有数据</li>
      * </ul>
      *
@@ -616,18 +616,18 @@ public class TokenService {
      * <pre>{@code
      * // 用户标识：abc-123-def-456
      * String tokenKey = getTokenKey("abc-123-def-456");
-     * // 返回：login_tokens:abc-123-def-456
+     * // 返回：logintoken:abc-123-def-456
      * }</pre>
      * <p>
      * <b>注意事项：</b>
      * <ul>
-     *     <li>Key 格式：{@code login_tokens:uuid}</li>
+     *     <li>Key 格式：{@code logintoken:uuid}</li>
      *     <li>前缀来自 {@code ACCESS_TOKEN} 常量（{@code TokenConstants.LOGIN_TOKEN_KEY}）</li>
      *     <li>用于在 Redis 中存储和获取用户信息</li>
      * </ul>
      *
      * @param token 用户标识（UUID），不能为 null
-     * @return Redis Key 字符串，格式：{@code login_tokens:uuid}
+     * @return Redis Key 字符串，格式：{@code logintoken:uuid}
      */
     private String getTokenKey(String token) {
         return ACCESS_TOKEN + token;

@@ -159,7 +159,7 @@ public class JwtUtil {
      * // 返回：uuid-123-456
      *
      * // 使用用户标识从 Redis 中获取用户信息
-     * String redisKey = "login_tokens:" + userKey;
+     * String redisKey = "logintoken:" + userKey;
      * LoginUserDTO user = redisService.getCacheObject(redisKey, LoginUserDTO.class);
      * }</pre>
      * <p>
