@@ -29,10 +29,7 @@ public class TokenDTO {
      */
     public TokenVO convertToVO() {
         TokenVO tokenVO = new TokenVO();
-        BeanCopyUtil.copyProperties(
-                            this,
-                tokenVO
-        );
+        BeanCopyUtil.copyProperties(this, tokenVO);
         return tokenVO;
     }
 }
