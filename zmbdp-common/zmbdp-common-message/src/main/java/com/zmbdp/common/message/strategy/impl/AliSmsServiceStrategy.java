@@ -82,7 +82,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 短信模板代码
      * <p>
-     * 配置项：sms.aliyun.templateCode。
+     * 配置项：sms.aliyun.templateCode。<br>
      * 在阿里云短信服务控制台创建的短信模板代码，用于发送验证码短信。<br>
      * 模板中需要包含 {code} 占位符，用于替换验证码。
      */
@@ -92,7 +92,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 短信签名
      * <p>
-     * 配置项：sms.sign-name。
+     * 配置项：sms.sign-name。<br>
      * 在阿里云短信服务控制台申请的短信签名，用于标识发送方。<br>
      * 签名需要审核通过后才能使用。
      */
@@ -115,7 +115,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 是否支持当前账号类型
      * <p>
-     * 判断当前发送器是否支持手机号账号类型。
+     * 判断当前发送器是否支持手机号账号类型。<br>
      * 使用 {@link com.zmbdp.common.core.utils.VerifyUtil#checkPhone(String)} 验证手机号格式。
      *
      * @param account 账号，不能为 null
@@ -129,7 +129,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 发送验证码
      * <p>
-     * 通过阿里云短信服务发送验证码到指定手机号。
+     * 通过阿里云短信服务发送验证码到指定手机号。<br>
      * 使用配置的短信模板和签名发送短信。
      * <p>
      * <b>使用示例：</b>
@@ -173,7 +173,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 发送模板短信
      * <p>
-     * 通过阿里云短信服务 API 发送模板短信。
+     * 通过阿里云短信服务 API 发送模板短信。<br>
      * 根据模板代码和参数构建短信内容并发送。
      * <p>
      * <b>执行流程：</b>

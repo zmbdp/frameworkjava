@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * 幂等性注解
  * <p>
- * 用于标记需要保证幂等性的接口方法，防止重复提交和重复请求。
+ * 用于标记需要保证幂等性的接口方法，防止重复提交和重复请求。<br>
  * 基于 Redis 实现分布式幂等性控制，支持 HTTP 请求和 MQ 消费者两种场景。
  * <p>
  * <b>功能说明：</b>
@@ -176,7 +176,7 @@ public @interface Idempotent {
     /**
      * 幂等性 Token 的请求头名称
      * <p>
-     * 用于指定从 HTTP 请求头或 RabbitMQ 消息头中获取 Token 的字段名称。
+     * 用于指定从 HTTP 请求头或 RabbitMQ 消息头中获取 Token 的字段名称。<br>
      * 支持自定义请求头名称，如 "X-Idempotency-Key"、"X-Request-Id" 等。
      * <p>
      * <b>使用示例：</b>
@@ -218,7 +218,7 @@ public @interface Idempotent {
     /**
      * 重复请求时的错误提示信息
      * <p>
-     * 防重模式下，当检测到重复请求时返回的错误提示信息。
+     * 防重模式下，当检测到重复请求时返回的错误提示信息。<br>
      * 可以根据业务场景自定义提示信息，提高用户体验。
      * <p>
      * <b>使用示例：</b>
@@ -304,7 +304,7 @@ public @interface Idempotent {
     /**
      * 请求参数名称（当 {@code allowParam} 为 true 时使用）
      * <p>
-     * 指定从请求参数中获取 Token 的参数名称。仅当 {@code allowParam = true} 时生效。
+     * 指定从请求参数中获取 Token 的参数名称。仅当 {@code allowParam = true} 时生效。<br>
      * 支持 GET 请求的查询参数和 POST 请求的表单参数。
      * <p>
      * <b>使用示例：</b>
@@ -349,7 +349,7 @@ public @interface Idempotent {
     /**
      * 从方法参数中获取 Token 的 SpEL 表达式
      * <p>
-     * 用于 MQ 消费者等非 HTTP 请求场景，从消息对象中动态提取 Token。
+     * 用于 MQ 消费者等非 HTTP 请求场景，从消息对象中动态提取 Token。<br>
      * 支持字段访问、方法调用、数组索引等多种表达式。
      * <p>
      * <b>SpEL 表达式示例：</b>

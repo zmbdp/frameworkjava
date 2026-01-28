@@ -182,7 +182,7 @@ public class JsonUtil {
      * // }
      *
      * // 用于日志输出
-     * log.debug("用户信息：{}", JsonUtil.classToJsonPretty(user));
+     * log.info("用户信息：{}", JsonUtil.classToJsonPretty(user));
      * }</pre>
      * <p>
      * <b>适用场景：</b>

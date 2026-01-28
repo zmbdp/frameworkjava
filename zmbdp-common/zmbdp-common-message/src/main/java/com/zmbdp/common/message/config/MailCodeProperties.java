@@ -41,10 +41,10 @@ public class MailCodeProperties {
                 subject != null ? subject.size() : 0,
                 content != null ? content.size() : 0);
         if (subject != null && !subject.isEmpty()) {
-            log.debug("邮件标题列表: {}", subject);
+            log.info("邮件标题列表: {}", subject);
         }
         if (content != null && !content.isEmpty()) {
-            log.debug("邮件内容模板数量: {}", content.size());
+            log.info("邮件内容模板数量: {}", content.size());
         }
     }
 }

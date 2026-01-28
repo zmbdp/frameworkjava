@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
 /**
  * Redis 实现的分布式布隆过滤器服务
  * <p>
- * 基于 Redis 的 RedisBloom 模块实现的分布式布隆过滤器。
+ * 基于 Redis 的 RedisBloom 模块实现的分布式布隆过滤器。<br>
  * 支持多实例部署，所有实例共享同一个布隆过滤器，保证数据一致性。
  * <p>
  * <b>核心特性：</b>
@@ -90,7 +90,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * Redis 元素计数 key
      * <p>
-     * 用于在 Redis 中存储布隆过滤器元素计数的键名。
+     * 用于在 Redis 中存储布隆过滤器元素计数的键名。<br>
      * 元素计数用于统计实际添加的元素数量（去重后）。
      */
     private static final String BLOOM_COUNT_KEY = BLOOM_NAME + ":count";
@@ -128,8 +128,8 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 初始化布隆过滤器（RedisBloom 类型）
      * <p>
-     * 使用 RedisBloom 的 BF.RESERVE 命令创建布隆过滤器。
-     * 通过分布式锁保证多实例同时启动时不会重复创建。
+     * 使用 RedisBloom 的 BF.RESERVE 命令创建布隆过滤器。<br>
+     * 通过分布式锁保证多实例同时启动时不会重复创建。<br>
      * 如果布隆过滤器已存在，则跳过创建。
      * <p>
      * <b>初始化流程：</b>
@@ -192,7 +192,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 异步增加 Redis 元素计数，并可选打印自动扩容提示
      * <p>
-     * 在后台线程中异步更新 Redis 中的元素计数，避免阻塞主线程。
+     * 在后台线程中异步更新 Redis 中的元素计数，避免阻塞主线程。<br>
      * 如果启用了扩容检查，会在计数超过阈值时触发扩容提示。
      * <p>
      * <b>执行流程：</b>
@@ -235,7 +235,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 单条添加元素到布隆过滤器
      * <p>
-     * 使用 RedisBloom 的 BF.ADD 命令添加元素。
+     * 使用 RedisBloom 的 BF.ADD 命令添加元素。<br>
      * 如果元素是新增的（之前不存在），会异步更新元素计数。
      * <p>
      * <b>使用示例：</b>
@@ -285,7 +285,7 @@ public class RedisBloomFilterService implements BloomFilterService {
                 incrementBloomCountAsync(1); // 异步增加计数 + 自动扩容提示
                 log.trace("[RedisBloom] 新增元素: {}", key);
             } else {
-                log.debug("[RedisBloom] 元素已存在: {}", key);
+                log.info("[RedisBloom] 元素已存在: {}", key);
             }
         } catch (Exception e) {
             log.error("[RedisBloom] 添加元素失败: {}", key, e);

@@ -38,6 +38,23 @@ public class RateLimitConstants {
     public static final String NACOS_ENABLED = "ratelimit.enabled";
 
     /**
+     * Nacos 配置：限流算法选择
+     * token-bucket = 令牌桶算法（默认）
+     * sliding-window = 滑动窗口算法
+     */
+    public static final String NACOS_ALGORITHM = "ratelimit.algorithm";
+
+    /**
+     * 限流算法值：令牌桶算法
+     */
+    public static final String ALGORITHM_TOKEN_BUCKET = "token-bucket";
+
+    /**
+     * 限流算法值：滑动窗口算法
+     */
+    public static final String ALGORITHM_SLIDING_WINDOW = "sliding-window";
+
+    /**
      * Nacos 配置：Redis 异常时的降级策略
      * true = 失败放行（降级），false = 失败拒绝（保证安全）
      */
@@ -97,7 +114,7 @@ public class RateLimitConstants {
     /**
      * Nacos 配置：IP 请求头名称
      * <p>
-     * 用于指定从 HTTP 请求头中获取客户端 IP 的字段名称。
+     * 用于指定从 HTTP 请求头中获取客户端 IP 的字段名称。<br>
      * 优先级：注解参数 > Nacos 配置 > 默认值（X-Forwarded-For）
      */
     public static final String NACOS_IP_HEADER_NAME = "ratelimit.ip-header-name";
@@ -105,7 +122,7 @@ public class RateLimitConstants {
     /**
      * Nacos 配置：是否允许从请求参数获取 IP
      * <p>
-     * 当无法在请求头中传递 IP 时，可以启用此选项从请求参数中获取 IP。
+     * 当无法在请求头中传递 IP 时，可以启用此选项从请求参数中获取 IP。<br>
      * 优先级：注解参数 > Nacos 配置 > 默认值（false）
      */
     public static final String NACOS_IP_ALLOW_PARAM = "ratelimit.ip-allow-param";
@@ -113,7 +130,7 @@ public class RateLimitConstants {
     /**
      * Nacos 配置：IP 请求参数名称
      * <p>
-     * 指定从请求参数中获取 IP 的参数名称。仅当 {@code ip-allow-param = true} 时生效。
+     * 指定从请求参数中获取 IP 的参数名称。仅当 {@code ip-allow-param = true} 时生效。<br>
      * 优先级：注解参数 > Nacos 配置 > 默认值（"clientIp"）
      */
     public static final String NACOS_IP_PARAM_NAME = "ratelimit.ip-param-name";

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 验证码服务
  * <p>
- * 提供验证码的生成、发送、存储、校验等功能。
+ * 提供验证码的生成、发送、存储、校验等功能。<br>
  * 支持短信和邮件两种发送方式，根据账号格式自动选择发送器。
  * <p>
  * <b>核心功能：</b>
@@ -88,7 +88,7 @@ public class CaptchaService {
     /**
      * 单个手机号/邮箱，每日发送验证码次数的限制
      * <p>
-     * 配置项：captcha.send-limit，默认值为 50。
+     * 配置项：captcha.send-limit，默认值为 50。<br>
      * 超过限制后，当日无法再发送验证码，需要等到次日重置。
      */
     @Value("${captcha.send-limit:50}")
@@ -97,7 +97,7 @@ public class CaptchaService {
     /**
      * 验证码的有效期，单位是分钟
      * <p>
-     * 配置项：captcha.code-expiration，默认值为 5 分钟。
+     * 配置项：captcha.code-expiration，默认值为 5 分钟。<br>
      * 验证码过期后无法使用，需要重新发送。
      */
     @Value("${captcha.code-expiration:5}")
@@ -317,7 +317,8 @@ public class CaptchaService {
     /**
      * 判断是否应该使用固定验证码
      * <p>
-     * 根据配置判断是否使用固定验证码。如果总开关关闭或对应通道关闭，则使用固定验证码。
+     * 根据配置判断是否使用固定验证码。<br>
+     * 如果总开关关闭或对应通道关闭，则使用固定验证码。
      * <p>
      * <b>使用固定验证码的情况：</b>
      * <ul>
@@ -347,7 +348,7 @@ public class CaptchaService {
     /**
      * 判断发送失败时是否应该忽略异常
      * <p>
-     * 如果使用了固定验证码，则发送失败时应该忽略异常（因为验证码已经固定，用户可以直接使用）。
+     * 如果使用了固定验证码，则发送失败时应该忽略异常（因为验证码已经固定，用户可以直接使用）。<br>
      * 此方法直接调用 {@link #shouldUseFixedCode(String)} 方法。
      * <p>
      * <b>使用场景：</b>

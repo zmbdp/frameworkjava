@@ -477,7 +477,7 @@ public class RedissonLockService {
             // isHeldByCurrentThread(): 检查锁是否被当前线程持有
             if (lock.isLocked() && lock.isHeldByCurrentThread()) {
                 lock.unlock();
-                log.debug("RedissonLockService.releaseLock Lock released: {}", lock.getName());
+                log.info("RedissonLockService.releaseLock Lock released: {}", lock.getName());
                 return true;
             }
         } catch (IllegalMonitorStateException e) {

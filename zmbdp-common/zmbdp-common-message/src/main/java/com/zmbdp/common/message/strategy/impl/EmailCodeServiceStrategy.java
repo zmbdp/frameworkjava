@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * 邮件验证码发送策略
  * <p>
- * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于邮件的验证码发送功能。
+ * 实现 {@link ICaptchaSenderStrategy} 接口，提供基于邮件的验证码发送功能。<br>
  * 支持通过邮件发送验证码，支持随机选择邮件标题和内容模板。
  * <p>
  * <b>核心功能：</b>
@@ -122,7 +122,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     /**
      * 是否支持当前账号类型
      * <p>
-     * 判断当前发送器是否支持邮箱账号类型。
+     * 判断当前发送器是否支持邮箱账号类型。<br>
      * 使用 {@link com.zmbdp.common.core.utils.VerifyUtil#checkEmail(String)} 验证邮箱格式。
      *
      * @param account 账号，不能为 null

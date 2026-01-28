@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * 布隆过滤器服务（线程安全版本）
  * <p>
- * 基于 Guava 的 BloomFilter 实现的线程安全布隆过滤器。
+ * 基于 Guava 的 BloomFilter 实现的线程安全布隆过滤器。<br>
  * 使用读写锁（ReentrantReadWriteLock）保证并发安全，适合多线程环境。
  * <p>
  * <b>核心特性：</b>
@@ -78,7 +78,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 精确元素计数器
      * <p>
-     * 使用 AtomicLong 维护精确的元素计数（去重后的元素数量）。
+     * 使用 AtomicLong 维护精确的元素计数（去重后的元素数量）。<br>
      * 线程安全，支持并发更新。
      */
     private final AtomicLong elementCount = new AtomicLong(0);
@@ -86,7 +86,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 存储实际元素的集合（用于扩容时数据迁移）
      * <p>
-     * 维护实际添加的元素集合，用于扩容时将现有元素迁移到新的布隆过滤器。
+     * 维护实际添加的元素集合，用于扩容时将现有元素迁移到新的布隆过滤器。<br>
      * 注意：这会占用额外内存，如果元素数量很大，内存占用会较高。
      */
     private final Set<String> actualElements = new HashSet<>();
@@ -116,7 +116,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 初始化/重置过滤器（线程安全）
      * <p>
-     * 重置布隆过滤器，清空所有元素并重新初始化。
+     * 重置布隆过滤器，清空所有元素并重新初始化。<br>
      * 使用写锁保证线程安全。在应用启动时自动调用（@PostConstruct）。
      * <p>
      * <b>注意事项：</b>
@@ -137,7 +137,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 清空布隆过滤器（线程安全）
      * <p>
-     * 清空布隆过滤器中的所有元素，但保留配置参数。
+     * 清空布隆过滤器中的所有元素，但保留配置参数。<br>
      * 使用写锁保证线程安全。
      * <p>
      * <b>注意事项：</b>
@@ -157,7 +157,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 刷新过滤器实例（线程安全）
      * <p>
-     * 重新创建布隆过滤器实例，清空元素计数和实际元素集合。
+     * 重新创建布隆过滤器实例，清空元素计数和实际元素集合。<br>
      * 使用写锁保证线程安全。
      * <p>
      * <b>执行流程：</b>
@@ -195,7 +195,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 添加元素到布隆过滤器（线程安全）
      * <p>
-     * 将元素添加到布隆过滤器中。使用写锁保证线程安全。
+     * 将元素添加到布隆过滤器中。使用写锁保证线程安全。<br>
      * 只有新元素才会被添加到布隆过滤器和计数器中。
      * <p>
      * <b>使用示例：</b>
@@ -241,7 +241,7 @@ public class SafeBloomFilterService implements BloomFilterService {
                 long count = elementCount.incrementAndGet();
                 checkAndWarnLoadFactor(count);
             } else {
-                log.debug("键已存在: {}", key);
+                log.info("键已存在: {}", key);
             }
         } finally {
             rwLock.writeLock().unlock();
@@ -251,7 +251,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 批量添加元素到布隆过滤器（线程安全）
      * <p>
-     * 将多个元素批量添加到布隆过滤器中。使用写锁保证线程安全。
+     * 将多个元素批量添加到布隆过滤器中。使用写锁保证线程安全。<br>
      * 只有新元素才会被添加。
      * <p>
      * <b>使用示例：</b>
@@ -295,7 +295,7 @@ public class SafeBloomFilterService implements BloomFilterService {
             // 再遍历集合，添加不为空的元素
             for (String key : keys) {
                 if (key == null || key.isEmpty()) {
-                    log.debug("跳过空键");
+                    log.info("跳过空键");
                     continue;
                 }
                 // 完全依赖 Set 判断新元素
@@ -357,7 +357,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 判断集合中是否有任意元素可能存在（线程安全）
      * <p>
-     * 使用读锁批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。
+     * 使用读锁批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。<br>
      * 读操作支持并发。
      * <p>
      * <b>使用示例：</b>
@@ -394,7 +394,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 手动扩容布隆过滤器（线程安全）
      * <p>
-     * 创建新的布隆过滤器，并将现有元素迁移到新过滤器中。
+     * 创建新的布隆过滤器，并将现有元素迁移到新过滤器中。<br>
      * 使用写锁保证线程安全。扩容后元素计数保持不变。
      * <p>
      * <b>使用示例：</b>
@@ -455,7 +455,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 获取当前状态报告（线程安全）
      * <p>
-     * 返回布隆过滤器的详细状态信息，包括预期容量、当前元素数量、负载率、误判率等。
+     * 返回布隆过滤器的详细状态信息，包括预期容量、当前元素数量、负载率、误判率等。<br>
      * 使用读锁保证线程安全。
      * <p>
      * <b>使用示例：</b>

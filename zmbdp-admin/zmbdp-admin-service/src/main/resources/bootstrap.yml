@@ -41,6 +41,17 @@ logging:
     console: '[%thread] %-5level %logger{36} - %msg%n'
   level:
     com.zmbdp.admin.service.map.mapper: debug
+    com.zmbdp.admin.service.config.mapper: debug
+    com.zmbdp.admin.service.user.mapper: debug
+  file:
+    name: ./logs/${spring.application.name}.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ./logs/${spring.application.name}-%d{yyyy-MM-dd}-%i.log
+      max-file-size: 100MB
+      max-history: 30
+      total-size-cap: 3GB
+      clean-history-on-start: false
 
 # MyBatis Plus 配置
 mybatis-plus:

@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 布隆过滤器服务（快速版本，不加锁）
  * <p>
- * 基于 Guava 的 BloomFilter 实现的快速布隆过滤器。
+ * 基于 Guava 的 BloomFilter 实现的快速布隆过滤器。<br>
  * 不使用锁，性能最高，但只适合单线程环境或对线程安全要求不高的场景。
  * <p>
  * <b>核心特性：</b>
@@ -78,7 +78,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 精确元素计数器
      * <p>
-     * 使用 AtomicLong 维护精确的元素计数（去重后的元素数量）。
+     * 使用 AtomicLong 维护精确的元素计数（去重后的元素数量）。<br>
      * 虽然使用 AtomicLong，但由于其他操作不加锁，整体仍不是线程安全的。
      */
     private final AtomicLong elementCount = new AtomicLong(0);
@@ -86,7 +86,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 存储实际元素的集合（用于扩容时的数据迁移）
      * <p>
-     * 维护实际添加的元素集合，用于扩容时将现有元素迁移到新的布隆过滤器。
+     * 维护实际添加的元素集合，用于扩容时将现有元素迁移到新的布隆过滤器。<br>
      * 注意：这会占用额外内存，如果元素数量很大，内存占用会较高。
      */
     private final Set<String> actualElements = new HashSet<>();
@@ -100,7 +100,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * Guava 布隆过滤器实例
      * <p>
-     * 使用 volatile 关键字保证可见性，但不保证原子性。
+     * 使用 volatile 关键字保证可见性，但不保证原子性。<br>
      * 在多线程环境下，替换操作可能不安全。
      */
     private volatile BloomFilter<String> bloomFilter;
@@ -108,7 +108,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 清空布隆过滤器
      * <p>
-     * 清空布隆过滤器中的所有元素，但保留配置参数。
+     * 清空布隆过滤器中的所有元素，但保留配置参数。<br>
      * 通过重新初始化过滤器实现清空效果。
      * <p>
      * <b>注意事项：</b>
@@ -128,7 +128,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 初始化/重置过滤器
      * <p>
-     * 重置布隆过滤器，清空所有元素并重新初始化。
+     * 重置布隆过滤器，清空所有元素并重新初始化。<br>
      * 在应用启动时自动调用（@PostConstruct）。
      * <p>
      * <b>注意事项：</b>
@@ -149,7 +149,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 刷新过滤器实例
      * <p>
-     * 重新创建布隆过滤器实例，清空元素计数和实际元素集合。
+     * 重新创建布隆过滤器实例，清空元素计数和实际元素集合。<br>
      * 使用当前配置参数创建新的布隆过滤器。
      * <p>
      * <b>执行流程：</b>
@@ -180,7 +180,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 手动扩容布隆过滤器
      * <p>
-     * 创建新的布隆过滤器，并将现有元素迁移到新过滤器中。
+     * 创建新的布隆过滤器，并将现有元素迁移到新过滤器中。<br>
      * 扩容后元素计数保持不变。用户可以在修改配置后调用此方法进行扩容。
      * <p>
      * <b>使用示例：</b>
