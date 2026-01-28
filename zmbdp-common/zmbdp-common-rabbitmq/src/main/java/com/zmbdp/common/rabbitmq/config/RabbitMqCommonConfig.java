@@ -17,7 +17,7 @@ public class RabbitMqCommonConfig {
     /**
      * 创建用于 JSON 与 Map 相互转换的消息转换器
      * <p>
-     * 该转换器主要用于 RabbitMQ 等消息中间件中，将 JSON 格式的消息体自动转换为 Map 结构，
+     * 该转换器主要用于 RabbitMQ 等消息中间件中，将 JSON 格式的消息体自动转换为 Map 结构；
      * 或将 Map 结构序列化为 JSON 消息体。特别适用于处理动态结构的消息内容。
      *
      * @return 配置完成的 MessageConverter 实例

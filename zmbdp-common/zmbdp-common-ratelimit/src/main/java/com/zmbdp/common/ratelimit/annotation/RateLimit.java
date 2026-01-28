@@ -179,8 +179,7 @@ public @interface RateLimit {
      * 触发限流时的提示信息
      * <p>
      * 当请求被限流时，返回给客户端的错误提示信息。<br>
-     * 此信息会封装在 {@link com.zmbdp.common.domain.exception.ServiceException} 中，
-     * 最终返回给客户端。
+     * 此信息会封装在 {@link com.zmbdp.common.domain.exception.ServiceException} 中，最终返回给客户端。
      * <p>
      * <b>配置规则：</b>
      * <ul>

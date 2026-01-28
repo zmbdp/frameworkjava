@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
@@ -88,17 +89,13 @@ public class ServletUtil {
      * @return 编码后的内容，如果编码失败则返回空字符串
      */
     public static String urlEncode(String str) {
-        try {
-            return URLEncoder.encode(str, CommonConstants.UTF8);
-        } catch (UnsupportedEncodingException e) {
-            return StringUtil.EMPTY;
-        }
+        return URLEncoder.encode(str, StandardCharsets.UTF_8);
     }
 
     /**
      * 设置 WebFlux 响应（使用默认 HTTP 200 状态码）
      * <p>
-     * 将响应内容写入 WebFlux 响应流，使用统一的 Result 格式包装。
+     * 将响应内容写入 WebFlux 响应流，使用统一的 Result 格式包装。<br>
      * 适用于 WebFlux 响应式编程场景。
      * <p>
      * <b>使用示例：</b>
@@ -164,7 +161,7 @@ public class ServletUtil {
     /**
      * 设置 WebFlux 响应（完整参数）
      * <p>
-     * 将响应内容写入 WebFlux 响应流，使用统一的 Result 格式包装，可指定 HTTP 状态码和 Content-Type。
+     * 将响应内容写入 WebFlux 响应流，使用统一的 Result 格式包装，可指定 HTTP 状态码和 Content-Type。<br>
      * 这是最灵活的版本，支持自定义所有响应参数。
      * <p>
      * <b>使用示例：</b>

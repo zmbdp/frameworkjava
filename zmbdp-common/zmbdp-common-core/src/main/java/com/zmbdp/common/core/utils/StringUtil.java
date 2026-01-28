@@ -55,7 +55,7 @@ public class StringUtil extends StringUtils {
     /**
      * 判断字符串是否与匹配规则列表中的任意一个匹配
      * <p>
-     * 检查指定字符串是否与匹配规则列表中的任意一个规则匹配。
+     * 检查指定字符串是否与匹配规则列表中的任意一个规则匹配。<br>
      * 只要有一个规则匹配成功，就返回 true。
      * <p>
      * <b>使用示例：</b>
@@ -104,7 +104,7 @@ public class StringUtil extends StringUtils {
     /**
      * 判断 URL 是否与规则匹配（Ant 风格路径匹配）
      * <p>
-     * 使用 Spring 的 AntPathMatcher 进行路径匹配，支持通配符匹配。
+     * 使用 Spring 的 AntPathMatcher 进行路径匹配，支持通配符匹配。<br>
      * 适用于 URL 路径匹配、权限控制等场景。
      * <p>
      * <b>匹配规则说明：</b>
