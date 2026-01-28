@@ -336,7 +336,7 @@ public class RedisBloomFilterService implements BloomFilterService {
         for (int i = 0; i < keyList.size(); i += batchSize) {
             List<String> batch = keyList.subList(i, Math.min(i + batchSize, keyList.size()));
             try {
-                // Lua 脚本：统计新增元素数量
+                // Lua 脚本：批量添加元素，BF.MADD 返回数组，每个元素表示对应输入是否是新添加的（1 = 新添加，0 = 已存在）
                 String lua = "return redis.call('BF.MADD', KEYS[1], unpack(ARGV))";
                 Object result = redissonClient.getScript().eval(
                         RScript.Mode.READ_WRITE,
@@ -346,7 +346,19 @@ public class RedisBloomFilterService implements BloomFilterService {
                         batch.toArray(new String[0])
                 );
 
-                long addedCount = result instanceof Number n ? n.longValue() : 0;
+                // BF.MADD 返回数组，需要统计数组中值为 1 的数量（表示新添加的元素）
+                long addedCount = 0;
+                if (result instanceof List<?> resultList) {
+                    for (Object item : resultList) {
+                        if (item instanceof Number num && (num.intValue() == 1 || num.longValue() == 1L)) {
+                            addedCount++;
+                        }
+                    }
+                } else if (result instanceof Number n) {
+                    // 兼容处理：如果返回单个数字，直接使用
+                    addedCount = n.longValue();
+                }
+
                 if (addedCount > 0) {
                     incrementBloomCountAsync(addedCount);
                     log.info("[RedisBloom] 批量新增 {} / {} 个元素", addedCount, batch.size());
@@ -805,8 +817,8 @@ public class RedisBloomFilterService implements BloomFilterService {
             return false;
         }
         try {
-            // 删除布隆过滤器、计数器、配置信息
-            long result = redisService.deleteObject(Arrays.asList(BLOOM_NAME, BLOOM_COUNT_KEY, "{frameworkjava:bloom}:config"));
+            // 删除布隆过滤器和计数器
+            long result = redisService.deleteObject(Arrays.asList(BLOOM_NAME, BLOOM_COUNT_KEY));
 
             log.info("[RedisBloom] 已删除");
             return result > 0;

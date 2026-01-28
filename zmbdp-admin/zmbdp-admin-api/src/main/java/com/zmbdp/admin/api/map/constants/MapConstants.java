@@ -18,6 +18,11 @@ public class MapConstants {
     public final static String CACHE_MAP_CITY_KEY = "map:city:id";
 
     /**
+     * 成视列表缓存锁前缀
+     */
+    public final static String CACHE_MAP_CITY_LOCK_KEY = "map:city:lock:";
+
+    /**
      * 城市拼音缓存 key
      */
     public final static String CACHE_MAP_CITY_PINYIN_KEY = "map:city:pinyin";
