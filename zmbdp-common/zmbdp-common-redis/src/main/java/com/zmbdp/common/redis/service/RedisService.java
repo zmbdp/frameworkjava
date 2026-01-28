@@ -92,7 +92,7 @@ public class RedisService {
     /**
      * Redis 模板对象
      * <p>
-     * Spring Data Redis 提供的 RedisTemplate，用于执行 Redis 操作。
+     * Spring Data Redis 提供的 RedisTemplate，用于执行 Redis 操作。<br>
      * 支持所有 Redis 数据结构类型的操作。
      */
     @Autowired
@@ -144,7 +144,7 @@ public class RedisService {
     /**
      * 为指定的键设置过期时间（支持自定义时间单位）
      * <p>
-     * 如果键不存在，操作会失败。如果键已经有过期时间，会更新为新的过期时间。
+     * 如果键不存在，操作会失败。如果键已经有过期时间，会更新为新的过期时间。<br>
      * 支持的时间单位：SECONDS（秒）、MINUTES（分钟）、HOURS（小时）、DAYS（天）等。
      * <p>
      * <b>使用示例：</b>
@@ -516,7 +516,7 @@ public class RedisService {
                 public List<Object> execute(RedisOperations operations) throws DataAccessException {
                     operations.multi(); // 开启事务
                     try {
-                        ((Consumer) action).accept(operations);
+                        action.accept(operations);
                     } catch (Exception e) {
                         operations.discard(); // 回滚事务
                         throw e;

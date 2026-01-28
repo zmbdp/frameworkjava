@@ -113,7 +113,8 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
      * 此配置用于控制是否实际调用邮件发送服务。
      * <p>
      * <b>注意：</b>此配置项与 {@link com.zmbdp.common.message.service.CaptchaService} 中的 sendMessage 配置项名称相同，
-     * 但作用域不同。此配置仅控制邮件发送，不影响短信发送。
+     * 但作用域不同。<br>
+     * 此配置仅控制邮件发送，不影响短信发送。
      */
     @Value("${captcha.send-message:false}")
     private boolean sendMessage;
