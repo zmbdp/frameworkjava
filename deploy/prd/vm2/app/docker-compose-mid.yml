@@ -44,7 +44,10 @@ services:
         hard: 40000
   frameworkjava-redis04:
     container_name: frameworkjava-redis04
-    image: redis:7.0.15
+    # 带有布隆过滤器版本的 redis 镜像
+    image: redislabs/rebloom:latest
+    # 普通版本 redis 镜像
+    #    image: redis:7.0.15
     ports:
       - "6383:6383"
       - "16383:16383"
@@ -63,7 +66,10 @@ services:
       retries: 3
   frameworkjava-redis05:
     container_name: frameworkjava-redis05
-    image: redis:7.0.15
+    # 带有布隆过滤器版本的 redis 镜像
+    image: redislabs/rebloom:latest
+    # 普通版本 redis 镜像
+    #    image: redis:7.0.15
     ports:
       - "6384:6384"
       - "16384:16384"
@@ -82,7 +88,10 @@ services:
       retries: 3
   frameworkjava-redis06:
     container_name: frameworkjava-redis06
-    image: redis:7.0.15
+    # 带有布隆过滤器版本的 redis 镜像
+    image: redislabs/rebloom:latest
+    # 普通版本 redis 镜像
+    #    image: redis:7.0.15
     ports:
       - "6385:6385"
       - "16385:16385"

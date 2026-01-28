@@ -216,7 +216,7 @@ public class RedisBloomFilterService implements BloomFilterService {
         threadPoolTaskExecutor.execute(() -> {
             try {
                 long total = redisService.incr(BLOOM_COUNT_KEY, delta); // 异步增加计数
-                log.trace("[RedisBloom] 异步增加计数: {}", delta);
+                log.info("[RedisBloom] 异步增加计数: {}", delta);
 
                 if (bloomFilterConfig.isCheckWarning()) {
                     double threshold = bloomFilterConfig.getExpectedInsertions() * bloomFilterConfig.getWarningThreshold();
@@ -283,7 +283,7 @@ public class RedisBloomFilterService implements BloomFilterService {
             boolean added = (result instanceof Integer i && i == 1) || (result instanceof Long l && l == 1L);
             if (added) {
                 incrementBloomCountAsync(1); // 异步增加计数 + 自动扩容提示
-                log.trace("[RedisBloom] 新增元素: {}", key);
+                log.info("[RedisBloom] 新增元素: {}", key);
             } else {
                 log.info("[RedisBloom] 元素已存在: {}", key);
             }
@@ -406,7 +406,7 @@ public class RedisBloomFilterService implements BloomFilterService {
         if (key == null || key.isEmpty()) {
             return false;
         }
-        log.trace("[RedisBloom] 查询元素: {}", key);
+        log.info("[RedisBloom] 查询元素: {}", key);
         try {
             String lua = "return redis.call('BF.EXISTS', KEYS[1], ARGV[1])";
             Object result = redissonClient.getScript().eval(
