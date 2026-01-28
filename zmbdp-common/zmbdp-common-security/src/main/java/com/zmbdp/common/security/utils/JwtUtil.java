@@ -303,13 +303,13 @@ public class JwtUtil {
     /**
      * 从 Token 中获取用户来源
      * <p>
-     * 解析 Token 并提取用户来源（如 "admin"、"portal" 等）。
+     * 解析 Token 并提取用户来源（如 "sys"、"app" 等）。
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
      * String token = "eyJhbGciOiJIUzUxMiJ9...";
      * String userFrom = JwtUtil.getUserFrom(token, "your-secret");
-     * // 返回：admin
+     * // 返回：sys
      * }</pre>
      *
      * @param token  JWT Token 字符串，不能为 null 或空字符串
@@ -338,7 +338,7 @@ public class JwtUtil {
     /**
      * 从数据声明（Claims）中获取指定键的值
      * <p>
-     * 从 Claims 对象中提取指定键的值，并转换为字符串。
+     * 从 Claims 对象中提取指定键的值，并转换为字符串。<br>
      * 如果值为 null，返回空字符串。
      * <p>
      * <b>使用示例：</b>

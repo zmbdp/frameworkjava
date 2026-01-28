@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 /**
  * 微信登录策略
  * <p>
- * 实现 {@link ILoginStrategy} 接口，提供基于微信 OpenId 的登录功能。
+ * 实现 {@link ILoginStrategy} 接口，提供基于微信 OpenId 的登录功能。<br>
  * 支持通过微信 OpenId 查询用户，如果用户不存在则自动注册。
  * <p>
  * <b>核心功能：</b>
@@ -65,7 +65,7 @@ public class WechatLoginStrategy implements ILoginStrategy {
     /**
      * 是否支持当前登录类型
      * <p>
-     * 判断当前策略是否支持微信登录类型。
+     * 判断当前策略是否支持微信登录类型。<br>
      * 通过 instanceof 判断是否为 WechatLoginDTO。
      *
      * @param loginDTO 登录 DTO，不能为 null

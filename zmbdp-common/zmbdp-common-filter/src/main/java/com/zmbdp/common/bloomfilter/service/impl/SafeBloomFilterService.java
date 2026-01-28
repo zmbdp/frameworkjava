@@ -318,7 +318,8 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 检查元素是否可能存在（线程安全）
      * <p>
-     * 使用读锁查询元素是否在布隆过滤器中。读操作支持并发，不会阻塞其他读操作。
+     * 使用读锁查询元素是否在布隆过滤器中。<br>
+     * 读操作支持并发，不会阻塞其他读操作。
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
@@ -497,7 +498,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 计算当前负载率（线程安全）
      * <p>
-     * 负载率 = 已插入元素数 / 预期插入元素数。
+     * 负载率 = 已插入元素数 / 预期插入元素数。<br>
      * 使用读锁保证线程安全。
      * <p>
      * <b>注意事项：</b>
@@ -525,7 +526,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 获取近似元素数量（线程安全）
      * <p>
-     * 从 Guava 的 BloomFilter 获取近似元素数量。
+     * 从 Guava 的 BloomFilter 获取近似元素数量。<br>
      * 使用读锁保证线程安全。
      * <p>
      * <b>注意事项：</b>
@@ -552,7 +553,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 获取精确元素数量（线程安全）
      * <p>
-     * 从 AtomicLong 计数器获取精确的元素数量（去重后的元素数量）。
+     * 从 AtomicLong 计数器获取精确的元素数量（去重后的元素数量）。<br>
      * 使用读锁保证线程安全。
      * <p>
      * <b>注意事项：</b>
@@ -579,7 +580,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 获取实际存储的元素数量（线程安全）
      * <p>
-     * 从 actualElements 集合获取实际存储的元素数量。
+     * 从 actualElements 集合获取实际存储的元素数量。<br>
      * 使用读锁保证线程安全。
      * <p>
      * <b>注意事项：</b>
@@ -669,7 +670,7 @@ public class SafeBloomFilterService implements BloomFilterService {
     /**
      * 删除布隆过滤器（线程安全）
      * <p>
-     * 清空布隆过滤器相关资源，包括布隆过滤器实例、元素计数和实际元素集合。
+     * 清空布隆过滤器相关资源，包括布隆过滤器实例、元素计数和实际元素集合。<br>
      * 使用写锁保证线程安全。
      * <p>
      * <b>使用示例：</b>

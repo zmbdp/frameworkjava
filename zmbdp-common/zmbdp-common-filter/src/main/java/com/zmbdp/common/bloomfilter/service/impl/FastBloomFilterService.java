@@ -295,7 +295,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 批量添加元素到布隆过滤器（高性能，不加锁）
      * <p>
-     * 将多个元素批量添加到布隆过滤器中。通过调用 put 方法逐个添加。
+     * 将多个元素批量添加到布隆过滤器中。通过调用 put 方法逐个添加。<br>
      * 操作不加锁，性能最高，但线程不安全。
      * <p>
      * <b>使用示例：</b>
@@ -384,7 +384,7 @@ public class FastBloomFilterService implements BloomFilterService {
     /**
      * 判断集合中是否有任意元素可能存在（高性能，不加锁）
      * <p>
-     * 批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。
+     * 批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。<br>
      * 操作不加锁，性能最高，但线程不安全。
      * <p>
      * <b>使用示例：</b>
