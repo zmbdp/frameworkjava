@@ -348,23 +348,22 @@ public class TestIdempotentController {
      */
     @GetMapping("/help")
     public Result<String> getTestHelp() {
-        StringBuilder help = new StringBuilder();
-        help.append("============================ 幂等性功能测试说明 ============================\n\n");
-        help.append("【一键测试接口】\n\n");
-        help.append("1. POST mstemplate/test/idempotent/all - 一键测试所有功能\n");
-        help.append("   说明：直接调用此接口即可测试所有幂等性功能，无需传参\n");
-        help.append("   测试内容：HTTP基础功能、HTTP高级功能、MQ基础功能、MQ高级功能\n\n");
-        help.append("2. POST mstemplate/test/idempotent/quick - 快速测试核心功能\n");
-        help.append("   说明：快速测试核心功能，测试时间更短\n\n");
-        help.append("3. GET mstemplate/test/idempotent/help - 获取测试说明（本接口）\n\n");
-        help.append("【测试说明】\n");
-        help.append("- HTTP测试使用OpenFeign客户端自动调用，无需手动传参\n");
-        help.append("- MQ测试直接发送消息到队列，由消费者处理\n");
-        help.append("- 所有测试结果都会在返回的JSON中显示\n");
-        help.append("- 请查看日志和MQ消费者处理结果以获取详细信息\n\n");
-        help.append("======================================================================\n");
+        String help = "============================ 幂等性功能测试说明 ============================\n\n" +
+                "【一键测试接口】\n\n" +
+                "1. POST mstemplate/test/idempotent/all - 一键测试所有功能\n" +
+                "   说明：直接调用此接口即可测试所有幂等性功能，无需传参\n" +
+                "   测试内容：HTTP基础功能、HTTP高级功能、MQ基础功能、MQ高级功能\n\n" +
+                "2. POST mstemplate/test/idempotent/quick - 快速测试核心功能\n" +
+                "   说明：快速测试核心功能，测试时间更短\n\n" +
+                "3. GET mstemplate/test/idempotent/help - 获取测试说明（本接口）\n\n" +
+                "【测试说明】\n" +
+                "- HTTP测试使用OpenFeign客户端自动调用，无需手动传参\n" +
+                "- MQ测试直接发送消息到队列，由消费者处理\n" +
+                "- 所有测试结果都会在返回的JSON中显示\n" +
+                "- 请查看日志和MQ消费者处理结果以获取详细信息\n\n" +
+                "======================================================================\n";
 
-        return Result.success(help.toString());
+        return Result.success(help);
     }
 
     /**
@@ -392,16 +391,16 @@ public class TestIdempotentController {
                     Result<String> response = idempotentTestAPI.testHttpBasicHeader(token);
                     if (isSuccess(response)) {
                         successCount.incrementAndGet();
-                        log.debug("防重模式并发测试 - 线程{}成功", index);
+                        log.info("防重模式并发测试 - 线程{}成功", index);
                     } else {
                         rejectCount.incrementAndGet();
-                        log.debug("防重模式并发测试 - 线程{}被拒绝: {}", index, response.getErrMsg());
+                        log.info("防重模式并发测试 - 线程{}被拒绝: {}", index, response.getErrMsg());
                     }
                 } catch (Exception e) {
                     // 如果是重复请求异常，也算正常
                     if (e.getMessage() != null && e.getMessage().contains("重复")) {
                         rejectCount.incrementAndGet();
-                        log.debug("防重模式并发测试 - 线程{}被拒绝（异常）: {}", index, e.getMessage());
+                        log.info("防重模式并发测试 - 线程{}被拒绝（异常）: {}", index, e.getMessage());
                     } else {
                         errorCount.incrementAndGet();
                         log.warn("防重模式并发测试 - 线程{}异常: {}", index, e.getMessage());
@@ -474,13 +473,13 @@ public class TestIdempotentController {
                         // 原子性地设置第一个结果，只有一个线程能成功
                         if (firstResult.compareAndSet(null, response.getData())) {
                             successCount.incrementAndGet();
-                            log.debug("强幂等模式并发测试 - 线程{}首次成功，结果: {}", index, response.getData());
+                            log.info("强幂等模式并发测试 - 线程{}首次成功，结果: {}", index, response.getData());
                         } else {
                             // 检查是否返回的是缓存结果（时间戳应该相同）
                             String cached = firstResult.get();
                             if (cached != null && cached.equals(response.getData())) {
                                 cachedCount.incrementAndGet();
-                                log.debug("强幂等模式并发测试 - 线程{}返回缓存结果", index);
+                                log.info("强幂等模式并发测试 - 线程{}返回缓存结果", index);
                             } else {
                                 errorCount.incrementAndGet();
                                 log.warn("强幂等模式并发测试 - 线程{}结果不一致，期望: {}，实际: {}",
@@ -554,7 +553,7 @@ public class TestIdempotentController {
                     Result<String> response = idempotentTestAPI.testHttpBasicHeader(token);
                     if (isSuccess(response)) {
                         successCount.incrementAndGet();
-                        log.debug("不同Token并发测试 - 线程{}成功，Token: {}", index, token);
+                        log.info("不同Token并发测试 - 线程{}成功，Token: {}", index, token);
                     } else {
                         errorCount.incrementAndGet();
                         log.warn("不同Token并发测试 - 线程{}失败，Token: {}, 错误: {}", index, token, response.getErrMsg());

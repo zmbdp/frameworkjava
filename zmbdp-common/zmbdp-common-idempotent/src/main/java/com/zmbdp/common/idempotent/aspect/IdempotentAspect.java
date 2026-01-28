@@ -356,7 +356,7 @@ public class IdempotentAspect {
                 }
             }
         } catch (Exception e) {
-            log.debug("从 RabbitMQ 消息头获取 Token 失败: {}", e.getMessage());
+            log.info("从 RabbitMQ 消息头获取 Token 失败: {}", e.getMessage());
         }
         return null;
     }
@@ -371,7 +371,7 @@ public class IdempotentAspect {
     private void cacheResult(String resultKey, Object result, long expireTime) {
         try {
             redisService.setCacheObject(resultKey, result, expireTime, TimeUnit.SECONDS);
-            log.debug("强幂等模式 - 缓存方法结果，Key: {}", resultKey);
+            log.info("强幂等模式 - 缓存方法结果，Key: {}", resultKey);
         } catch (Exception e) {
             log.warn("强幂等模式 - 缓存方法结果失败: {}", e.getMessage());
         }
@@ -404,7 +404,7 @@ public class IdempotentAspect {
     /**
      * 等待结果（强幂等模式）
      * <p>
-     * 当检测到正在执行中或状态未知时，轮询等待结果。
+     * 当检测到正在执行中或状态未知时，轮询等待结果。<br>
      * 重要：此方法不会删除 <code>token</code>，只有持有锁的线程才能删除 <code>token</code>。
      * </p>
      * <p>
@@ -460,7 +460,7 @@ public class IdempotentAspect {
                     }
                 } else if (IdempotentConstants.STATUS_PROCESSING.equals(status)) {
                     // 还在执行中，继续等
-                    log.debug("强幂等模式 - 仍在执行中，继续等待，Token: {}, 重试次数: {}/{}", redisKey, i + 1, maxRetryCount);
+                    log.info("强幂等模式 - 仍在执行中，继续等待，Token: {}, 重试次数: {}/{}", redisKey, i + 1, maxRetryCount);
                     continue;
                 } else {
                     // 状态未知或已过期
@@ -572,7 +572,7 @@ public class IdempotentAspect {
     /**
      * 原子操作：如果状态等于指定值，则删除 Token
      * <p>
-     * 使用 <code>Lua</code> 脚本实现原子操作，避免并发问题。
+     * 使用 <code>Lua</code> 脚本实现原子操作，避免并发问题。<br>
      * 只有当 <code>Token</code> 的状态等于指定状态时，才会删除 <code>Token</code>。
      * </p>
      *
@@ -618,7 +618,7 @@ public class IdempotentAspect {
             }
         } else if (IdempotentConstants.STATUS_PROCESSING.equals(currentStatus)) {
             // 还在执行中，等待结果
-            log.debug("强幂等模式 - 检测到正在执行中，等待结果，Token: {}", idempotentToken);
+            log.info("强幂等模式 - 检测到正在执行中，等待结果，Token: {}", idempotentToken);
             return waitForResult(joinPoint, redisKey, resultKey, isMqConsumer);
         } else if (IdempotentConstants.STATUS_FAILED.equals(currentStatus)) {
             // 执行失败了，也等待一下看看
@@ -714,7 +714,7 @@ public class IdempotentAspect {
     /**
      * 创建 <code>AmqpRejectAndDontRequeueException</code> 异常
      * <p>
-     * 使用反射方式创建，避免编译时依赖 <code>spring-amqp</code>。
+     * 使用反射方式创建，避免编译时依赖 <code>spring-amqp</code>。<br>
      * 该异常会告诉 <code>RabbitMQ</code> 拒绝消息且不要重新入队，直接丢弃消息。
      * </p>
      *

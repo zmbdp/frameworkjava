@@ -10,14 +10,15 @@ import java.lang.annotation.Target;
 /**
  * 频控 / 防刷注解
  * <p>
- * 标记需要限流的方法，基于 <b>AOP + Redis 滑动窗口</b>实现。业务代码无感知，仅加注解即可生效。
+ * 标记需要限流的方法，基于 <b>AOP + Redis</b>实现。业务代码无感知，仅加注解即可生效。
+ * 支持 <b>令牌桶</b>和<b>滑动窗口</b>两种算法，可通过配置 {@code ratelimit.algorithm} 选择，默认使用令牌桶算法。
  * <p>
  * <b>核心特性：</b>
  * <ul>
  *     <li>支持 <b>IP、账号、双维度</b>限流（{@link RateLimitDimension}）</li>
  *     <li>支持 <b>Nacos 热配置</b>，无需重启即可调整限流参数</li>
  *     <li>支持 <b>接口级覆盖</b>，每个方法可独立配置限流规则</li>
- *     <li>基于 <b>滑动窗口算法</b>（ZSET + Lua），限流更平滑，无边界突发问题</li>
+ *     <li>支持 <b>算法选择</b>：令牌桶（允许突发流量）或滑动窗口（精确控制），默认令牌桶</li>
  *     <li>支持 <b>降级策略</b>（fail-open/fail-close），Redis 异常时可配置处理方式</li>
  * </ul>
  * <p>
@@ -79,7 +80,8 @@ import java.lang.annotation.Target;
  *     <li>账号维度（{@code ACCOUNT} 或 {@code BOTH}）未登录时（无 {@code userId} 请求头或无 {@code account} 请求参数）会退化为 IP 限流</li>
  *     <li>双维度限流时，如果未登录，{@code identityKey == ipKey}，只限流一次，避免重复计数</li>
  *     <li>限流基于 Redis，确保 Redis 可用性，建议配置降级策略（{@code ratelimit.fail-open}）</li>
- *     <li>滑动窗口算法使用 ZSET 存储，每个请求会生成一个 UUID 作为 member，注意 Redis 内存占用</li>
+ *     <li>算法选择：通过配置 {@code ratelimit.algorithm} 选择令牌桶（token-bucket，默认）或滑动窗口（sliding-window）</li>
+ *     <li>令牌桶算法使用 Hash 存储桶状态（tokens, lastRefillTime），内存占用较小；滑动窗口使用 ZSET 存储请求时间戳</li>
  * </ul>
  * <p>
  * <b>最佳实践：</b>
@@ -99,10 +101,11 @@ import java.lang.annotation.Target;
 public @interface RateLimit {
 
     /**
-     * 时间窗口内允许的最大请求数
+     * 令牌桶容量（最大令牌数）
      * <p>
-     * 在 {@code windowSec} 时间窗口内，允许的最大请求次数。
-     * 超过此阈值后，后续请求将被拒绝，返回 {@code ResultCode.REQUEST_TOO_FREQUENT}。
+     * 令牌桶的最大容量，也是允许的突发流量上限。
+     * 令牌以固定速率（refillRate = limit / windowSec）持续补充。
+     * 当桶中无令牌时，请求将被拒绝，返回 {@code ResultCode.REQUEST_TOO_FREQUENT}。
      * <p>
      * <b>配置规则：</b>
      * <ul>
@@ -112,19 +115,22 @@ public @interface RateLimit {
      * <p>
      * <b>示例：</b>
      * <ul>
-     *     <li>{@code limit = 10, windowSec = 60}：每分钟最多 10 次请求</li>
-     *     <li>{@code limit = 100, windowSec = 1}：每秒最多 100 次请求</li>
+     *     <li><b>令牌桶</b>：{@code limit = 10, windowSec = 60} 表示桶容量 10，每秒补充 10/60 ≈ 0.167 个令牌，允许突发 10 次请求</li>
+     *     <li><b>滑动窗口</b>：{@code limit = 10, windowSec = 60} 表示在 60 秒时间窗口内最多允许 10 次请求</li>
      * </ul>
      *
-     * @return 限流阈值（时间窗口内最大请求数），默认 0 表示使用全局配置
+     * @return 限流阈值（令牌桶：桶容量/最大令牌数；滑动窗口：时间窗口内最大请求数），默认 0 表示使用全局配置
      */
     int limit() default 0;
 
     /**
      * 时间窗口大小（秒）
      * <p>
-     * 滑动窗口的时间范围，限流统计基于此时间窗口内的请求数。
-     * 使用滑动窗口算法，窗口随请求时间滑动，避免固定窗口的边界突发问题。
+     * 根据配置的算法不同，含义不同：
+     * <ul>
+     *     <li><b>令牌桶</b>：用于计算令牌补充速率（refillRate = limit / windowSec）</li>
+     *     <li><b>滑动窗口</b>：滑动窗口的时间范围，限流统计基于此时间窗口内的请求数，窗口随请求时间滑动，避免固定窗口的边界突发问题</li>
+     * </ul>
      * <p>
      * <b>配置规则：</b>
      * <ul>

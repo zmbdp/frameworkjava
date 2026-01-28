@@ -81,7 +81,7 @@ public class LoginRouter {
     /**
      * 登录策略列表
      * <p>
-     * Spring 会自动注入所有实现了 {@link ILoginStrategy} 接口的 Bean。
+     * Spring 会自动注入所有实现了 {@link ILoginStrategy} 接口的 Bean。<br>
      * 当前包含的策略：
      * <ul>
      *     <li>{@link com.zmbdp.portal.service.user.strategy.login.impl.WechatLoginStrategy}：微信登录策略</li>

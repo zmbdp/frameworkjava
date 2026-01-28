@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 /**
  * 验证码登录策略
  * <p>
- * 实现 {@link ILoginStrategy} 接口，提供基于验证码的登录功能。
+ * 实现 {@link ILoginStrategy} 接口，提供基于验证码的登录功能。<br>
  * 支持手机号和邮箱两种账号类型的验证码登录。
  * <p>
  * <b>核心功能：</b>
@@ -75,7 +75,7 @@ public class CodeLoginStrategy implements ILoginStrategy {
     /**
      * 是否支持当前登录类型
      * <p>
-     * 判断当前策略是否支持验证码登录类型。
+     * 判断当前策略是否支持验证码登录类型。<br>
      * 通过 instanceof 判断是否为 CodeLoginDTO。
      *
      * @param loginDTO 登录 DTO，不能为 null

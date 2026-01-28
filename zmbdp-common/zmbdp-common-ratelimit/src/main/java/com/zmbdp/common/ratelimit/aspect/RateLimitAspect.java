@@ -40,18 +40,24 @@ import java.util.List;
  * 频控 / 防刷切面
  * <p>
  * 拦截带 {@link RateLimit} 注解的方法，在方法执行前进行限流校验。<br>
- * 基于 Redis <b>滑动窗口</b>算法实现，支持 IP、账号双维度限流。
+ * 支持 <b>令牌桶</b>和<b>滑动窗口</b>两种算法，可通过配置 {@code ratelimit.algorithm} 选择，默认使用令牌桶算法。
+ * 支持 IP、账号双维度限流。
  * <p>
- * <b>滑动窗口 vs 固定窗口：</b><br>
- * 滑动窗口按「当前时刻往前 windowSec 秒」统计请求数，窗口随请求时间滑动，
- * 避免固定窗口在边界处的突发流量（如 59s、61s 各打满一次）。
+ * <b>算法说明：</b>
+ * <ul>
+ *     <li><b>令牌桶算法</b>（默认）：维护一个固定容量的令牌桶，以固定速率（refillRate = limit / windowSec）持续补充令牌。
+ *         请求到达时消耗一个令牌，无令牌时拒绝请求。允许突发流量（桶满时），但长期平均速率受限制。
+ *         使用 Redis Hash + Lua 实现，内存占用较小。</li>
+ *     <li><b>滑动窗口算法</b>：按「当前时刻往前 windowSec 秒」统计请求数，窗口随请求时间滑动，
+ *         严格限制时间窗口内的请求数，避免固定窗口的边界突发问题。使用 Redis ZSET + Lua 实现。</li>
+ * </ul>
  * <p>
  * <b>工作原理：</b>
  * <ol>
  *     <li>拦截带 {@code @RateLimit} 的方法</li>
  *     <li>从请求中提取 IP 和用户 ID（从网关下发的 userId 请求头）</li>
  *     <li>根据注解配置的维度（IP/ACCOUNT/BOTH）构建 Redis Key</li>
- *     <li>对每个 Key 用 ZSET 滑动窗口：ZREMRANGEBYSCORE 剔除窗口外、ZCARD 计数、未超限则 ZADD 当前请求</li>
+ *     <li>对每个 Key 执行限流检查（根据配置的算法选择令牌桶或滑动窗口）</li>
  *     <li>任一 Key 超限则抛出 {@link ServiceException} 拒绝请求</li>
  *     <li>否则放行，继续执行原方法</li>
  * </ol>
@@ -87,9 +93,10 @@ import java.util.List;
  *             <li>未找到账号标识时，退化为 IP 维度，避免重复计数</li>
  *         </ul>
  *     </li>
- *     <li>使用滑动窗口（ZSET + Lua）保证原子性，限流更平滑，无边界突发</li>
- *     <li>支持降级策略：Redis 异常时可配置失败放行（fail-open）或失败拒绝（fail-close）</li>
- *     <li>双维度限流时，如果未登录，identityKey == ipKey，只限流一次，避免重复计数</li>
+     *     <li>使用 Lua 脚本保证限流操作的原子性（令牌桶：Hash + Lua，滑动窗口：ZSET + Lua）</li>
+     *     <li>支持算法选择：通过配置 {@code ratelimit.algorithm} 选择令牌桶（token-bucket）或滑动窗口（sliding-window），默认令牌桶</li>
+     *     <li>支持降级策略：Redis 异常时可配置失败放行（fail-open）或失败拒绝（fail-close）</li>
+     *     <li>双维度限流时，如果未登录，identityKey == ipKey，只限流一次，避免重复计数</li>
  * </ul>
  *
  * @author 稚名不带撇
@@ -113,7 +120,7 @@ public class RateLimitAspect {
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
     /**
-     * 限流执行器（滑动窗口实现）
+     * 限流执行器（根据配置选择令牌桶或滑动窗口实现）
      */
     @Autowired
     private RateLimiterExecutor rateLimiter;
@@ -192,8 +199,8 @@ public class RateLimitAspect {
      *     <li>解析配置（注解 > Nacos > 默认值）</li>
      *     <li>提取 IP 和用户 ID</li>
      *     <li>构建限流 Key 列表</li>
-     *     <li>对每个 Key 执行限流检查</li>
-     *     <li>任一 Key 超限则抛出异常，否则放行</li>
+     *     <li>对每个 Key 执行限流检查（根据配置的算法选择令牌桶或滑动窗口）</li>
+     *     <li>任一 Key 无令牌则抛出异常，否则放行</li>
      * </ol>
      * <p>
      * <b>职责说明：</b>
@@ -214,7 +221,7 @@ public class RateLimitAspect {
         // 先检查一下 Http 请求上下文
         HttpServletRequest request = ServletUtil.getRequest();
         if (request == null) {
-            log.debug("RateLimit: 无 HTTP 请求上下文，跳过限流");
+            log.info("RateLimit: 无 HTTP 请求上下文，跳过限流");
             return joinPoint.proceed();
         }
 
@@ -264,7 +271,7 @@ public class RateLimitAspect {
             }
 
             if (!allowed) {
-                // 业务限流：滑动窗口内已超限
+                // 业务限流：触发限流（令牌桶：无可用令牌；滑动窗口：超过时间窗口内最大请求数）
                 log.info("RateLimit: 触发限流 key={} limit={} windowSec={}", key, config.limit(), config.windowSec());
                 throw new ServiceException(config.message(), ResultCode.REQUEST_TOO_FREQUENT.getCode());
             }

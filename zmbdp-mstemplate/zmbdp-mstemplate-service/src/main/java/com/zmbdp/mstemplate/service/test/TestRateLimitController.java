@@ -229,15 +229,15 @@ public class TestRateLimitController {
                         Result<String> response = rateLimitTestApi.testConcurrent();
                         if (isSuccess(response)) {
                             successCount.incrementAndGet();
-                            log.debug("并发测试 - 线程{}成功", index);
+                            log.info("并发测试 - 线程{}成功", index);
                         } else {
                             // 检查是否是限流错误（错误码 400020 或包含"频繁"关键词）
                             if (response.getCode() == ResultCode.REQUEST_TOO_FREQUENT.getCode()) {
                                 limitedCount.incrementAndGet();
-                                log.debug("并发测试 - 线程{}被限流: {}", index, response.getErrMsg());
+                                log.info("并发测试 - 线程{}被限流: {}", index, response.getErrMsg());
                             } else if (response.getErrMsg() != null && response.getErrMsg().contains("频繁")) {
                                 limitedCount.incrementAndGet();
-                                log.debug("并发测试 - 线程{}被限流: {}", index, response.getErrMsg());
+                                log.info("并发测试 - 线程{}被限流: {}", index, response.getErrMsg());
                             } else {
                                 errorCount.incrementAndGet();
                                 log.warn("并发测试 - 线程{}失败: {}", index, response.getErrMsg());
@@ -248,7 +248,7 @@ public class TestRateLimitController {
                         String errorMsg = e.getMessage();
                         if (errorMsg != null && (errorMsg.contains("400020") || errorMsg.contains("频繁") || errorMsg.contains("REQUEST_TOO_FREQUENT"))) {
                             limitedCount.incrementAndGet();
-                            log.debug("并发测试 - 线程{}被限流（异常）: {}", index, errorMsg);
+                            log.info("并发测试 - 线程{}被限流（异常）: {}", index, errorMsg);
                         } else {
                             errorCount.incrementAndGet();
                             log.warn("并发测试 - 线程{}异常: {}", index, errorMsg);
@@ -336,26 +336,25 @@ public class TestRateLimitController {
      */
     @GetMapping("/help")
     public Result<String> getTestHelp() {
-        StringBuilder help = new StringBuilder();
-        help.append("============================ 限流功能测试说明 ============================\n\n");
-        help.append("【一键测试接口】\n\n");
-        help.append("1. POST /test/ratelimit/all - 一键测试所有功能\n");
-        help.append("   说明：直接调用此接口即可测试所有限流功能，无需传参\n");
-        help.append("   测试内容：基础功能、自定义参数、IP获取方式、全局配置、异常情况、并发测试\n\n");
-        help.append("2. POST /test/ratelimit/quick - 快速测试核心功能\n");
-        help.append("   说明：快速测试核心功能，测试时间更短\n\n");
-        help.append("3. POST /test/ratelimit/concurrent?concurrency=50 - 高并发测试\n");
-        help.append("   说明：测试高并发场景下的限流功能，可指定并发量\n\n");
-        help.append("4. GET /test/ratelimit/help - 获取测试说明（本接口）\n\n");
-        help.append("【测试说明】\n");
-        help.append("- HTTP测试使用OpenFeign客户端自动调用，无需手动传参\n");
-        help.append("- 测试了RateLimit注解的所有参数：limit、windowSec、dimensions、message、keySuffix、ipHeaderName、allowIpParam、ipParamName\n");
-        help.append("- 测试了正常和异常情况\n");
-        help.append("- 所有测试结果都会在返回的JSON中显示\n");
-        help.append("- 请查看日志获取详细信息\n\n");
-        help.append("======================================================================\n");
+        String help = "============================ 限流功能测试说明 ============================\n\n" +
+                "【一键测试接口】\n\n" +
+                "1. POST /test/ratelimit/all - 一键测试所有功能\n" +
+                "   说明：直接调用此接口即可测试所有限流功能，无需传参\n" +
+                "   测试内容：基础功能、自定义参数、IP获取方式、全局配置、异常情况、并发测试\n\n" +
+                "2. POST /test/ratelimit/quick - 快速测试核心功能\n" +
+                "   说明：快速测试核心功能，测试时间更短\n\n" +
+                "3. POST /test/ratelimit/concurrent?concurrency=50 - 高并发测试\n" +
+                "   说明：测试高并发场景下的限流功能，可指定并发量\n\n" +
+                "4. GET /test/ratelimit/help - 获取测试说明（本接口）\n\n" +
+                "【测试说明】\n" +
+                "- HTTP测试使用OpenFeign客户端自动调用，无需手动传参\n" +
+                "- 测试了RateLimit注解的所有参数：limit、windowSec、dimensions、message、keySuffix、ipHeaderName、allowIpParam、ipParamName\n" +
+                "- 测试了正常和异常情况\n" +
+                "- 所有测试结果都会在返回的JSON中显示\n" +
+                "- 请查看日志获取详细信息\n\n" +
+                "======================================================================\n";
 
-        return Result.success(help.toString());
+        return Result.success(help);
     }
 
     /*=============================================    Feign 客户端调用的测试接口    =============================================*/

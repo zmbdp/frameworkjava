@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
 /**
  * Redis 实现的分布式布隆过滤器服务
  * <p>
- * 基于 Redis 的 RedisBloom 模块实现的分布式布隆过滤器。
+ * 基于 Redis 的 RedisBloom 模块实现的分布式布隆过滤器。<br>
  * 支持多实例部署，所有实例共享同一个布隆过滤器，保证数据一致性。
  * <p>
  * <b>核心特性：</b>
@@ -90,7 +90,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * Redis 元素计数 key
      * <p>
-     * 用于在 Redis 中存储布隆过滤器元素计数的键名。
+     * 用于在 Redis 中存储布隆过滤器元素计数的键名。<br>
      * 元素计数用于统计实际添加的元素数量（去重后）。
      */
     private static final String BLOOM_COUNT_KEY = BLOOM_NAME + ":count";
@@ -128,8 +128,8 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 初始化布隆过滤器（RedisBloom 类型）
      * <p>
-     * 使用 RedisBloom 的 BF.RESERVE 命令创建布隆过滤器。
-     * 通过分布式锁保证多实例同时启动时不会重复创建。
+     * 使用 RedisBloom 的 BF.RESERVE 命令创建布隆过滤器。<br>
+     * 通过分布式锁保证多实例同时启动时不会重复创建。<br>
      * 如果布隆过滤器已存在，则跳过创建。
      * <p>
      * <b>初始化流程：</b>
@@ -192,7 +192,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 异步增加 Redis 元素计数，并可选打印自动扩容提示
      * <p>
-     * 在后台线程中异步更新 Redis 中的元素计数，避免阻塞主线程。
+     * 在后台线程中异步更新 Redis 中的元素计数，避免阻塞主线程。<br>
      * 如果启用了扩容检查，会在计数超过阈值时触发扩容提示。
      * <p>
      * <b>执行流程：</b>
@@ -235,7 +235,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 单条添加元素到布隆过滤器
      * <p>
-     * 使用 RedisBloom 的 BF.ADD 命令添加元素。
+     * 使用 RedisBloom 的 BF.ADD 命令添加元素。<br>
      * 如果元素是新增的（之前不存在），会异步更新元素计数。
      * <p>
      * <b>使用示例：</b>
@@ -285,7 +285,7 @@ public class RedisBloomFilterService implements BloomFilterService {
                 incrementBloomCountAsync(1); // 异步增加计数 + 自动扩容提示
                 log.trace("[RedisBloom] 新增元素: {}", key);
             } else {
-                log.debug("[RedisBloom] 元素已存在: {}", key);
+                log.info("[RedisBloom] 元素已存在: {}", key);
             }
         } catch (Exception e) {
             log.error("[RedisBloom] 添加元素失败: {}", key, e);
@@ -295,7 +295,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 批量添加元素到布隆过滤器
      * <p>
-     * 使用 RedisBloom 的 BF.MADD 命令批量添加元素。
+     * 使用 RedisBloom 的 BF.MADD 命令批量添加元素。<br>
      * 为了提高性能，会按照配置的批次大小分批处理。
      * <p>
      * <b>使用示例：</b>
@@ -360,7 +360,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 查询元素是否可能存在
      * <p>
-     * 使用 RedisBloom 的 BF.EXISTS 命令查询元素是否存在。
+     * 使用 RedisBloom 的 BF.EXISTS 命令查询元素是否存在。<br>
      * 如果返回 false，则元素一定不存在；如果返回 true，则元素可能存在（可能误判）。
      * <p>
      * <b>使用示例：</b>
@@ -414,7 +414,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 批量查询集合中是否有任意元素可能存在
      * <p>
-     * 使用 Lua 脚本批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。
+     * 使用 Lua 脚本批量查询，只要有一个元素返回 true，就立即返回 true（短路操作）。<br>
      * 适用于批量检查场景，提高查询效率。
      * <p>
      * <b>使用示例：</b>
@@ -477,7 +477,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 清空布隆过滤器和计数（配置不变）
      * <p>
-     * 删除 Redis 中的布隆过滤器和计数器，然后重新初始化。
+     * 删除 Redis 中的布隆过滤器和计数器，然后重新初始化。<br>
      * 使用分布式锁保证多实例安全，避免并发清空导致的问题。
      * <p>
      * <b>使用示例：</b>
@@ -524,7 +524,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 重置布隆过滤器（删除原有并重新初始化）
      * <p>
-     * 删除 Redis 中的布隆过滤器和计数器，然后使用当前配置重新初始化。
+     * 删除 Redis 中的布隆过滤器和计数器，然后使用当前配置重新初始化。<br>
      * 使用分布式锁保证多实例安全。
      * <p>
      * <b>使用示例：</b>
@@ -573,7 +573,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 扩容布隆过滤器（RedisBloom 自动扩容，无需手动操作）
      * <p>
-     * RedisBloom 模块支持自动扩容，当元素数量超过预期值时，会自动扩容。
+     * RedisBloom 模块支持自动扩容，当元素数量超过预期值时，会自动扩容。<br>
      * 因此此方法只需要记录日志，无需执行实际扩容操作。
      * <p>
      * <b>使用示例：</b>
@@ -636,7 +636,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 计算负载因子
      * <p>
-     * 负载因子 = 已插入元素数 / 预期插入元素数。
+     * 负载因子 = 已插入元素数 / 预期插入元素数。<br>
      * 负载因子越高，误判率越高。当负载因子接近 1 时，建议扩容或重置。
      * <p>
      * <b>使用示例：</b>
@@ -742,7 +742,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 获取实际存储的元素数量（从 Redis 计数器获取）
      * <p>
-     * 从 Redis 计数器获取实际元素数量，并转换为 int 类型。
+     * 从 Redis 计数器获取实际元素数量，并转换为 int 类型。<br>
      * 如果数量超过 Integer.MAX_VALUE，返回 Integer.MAX_VALUE。
      * <p>
      * <b>注意事项：</b>
@@ -764,7 +764,7 @@ public class RedisBloomFilterService implements BloomFilterService {
     /**
      * 删除布隆过滤器（不重新创建）
      * <p>
-     * 完全删除 Redis 中的布隆过滤器、计数器和配置信息。
+     * 完全删除 Redis 中的布隆过滤器、计数器和配置信息。<br>
      * 删除后不会自动重新创建，需要手动调用 {@link #reset()} 方法重新初始化。
      * <p>
      * <b>使用示例：</b>

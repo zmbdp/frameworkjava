@@ -1,7 +1,9 @@
 package com.zmbdp.common.ratelimit.executor.impl;
 
+import com.zmbdp.common.domain.constants.RateLimitConstants;
 import com.zmbdp.common.ratelimit.executor.RateLimiterExecutor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,10 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(
+        name = RateLimitConstants.NACOS_ALGORITHM,
+        havingValue = RateLimitConstants.ALGORITHM_SLIDING_WINDOW
+)
 public class RedisSlidingWindowRateLimiter implements RateLimiterExecutor {
 
     /**
