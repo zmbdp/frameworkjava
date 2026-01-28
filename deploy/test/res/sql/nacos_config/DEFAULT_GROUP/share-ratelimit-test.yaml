@@ -3,13 +3,22 @@ ratelimit:
   # 全局开关，false 时关闭所有 @RateLimit 限流
   enabled: true
 
+  # 限流算法选择
+  # token-bucket = 令牌桶算法（默认）：允许突发流量，适合需要平滑限流的场景
+  # sliding-window = 滑动窗口算法：严格限制时间窗口内的请求数，适合需要精确控制的场景
+  algorithm: "token-bucket"
+
   # Redis Key 前缀，用于区分限流相关的 Key。
   key-prefix: "ratelimit:"
 
-  # 全局默认：时间窗口内最大请求数（注解未配置时使用）
+  # 全局默认：限流阈值（注解未配置时使用）
+  # 令牌桶算法：桶容量（最大令牌数），允许的突发流量上限
+  # 滑动窗口算法：时间窗口内最大请求数
   default-limit: 30
 
   # 全局默认：时间窗口秒数（注解未配置时使用）
+  # 令牌桶算法：用于计算令牌补充速率（refillRate = limit / windowSec）
+  # 滑动窗口算法：滑动窗口的时间范围，限流统计基于此时间窗口内的请求数
   default-window-sec: 60
 
   # 全局默认：触发限流时的提示信息（注解未配置时使用）

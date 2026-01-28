@@ -59,7 +59,7 @@ public enum IdempotentMode {
     /**
      * 使用全局配置
      * <p>
-     * 如果全局配置 {@code idempotent.return-cached-result} 为 true，则开启强幂等模式；
+     * 如果全局配置 {@code idempotent.return-cached-result} 为 true，则开启强幂等模式；<br>
      * 如果为 false 或未配置，则使用防重模式。
      * <p>
      * <b>使用示例：</b>

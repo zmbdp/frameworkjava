@@ -1,4 +1,4 @@
-package com.zmbdp.admin.service.config.comtroller;
+package com.zmbdp.admin.service.config.controller;
 
 import com.zmbdp.admin.api.config.domain.dto.*;
 import com.zmbdp.admin.api.config.domain.vo.DictionaryDataVO;
