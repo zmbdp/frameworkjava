@@ -9,7 +9,7 @@ com.zmbdp.admin.api.map.domain.dto
 com.zmbdp.admin.api.map.domain.vo
 com.zmbdp.admin.api.map.feign
 com.zmbdp.admin.service
-com.zmbdp.admin.service.config.comtroller
+com.zmbdp.admin.service.config.controller
 com.zmbdp.admin.service.config.domain.entity
 com.zmbdp.admin.service.config.mapper
 com.zmbdp.admin.service.config.service
