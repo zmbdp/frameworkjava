@@ -147,11 +147,12 @@ public class ResetBloomFilterTimedTask {
             }
 
             // 添加用户 ID
-            bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+            bloomFilterService.put(APP_USER_PREFIX + appUser.getId());
         }
 
         if (count != appUsers.size()) {
             log.warn("布隆过滤器刷新用户任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查 -----------------------", count, appUsers.size());
+            return;
         }
         log.info("布隆过滤器刷新用户任务执行完成，共加载 {} 个用户数据 -----------------------", count);
     }

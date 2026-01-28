@@ -162,7 +162,7 @@ public class MapServiceImpl implements IMapService {
     public List<SysRegionDTO> getCityListV1() {
         // 继续优化，使用看门狗分布式锁来确定只有一个线程需要查数据库
         // 先获取到一把锁
-        RLock lock = redissonLockService.acquire(MapConstants.CACHE_MAP_CITY_KEY, 3, TimeUnit.SECONDS);// 加锁
+        RLock lock = redissonLockService.acquire(MapConstants.CACHE_MAP_CITY_LOCK_KEY, 3, TimeUnit.SECONDS);// 加锁
         // 如果说未获取到锁，那就返回空
         if (null == lock) {
             return CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {

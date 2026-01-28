@@ -400,7 +400,7 @@ public class RateLimitAspect {
             return StringUtil.isNotEmpty(userId) ? userId.trim() : null;
         } catch (Exception e) {
             // Token 解析失败（可能是未登录或 Token 无效），忽略异常
-            log.trace("RateLimit: 从 JWT Token 提取 userId 失败", e);
+            log.warn("RateLimit: 从 JWT Token 提取 userId 失败", e);
             return null;
         }
     }
@@ -425,7 +425,7 @@ public class RateLimitAspect {
             }
             return null;
         } catch (Exception e) {
-            log.trace("RateLimit: 从请求参数提取 account 失败", e);
+            log.error("RateLimit: 从请求参数提取 account 失败", e);
             return null;
         }
     }
@@ -491,7 +491,7 @@ public class RateLimitAspect {
 
             return null;
         } catch (Exception e) {
-            log.trace("RateLimit: 从方法参数提取 account 失败", e);
+            log.warn("RateLimit: 从方法参数提取 account 失败", e);
             return null;
         }
     }
