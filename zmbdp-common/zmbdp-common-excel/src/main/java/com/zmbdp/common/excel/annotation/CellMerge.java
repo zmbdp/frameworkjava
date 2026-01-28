@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Excel 单元格合并注解
  * <p>
- * 用于标记需要合并的 Excel 列，相同值的连续单元格会自动合并。需配合 {@link CellMergeStrategy} 策略使用，
+ * 用于标记需要合并的 Excel 列，相同值的连续单元格会自动合并。需配合 {@link CellMergeStrategy} 策略使用。<br>
  * 在调用 {@link com.zmbdp.common.excel.util.ExcelUtil#outputExcel(List, String, Class, boolean, HttpServletResponse)}
  * 时设置 {@code merge=true} 启用合并功能。
  *
@@ -106,8 +106,8 @@ public @interface CellMerge {
     /**
      * 列索引（从 0 开始）
      * <p>
-     * 用于指定需要合并的列在 Excel 中的位置。当字段在类中的声明顺序与 Excel 列顺序不一致时，
-     * 需要明确指定列索引。
+     * 用于指定需要合并的列在 Excel 中的位置。<br>
+     * 当字段在类中的声明顺序与 Excel 列顺序不一致时，需要明确指定列索引。
      *
      * <p>
      * <b>取值说明：</b>
@@ -120,8 +120,7 @@ public @interface CellMerge {
      * <b>使用建议：</b>
      * <ul>
      *     <li>如果字段顺序与 Excel 列顺序一致，使用默认值 -1 即可</li>
-     *     <li>如果字段顺序与 Excel 列顺序不一致（如使用了 {@code @ExcelProperty#index}），
-     *         需要明确指定 {@code index} 值</li>
+     *     <li>如果字段顺序与 Excel 列顺序不一致（如使用了 {@code @ExcelProperty#index}），需要明确指定 {@code index} 值</li>
      *     <li>确保指定的索引值在有效范围内（0 到字段总数-1），否则可能导致合并位置错误</li>
      * </ul>
      *

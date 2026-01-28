@@ -39,7 +39,7 @@ public class BeanCopyUtil extends BeanUtils {
     /**
      * 批量拷贝 List 集合中的元素到目标类型的新集合
      * <p>
-     * 将源 List 中的每个元素拷贝到目标类型的新实例中，并返回新的 List 集合。
+     * 将源 List 中的每个元素拷贝到目标类型的新实例中，并返回新的 List 集合。<br>
      * 适用于批量转换场景，如将 Entity 列表转换为 DTO 列表。
      * <p>
      * <b>使用示例：</b>
@@ -87,7 +87,7 @@ public class BeanCopyUtil extends BeanUtils {
     /**
      * 批量拷贝 Map 集合中的 value 元素到目标类型的新 Map
      * <p>
-     * 将源 Map 中的每个 value 拷贝到目标类型的新实例中，保持原有的 key 不变，返回新的 Map 集合。
+     * 将源 Map 中的每个 value 拷贝到目标类型的新实例中，保持原有的 key 不变，返回新的 Map 集合。<br>
      * 适用于需要转换 Map 中 value 类型的场景。
      * <p>
      * <b>使用示例：</b>
@@ -136,7 +136,7 @@ public class BeanCopyUtil extends BeanUtils {
     /**
      * 批量拷贝 Map 集合中嵌套的 List 元素（支持复杂泛型嵌套）
      * <p>
-     * 将源 Map 中每个 key 对应的 List&lt;S&gt; 转换为 List&lt;T&gt;，保持原有的 key 不变。
+     * 将源 Map 中每个 key 对应的 List&lt;S&gt; 转换为 List&lt;T&gt;，保持原有的 key 不变。<br>
      * 适用于 Map 的 value 是 List 集合，且需要转换 List 中元素类型的场景。
      * <p>
      * <b>使用示例：</b>

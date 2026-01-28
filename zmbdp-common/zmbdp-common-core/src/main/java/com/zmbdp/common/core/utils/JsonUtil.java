@@ -74,7 +74,7 @@ public class JsonUtil {
     /**
      * 创建一个 ObjectMapper 对象，这个对象会根据我们后续的配置，进行 json 转换
      */
-    private static ObjectMapper OBJECT_MAPPER;
+    private static final ObjectMapper OBJECT_MAPPER;
 
     /**
      * 静态代码块，初始化 ObjectMapper 对象
@@ -118,7 +118,7 @@ public class JsonUtil {
     /**
      * 对象转 JSON 字符串
      * <p>
-     * 将 Java 对象转换为 JSON 字符串，使用紧凑格式（无换行和缩进）。
+     * 将 Java 对象转换为 JSON 字符串，使用紧凑格式（无换行和缩进）。<br>
      * 如果对象为 null 或已经是 String 类型，直接返回。
      * <p>
      * <b>使用示例：</b>
@@ -165,7 +165,7 @@ public class JsonUtil {
     /**
      * 对象转 JSON 格式字符串（美化格式）
      * <p>
-     * 将 Java 对象转换为格式化的 JSON 字符串，包含换行和缩进，便于阅读和调试。
+     * 将 Java 对象转换为格式化的 JSON 字符串，包含换行和缩进，便于阅读和调试。<br>
      * 如果对象为 null 或已经是 String 类型，直接返回。
      * <p>
      * <b>使用示例：</b>
@@ -222,7 +222,7 @@ public class JsonUtil {
     /**
      * JSON 字符串转对象
      * <p>
-     * 将 JSON 字符串转换为指定类型的 Java 对象。
+     * 将 JSON 字符串转换为指定类型的 Java 对象。<br>
      * 支持自动忽略 JSON 中的未知属性，不会因为 JSON 中有对象类中不存在的属性而抛出异常。
      * <p>
      * <b>使用示例：</b>
@@ -279,7 +279,7 @@ public class JsonUtil {
     /**
      * JSON 转换为自定义对象（支持复杂泛型嵌套）
      * <p>
-     * 使用 TypeReference 支持复杂泛型类型的 JSON 转换，如 List&lt;Map&lt;String, UserDTO&gt;&gt; 等。
+     * 使用 TypeReference 支持复杂泛型类型的 JSON 转换，如 List&lt;Map&lt;String, UserDTO&gt;&gt; 等。<br>
      * 适用于需要转换复杂嵌套结构的场景。
      * <p>
      * <b>使用示例：</b>
@@ -339,7 +339,7 @@ public class JsonUtil {
     /**
      * JSON 转 List 集合
      * <p>
-     * 将 JSON 数组字符串转换为指定元素类型的 List 集合。
+     * 将 JSON 数组字符串转换为指定元素类型的 List 集合。<br>
      * 适用于将 JSON 数组转换为 Java List 的场景。
      * <p>
      * <b>使用示例：</b>
@@ -389,7 +389,7 @@ public class JsonUtil {
     /**
      * JSON 转 Map 集合
      * <p>
-     * 将 JSON 对象字符串转换为 Map&lt;String, T&gt; 集合。
+     * 将 JSON 对象字符串转换为 Map&lt;String, T&gt; 集合。<br>
      * Map 的 key 必须是 String 类型，value 是指定的类型。
      * <p>
      * <b>使用示例：</b>

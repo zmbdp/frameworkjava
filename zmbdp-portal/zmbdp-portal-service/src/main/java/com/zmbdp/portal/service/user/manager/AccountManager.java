@@ -75,7 +75,7 @@ public class AccountManager {
     /**
      * 所有注册的账号策略实现类列表
      * <p>
-     * Spring 会自动注入所有实现了 {@link IAccountStrategy} 接口的 Bean，
+     * Spring 会自动注入所有实现了 {@link IAccountStrategy} 接口的 Bean；<br>
      * 如：{@link PhoneAccountStrategy}、{@link EmailAccountStrategy} 等。
      * </p>
      */
@@ -126,7 +126,7 @@ public class AccountManager {
     /**
      * 校验账号格式并查询用户
      * <p>
-     * 此方法会先校验账号格式，然后根据账号类型查询用户信息，
+     * 此方法会先校验账号格式，然后根据账号类型查询用户信息。<br>
      * 避免后续代码重复判断账号类型和重复查询。
      * <p>
      * <b>工作流程：</b>
