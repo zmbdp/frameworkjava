@@ -1,16 +1,16 @@
 package com.zmbdp.common.domain.exception;
 
 import com.zmbdp.common.domain.domain.ResultCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 自定义异常
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ServiceException extends RuntimeException {
 
     /**

@@ -3,6 +3,7 @@ package com.zmbdp.admin.api.map.domain.dto;
 import com.zmbdp.common.domain.domain.dto.BasePageReqDTO;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 查询请求 DTO
@@ -10,6 +11,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PlaceSearchReqDTO extends BasePageReqDTO {
 
     /**

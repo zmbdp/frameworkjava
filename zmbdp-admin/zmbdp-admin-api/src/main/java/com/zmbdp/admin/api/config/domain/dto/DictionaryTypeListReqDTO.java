@@ -2,6 +2,7 @@ package com.zmbdp.admin.api.config.domain.dto;
 
 import com.zmbdp.common.domain.domain.dto.BasePageReqDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 字典类型列表 DTO
@@ -9,6 +10,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class DictionaryTypeListReqDTO extends BasePageReqDTO {
 
     /**

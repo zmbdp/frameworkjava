@@ -3,16 +3,14 @@ package com.zmbdp.admin.service.config.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 系统参数表对应的实体类
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
 @TableName("sys_argument")
 public class SysArgument {
 

@@ -1,15 +1,13 @@
 package com.zmbdp.mstemplate.service.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 区划测试实体
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
 public class RegionTest {
 
     /**

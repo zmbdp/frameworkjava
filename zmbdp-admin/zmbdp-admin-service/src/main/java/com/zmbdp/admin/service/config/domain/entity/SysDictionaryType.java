@@ -3,16 +3,14 @@ package com.zmbdp.admin.service.config.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 字典类型表
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
 @TableName("sys_dictionary_type") // 表和实体类映射
 public class SysDictionaryType {
 

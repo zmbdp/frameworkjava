@@ -36,7 +36,7 @@ import java.util.Collections;
 @ConditionalOnProperty(
         name = RateLimitConstants.NACOS_ALGORITHM,
         havingValue = RateLimitConstants.ALGORITHM_TOKEN_BUCKET,
-        matchIfMissing = true  // 默认使用令牌桶算法
+        matchIfMissing = true // 默认使用令牌桶算法
 )
 public class RedisTokenBucketRateLimiter implements RateLimiterExecutor {
 
@@ -193,9 +193,9 @@ public class RedisTokenBucketRateLimiter implements RateLimiterExecutor {
 
         // 记录令牌桶状态日志
         if (result == 1L) {
-            log.info("令牌桶限流通过：key={}, 桶总容量={}, 剩余令牌={}", key, limit, remainingTokens);
+            log.info("令牌桶限流通过：key = {}, 桶总容量 = {}, 剩余令牌 = {}", key, limit, remainingTokens);
         } else {
-            log.info("令牌桶限流拒绝：key={}, 桶总容量={}, 剩余令牌={}（无可用令牌）", key, limit, remainingTokens);
+            log.info("令牌桶限流拒绝：key = {}, 桶总容量 = {}, 剩余令牌 = {}（无可用令牌）", key, limit, remainingTokens);
         }
 
         return result == 1L;
