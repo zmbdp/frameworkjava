@@ -81,12 +81,14 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
     public BasePageVO<DictionaryTypeVO> listType(DictionaryTypeListReqDTO dictionaryTypeListReqDTO) {
         BasePageVO<DictionaryTypeVO> result = new BasePageVO<>();
         LambdaQueryWrapper<SysDictionaryType> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtil.isNotBlank(dictionaryTypeListReqDTO.getValue())) {
-            queryWrapper.like(SysDictionaryType::getValue, dictionaryTypeListReqDTO.getValue());
-        }
-        if (StringUtil.isNotBlank(dictionaryTypeListReqDTO.getTypeKey())) {
-            queryWrapper.eq(SysDictionaryType::getTypeKey, dictionaryTypeListReqDTO.getTypeKey());
-        }
+        queryWrapper.like(
+                StringUtil.isNotBlank(dictionaryTypeListReqDTO.getValue()),
+                SysDictionaryType::getValue, dictionaryTypeListReqDTO.getValue()
+        );
+        queryWrapper.eq(
+                StringUtil.isNotBlank(dictionaryTypeListReqDTO.getTypeKey()),
+                SysDictionaryType::getTypeKey, dictionaryTypeListReqDTO.getTypeKey()
+        );
         Page<SysDictionaryType> page = sysDictionaryTypeMapper.selectPage(
                 new Page<>(
                         // 传入第几页一页几条，就会查询记录并翻页
@@ -191,9 +193,10 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         LambdaQueryWrapper<SysDictionaryData> queryWrapper = new LambdaQueryWrapper<>();
         // 构建查询条件
         queryWrapper.eq(SysDictionaryData::getTypeKey, dictionaryDataListReqDTO.getTypeKey());
-        if (StringUtil.isNotBlank(dictionaryDataListReqDTO.getValue())) {
-            queryWrapper.like(SysDictionaryData::getValue, dictionaryDataListReqDTO.getValue());
-        }
+        queryWrapper.like(
+                StringUtil.isNotBlank(dictionaryDataListReqDTO.getValue()),
+                SysDictionaryData::getValue, dictionaryDataListReqDTO.getValue()
+        );
         // 根据排序字段升序排序
         queryWrapper.orderByAsc(SysDictionaryData::getSort);
         // 如果说排序字段一样，就根据 id 升序排序

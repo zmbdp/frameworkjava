@@ -1,15 +1,13 @@
 package com.zmbdp.file.api.domain.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 文件信息
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
 public class FileReqDTO {
 
     /**

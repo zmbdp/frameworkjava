@@ -1,15 +1,13 @@
 package com.zmbdp.admin.service.map.domain.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * 区域信息 DTO
  *
  * @author 稚名不带撇
  */
-@Getter
-@Setter
+@Data
 public class SysRegionDTO {
 
     /**
