@@ -4,6 +4,7 @@ import com.zmbdp.admin.service.user.domain.vo.SysUserLoginVO;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.security.domain.dto.LoginUserDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * B端登录用户信息 DTO
@@ -11,6 +12,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SysUserLoginDTO extends LoginUserDTO {
 
     /**

@@ -3,6 +3,7 @@ package com.zmbdp.admin.service.user.domain.vo;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.vo.LoginUserVO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * B端用户登录信息
@@ -10,6 +11,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SysUserLoginVO extends LoginUserVO {
 
     /**

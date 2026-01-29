@@ -3,6 +3,7 @@ package com.zmbdp.admin.api.config.domain.dto;
 import com.zmbdp.common.domain.domain.dto.BasePageReqDTO;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 字典数据列表 DTO
@@ -10,6 +11,7 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class DictionaryDataListReqDTO extends BasePageReqDTO {
 
     /**

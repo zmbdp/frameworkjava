@@ -2,6 +2,7 @@ package com.zmbdp.admin.api.appuser.domain.dto;
 
 import com.zmbdp.common.domain.domain.dto.BasePageReqDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AppUserListReqDTO extends BasePageReqDTO implements Serializable {
 
     /**
