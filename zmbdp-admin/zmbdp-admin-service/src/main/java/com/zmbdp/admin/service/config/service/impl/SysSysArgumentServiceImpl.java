@@ -73,12 +73,14 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
     public BasePageVO<ArgumentVO> listArgument(ArgumentListReqDTO argumentListReqDTO) {
         // 查询数据库，查出所有符合的参数列表
         LambdaQueryWrapper<SysArgument> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtil.isNotBlank(argumentListReqDTO.getConfigKey())) {
-            queryWrapper.eq(SysArgument::getConfigKey, argumentListReqDTO.getConfigKey());
-        }
-        if (StringUtil.isNotBlank(argumentListReqDTO.getName())) {
-            queryWrapper.like(SysArgument::getName, argumentListReqDTO.getName());
-        }
+        queryWrapper.eq(
+                StringUtil.isNotBlank(argumentListReqDTO.getConfigKey()),
+                SysArgument::getConfigKey, argumentListReqDTO.getConfigKey()
+        );
+        queryWrapper.like(
+                StringUtil.isNotBlank(argumentListReqDTO.getName()),
+                SysArgument::getName, argumentListReqDTO.getName()
+        );
         Page<SysArgument> page = sysArgumentMapper.selectPage(
                 new Page<>(argumentListReqDTO.getPageNo().longValue(), argumentListReqDTO.getPageSize().longValue()),
                 queryWrapper
@@ -141,7 +143,7 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
                 .eq(SysArgument::getConfigKey, configKey)
         );
         ArgumentDTO argumentDTO = new ArgumentDTO();
-        if (sysArgument != null){
+        if (sysArgument != null) {
             BeanCopyUtil.copyProperties(sysArgument, argumentDTO);
         }
         return argumentDTO;
