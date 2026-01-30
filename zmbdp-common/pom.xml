@@ -27,6 +27,7 @@
         <module>zmbdp-common-idempotent</module>
         <module>zmbdp-common-ratelimit</module>
         <module>zmbdp-common-excel</module>
+        <module>zmbdp-common-log</module>
     </modules>
 
     <properties>
