@@ -142,11 +142,19 @@ public class LogActionAspect {
      * <p>
      * 用于记录没有注解的方法的基本信息（异常堆栈、方法耗时、traceId、调用链等）
      * 可通过配置 {@code log.global-record-enabled} 控制是否启用
+     * <p>
+     * <b>排除说明：</b>
+     * <ul>
+     *     <li>排除 {@link ILogStorageService} 实现类，避免日志存储时触发无限递归</li>
+     *     <li>排除 {@link LogActionAspect} 自身，避免切面方法被拦截</li>
+     * </ul>
      */
     @Pointcut("(@within(org.springframework.web.bind.annotation.RestController) || " +
             "@within(org.springframework.stereotype.Controller) || " +
             "@within(org.springframework.stereotype.Service)) && " +
-            "execution(public * *(..))")
+            "execution(public * *(..)) && " +
+            "!within(com.zmbdp.common.log.service.impl..*) && " +
+            "!within(com.zmbdp.common.log.aspect.LogActionAspect)")
     public void globalRecordPointcut() {
     }
 
