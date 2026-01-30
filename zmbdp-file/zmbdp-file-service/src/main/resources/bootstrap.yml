@@ -27,11 +27,12 @@ logging:
   pattern:
     console: '[%thread] %-5level %logger{36} - %msg%n'
   file:
-    name: ./logs/${spring.application.name}.log
+    name: ./logs/${spring.application.name}.log # 日志文件名
   logback:
     rollingpolicy:
+      # 日志滚动策略
       file-name-pattern: ./logs/%d{yyyy-MM-dd}/${spring.application.name}-%d{yyyy-MM-dd}-%i.log
-      max-file-size: 100MB
-      max-history: 30
-      total-size-cap: 3GB
-      clean-history-on-start: false
+      max-file-size: 100MB # 日志文件最大大小
+      max-history: 3 # 日志文件保留天数
+      total-size-cap: 3GB # 日志文件总大小
+      clean-history-on-start: false # 是否在启动时清理历史日志
