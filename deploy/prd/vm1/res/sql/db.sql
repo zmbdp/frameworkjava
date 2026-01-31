@@ -5,6 +5,38 @@ SET NAMES utf8mb4;
 
 use `frameworkjava_prd`;
 
+DROP TABLE IF EXISTS `operation_log`;
+CREATE TABLE `operation_log`
+(
+    `id` bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `operation`       varchar(255) NOT NULL COMMENT '操作描述',
+    `method`          varchar(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
+    `request_path`    varchar(500)  DEFAULT NULL COMMENT '请求路径',
+    `request_method`  varchar(10)   DEFAULT NULL COMMENT '请求方式（GET/POST/PUT/DELETE等）',
+    `params`          text COMMENT '方法入参（JSON格式）',
+    `result`          text COMMENT '方法返回值（JSON格式）',
+    `exception`       varchar(1000) DEFAULT NULL COMMENT '异常信息',
+    `exception_stack` text COMMENT '异常堆栈',
+    `user_id`         bigint(20) DEFAULT NULL COMMENT '操作者用户ID',
+    `user_name`       varchar(100)  DEFAULT NULL COMMENT '操作者用户名',
+    `client_ip`       varchar(50)   DEFAULT NULL COMMENT '客户端IP地址',
+    `user_agent`      varchar(500)  DEFAULT NULL COMMENT '请求来源（User-Agent）',
+    `operation_time`  datetime     NOT NULL COMMENT '操作时间',
+    `cost_time`       bigint(20) DEFAULT NULL COMMENT '方法执行耗时（毫秒）',
+    `status`          varchar(20)  NOT NULL COMMENT '操作状态（SUCCESS/FAILED）',
+    `module`          varchar(100)  DEFAULT NULL COMMENT '业务模块',
+    `business_type`   varchar(100)  DEFAULT NULL COMMENT '业务类型',
+    `ext_info`        text COMMENT '扩展字段（JSON格式）',
+    `trace_id`        varchar(100)  DEFAULT NULL COMMENT '调用链追踪ID',
+    `span_id`         varchar(100)  DEFAULT NULL COMMENT '调用链跨度ID',
+    PRIMARY KEY (`id`),
+    KEY               `idx_operation_time` (`operation_time`),
+    KEY               `idx_user_id` (`user_id`),
+    KEY               `idx_status` (`status`),
+    KEY               `idx_module` (`module`),
+    KEY               `idx_trace_id` (`trace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+
 CREATE TABLE `sys_region`
 (
     `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
@@ -4608,6 +4640,7 @@ CREATE TABLE `sys_user`
 ) ENGINE=InnoDB AUTO_INCREMENT=10000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='管理端人员表';
 
 insert into `sys_user` (nick_name, phone_number, password, identity, remark, status)
-values ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e', '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
+values ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
+        '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
 
 commit;

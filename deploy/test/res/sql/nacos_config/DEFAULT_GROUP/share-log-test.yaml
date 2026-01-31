@@ -1,0 +1,63 @@
+# 操作日志配置（支持 Nacos 热更新）
+log:
+  # 全局开关，false 时关闭所有 @LogAction 日志记录
+  enabled: true
+
+  # 是否启用异步处理（默认：true）
+  # true: 异步写入日志，不阻塞业务线程，适合高并发场景
+  # false: 同步写入日志，可能影响业务性能，适合日志量小的场景
+  async-enabled: true
+
+  # 是否启用全局默认记录（默认：false）
+  # true: 即使没有 @LogAction 注解的方法，也记录基本信息（异常堆栈、方法耗时、traceId、调用链等）
+  # false: 只记录带 @LogAction 注解的方法
+  # 注意：全局默认记录只记录基本信息，不记录参数和返回值
+  global-record-enabled: false
+
+  # 日志存储类型（console/database/file/redis/mq，默认：console）
+  # console: 输出到控制台/日志文件（SLF4J），默认方式，无需额外配置
+  # database: 存储到数据库（需要自定义实现 DatabaseLogStorageService）
+  # file: 存储到文件系统（自动实现，可通过 log.file.path 配置文件路径）
+  # redis: 存储到 Redis（需要引入 zmbdp-common-redis 依赖，可通过 log.redis.expire-time 配置过期时间）
+  # mq: 发送到消息队列（需要引入 zmbdp-common-rabbitmq 依赖，可通过 log.mq.queue-name 配置队列名称）
+  # 优先级：方法注解 > 类注解 > Nacos 全局配置
+  storage-type: console
+
+  # 文件存储配置（当 storage-type=file 时生效）
+  file:
+    # 日志文件路径（默认：./logs/operation.log）
+    path: ./logs/operation.log
+
+  # Redis 存储配置（当 storage-type=redis 时生效）
+  redis:
+    # 日志过期时间（秒，默认：7天）
+    expire-time: 604800
+
+  # 全局默认策略（三层策略的兜底配置）
+  # 优先级：方法注解 > 类注解 > 全局默认策略
+  # 方法注解的配置优先，如果方法注解的某个属性为默认值，使用类注解的值
+  # 如果类注解也不存在或为默认值，使用全局默认配置
+  default:
+    # 全局默认是否记录方法入参（默认：false）
+    # true: 默认记录方法参数，便于追踪调用
+    # false: 默认不记录方法参数，减少日志量
+    # 建议：生产环境 false（减少日志量），开发环境 true（便于调试）
+    record-params: false
+
+    # 全局默认是否记录方法返回值（默认：false）
+    # true: 默认记录方法返回值，便于追踪结果
+    # false: 默认不记录方法返回值，减少日志量
+    # 建议：生产环境 false（减少日志量），开发环境 true（便于调试）
+    record-result: false
+
+    # 全局默认是否记录异常信息（默认：true）
+    # true: 默认记录异常信息和完整堆栈，便于问题排查
+    # false: 默认不记录异常信息，减少日志量
+    # 建议：生产环境 true（便于排查问题），开发环境 true（便于调试）
+    record-exception: true
+
+    # 全局默认异常时是否抛出异常（默认：true）
+    # true: 默认抛出异常，业务逻辑正常处理异常
+    # false: 默认不抛出异常，仅记录日志，适合非关键业务操作
+    # 建议：生产环境 true（保证业务逻辑正确），特殊场景可设置为 false
+    throw-exception: true

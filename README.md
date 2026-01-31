@@ -209,6 +209,8 @@ mvn spring-boot:run
 | [配置中心与环境配置](docs/CONFIGURATION.md)   | Nacos 配置、多环境切换指南              |
 | [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
 | [分布式幂等性设计](docs/IDEMPOTENT.md)       | 幂等性控制原理与使用指南                  |
+| [频控 / 防刷](docs/RATELIMIT.md)         | 限流组件说明与使用指南                   |
+| [操作日志](docs/LOG.md)                  | 操作日志组件说明与使用指南                 |
 | [新增业务模块指南](docs/ADD_NEW_MODULE.md)   | 快速创建新微服务模块                    |
 | [性能与并发设计](docs/PERFORMANCE.md)       | 性能优化策略与并发设计                   |
 | [常见问题](docs/FAQ.md)                  | 开发中常见问题解答                     |

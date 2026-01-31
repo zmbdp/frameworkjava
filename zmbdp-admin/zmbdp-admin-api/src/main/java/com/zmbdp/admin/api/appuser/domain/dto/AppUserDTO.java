@@ -4,6 +4,7 @@ import com.zmbdp.admin.api.appuser.domain.vo.AppUserVO;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +14,9 @@ import java.io.Serializable;
  */
 @Data
 public class AppUserDTO implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * C端用户 ID

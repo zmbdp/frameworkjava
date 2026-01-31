@@ -40,12 +40,19 @@ spring:
             refresh: true # 配置是否支持动态刷新
           - data-id: share-ratelimit-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             refresh: true # 配置是否支持动态刷新
+          - data-id: share-log-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true # 配置是否支持动态刷新
+          - data-id: share-mysql-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true # 配置是否支持动态刷新
 
 
 # 这⼀配置用于定义应用在控制台输出日志时所遵循的格式规则
 logging:
   pattern:
     console: '[%thread] %-5level %logger{36} - %msg%n'
+  level:
+    com.zmbdp.common.log.service.impl: debug
+    com.zmbdp.common.log.mq: debug
   file:
     name: ./logs/${spring.application.name}.log # 日志文件名
   logback:

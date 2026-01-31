@@ -2,6 +2,7 @@ package com.zmbdp.admin.service.user.domain.dto;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,9 @@ import java.io.Serializable;
  */
 @Data
 public class SysUserListReqDTO implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户 ID
