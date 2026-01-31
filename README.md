@@ -28,8 +28,7 @@
 
 ## 📖 项目简介
 
-**FrameworkJava** 是我在多个项目中反复使用的一套基于 **Spring Boot 3.x + Spring Cloud 2023** 的 **微服务工程脚手架（Scaffold）
-**。
+**FrameworkJava** 是我在多个项目中反复使用的一套基于 **Spring Boot 3.x + Spring Cloud 2023** 的 **微服务工程脚手架（Scaffold）**。
 
 这个项目一开始只是我自己用来起新服务的一套工程骨架。
 
