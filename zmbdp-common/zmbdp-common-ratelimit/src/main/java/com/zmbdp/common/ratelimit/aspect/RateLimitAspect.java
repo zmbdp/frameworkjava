@@ -3,6 +3,7 @@ package com.zmbdp.common.ratelimit.aspect;
 import com.zmbdp.common.core.utils.ClientIpUtil;
 import com.zmbdp.common.core.utils.ServletUtil;
 import com.zmbdp.common.core.utils.StringUtil;
+import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.constants.RateLimitConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
@@ -40,7 +41,7 @@ import java.util.List;
  * 频控 / 防刷切面
  * <p>
  * 拦截带 {@link RateLimit} 注解的方法，在方法执行前进行限流校验。<br>
- * 支持 <b>令牌桶</b>和<b>滑动窗口</b>两种算法，可通过配置 {@code ratelimit.algorithm} 选择，默认使用令牌桶算法。
+ * 支持 <b>令牌桶</b>和<b>滑动窗口</b>两种算法，可通过配置 {@code ratelimit.algorithm} 选择，默认使用令牌桶算法。<br>
  * 支持 IP、账号双维度限流。
  * <p>
  * <b>算法说明：</b>
@@ -93,10 +94,10 @@ import java.util.List;
  *             <li>未找到账号标识时，退化为 IP 维度，避免重复计数</li>
  *         </ul>
  *     </li>
-     *     <li>使用 Lua 脚本保证限流操作的原子性（令牌桶：Hash + Lua，滑动窗口：ZSET + Lua）</li>
-     *     <li>支持算法选择：通过配置 {@code ratelimit.algorithm} 选择令牌桶（token-bucket）或滑动窗口（sliding-window），默认令牌桶</li>
-     *     <li>支持降级策略：Redis 异常时可配置失败放行（fail-open）或失败拒绝（fail-close）</li>
-     *     <li>双维度限流时，如果未登录，identityKey == ipKey，只限流一次，避免重复计数</li>
+ *     <li>使用 Lua 脚本保证限流操作的原子性（令牌桶：Hash + Lua，滑动窗口：ZSET + Lua）</li>
+ *     <li>支持算法选择：通过配置 {@code ratelimit.algorithm} 选择令牌桶（token-bucket）或滑动窗口（sliding-window），默认令牌桶</li>
+ *     <li>支持降级策略：Redis 异常时可配置失败放行（fail-open）或失败拒绝（fail-close）</li>
+ *     <li>双维度限流时，如果未登录，identityKey == ipKey，只限流一次，避免重复计数</li>
  * </ul>
  *
  * @author 稚名不带撇
@@ -301,7 +302,7 @@ public class RateLimitAspect {
         // 先从配置的请求头获取 IP
         if (StringUtil.isNotEmpty(config.ipHeaderName())) {
             String ip = request.getHeader(config.ipHeaderName());
-            if (StringUtil.isNotEmpty(ip) && !RateLimitConstants.UNKNOWN.equalsIgnoreCase(ip)) {
+            if (StringUtil.isNotEmpty(ip) && !CommonConstants.UNKNOWN.equalsIgnoreCase(ip)) {
                 // X-Forwarded-For 可能包含多个 IP（逗号分隔），只取第一个
                 int idx = ip.indexOf(',');
                 ip = idx > 0 ? ip.substring(0, idx).trim() : ip.trim();
@@ -314,7 +315,7 @@ public class RateLimitAspect {
         // 如果允许从请求参数获取且请求头中没有，从请求参数获取
         if (config.allowIpParam() && StringUtil.isNotEmpty(config.ipParamName())) {
             String ip = request.getParameter(config.ipParamName());
-            if (StringUtil.isNotEmpty(ip) && !RateLimitConstants.UNKNOWN.equalsIgnoreCase(ip)) {
+            if (StringUtil.isNotEmpty(ip) && !CommonConstants.UNKNOWN.equalsIgnoreCase(ip)) {
                 return ip.trim();
             }
         }

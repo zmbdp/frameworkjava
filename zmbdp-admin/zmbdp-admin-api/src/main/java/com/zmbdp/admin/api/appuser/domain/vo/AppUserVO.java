@@ -2,6 +2,7 @@ package com.zmbdp.admin.api.appuser.domain.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -11,6 +12,9 @@ import java.io.Serializable;
  */
 @Data
 public class AppUserVO implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * C端用户 ID

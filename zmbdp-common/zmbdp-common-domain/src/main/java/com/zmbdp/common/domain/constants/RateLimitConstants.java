@@ -76,7 +76,7 @@ public class RateLimitConstants {
     public static final String DEFAULT_MESSAGE = "请求过于频繁，请稍后重试";
 
     /**
-     * 请求头：网关下发的用户 ID（与 {@link com.zmbdp.common.domain.constants.SecurityConstants#USER_ID} 一致）
+     * 请求头：网关下发的用户 ID（与 {@link SecurityConstants#USER_ID} 一致）
      */
     public static final String HEADER_USER_ID = "userId";
 
@@ -84,32 +84,6 @@ public class RateLimitConstants {
      * 账号
      */
     public static final String HEADER_ACCOUNT = "account";
-
-    /**
-     * HTTP 请求头：X-Forwarded-For
-     * <p>
-     * 用于标识通过代理或负载均衡器转发的原始客户端 IP。
-     * <p>
-     * 格式：{@code 客户端IP, 代理1IP, 代理2IP, ...}
-     * 我们只取第一个 IP（最原始的客户端 IP）。
-     */
-    public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
-
-    /**
-     * HTTP 请求头：X-Real-IP
-     * <p>
-     * Nginx 等反向代理服务器设置的客户端真实 IP。
-     * <p>
-     * 通常只有一个 IP 地址。
-     */
-    public static final String HEADER_X_REAL_IP = "X-Real-IP";
-
-    /**
-     * 无效 IP 标识：unknown
-     * <p>
-     * 某些代理服务器在无法获取真实 IP 时会设置此值，需要过滤掉。
-     */
-    public static final String UNKNOWN = "unknown";
 
     /**
      * Nacos 配置：IP 请求头名称
@@ -140,7 +114,7 @@ public class RateLimitConstants {
      * <p>
      * 默认使用 X-Forwarded-For，支持多层代理场景。
      */
-    public static final String DEFAULT_IP_HEADER_NAME = HEADER_X_FORWARDED_FOR;
+    public static final String DEFAULT_IP_HEADER_NAME = HttpConstants.HEADER_X_FORWARDED_FOR;
 
     /**
      * 默认是否允许从请求参数获取 IP

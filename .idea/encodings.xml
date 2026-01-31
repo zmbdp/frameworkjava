@@ -15,6 +15,7 @@
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-excel/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-filter/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-idempotent/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-log/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-message/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-rabbitmq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-ratelimit/src/main/java" charset="UTF-8" />
