@@ -1,6 +1,7 @@
 package com.zmbdp.common.core.utils;
 
-import com.zmbdp.common.domain.constants.RateLimitConstants;
+import com.zmbdp.common.domain.constants.CommonConstants;
+import com.zmbdp.common.domain.constants.HttpConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -89,8 +90,8 @@ public class ClientIpUtil {
 
         // 2. 优先从 X-Forwarded-For 请求头获取（支持多层代理场景）
         // X-Forwarded-For 格式：客户端IP, 代理1IP, 代理2IP, ...
-        String ip = request.getHeader(RateLimitConstants.HEADER_X_FORWARDED_FOR);
-        if (StringUtil.isNotEmpty(ip) && !RateLimitConstants.UNKNOWN.equalsIgnoreCase(ip)) {
+        String ip = request.getHeader(HttpConstants.HEADER_X_FORWARDED_FOR);
+        if (StringUtil.isNotEmpty(ip) && !CommonConstants.UNKNOWN.equalsIgnoreCase(ip)) {
             // 如果包含多个 IP（逗号分隔），只取第一个（最原始的客户端 IP）
             int idx = ip.indexOf(',');
             ip = idx > 0 ? ip.substring(0, idx).trim() : ip.trim();
@@ -98,13 +99,13 @@ public class ClientIpUtil {
 
         // 3. 如果 X-Forwarded-For 无效，尝试从 X-Real-IP 获取
         // X-Real-IP 通常由 Nginx 等反向代理设置，只有一个 IP
-        if (StringUtil.isEmpty(ip) || RateLimitConstants.UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader(RateLimitConstants.HEADER_X_REAL_IP);
+        if (StringUtil.isEmpty(ip) || CommonConstants.UNKNOWN.equalsIgnoreCase(ip)) {
+            ip = request.getHeader(HttpConstants.HEADER_X_REAL_IP);
         }
 
         // 4. 如果前两种方式都失败，使用 getRemoteAddr() 获取
         // 注意：在代理场景下，这可能返回代理服务器的 IP，而非真实客户端 IP
-        if (StringUtil.isEmpty(ip) || RateLimitConstants.UNKNOWN.equalsIgnoreCase(ip)) {
+        if (StringUtil.isEmpty(ip) || CommonConstants.UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
 

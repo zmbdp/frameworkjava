@@ -1682,9 +1682,10 @@ insert into `sys_user` (nick_name, phone_number, password, identity, remark, sta
 values ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
         '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
 
+DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`
 (
-    `id`              bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `id` bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `operation`       varchar(255) NOT NULL COMMENT '操作描述',
     `method`          varchar(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
     `request_path`    varchar(500)  DEFAULT NULL COMMENT '请求路径',

@@ -32,16 +32,34 @@ import org.springframework.context.annotation.Configuration;
  * <p>
  * <b>Mapper 扫描说明：</b>
  * <ul>
+ *     <li>Mapper 通过 {@link LogMapperConfiguration} 的 {@link org.mybatis.spring.annotation.MapperScan} 扫描</li>
  *     <li>Mapper 扫描仅在存在 {@link SqlSessionFactory} Bean 时生效</li>
  *     <li>如果应用没有配置数据源，Mapper 不会被扫描，但不会影响其他功能</li>
  *     <li>数据库存储服务在没有 Mapper 时会优雅降级，只记录警告日志</li>
+ * </ul>
+ * <p>
+ * <b>MQ 说明：</b>
+ * <ul>
+ *     <li>MQ 相关 Bean（生产者、消费者）由 {@link RabbitConfig} 管理，仅在存在 RabbitMQ 时加载</li>
+ * </ul>
+ * <p>
+ * <b>条件注册说明：</b>
+ * <ul>
+ *     <li>Redis/MQ 存储服务使用 {@code @ConditionalOnClass} 而不是 {@code @ConditionalOnBean}</li>
+ *     <li>只检查类是否存在，不依赖 Bean 加载顺序，避免加载顺序问题</li>
+ *     <li>如果项目没有引入对应依赖，相应的存储服务不会注册，不影响其他存储方式</li>
  * </ul>
  *
  * @author 稚名不带撇
  */
 @Slf4j
 @Configuration
-@ComponentScan("com.zmbdp.common.log.service.impl")
+@ComponentScan({
+        "com.zmbdp.common.log.service.impl",
+        "com.zmbdp.common.log.strategy.impl",
+        "com.zmbdp.common.log.router",
+        "com.zmbdp.common.log.resolver"
+})
 public class LogAutoConfiguration {
 
     /**
@@ -58,7 +76,7 @@ public class LogAutoConfiguration {
     /**
      * Mapper 扫描配置（仅在存在数据源时生效）
      * <p>
-     * 当应用配置了数据源时，自动扫描并注册 {@link com.zmbdp.common.log.mapper.OperationLogMapper}。
+     * 当应用配置了数据源时，自动扫描并注册 {@link com.zmbdp.common.log.mapper.OperationLogMapper}。<br>
      * 如果应用没有配置数据源（如文件服务、网关服务），此配置不会生效，避免启动失败。
      *
      * @author 稚名不带撇

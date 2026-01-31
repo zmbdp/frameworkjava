@@ -30,6 +30,7 @@ logging:
     console: '[%thread] %-5level %logger{36} - %msg%n'
   level:
     com.zmbdp.common.log.service.impl: debug
+    com.zmbdp.common.log.mq: debug
   file:
     name: ./logs/${spring.application.name}.log # 日志文件名
   logback:

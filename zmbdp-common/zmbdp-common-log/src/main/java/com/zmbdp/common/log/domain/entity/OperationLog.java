@@ -1,9 +1,9 @@
 package com.zmbdp.common.log.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zmbdp.common.core.domain.entity.BaseDO;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +16,13 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("operation_log")
-@EqualsAndHashCode(callSuper = true)
-public class OperationLog extends BaseDO {
+public class OperationLog {
+
+    /**
+     * 主键ID（雪花算法，由 IdentifierGenerator 根据网卡生成，分布式环境下唯一）
+     */
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
     /**
      * 操作描述（必填）

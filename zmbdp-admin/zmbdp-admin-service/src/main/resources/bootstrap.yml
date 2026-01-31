@@ -46,6 +46,7 @@ logging:
     com.zmbdp.admin.service.config.mapper: debug
     com.zmbdp.admin.service.user.mapper: debug
     com.zmbdp.common.log.service.impl: debug
+    com.zmbdp.common.log.mq: debug
   file:
     name: ./logs/${spring.application.name}.log # 日志文件名
   logback:

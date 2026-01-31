@@ -5,9 +5,10 @@ SET NAMES utf8mb4;
 
 use `frameworkjava_prd`;
 
+DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`
 (
-    `id`              bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `id` bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `operation`       varchar(255) NOT NULL COMMENT '操作描述',
     `method`          varchar(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
     `request_path`    varchar(500)  DEFAULT NULL COMMENT '请求路径',

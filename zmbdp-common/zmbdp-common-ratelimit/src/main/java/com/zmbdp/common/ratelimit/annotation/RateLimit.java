@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * 频控 / 防刷注解
  * <p>
- * 标记需要限流的方法，基于 <b>AOP + Redis</b>实现。业务代码无感知，仅加注解即可生效。
+ * 标记需要限流的方法，基于 <b>AOP + Redis</b>实现。业务代码无感知，仅加注解即可生效。<br>
  * 支持 <b>令牌桶</b>和<b>滑动窗口</b>两种算法，可通过配置 {@code ratelimit.algorithm} 选择，默认使用令牌桶算法。
  * <p>
  * <b>核心特性：</b>
@@ -103,8 +103,8 @@ public @interface RateLimit {
     /**
      * 令牌桶容量（最大令牌数）
      * <p>
-     * 令牌桶的最大容量，也是允许的突发流量上限。
-     * 令牌以固定速率（refillRate = limit / windowSec）持续补充。
+     * 令牌桶的最大容量，也是允许的突发流量上限。<br>
+     * 令牌以固定速率（refillRate = limit / windowSec）持续补充。<br>
      * 当桶中无令牌时，请求将被拒绝，返回 {@code ResultCode.REQUEST_TOO_FREQUENT}。
      * <p>
      * <b>配置规则：</b>

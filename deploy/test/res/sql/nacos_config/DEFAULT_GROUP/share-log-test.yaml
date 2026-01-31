@@ -33,11 +33,6 @@ log:
     # 日志过期时间（秒，默认：7天）
     expire-time: 604800
 
-  # 消息队列存储配置（当 storage-type=mq 时生效）
-  mq:
-    # 日志队列名称（默认：log.operation.queue）
-    queue-name: log.operation.queue
-
   # 全局默认策略（三层策略的兜底配置）
   # 优先级：方法注解 > 类注解 > 全局默认策略
   # 方法注解的配置优先，如果方法注解的某个属性为默认值，使用类注解的值

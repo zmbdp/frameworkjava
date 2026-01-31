@@ -9,8 +9,6 @@ import com.zmbdp.mstemplate.service.test.feign.RateLimitTestApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
@@ -19,10 +17,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @author 稚名不带撇
  */
 @Slf4j
-@SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class
-}) // 禁用数据源自动配置
+@SpringBootApplication  // 启用数据源自动配置，支持数据库日志存储
 @EnableFeignClients(clients = {
         FileServiceApi.class, MapServiceApi.class,
         DictionaryServiceApi.class, ArgumentServiceApi.class,

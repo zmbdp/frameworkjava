@@ -141,4 +141,26 @@ public class LogConstants {
      * 敏感字段脱敏：银行卡号（保留前4位和后4位）
      */
     public static final String DESENSITIZE_BANK_CARD = "bankCard";
+
+    /*=============================================    日志状态常量    =============================================*/
+
+    /**
+     * 日志状态：成功
+     * <p>
+     * 注意：此常量已废弃，请使用 {@link CommonConstants#STATUS_SUCCESS}
+     *
+     * @deprecated 使用 {@link CommonConstants#STATUS_SUCCESS} 替代
+     */
+    @Deprecated
+    public static final String LOG_STATUS_SUCCESS = CommonConstants.STATUS_SUCCESS;
+
+    /**
+     * 日志状态：失败
+     * <p>
+     * 注意：此常量已废弃，请使用 {@link CommonConstants#STATUS_FAILED}
+     *
+     * @deprecated 使用 {@link CommonConstants#STATUS_FAILED} 替代
+     */
+    @Deprecated
+    public static final String LOG_STATUS_FAILED = CommonConstants.STATUS_FAILED;
 }

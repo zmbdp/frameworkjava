@@ -1,1 +1,2 @@
 com.zmbdp.common.log.config.LogAutoConfiguration
+com.zmbdp.common.log.config.RabbitConfig

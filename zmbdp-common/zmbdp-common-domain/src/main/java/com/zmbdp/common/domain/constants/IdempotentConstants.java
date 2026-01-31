@@ -43,21 +43,6 @@ public class IdempotentConstants {
     public static final long IDEMPOTENT_EXPIRE_TIME_DEFAULT = 300L;
 
     /**
-     * 幂等性状态：正在执行中
-     */
-    public static final String STATUS_PROCESSING = "PROCESSING";
-
-    /**
-     * 幂等性状态：执行成功
-     */
-    public static final String STATUS_SUCCESS = "SUCCESS";
-
-    /**
-     * 幂等性状态：执行失败
-     */
-    public static final String STATUS_FAILED = "FAILED";
-
-    /**
      * 强幂等模式：等待结果的最大重试次数（默认值）
      */
     public static final int DEFAULT_MAX_RETRY_COUNT = 3;
