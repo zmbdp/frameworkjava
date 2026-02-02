@@ -71,6 +71,7 @@ com.zmbdp.common.message.router
 com.zmbdp.common.message.service
 com.zmbdp.common.message.strategy
 com.zmbdp.common.message.strategy.impl
+com.zmbdp.common.monitor.config
 com.zmbdp.common.rabbitmq.config
 com.zmbdp.common.ratelimit.annotation
 com.zmbdp.common.ratelimit.aspect

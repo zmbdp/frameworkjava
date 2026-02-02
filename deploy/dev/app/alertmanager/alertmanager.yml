@@ -1,0 +1,120 @@
+# AlertManager 配置文件 - Dev 环境
+global:
+  resolve_timeout: 5m
+
+  # ==================== 用户自行配置：邮件配置 ====================
+  # 如果不需要邮件告警，可以保持默认值，不影响 AlertManager 启动
+  smtp_smarthost: 'smtp.qq.com:587'              # 用户自行配置：SMTP 服务器地址
+  smtp_from: 'your-email@qq.com'                 # 用户自行配置：发件人邮箱
+  smtp_auth_username: 'your-email@qq.com'        # 用户自行配置：SMTP 认证用户名
+  smtp_auth_password: 'your-smtp-password'       # 用户自行配置：SMTP 认证密码（QQ邮箱需要授权码）
+  smtp_require_tls: true
+
+# 告警模板
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# 告警路由
+route:
+  # 默认接收者
+  receiver: 'default'
+  # 分组等待时间
+  group_wait: 10s
+  # 分组间隔时间
+  group_interval: 10s
+  # 重复告警间隔时间
+  repeat_interval: 1h
+  # 分组标签
+  group_by: [ 'alertname', 'cluster', 'service' ]
+  
+  # 子路由
+  routes:
+    # 严重告警立即发送
+    - match:
+        severity: critical
+      receiver: 'critical'
+      group_wait: 5s
+      repeat_interval: 30m
+    
+    # 警告级别告警
+    - match:
+        severity: warning
+      receiver: 'warning'
+      group_wait: 10s
+      repeat_interval: 1h
+    
+    # 数据库相关告警
+    - match:
+        category: database
+      receiver: 'database-team'
+    
+    # Redis 相关告警
+    - match:
+        category: redis
+      receiver: 'redis-team'
+
+# 告警接收者配置
+receivers:
+  # 默认接收者
+  - name: 'default'
+    email_configs:
+      - to: 'dev-team@example.com'              # 用户自行配置：接收告警的邮箱地址
+        headers:
+          Subject: '【Dev环境告警】{{ .GroupLabels.alertname }}'
+
+  # 严重告警接收者
+  - name: 'critical'
+    email_configs:
+      - to: 'admin@example.com'                 # 用户自行配置：接收严重告警的邮箱地址
+        headers:
+          Subject: '【Dev环境严重告警】{{ .GroupLabels.alertname }}'
+        html: |
+          <h2>告警详情</h2>
+          <p><strong>告警名称:</strong> {{ .GroupLabels.alertname }}</p>
+          <p><strong>告警级别:</strong> {{ .CommonLabels.severity }}</p>
+          <p><strong>告警服务:</strong> {{ .CommonLabels.service }}</p>
+          <p><strong>告警时间:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05" }}</p>
+          <h3>告警列表:</h3>
+          <ul>
+          {{ range .Alerts }}
+            <li>{{ .Annotations.summary }} - {{ .Annotations.description }}</li>
+          {{ end }}
+          </ul>
+
+  # 警告级别接收者
+  - name: 'warning'
+    email_configs:
+      - to: 'dev-team@example.com'              # 用户自行配置：接收警告的邮箱地址
+        headers:
+          Subject: '【Dev环境警告】{{ .GroupLabels.alertname }}'
+
+  # 数据库团队接收者
+  - name: 'database-team'
+    email_configs:
+      - to: 'dba@example.com'                   # 用户自行配置：数据库团队邮箱
+        headers:
+          Subject: '【Dev环境数据库告警】{{ .GroupLabels.alertname }}'
+
+  # Redis 团队接收者
+  - name: 'redis-team'
+    email_configs:
+      - to: 'redis-admin@example.com'           # 用户自行配置：Redis 团队邮箱
+        headers:
+          Subject: '【Dev环境Redis告警】{{ .GroupLabels.alertname }}'
+
+# 告警抑制规则
+inhibit_rules:
+  # 服务下线时，抑制该服务的其他所有告警
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match_re:
+      alertname: '.*'
+    equal: [ 'service', 'instance' ]
+  
+  # 严重告警触发时，抑制同类型的警告告警
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: [ 'alertname', 'service' ]
+

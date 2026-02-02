@@ -1,0 +1,236 @@
+# 服务告警规则
+groups:
+  # ==================== 服务可用性告警 ====================
+  - name: service_availability
+    interval: 30s
+    rules:
+      # 服务下线告警
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "服务 {{ $labels.service }} 已下线"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 已下线超过 1 分钟"
+          value: "{{ $value }}"
+
+      # 服务重启告警
+      - alert: ServiceRestarted
+        expr: time() - process_start_time_seconds < 300
+        for: 1m
+        labels:
+          severity: warning
+          category: availability
+        annotations:
+          summary: "服务 {{ $labels.service }} 最近重启"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 在最近 5 分钟内重启"
+
+  # ==================== JVM 性能告警 ====================
+  - name: jvm_performance
+    interval: 30s
+    rules:
+      # JVM 堆内存使用率过高
+      - alert: JvmHeapMemoryHigh
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} JVM 堆内存使用率过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) JVM 堆内存使用率超过 85%，当前值: {{ $value | humanize }}%"
+
+      # JVM 堆内存使用率严重过高
+      - alert: JvmHeapMemoryCritical
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} JVM 堆内存使用率严重过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) JVM 堆内存使用率超过 95%，当前值: {{ $value | humanize }}%，可能即将 OOM"
+
+      # Full GC 频繁
+      - alert: FullGCFrequent
+        expr: rate(jvm_gc_pause_seconds_count{action="end of major GC"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} Full GC 频繁"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) Full GC 频率过高，5分钟内平均每秒 {{ $value | humanize }} 次"
+
+      # GC 耗时过长
+      - alert: GCTimeTooLong
+        expr: rate(jvm_gc_pause_seconds_sum[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} GC 耗时过长"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) GC 耗时占比过高，5分钟内平均每秒 {{ $value | humanize }} 秒"
+
+      # 线程数过多
+      - alert: ThreadCountHigh
+        expr: jvm_threads_live_threads > 500
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} 线程数过多"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 线程数超过 500，当前值: {{ $value }}"
+
+      # 死锁检测
+      - alert: ThreadDeadlock
+        expr: jvm_threads_deadlocked_threads > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "服务 {{ $labels.service }} 检测到线程死锁"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 检测到 {{ $value }} 个死锁线程"
+
+  # ==================== 接口性能告警 ====================
+  - name: api_performance
+    interval: 30s
+    rules:
+      # 接口响应时间过长
+      - alert: ApiResponseTimeSlow
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 3
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "接口 {{ $labels.uri }} 响应时间过长"
+          description: "服务 {{ $labels.service }} 接口 {{ $labels.uri }} P95 响应时间超过 3 秒，当前值: {{ $value | humanize }}s"
+
+      # 接口错误率过高
+      - alert: ApiErrorRateHigh
+        expr: (rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "接口 {{ $labels.uri }} 错误率过高"
+          description: "服务 {{ $labels.service }} 接口 {{ $labels.uri }} 5xx 错误率超过 5%，当前值: {{ $value | humanize }}%"
+
+      # 接口错误率严重过高
+      - alert: ApiErrorRateCritical
+        expr: (rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m])) * 100 > 20
+        for: 2m
+        labels:
+          severity: critical
+          category: performance
+        annotations:
+          summary: "接口 {{ $labels.uri }} 错误率严重过高"
+          description: "服务 {{ $labels.service }} 接口 {{ $labels.uri }} 5xx 错误率超过 20%，当前值: {{ $value | humanize }}%"
+
+      # 接口 QPS 异常高
+      - alert: ApiQPSAbnormallyHigh
+        expr: rate(http_server_requests_seconds_count[1m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "接口 {{ $labels.uri }} QPS 异常高"
+          description: "服务 {{ $labels.service }} 接口 {{ $labels.uri }} QPS 超过 1000，当前值: {{ $value | humanize }}/s，可能遭受攻击"
+
+  # ==================== 数据库连接池告警 ====================
+  - name: database_connection_pool
+    interval: 30s
+    rules:
+      # 数据库连接池使用率过高
+      - alert: DatabaseConnectionPoolHigh
+        expr: (hikaricp_connections_active / hikaricp_connections_max) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "服务 {{ $labels.service }} 数据库连接池使用率过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 数据库连接池使用率超过 80%，当前值: {{ $value | humanize }}%"
+
+      # 数据库连接等待时间过长
+      - alert: DatabaseConnectionWaitTimeLong
+        expr: hikaricp_connections_pending > 10
+        for: 2m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "服务 {{ $labels.service }} 数据库连接等待过多"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 有 {{ $value }} 个请求在等待数据库连接"
+
+  # ==================== Redis 告警 ====================
+  - name: redis_alerts
+    interval: 30s
+    rules:
+      # Redis 内存使用率过高
+      - alert: RedisMemoryHigh
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: redis
+        annotations:
+          summary: "Redis 内存使用率过高"
+          description: "Redis ({{ $labels.instance }}) 内存使用率超过 80%，当前值: {{ $value | humanize }}%"
+
+      # Redis 连接数过多
+      - alert: RedisConnectionsHigh
+        expr: redis_connected_clients > 1000
+        for: 5m
+        labels:
+          severity: warning
+          category: redis
+        annotations:
+          summary: "Redis 连接数过多"
+          description: "Redis ({{ $labels.instance }}) 连接数超过 1000，当前值: {{ $value }}"
+
+  # ==================== 系统资源告警 ====================
+  - name: system_resources
+    interval: 30s
+    rules:
+      # CPU 使用率过高
+      - alert: SystemCpuHigh
+        expr: system_cpu_usage * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "服务 {{ $labels.service }} 系统 CPU 使用率过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 系统 CPU 使用率超过 80%，当前值: {{ $value | humanize }}%"
+
+      # 进程 CPU 使用率过高
+      - alert: ProcessCpuHigh
+        expr: process_cpu_usage * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "服务 {{ $labels.service }} 进程 CPU 使用率过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 进程 CPU 使用率超过 80%，当前值: {{ $value | humanize }}%"
+
+      # 文件描述符使用率过高
+      - alert: FileDescriptorHigh
+        expr: (process_files_open_files / process_files_max_files) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "服务 {{ $labels.service }} 文件描述符使用率过高"
+          description: "服务 {{ $labels.service }} ({{ $labels.instance }}) 文件描述符使用率超过 80%，当前值: {{ $value | humanize }}%"
+

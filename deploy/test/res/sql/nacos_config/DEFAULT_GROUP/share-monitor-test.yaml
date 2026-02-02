@@ -1,0 +1,102 @@
+# ==================== Spring Boot Actuator 监控配置 ====================
+management:
+  # 端点配置
+  endpoints:
+    web:
+      exposure:
+        # 暴露的端点（生产环境建议只暴露 prometheus 和 health）
+        include: prometheus,health,info,metrics
+      base-path: /actuator
+      # 跨域配置（如果需要）
+      cors:
+        allowed-origins: "*"
+        allowed-methods: GET,POST
+
+  # 健康检查配置
+  endpoint:
+    health:
+      show-details: always  # 显示详细健康信息
+      probes:
+        enabled: true  # 启用 Kubernetes 探针
+    prometheus:
+      enabled: true
+
+  # 健康检查指示器
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+    rabbit:
+      enabled: true
+
+  # 指标配置
+  metrics:
+    # Prometheus 导出配置
+    export:
+      prometheus:
+        enabled: true
+        step: 15s  # 采集间隔（与 Prometheus 配置一致）
+        descriptions: true  # 包含指标描述
+
+    # 全局标签
+    tags:
+      application: ${spring.application.name}
+      environment: dev
+      cluster: frameworkjava
+
+    # 启用的指标
+    enable:
+      jvm: true  # JVM 指标
+      process: true  # 进程指标
+      system: true  # 系统指标
+      tomcat: true  # Tomcat 指标
+      logback: true  # Logback 指标
+      hikaricp: true  # HikariCP 连接池指标
+
+    # 分布配置（响应时间分布）
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true  # HTTP 请求响应时间分布
+      slo:
+        http.server.requests: 100ms,200ms,500ms,1s,2s,3s,5s  # 响应时间 SLO
+  
+  # Micrometer Tracing 配置
+  tracing:
+    sampling:
+      probability: 1.0  # 采样率 100%
+
+# ==================== SkyWalking 配置（可选）====================
+# 注意：如果使用 SkyWalking Agent，这些配置会被 Agent 参数覆盖
+# 这里仅作为参考配置，实际以 Agent 参数为准
+skywalking:
+  agent:
+    # 服务名称
+    service_name: ${spring.application.name}
+    # OAP 服务地址
+    collector:
+      backend_service: localhost:11800
+    # 采样率（-1 表示全量采集，生产环境建议设置为 1000-5000）
+    sample_n_per_3_secs: -1
+    # 日志级别
+    logging:
+      level: INFO
+    # 追踪配置
+    trace:
+      # 忽略的端点（不追踪）
+      ignore_path: /actuator/**,/health,/metrics,/favicon.ico
+    # Span 限制
+    span_limit_per_segment: 300
+
+# ==================== 日志配置（关联 TraceId）====================
+logging:
+  pattern:
+    # 控制台日志格式（使用 SkyWalking 的 tid）
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [TID:%X{tid}] %-5level [%thread] %logger{36} : %msg%n"
+  level:
+    # 根日志级别
+    root: INFO
+    # 框架日志级别
+    com.zmbdp: DEBUG
+    # SQL 日志级别
+    com.zmbdp.*.mapper: DEBUG

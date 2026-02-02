@@ -11,7 +11,10 @@ services:
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+      # SkyWalking Agent 配置
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-admin -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    volumes:
+      - ./skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
   frameworkjava-file:
@@ -24,7 +27,10 @@ services:
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+      # SkyWalking Agent 配置
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-file -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    volumes:
+      - ./skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
   frameworkjava-gateway:
@@ -37,7 +43,10 @@ services:
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+      # SkyWalking Agent 配置
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-gateway -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    volumes:
+      - ./skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
   frameworkjava-portal:
@@ -50,7 +59,10 @@ services:
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+      # SkyWalking Agent 配置
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-portal -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器1内网ip/你的虚拟机1内网ip
+    volumes:
+      - ./skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
 networks:
