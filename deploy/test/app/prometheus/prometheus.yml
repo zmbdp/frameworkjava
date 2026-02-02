@@ -1,0 +1,87 @@
+# Prometheus 配置文件 - Test 环境
+global:
+  scrape_interval: 15s # 默认抓取间隔
+  evaluation_interval: 15s # 规则评估间隔
+  external_labels:
+    cluster: 'frameworkjava-test'
+    environment: 'test'
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - frameworkjava-alertmanager:9093
+
+# 告警规则文件
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# 抓取配置
+scrape_configs:
+  # Prometheus 自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+        labels:
+          service: 'prometheus'
+
+  # SkyWalking OAP 监控
+  - job_name: 'skywalking-oap'
+    static_configs:
+      - targets: [ 'frameworkjava-skywalking-oap:1234' ]
+        labels:
+          service: 'skywalking-oap'
+
+  # 网关服务监控
+  - job_name: 'zmbdp-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'localhost:10030' ]  # 服务部署在同一台服务器
+        labels:
+          service: 'zmbdp-gateway'
+          application: 'gateway'
+
+  # 管理服务监控
+  - job_name: 'zmbdp-admin'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'localhost:18081' ]  # 服务部署在同一台服务器
+        labels:
+          service: 'zmbdp-admin'
+          application: 'admin'
+
+  # 门户服务监控
+  - job_name: 'zmbdp-portal'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'localhost:18083' ]  # 服务部署在同一台服务器
+        labels:
+          service: 'zmbdp-portal'
+          application: 'portal'
+
+  # 文件服务监控
+  - job_name: 'zmbdp-file'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'localhost:18082' ]  # 服务部署在同一台服务器
+        labels:
+          service: 'zmbdp-file'
+          application: 'file'
+
+  # 模板服务监控
+  - job_name: 'zmbdp-mstemplate'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'localhost:18085' ]  # 服务部署在同一台服务器
+        labels:
+          service: 'zmbdp-mstemplate'
+          application: 'mstemplate'
+
+  # RabbitMQ 监控
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: [ 'frameworkjava-rabbit:15692' ]
+        labels:
+          service: 'rabbitmq'
+

@@ -31,7 +31,7 @@ services:
     networks:
       - frameworkjava_network
     healthcheck:
-      test: mysql --user=zmbdpdev -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
+      test: mysql --user=zmbdptest -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
       start_period: 30s
       interval: 10s
       timeout: 5s
@@ -56,7 +56,7 @@ services:
       - MYSQL_SERVICE_HOST=frameworkjava-mysql
       - MYSQL_SERVICE_PORT=3306
       - MYSQL_SERVICE_DB_NAME=frameworkjava_nacos_test
-      - MYSQL_SERVICE_USER=zmbdpdev
+      - MYSQL_SERVICE_USER=zmbdptest
       - MYSQL_SERVICE_PASSWORD=Hf@173503494
     volumes:
       - ../data/frameworkjavadata/nacos/logs/:/home/nacos/logs
@@ -100,20 +100,20 @@ services:
       retries: 10
   frameworkjava-rabbitmq:
     image: rabbitmq:3.12.6-management
-    container_name: frameworkjava-rabbitmq
+    container_name: frameworkjava-rabbit
     restart: always
-    hostname: frameworkjava-rabbitmq
+    hostname: frameworkjava-rabbit
     environment:
       # 用户名
-      RABBITMQ_DEFAULT_USER: zmbdp
+      RABBITMQ_DEFAULT_USER: zmbdptest
       # 密码
       RABBITMQ_DEFAULT_PASS: Hf@173503494
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
-      - ../data/frameworkjavadata/rabbitmq/log:/var/log/rabbitmq
-      - ../data/frameworkjavadata/rabbitmq/data:/var/lib/rabbitmq
+      - ../data/frameworkjavadata/rabbit/log:/var/log/rabbit
+      - ../data/frameworkjavadata/rabbit/data:/var/lib/rabbit
     networks:
       - frameworkjava_network
     healthcheck:
@@ -121,6 +121,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+  
   frameworkjava-web:
     image: nginx:1.24.0
     container_name: frameworkjava-web
@@ -137,6 +138,131 @@ services:
       nofile:
         soft: 20000
         hard: 40000
+  
+  # ==================== 链路追踪 SkyWalking ====================
+  frameworkjava-skywalking-oap:
+    container_name: frameworkjava-skywalking-oap
+    build:
+      context: ./skywalking
+      dockerfile: Dockerfile
+    image: frameworkjava-skywalking-oap:9.7.0-mysql
+    ports:
+      - "11800:11800"  # gRPC 端口（Agent 上报数据）
+      - "12800:12800"  # HTTP 端口（UI 查询数据）
+    environment:
+      TZ: Asia/Shanghai
+      SW_STORAGE: mysql
+      SW_JDBC_URL: jdbc:mysql://frameworkjava-mysql:3306/frameworkjava_skywalking_test?serverTimezone=Asia/Shanghai&characterEncoding=utf8
+      SW_DATA_SOURCE_USER: zmbdptest
+      SW_DATA_SOURCE_PASSWORD: Hf@173503494
+      SW_HEALTH_CHECKER: default
+      SW_TELEMETRY: prometheus
+      JAVA_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - ../data/frameworkjavadata/skywalking/oap/logs:/skywalking/logs
+    restart: always
+    networks:
+      - frameworkjava_network
+    depends_on:
+      frameworkjava-mysql:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:12800/internal/l7check || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  frameworkjava-skywalking-ui:
+    container_name: frameworkjava-skywalking-ui
+    image: apache/skywalking-ui:9.7.0
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Asia/Shanghai
+      SW_OAP_ADDRESS: http://frameworkjava-skywalking-oap:12800
+      SW_ZIPKIN_ADDRESS: http://frameworkjava-skywalking-oap:9412
+    restart: always
+    networks:
+      - frameworkjava_network
+    depends_on:
+      frameworkjava-skywalking-oap:
+        condition: service_healthy
+
+  # ==================== 服务监控 Prometheus + Grafana ====================
+  frameworkjava-prometheus:
+    container_name: frameworkjava-prometheus
+    image: prom/prometheus:v2.48.0
+    user: "0:0"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/rules:/etc/prometheus/rules
+      - ../data/frameworkjavadata/prometheus/data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: always
+    networks:
+      - frameworkjava_network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frameworkjava-grafana:
+    container_name: frameworkjava-grafana
+    image: grafana/grafana:10.2.2
+    user: "0:0"
+    ports:
+      - "3000:3000"
+    environment:
+      TZ: Asia/Shanghai
+      GF_SECURITY_ADMIN_USER: zmbdptest
+      GF_SECURITY_ADMIN_PASSWORD: Hf@173503494
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel
+      GF_DEFAULT_LOCALE: zh-Hans
+    volumes:
+      - ../data/frameworkjavadata/grafana/data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    restart: always
+    networks:
+      - frameworkjava_network
+    depends_on:
+      - frameworkjava-prometheus
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frameworkjava-alertmanager:
+    container_name: frameworkjava-alertmanager
+    image: prom/alertmanager:v0.26.0
+    user: "0:0"
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ../data/frameworkjavadata/alertmanager/data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    restart: always
+    networks:
+      - frameworkjava_network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9093/-/healthy" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   frameworkjava_network:

@@ -28,6 +28,7 @@
         <module>zmbdp-common-ratelimit</module>
         <module>zmbdp-common-excel</module>
         <module>zmbdp-common-log</module>
+        <module>zmbdp-common-monitor</module>
     </modules>
 
     <properties>
