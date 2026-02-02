@@ -1,30 +1,33 @@
 # 工具类使用指南
 
-FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮件、分页、流处理等常用场景，开箱即用，无需重复造轮子。
+FrameworkJava 提供了 **25 个工具类**，覆盖加密、JSON、Excel、邮件、分页、流处理、脱敏、日志等常用场景，开箱即用，无需重复造轮子。
 
 > **注意**：Excel 相关工具类位于 `zmbdp-common-excel` 模块，使用前需要添加该模块依赖。
 
 ## 工具类分类
 
-### 核心工具类（17 个）
+### 核心工具类（19 个）
 
-#### zmbdp-common-core 模块（13 个）
+#### zmbdp-common-core 模块（15 个）
 
-| 工具类 | 功能说明 | 主要方法 |
-|--------|---------|---------|
-| `AESUtil` | AES 加密/解密 | `encrypt()`, `decrypt()` |
-| `BeanCopyUtil` | Bean 属性拷贝 | `copyProperties()`, `copyListProperties()` |
-| `FileUtil` | 文件操作 | `read()`, `write()`, `delete()` |
-| `JsonUtil` | JSON 处理 | `toJson()`, `parseObject()`, `parseArray()` |
-| `MailUtil` | 邮件发送 | `sendText()`, `sendHtml()` |
-| `PageUtil` | 分页处理 | `startPage()`, `getPage()` |
-| `ServletUtil` | Servlet 工具 | `getRequest()`, `getResponse()`, `getParameter()` |
-| `StreamUtil` | 流处理 | `toInputStream()`, `toByteArray()` |
-| `StringUtil` | 字符串处理 | `isEmpty()`, `isBlank()`, `trim()` |
-| `ThreadUtil` | 线程工具 | `sleep()`, `waitFor()` |
-| `TimestampUtil` | 时间戳处理 | `getCurrentTimestamp()`, `format()` |
-| `ValidatorUtil` | 数据校验 | `validate()`, `validateObject()` |
-| `VerifyUtil` | 格式验证 | `checkPhone()`, `checkEmail()`, `checkIdCard()` |
+| 工具类                | 功能说明       | 主要方法                                                              |
+|--------------------|------------|-------------------------------------------------------------------|
+| `AESUtil`          | AES 加密/解密  | `encrypt()`, `decrypt()`                                          |
+| `BeanCopyUtil`     | Bean 属性拷贝  | `copyProperties()`, `copyListProperties()`                        |
+| `ClientIpUtil`     | 客户端 IP 获取  | `getClientIp()`, `getIpFromRequest()`                             |
+| `DesensitizeUtil`  | 敏感字段脱敏     | `desensitizePhone()`, `desensitizeIdCard()`, `desensitizeEmail()` |
+| `FileUtil`         | 文件操作       | `read()`, `write()`, `delete()`                                   |
+| `JsonUtil`         | JSON 处理    | `toJson()`, `parseObject()`, `parseArray()`                       |
+| `LogExceptionUtil` | 日志异常处理     | `getStackTrace()`, `formatException()`                            |
+| `MailUtil`         | 邮件发送       | `sendText()`, `sendHtml()`                                        |
+| `PageUtil`         | 分页处理       | `startPage()`, `getPage()`                                        |
+| `ServletUtil`      | Servlet 工具 | `getRequest()`, `getResponse()`, `getParameter()`                 |
+| `StreamUtil`       | 流处理        | `toInputStream()`, `toByteArray()`                                |
+| `StringUtil`       | 字符串处理      | `isEmpty()`, `isBlank()`, `trim()`                                |
+| `ThreadUtil`       | 线程工具       | `sleep()`, `waitFor()`                                            |
+| `TimestampUtil`    | 时间戳处理      | `getCurrentTimestamp()`, `format()`                               |
+| `ValidatorUtil`    | 数据校验       | `validate()`, `validateObject()`                                  |
+| `VerifyUtil`       | 格式验证       | `checkPhone()`, `checkEmail()`, `checkIdCard()`                   |
 
 #### 其他模块（4 个）
 
@@ -55,6 +58,7 @@ FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮�
 - **Bean 拷贝**：`BeanCopyUtil` - DTO/Entity/VO 转换
 - **JSON 处理**：`JsonUtil` - JSON 序列化/反序列化
 - **流处理**：`StreamUtil` - 流转换和处理
+- **敏感字段脱敏**：`DesensitizeUtil` - 手机号、身份证、邮箱、银行卡等脱敏
 
 #### 文件操作
 - **文件操作**：`FileUtil` - 文件读写、删除
@@ -73,14 +77,68 @@ FrameworkJava 提供了 **23 个工具类**，覆盖加密、JSON、Excel、邮�
 #### Web 相关
 - **Servlet 工具**：`ServletUtil` - 获取请求、响应等
 - **分页处理**：`PageUtil` - 分页参数处理
+- **客户端 IP 获取**：`ClientIpUtil` - 获取真实客户端 IP（支持代理、负载均衡）
 
 #### 其他工具
 - **邮件发送**：`MailUtil` - 邮件发送
 - **线程工具**：`ThreadUtil` - 线程等待、休眠
 - **时间戳**：`TimestampUtil` - 时间戳处理
 - **缓存工具**：`CacheUtil` - 三级缓存操作
+- **日志异常处理**：`LogExceptionUtil` - 异常堆栈格式化（用于日志记录）
 
 ## 使用示例
+
+### 敏感字段脱敏
+
+```java
+// 手机号脱敏（保留前3位和后4位）
+String phone = "13800138000";
+String masked = DesensitizeUtil.desensitizePhone(phone);
+// 输出: 138****8000
+
+// 身份证号脱敏（保留前6位和后4位）
+String idCard = "110101199001011234";
+String masked = DesensitizeUtil.desensitizeIdCard(idCard);
+// 输出: 110101********1234
+
+// 邮箱脱敏（保留@前3位和@后全部）
+String email = "user@example.com";
+String masked = DesensitizeUtil.desensitizeEmail(email);
+// 输出: use***@example.com
+
+// 银行卡号脱敏（保留前4位和后4位）
+String bankCard = "6222021234567890123";
+String masked = DesensitizeUtil.desensitizeBankCard(bankCard);
+// 输出: 6222************0123
+
+// 密码脱敏（全部替换为*）
+String password = "myPassword123";
+String masked = DesensitizeUtil.desensitizePassword(password);
+// 输出: *************
+```
+
+### 日志异常处理
+
+```java
+try {
+    // 业务代码
+} catch (Exception e) {
+    // 获取完整异常堆栈（格式化为字符串）
+    String stackTrace = LogExceptionUtil.getStackTrace(e);
+    
+    // 记录到日志或数据库
+    log.error("操作失败: {}", stackTrace);
+}
+```
+
+### 客户端 IP 获取
+
+```java
+// 从 HttpServletRequest 获取真实客户端 IP
+// 自动处理代理、负载均衡等场景（X-Forwarded-For、X-Real-IP 等）
+HttpServletRequest request = ServletUtil.getRequest();
+String clientIp = ClientIpUtil.getClientIp(request);
+```
 
 ### Bean 拷贝
 

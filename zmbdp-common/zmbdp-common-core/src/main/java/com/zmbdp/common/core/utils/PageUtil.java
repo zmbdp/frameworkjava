@@ -1,5 +1,8 @@
 package com.zmbdp.common.core.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * 分页工具类
  * <p>
@@ -41,6 +44,7 @@ package com.zmbdp.common.core.utils;
  *
  * @author 稚名不带撇
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageUtil {
 
     /**

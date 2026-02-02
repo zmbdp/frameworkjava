@@ -68,12 +68,6 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
 
-        <!--   mybatis-plus     -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-        </dependency>
-
         <!--   JAXB     -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
