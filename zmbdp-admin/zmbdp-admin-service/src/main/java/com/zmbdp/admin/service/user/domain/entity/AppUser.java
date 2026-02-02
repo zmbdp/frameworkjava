@@ -1,7 +1,7 @@
 package com.zmbdp.admin.service.user.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zmbdp.common.core.domain.entity.BaseDO;
+import com.zmbdp.common.domain.domain.entity.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

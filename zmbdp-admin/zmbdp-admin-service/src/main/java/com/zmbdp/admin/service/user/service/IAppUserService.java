@@ -3,7 +3,7 @@ package com.zmbdp.admin.service.user.service;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
-import com.zmbdp.common.core.domain.dto.BasePageDTO;
+import com.zmbdp.common.domain.domain.dto.BasePageDTO;
 
 import java.util.List;
 

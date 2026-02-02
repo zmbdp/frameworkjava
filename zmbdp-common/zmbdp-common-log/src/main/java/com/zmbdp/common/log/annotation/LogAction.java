@@ -103,18 +103,6 @@ import java.lang.annotation.Target;
  * }</pre>
  * </p>
  * <p>
- * <b>注意事项：</b>
- * <ul>
- *     <li>注解必须标注在方法上，类级别不支持</li>
- *     <li>SpEL 表达式中可以使用方法参数名（如 {@code #userDTO}）或 {@code args[0]} 访问参数</li>
- *     <li>SpEL 表达式中可以使用 {@code #result} 访问方法返回值</li>
- *     <li>条件表达式返回 {@code false} 时，不会记录日志</li>
- *     <li>异步处理默认启用，可通过配置 {@code log.async-enabled} 控制</li>
- *     <li>敏感字段（如密码、手机号）会自动脱敏，可通过 {@code desensitizeFields} 配置</li>
- *     <li>无 HTTP 请求上下文时（如内部调用、单元测试）会跳过部分信息收集</li>
- * </ul>
- * </p>
- * <p>
  * <b>类注解示例：</b>
  * <pre>{@code
  * // 在 Controller 类上设置默认配置
@@ -147,7 +135,7 @@ import java.lang.annotation.Target;
  * }</pre>
  * </p>
  * <p>
- * <b>注意事项：</b>
+ * <b>通用注意事项：</b>
  * <ul>
  *     <li>注解可以标注在方法上或类上，支持同时使用</li>
  *     <li>方法注解优先级高于类注解，方法注解存在时完全使用方法注解的配置</li>

@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.domain.entity;
+package com.zmbdp.common.domain.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
