@@ -5,7 +5,7 @@ import com.zmbdp.admin.api.map.domain.dto.PlaceSearchReqDTO;
 import com.zmbdp.admin.service.map.domain.dto.RegionCityDTO;
 import com.zmbdp.admin.service.map.domain.dto.SearchPoiDTO;
 import com.zmbdp.admin.service.map.domain.dto.SysRegionDTO;
-import com.zmbdp.common.core.domain.dto.BasePageDTO;
+import com.zmbdp.common.domain.domain.dto.BasePageDTO;
 
 import java.util.List;
 import java.util.Map;

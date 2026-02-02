@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.domain.dto;
+package com.zmbdp.common.domain.domain.dto;
 
 import lombok.Data;
 

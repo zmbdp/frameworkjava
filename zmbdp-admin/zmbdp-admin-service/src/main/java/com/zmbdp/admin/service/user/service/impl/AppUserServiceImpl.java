@@ -9,12 +9,12 @@ import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
 import com.zmbdp.admin.service.user.service.IAppUserService;
 import com.zmbdp.common.bloomfilter.service.BloomFilterService;
-import com.zmbdp.common.core.domain.dto.BasePageDTO;
 import com.zmbdp.common.core.utils.AESUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.domain.constants.BloomFilterConstants;
 import com.zmbdp.common.domain.domain.ResultCode;
+import com.zmbdp.common.domain.domain.dto.BasePageDTO;
 import com.zmbdp.common.domain.exception.ServiceException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -129,7 +129,7 @@ public class AppUserServiceImpl implements IAppUserService {
         appUserMapper.insert(appUser);
         // 在把这个微信的 id 添加到布隆过滤器中
         bloomFilterService.put(APP_USER_OPEN_ID_PREFIX + appUser.getOpenId());
-        bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+        bloomFilterService.put(APP_USER_PREFIX + appUser.getId());
         // 对象转换
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
@@ -189,7 +189,7 @@ public class AppUserServiceImpl implements IAppUserService {
         appUserMapper.insert(appUser);
         // 将手机号加密之后添加到布隆过滤器中, 一定要添加 appUser 的，确保注册失败之后里面存的也是空
         bloomFilterService.put(APP_USER_PHONE_NUMBER_PREFIX + appUser.getPhoneNumber());
-        bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+        bloomFilterService.put(APP_USER_PREFIX + appUser.getId());
         // 对象转换返回
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
@@ -229,7 +229,7 @@ public class AppUserServiceImpl implements IAppUserService {
         appUser.setAvatar(defaultAvatar);
         appUserMapper.insert(appUser);
         bloomFilterService.put(APP_USER_EMAIL_PREFIX + appUser.getEmail());
-        bloomFilterService.put(APP_USER_PREFIX + String.valueOf(appUser.getId()));
+        bloomFilterService.put(APP_USER_PREFIX + appUser.getId());
         AppUserDTO appUserDTO = new AppUserDTO();
         BeanCopyUtil.copyProperties(appUser, appUserDTO);
         appUserDTO.setUserId(appUser.getId());
@@ -245,7 +245,7 @@ public class AppUserServiceImpl implements IAppUserService {
     public void edit(UserEditReqDTO userEditReqDTO) {
         // 根据 id 查询
         // 先查询布隆过滤器
-        if (!bloomFilterService.mightContain(APP_USER_PREFIX + String.valueOf(userEditReqDTO.getUserId()))) {
+        if (!bloomFilterService.mightContain(APP_USER_PREFIX + userEditReqDTO.getUserId())) {
             throw new ServiceException("用户不存在", ResultCode.INVALID_PARA.getCode());
         }
         AppUser appUser = appUserMapper.selectById(userEditReqDTO.getUserId());
@@ -294,7 +294,7 @@ public class AppUserServiceImpl implements IAppUserService {
     @Override
     public AppUserDTO findById(Long userId) {
         // 对 userId 进行判空操作
-        if (userId == null || !bloomFilterService.mightContain(APP_USER_PREFIX + String.valueOf(userId))) {
+        if (userId == null || !bloomFilterService.mightContain(APP_USER_PREFIX + userId)) {
             return null;
         }
         // 查询 appUser 对象
