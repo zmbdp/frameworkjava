@@ -33,7 +33,7 @@
 这个项目一开始只是我自己用来起新服务的一套工程骨架。
 
 后来项目多了，每个项目里都会重复用到一些东西，
-比如网关、认证、缓存、幂等等，
+比如网关、认证、缓存、幂等、日志、链路追踪、服务监控等，
 就干脆把这些部分慢慢拆出来，整理成现在这个结构。
 
 
@@ -85,8 +85,8 @@ FrameworkJava 本身并不是一个可以直接上线使用的后台系统，这
 
 ### 🚀 一键式环境部署
 
-Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ），支持 dev/test/prd 多环境配置，**5 分钟快速搭建完整开发环境
-**，告别繁琐的环境配置
+Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ、SkyWalking、Prometheus、Grafana），支持 dev/test/prd 多环境配置，
+**5 分钟快速搭建完整开发环境**，告别繁琐的环境配置
 
 ### 🔐 统一认证与鉴权能力
 
@@ -101,6 +101,16 @@ JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系，**
 
 基于 AOP + Redis 的幂等性方案，支持 HTTP / MQ 场景，**针对高并发做了专项优化**，保障数据一致性  
 *（支持防重模式/强幂等模式，Redis + Lua 脚本保证原子性，支持并发穿透控制）*
+
+### 🔍 全链路追踪（SkyWalking）
+
+**无侵入式链路追踪**，自动追踪微服务间的调用链路，支持性能分析、慢查询定位、服务拓扑图、日志关联 TraceId  
+*（基于 Java Agent，零代码侵入，支持 HTTP、RPC、数据库、缓存、消息队列全链路追踪）*
+
+### 📊 全方位服务监控（Prometheus + Grafana）
+
+**实时监控 JVM、接口、数据库、缓存、系统资源**，Grafana 可视化大盘，多级别智能告警（邮件/钉钉/短信）  
+*（30+ 监控指标，10+ 告警规则，开箱即用的监控大盘，支持自定义扩展）*
 
 ### 📦 模块化微服务结构
 
@@ -158,13 +168,17 @@ cd frameworkjava
 
 ```bash
 cd deploy/dev/app
-docker-compose -p frameworkjava -f docker-compose-mid.yml up -d
+docker compose -p frameworkjava -f docker-compose-mid.yml up -d
 ```
 
 **等待 30-60 秒后，访问以下地址验证：**
 
-- Nacos 控制台：[http://localhost:8848/nacos](http://localhost:8848/nacos) (默认账号/密码: nacos/nacos)
-- RabbitMQ 管理界面：[http://localhost:15672](http://localhost:15672) (默认账号/密码: guest/guest)
+- Nacos 控制台：[http://localhost:8848/nacos](http://localhost:8848/nacos)
+- RabbitMQ 管理界面：[http://localhost:15672](http://localhost:15672)
+- SkyWalking UI 界面：[http://localhost:8080](http://localhost:8080)
+- Prometheus 界面：[http://localhost:9090](http://localhost:9090)
+- Grafana 界面：[http://localhost:3000](http://localhost:3000)
+- AlertManager 界面：[http://localhost:9093](http://localhost:9093)
 
 #### 3. 启动服务
 
@@ -188,6 +202,9 @@ mvn spring-boot:run
 - **统一认证**：通过网关访问登录接口，体验 JWT 无状态认证
 - **配置管理**：在 Nacos 控制台查看完整的配置结构和管理方式
 - **缓存体验**：测试三级缓存（布隆过滤器 + Caffeine + Redis）的命中与降级效果
+- **链路追踪**：访问 [SkyWalking UI](http://localhost:8080)，查看服务调用链路和性能分析
+- **服务监控**：访问 [Grafana](http://localhost:3000)，查看 JVM、接口、系统资源监控大盘
+- **告警测试**：访问 [Prometheus](http://localhost:9090)，查看告警规则和触发状态
 - **快速开发**：使用 `zmbdp-mstemplate` 模块作为模板，10 分钟快速新建一个业务微服务
 - **能力验证**：体验幂等性控制、限流防刷、消息发送等核心能力
 
@@ -204,12 +221,14 @@ mvn spring-boot:run
 | 文档                                   | 说明                            |
 |--------------------------------------|-------------------------------|
 | [项目结构说明](docs/PROJECT_STRUCTURE.md)  | 详细的模块划分和职责说明                  |
-| [工具类使用指南](docs/UTILS.md)             | 23 个工具类完整说明与使用示例              |
+| [工具类使用指南](docs/UTILS.md)             | 20 多个工具类完整说明与使用示例             |
 | [配置中心与环境配置](docs/CONFIGURATION.md)   | Nacos 配置、多环境切换指南              |
 | [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
 | [分布式幂等性设计](docs/IDEMPOTENT.md)       | 幂等性控制原理与使用指南                  |
 | [频控 / 防刷](docs/RATELIMIT.md)         | 限流组件说明与使用指南                   |
 | [操作日志](docs/LOG.md)                  | 操作日志组件说明与使用指南                 |
+| [链路追踪](docs/TRACING.md)              | SkyWalking 链路追踪使用指南           |
+| [服务监控与告警](docs/MONITORING.md)        | Prometheus + Grafana 监控告警指南   |
 | [新增业务模块指南](docs/ADD_NEW_MODULE.md)   | 快速创建新微服务模块                    |
 | [性能与并发设计](docs/PERFORMANCE.md)       | 性能优化策略与并发设计                   |
 | [常见问题](docs/FAQ.md)                  | 开发中常见问题解答                     |

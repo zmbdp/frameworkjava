@@ -12,6 +12,8 @@
 - [分布式幂等性](IDEMPOTENT.md)
 - [频控 / 防刷](RATELIMIT.md)
 - [操作日志](LOG.md)
+- [链路追踪](TRACING.md)
+- [服务监控与告警](MONITORING.md)
 
 ## 开发指南
 - [新增业务模块](ADD_NEW_MODULE.md)
