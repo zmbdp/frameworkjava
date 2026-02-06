@@ -73,7 +73,7 @@ import java.lang.reflect.Method;
  * @see ILogProcessStrategy
  * @see UserContextResolver
  * @see TraceResolver
- * @see com.zmbdp.common.log.domain.dto.OperationLogDTO
+ * @see OperationLogDTO
  */
 @Slf4j
 @Component
@@ -243,8 +243,8 @@ public class LogDtoBuildStrategy implements ILogProcessStrategy {
      *
      * @param joinPoint 连接点，不能为 null
      * @param logDTO    操作日志 DTO，不能为 null
-     * @see com.zmbdp.common.core.utils.ServletUtil#getRequest()
-     * @see com.zmbdp.common.core.utils.ClientIpUtil#getClientIp(HttpServletRequest)
+     * @see ServletUtil#getRequest()
+     * @see ClientIpUtil#getClientIp(HttpServletRequest)
      */
     private void fillMethodAndRequest(ProceedingJoinPoint joinPoint, OperationLogDTO logDTO) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();

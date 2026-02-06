@@ -42,7 +42,7 @@ scrape_configs:
           service: 'zmbdp-gateway'
           application: 'gateway'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:10030' ]  # vm2 服务器，替换 vm2_ip 为实际 IP
+      - targets: [ 'vm2:10030' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
@@ -57,7 +57,7 @@ scrape_configs:
           service: 'zmbdp-admin'
           application: 'admin'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:18081' ]  # vm2 服务器，替换 vm2_ip 为实际 IP
+      - targets: [ 'vm2:18081' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
@@ -72,7 +72,7 @@ scrape_configs:
           service: 'zmbdp-portal'
           application: 'portal'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:18083' ]  # vm2 服务器，替换 vm2_ip 为实际 IP
+      - targets: [ 'vm2:18083' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
@@ -87,7 +87,7 @@ scrape_configs:
           service: 'zmbdp-file'
           application: 'file'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:18082' ]  # vm2 服务器，替换 vm2_ip 为实际 IP
+      - targets: [ 'vm2:18082' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
         labels:
           service: 'zmbdp-file'
           application: 'file'
@@ -102,25 +102,19 @@ scrape_configs:
           service: 'zmbdp-mstemplate'
           application: 'mstemplate'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:18085' ]  # vm2 服务器，替换 vm2_ip 为实际 IP
+      - targets: [ 'vm2:18085' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
         labels:
           service: 'zmbdp-mstemplate'
           application: 'mstemplate'
           instance: 'vm2'
 
-  # RabbitMQ 监控（vm1 + vm2，需要启用 rabbitmq_prometheus 插件）
+  # RabbitMQ 监控（单机部署在 vm1，已启用 rabbitmq_prometheus 插件）
   - job_name: 'rabbitmq'
     static_configs:
-      - targets: [ 'frameworkjava-rabbit:15692' ]  # vm1
+      - targets: [ 'frameworkjava-rabbit:15692' ]
         labels:
           service: 'rabbitmq'
-          node: 'rabbitmq01'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:15693' ]  # vm2，替换 vm2_ip 为实际 IP
-        labels:
-          service: 'rabbitmq'
-          node: 'rabbitmq02'
-          instance: 'vm2'
 
   # MySQL 监控（vm1 主库 + vm2 从库，需要安装 mysqld_exporter）
   # - job_name: 'mysql'

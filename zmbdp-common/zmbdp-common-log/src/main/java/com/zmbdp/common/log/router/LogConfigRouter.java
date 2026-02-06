@@ -86,8 +86,8 @@ import org.springframework.stereotype.Component;
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.domain.constants.LogConstants
- * @see org.springframework.core.env.Environment
+ * @see LogConstants
+ * @see Environment
  */
 @Slf4j
 @Component
