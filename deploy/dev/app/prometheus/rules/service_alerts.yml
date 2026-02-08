@@ -7,6 +7,7 @@ groups:
       # 服务下线告警
       - alert: ServiceDown
         expr: up == 0
+        # expr: up{environment!="dev"} == 0 # 表示排除本地环境，本地环境不发送告警消息
         for: 1m
         labels:
           severity: critical

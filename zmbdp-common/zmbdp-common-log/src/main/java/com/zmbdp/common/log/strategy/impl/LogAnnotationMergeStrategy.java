@@ -71,7 +71,7 @@ import org.springframework.stereotype.Component;
  * @author 稚名不带撇
  * @see ILogProcessStrategy
  * @see LogAction
- * @see com.zmbdp.common.domain.constants.LogConstants
+ * @see LogConstants
  */
 @Slf4j
 @Component

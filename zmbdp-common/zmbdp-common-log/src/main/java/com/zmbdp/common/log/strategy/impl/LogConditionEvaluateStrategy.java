@@ -71,7 +71,7 @@ import java.lang.reflect.Method;
  *
  * @author 稚名不带撇
  * @see ILogProcessStrategy
- * @see org.springframework.expression.spel.standard.SpelExpressionParser
+ * @see SpelExpressionParser
  */
 @Slf4j
 @Component
@@ -237,7 +237,7 @@ public class LogConditionEvaluateStrategy implements ILogProcessStrategy {
      * @param joinPoint 连接点，不能为 null
      * @param result    方法返回值（可为 null）
      * @return SpEL 评估上下文
-     * @see org.springframework.expression.spel.support.StandardEvaluationContext
+     * @see StandardEvaluationContext
      */
     private EvaluationContext buildContext(ProceedingJoinPoint joinPoint, Object result) {
         org.aspectj.lang.reflect.MethodSignature signature = (org.aspectj.lang.reflect.MethodSignature) joinPoint.getSignature();
