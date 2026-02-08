@@ -33,88 +33,87 @@ scrape_configs:
         labels:
           service: 'skywalking-oap'
 
-  # 网关服务监控（vm1 + vm2）
+  # 网关服务监控（vm1 + vm2 Docker 容器）
   - job_name: 'zmbdp-gateway'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:10030' ]  # vm1 本机
+      - targets: [ 'frameworkjava-gateway-prd:10030' ]  # vm1 容器（通过 Docker 网络，注意端口是10030）
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
           instance: 'vm1'
-      - targets: [ 'vm2:10030' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
+          environment: 'prd'
+      - targets: [ 'vm2_ip:10030' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
           instance: 'vm2'
+          environment: 'prd'
 
-  # 管理服务监控（vm1 + vm2）
+  # 管理服务监控（vm1 + vm2 Docker 容器）
   - job_name: 'zmbdp-admin'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18081' ]  # vm1 本机
+      - targets: [ 'frameworkjava-admin-prd:18081' ]  # vm1 容器（通过 Docker 网络）
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
           instance: 'vm1'
-      - targets: [ 'vm2:18081' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
+          environment: 'prd'
+      - targets: [ 'vm2_ip:18081' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
           instance: 'vm2'
+          environment: 'prd'
 
-  # 门户服务监控（vm1 + vm2）
+  # 门户服务监控（vm1 + vm2 Docker 容器）
   - job_name: 'zmbdp-portal'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18083' ]  # vm1 本机
+      - targets: [ 'frameworkjava-portal-prd:18083' ]  # vm1 容器（通过 Docker 网络）
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
           instance: 'vm1'
-      - targets: [ 'vm2:18083' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
+          environment: 'prd'
+      - targets: [ 'vm2_ip:18083' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
           instance: 'vm2'
+          environment: 'prd'
 
-  # 文件服务监控（vm1 + vm2）
+  # 文件服务监控（vm1 + vm2 Docker 容器）
   - job_name: 'zmbdp-file'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18082' ]  # vm1 本机
+      - targets: [ 'frameworkjava-file-prd:18082' ]  # vm1 容器（通过 Docker 网络）
         labels:
           service: 'zmbdp-file'
           application: 'file'
           instance: 'vm1'
-      - targets: [ 'vm2:18082' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
+          environment: 'prd'
+      - targets: [ 'vm2_ip:18082' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
         labels:
           service: 'zmbdp-file'
           application: 'file'
           instance: 'vm2'
+          environment: 'prd'
 
-  # 模板服务监控（vm1 + vm2）
-  - job_name: 'zmbdp-mstemplate'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: [ 'localhost:18085' ]  # vm1 本机
-        labels:
-          service: 'zmbdp-mstemplate'
-          application: 'mstemplate'
-          instance: 'vm1'
-      - targets: [ 'vm2:18085' ]  # vm2 服务器，请替换 vm2 为实际 IP 或主机名
-        labels:
-          service: 'zmbdp-mstemplate'
-          application: 'mstemplate'
-          instance: 'vm2'
-
-  # RabbitMQ 监控（单机部署在 vm1，已启用 rabbitmq_prometheus 插件）
+  # RabbitMQ 监控（vm1 + vm2 集群，已启用 rabbitmq_prometheus 插件）
   - job_name: 'rabbitmq'
     static_configs:
-      - targets: [ 'frameworkjava-rabbit:15692' ]
+      - targets: [ 'frameworkjava-rabbit:15692' ]  # vm1 RabbitMQ01
         labels:
           service: 'rabbitmq'
+          node: 'rabbitmq01'
           instance: 'vm1'
+      - targets: [ 'vm2_ip:15673' ]  # vm2 RabbitMQ02（端口是15673），请替换 vm2_ip 为实际 IP
+        labels:
+          service: 'rabbitmq'
+          node: 'rabbitmq02'
+          instance: 'vm2'
 
   # MySQL 监控（vm1 主库 + vm2 从库，需要安装 mysqld_exporter）
   # - job_name: 'mysql'

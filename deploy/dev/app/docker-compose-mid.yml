@@ -29,7 +29,7 @@ services:
     ]
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     healthcheck:
       test: mysql --user=zmbdpdev -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
       start_period: 30s
@@ -68,7 +68,7 @@ services:
       - "9849:9849"
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     depends_on:
       frameworkjava-mysql:
         condition: service_healthy
@@ -92,7 +92,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -115,7 +115,7 @@ services:
       - ../data/frameworkjavadata/rabbit/log:/var/log/rabbit
       - ../data/frameworkjavadata/rabbit/data:/var/lib/rabbit
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
@@ -145,7 +145,7 @@ services:
       - ../data/frameworkjavadata/skywalking/oap/logs:/skywalking/logs
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     depends_on:
       frameworkjava-mysql:
         condition: service_healthy
@@ -167,7 +167,7 @@ services:
       SW_ZIPKIN_ADDRESS: http://frameworkjava-skywalking-oap:9412
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     depends_on:
       frameworkjava-skywalking-oap:
         condition: service_healthy
@@ -195,7 +195,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy" ]
       interval: 10s
@@ -220,7 +220,7 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     depends_on:
       - frameworkjava-prometheus
     healthcheck:
@@ -243,7 +243,7 @@ services:
       - '--storage.path=/alertmanager'
     restart: always
     networks:
-      - frameworkjava_network
+      - frameworkjava_network_dev
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9093/-/healthy" ]
       interval: 10s
@@ -251,4 +251,4 @@ services:
       retries: 5
 
 networks:
-  frameworkjava_network:
+  frameworkjava_network_dev:
