@@ -68,7 +68,7 @@ import java.util.Map;
  *
  * @author 稚名不带撇
  * @see ILogProcessStrategy
- * @see com.zmbdp.common.core.utils.DesensitizeUtil
+ * @see DesensitizeUtil
  */
 @Slf4j
 @Component

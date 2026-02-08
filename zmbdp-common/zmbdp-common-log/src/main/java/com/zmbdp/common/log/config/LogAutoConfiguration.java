@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  * <p>
  * <b>Mapper 扫描说明：</b>
  * <ul>
- *     <li>Mapper 通过 {@link LogMapperConfiguration} 的 {@link org.mybatis.spring.annotation.MapperScan} 扫描</li>
+ *     <li>Mapper 通过 {@link LogMapperConfiguration} 的 {@link MapperScan} 扫描</li>
  *     <li>Mapper 扫描仅在存在 {@link SqlSessionFactory} Bean 时生效</li>
  *     <li>如果应用没有配置数据源，Mapper 不会被扫描，但不会影响其他功能</li>
  *     <li>数据库存储服务在没有 Mapper 时会优雅降级，只记录警告日志</li>

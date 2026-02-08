@@ -41,3 +41,4 @@ build/
 /deploy/test/app/config/cert/key.pem
 /PROJECT_STRUCTURE_DETAILED.md
 /logs/
+/deploy/dev/app/skywalking/apache-skywalking-java-agent-9.5.0/skywalking-agent/logs/
