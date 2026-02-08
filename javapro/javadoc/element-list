@@ -57,6 +57,8 @@ com.zmbdp.common.log.aspect
 com.zmbdp.common.log.config
 com.zmbdp.common.log.domain.dto
 com.zmbdp.common.log.domain.entity
+com.zmbdp.common.log.filter
+com.zmbdp.common.log.interceptor
 com.zmbdp.common.log.mapper
 com.zmbdp.common.log.mq.consumer
 com.zmbdp.common.log.mq.producer
