@@ -191,6 +191,9 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
     restart: always
+    # 添加 extra_hosts 让容器能访问宿主机（用于 SSH 反向隧道）
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - frameworkjava_network
     healthcheck:

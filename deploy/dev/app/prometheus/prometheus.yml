@@ -33,56 +33,55 @@ scrape_configs:
         labels:
           service: 'skywalking-oap'
 
-  # 网关服务监控
+  # 网关服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-gateway'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      # 反向监控本地环境（通过 SSH 隧道）
-      - targets: [ 'localhost:10030' ]
+      - targets: [ 'host.docker.internal:10030' ]
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
-          environment: dev # 表示本地环境
+          environment: 'local-dev'
 
-  # 管理服务监控
+  # 管理服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-admin'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18081' ]
+      - targets: [ 'host.docker.internal:18081' ]
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
-          environment: dev # 表示本地环境
+          environment: 'local-dev'
 
-  # 门户服务监控
+  # 门户服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-portal'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18083' ]
+      - targets: [ 'host.docker.internal:18083' ]
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
-          environment: dev # 表示本地环境
+          environment: 'local-dev'
 
-  # 文件服务监控
+  # 文件服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-file'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18082' ]
+      - targets: [ 'host.docker.internal:18082' ]
         labels:
           service: 'zmbdp-file'
           application: 'file'
-          environment: dev # 表示本地环境
+          environment: 'local-dev'
 
-  # 模板服务监控
+  # 模板服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-mstemplate'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18085' ]
+      - targets: [ 'host.docker.internal:18085' ]
         labels:
           service: 'zmbdp-mstemplate'
           application: 'mstemplate'
-          environment: dev # 表示本地环境
+          environment: 'local-dev'
 
   # MySQL 监控（可选，需要安装 mysqld_exporter）
   # - job_name: 'mysql'
