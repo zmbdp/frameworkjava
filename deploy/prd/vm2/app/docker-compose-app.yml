@@ -31,7 +31,7 @@ services:
     build:
       context: service/gateway
     ports:
-      - "18080:18080"
+      - "10030:10030"
     image: frameworkjavaprd/zmbdp-gateway-service:1.0-SNAPSHOT
     container_name: frameworkjava-gateway-prd
     environment:
