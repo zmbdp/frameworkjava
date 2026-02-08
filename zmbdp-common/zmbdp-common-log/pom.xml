@@ -31,6 +31,34 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
+        <!-- RabbitMQ（可选，用于消息队列存储） -->
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>zmbdp-common-rabbitmq</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- OpenFeign（用于 Feign 拦截器） -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>zmbdp-common-monitor</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- 公共领域对象（异常、常量等） -->
         <dependency>
             <groupId>com.zmbdp</groupId>
@@ -57,21 +85,6 @@
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-redis</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- RabbitMQ（可选，用于消息队列存储） -->
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>zmbdp-common-rabbitmq</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 

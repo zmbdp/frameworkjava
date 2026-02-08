@@ -1,2 +1,3 @@
 com.zmbdp.common.log.config.LogAutoConfiguration
 com.zmbdp.common.log.config.RabbitConfig
+com.zmbdp.common.log.config.FeignConfig

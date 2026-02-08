@@ -2,7 +2,20 @@
 
 ## 📖 概述
 
-FrameworkJava 集成了 **Apache SkyWalking** 作为分布式链路追踪解决方案，提供：
+FrameworkJava 提供了两种链路追踪方案：
+
+### 1. 轻量级 TraceId 方案（推荐用于日志追踪）
+
+基于 MDC 实现的轻量级 TraceId 传递，无需 Agent，开箱即用：
+
+- **全链路 TraceId**：从网关到所有微服务保持一致的 TraceId
+- **日志关联**：所有日志自动包含 TraceId，便于问题排查
+- **零侵入**：无需修改业务代码，自动传递
+- **高性能**：基于 MDC，性能损耗极小
+
+### 2. Apache SkyWalking 方案（推荐用于性能分析）
+
+功能强大的 APM 系统，提供：
 
 - **全链路追踪**：自动追踪微服务间的调用链路
 - **性能分析**：分析接口响应时间、慢查询、性能瓶颈
@@ -10,7 +23,235 @@ FrameworkJava 集成了 **Apache SkyWalking** 作为分布式链路追踪解决�
 - **告警功能**：异常自动告警
 - **日志关联**：日志自动关联 TraceId
 
-## 🚀 快速开始
+---
+
+## 🎯 方案一：轻量级 TraceId（推荐）
+
+### 🌟 智能适配：自动兼容 SkyWalking
+
+**重要特性：我们的实现会自动检测并适配 SkyWalking！**
+
+**TraceId 获取优先级：**
+
+```
+1. SkyWalking 的 traceId（如果配置了 Agent）
+   ↓ 如果没有
+2. 请求头中的 traceId（X-Trace-Id）
+   ↓ 如果没有
+3. 生成新的 traceId（32位UUID）
+```
+
+**这意味着：**
+
+- ✅ **配置了 SkyWalking**：自动使用 SkyWalking 的 traceId，获得性能分析 + 统一的 traceId
+- ✅ **未配置 SkyWalking**：自动生成轻量级 traceId，仍然有完整的日志追踪
+- ✅ **跨服务 traceId 始终保持一致**
+- ✅ **无需修改代码，自动适配**
+
+### 架构说明
+
+```
+客户端请求
+    ↓
+Gateway [生成 traceId=abc123]
+    ↓ (请求头: X-Trace-Id: abc123)
+Admin Service [traceId=abc123]
+    ↓ (Feign 请求头: X-Trace-Id: abc123)
+File Service [traceId=abc123]
+```
+
+### 实现原理
+
+1. **Gateway 层（TraceFilter）**
+   - 生成全局唯一的 traceId（32位UUID）
+   - 设置到 MDC：`MDC.put("traceId", traceId)`
+   - 添加到请求头：`X-Trace-Id`
+
+2. **微服务层（TraceIdFilter）**
+   - 从请求头提取 traceId
+   - 设置到 MDC：`MDC.put("traceId", traceId)`
+   - 请求结束后清理 MDC
+
+3. **Feign 调用（FeignTraceInterceptor）**
+   - 从 MDC 获取 traceId
+   - 添加到 Feign 请求头：`X-Trace-Id`
+   - 确保下游服务接收到相同的 traceId
+
+### 核心组件
+
+#### 1. Gateway 过滤器
+
+**位置：** `zmbdp-gateway/src/main/java/com/zmbdp/gateway/filter/TraceFilter.java`
+
+**功能：**
+
+- 优先使用 SkyWalking 的 traceId（如果配置了 Agent）
+- 否则生成轻量级 traceId（32位UUID）
+- 设置到 MDC 和请求头
+- 优先级：-300（最先执行）
+
+#### 2. 微服务过滤器
+
+**位置：** `zmbdp-common-log/src/main/java/com/zmbdp/common/log/filter/TraceIdFilter.java`
+
+**功能：**
+
+- 优先使用 SkyWalking 的 traceId（如果配置了 Agent）
+- 否则从请求头提取 traceId
+- 设置到 MDC
+- 请求结束后清理 MDC
+
+#### 3. Feign 拦截器
+
+**位置：** `zmbdp-common-log/src/main/java/com/zmbdp/common/log/interceptor/FeignTraceInterceptor.java`
+
+**功能：**
+
+- 从 MDC 获取 traceId（可能是 SkyWalking 的，也可能是轻量级的）
+- 添加到 Feign 请求头
+- 实现跨服务传递
+
+#### 4. Feign 配置类
+
+**位置：** `zmbdp-common-log/src/main/java/com/zmbdp/common/log/config/FeignConfig.java`
+
+**功能：**
+
+- 注册 Feign 拦截器
+- 使用 `@ConditionalOnClass` 确保只在有 Feign 时生效
+- Gateway 不会加载此配置（因为 Gateway 没有 Feign 依赖）
+
+### 使用方式
+
+#### 场景 1：开发环境 - 只需要日志追踪
+
+```bash
+# 不需要配置 SkyWalking Agent
+# 直接启动服务即可
+java -jar zmbdp-gateway.jar
+```
+
+✅ **效果：**
+
+- 自动生成轻量级 traceId（32位UUID）
+- 所有日志自动包含 traceId
+- 跨服务 traceId 保持一致
+- 零配置，开箱即用
+
+**日志示例：**
+
+```
+2026-02-03 10:00:00.123 [abc123def456] INFO  Gateway 处理请求
+2026-02-03 10:00:00.130 [abc123def456] INFO  Admin 处理业务
+2026-02-03 10:00:00.140 [abc123def456] INFO  File 上传文件
+```
+
+#### 场景 2：生产环境 - 性能分析 + 日志追踪（推荐）⭐
+
+```bash
+# 配置 SkyWalking Agent
+java -javaagent:/path/to/skywalking-agent.jar \
+     -Dskywalking.agent.service_name=zmbdp-gateway-service \
+     -Dskywalking.collector.backend_service=skywalking-oap:11800 \
+     -jar zmbdp-gateway.jar
+```
+
+✅ **效果：**
+
+- **自动使用 SkyWalking 的 traceId**（无需修改代码）
+- 完整的 APM 功能（性能分析、服务拓扑图、慢查询分析）
+- 跨服务 traceId 保持一致（使用 SkyWalking 的 traceId）
+- 所有日志自动包含 traceId
+- 可以在 SkyWalking UI 中查看完整的调用链路
+
+**日志示例：**
+
+```
+2026-02-03 10:00:00.123 [TID:N.e4a.16753.17] INFO  Gateway 处理请求
+2026-02-03 10:00:00.130 [TID:N.e4a.16753.17] INFO  Admin 处理业务
+2026-02-03 10:00:00.140 [TID:N.e4a.16753.17] INFO  File 上传文件
+```
+
+**SkyWalking UI 中可以看到：**
+
+- 完整的调用链路（Gateway → Admin → File）
+- 每个服务的响应时间
+- SQL 查询详情
+- 异常堆栈信息
+- 根据 traceId 关联所有日志
+
+#### 两者对比
+
+| 特性             | 未配置 SkyWalking | 配置了 SkyWalking |
+|----------------|----------------|----------------|
+| **TraceId 格式** | 32位UUID        | SkyWalking 格式  |
+| **日志追踪**       | ✅ 支持           | ✅ 支持           |
+| **跨服务一致**      | ✅ 一致           | ✅ 一致           |
+| **性能分析**       | ❌ 不支持          | ✅ 支持           |
+| **服务拓扑图**      | ❌ 不支持          | ✅ 支持           |
+| **慢查询分析**      | ❌ 不支持          | ✅ 支持           |
+| **配置复杂度**      | 零配置            | 需要配置 Agent     |
+| **性能损耗**       | <1%            | 1-3%           |
+
+### 1. 无需任何配置
+
+所有组件已自动注册，无需额外配置。
+
+#### 2. 日志配置（Nacos）
+
+在 `share-monitor-{env}.yaml` 中配置：
+
+```yaml
+logging:
+   pattern:
+      console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
+      file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
+```
+
+#### 3. 查看日志
+
+**Gateway 日志：**
+
+```
+2026-02-03 10:00:00.123 [abc123def456] INFO  [reactor-http-nio-2] c.z.g.f.TraceFilter : 生成 traceId
+```
+
+**Admin Service 日志：**
+
+```
+2026-02-03 10:00:00.130 [abc123def456] INFO  [http-nio-18081-exec-1] c.z.a.c.UploadController : 处理上传请求
+```
+
+**File Service 日志：**
+
+```
+2026-02-03 10:00:00.140 [abc123def456] INFO  [http-nio-18082-exec-1] c.z.f.c.FileController : 接收文件上传
+```
+
+✅ **所有日志的 traceId 保持一致！**
+
+### 优势
+
+- ✅ **零配置**：无需 Agent，无需 XML 配置
+- ✅ **高性能**：基于 MDC，性能损耗极小
+- ✅ **全链路**：从网关到所有微服务保持一致
+- ✅ **易排查**：根据 traceId 快速定位问题
+
+### 日志查询
+
+```bash
+# 根据 traceId 查询所有相关日志
+grep "abc123def456" logs/*.log
+
+# 或使用 ELK 查询
+traceId: "abc123def456"
+```
+
+---
+
+## 🚀 方案二：Apache SkyWalking
+
+## 🚀 SkyWalking 快速开始
 
 ### 1. 启动 SkyWalking 服务
 
@@ -133,14 +374,14 @@ FrameworkJava 已集成 SkyWalking Logback 插件，日志会自动关联 TraceI
 **日志格式：**
 
 ```
-2026-02-02 10:30:45.123 [TID:a1b2c3d4e5f6] INFO  [http-nio-10010-exec-1] c.z.a.s.u.c.SysUserController : 用户登录成功
+2026-02-02 10:30:45.123 [a1b2c3d4e5f6] INFO  [http-nio-10010-exec-1] c.z.a.s.u.c.SysUserController : 用户登录成功
 ```
 
 **根据 TraceId 查询日志：**
 
 ```bash
 # 在日志文件中搜索
-grep "TID:a1b2c3d4e5f6" logs/zmbdp-admin-service.log
+grep "a1b2c3d4e5f6" logs/zmbdp-admin-service.log
 ```
 
 ### 5. 手动埋点（可选）

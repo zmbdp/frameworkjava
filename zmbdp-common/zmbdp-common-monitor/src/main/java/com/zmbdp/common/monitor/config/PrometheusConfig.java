@@ -102,4 +102,3 @@ public class PrometheusConfig {
         return new FileDescriptorMetrics();
     }
 }
-

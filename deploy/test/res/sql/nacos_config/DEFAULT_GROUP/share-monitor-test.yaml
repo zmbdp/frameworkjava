@@ -88,15 +88,22 @@ skywalking:
     # Span 限制
     span_limit_per_segment: 300
 
-# ==================== 日志配置（关联 TraceId）====================
+# ==================== 日志格式规则配置（关联 TraceId）====================
 logging:
   pattern:
-    # 控制台日志格式（使用 SkyWalking 的 tid）
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [TID:%X{tid}] %-5level [%thread] %logger{36} : %msg%n"
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
   level:
-    # 根日志级别
-    root: INFO
-    # 框架日志级别
-    com.zmbdp: DEBUG
-    # SQL 日志级别
-    com.zmbdp.*.mapper: DEBUG
+    com.zmbdp.common.log.service.impl: debug
+    com.zmbdp.common.log.mq: debug
+    com.zmbdp..mapper: debug
+  file:
+    name: ./logs/${spring.application.name}.log # 日志文件名
+  logback:
+    rollingpolicy:
+      # 日志滚动策略
+      file-name-pattern: ./logs/%d{yyyy-MM-dd}/${spring.application.name}-%d{yyyy-MM-dd}-%i.log
+      max-file-size: 100MB # 日志文件最大大小
+      max-history: 3 # 日志文件保留天数
+      total-size-cap: 3GB # 日志文件总大小
+      clean-history-on-start: false # 是否在启动时清理历史日志

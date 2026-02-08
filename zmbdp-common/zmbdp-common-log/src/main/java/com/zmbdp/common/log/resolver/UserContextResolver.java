@@ -57,8 +57,8 @@ import org.springframework.stereotype.Component;
  * </ul>
  *
  * @author 稚名不带撇
- * @see com.zmbdp.common.security.service.TokenService
- * @see com.zmbdp.common.log.domain.dto.OperationLogDTO
+ * @see TokenService
+ * @see OperationLogDTO
  */
 @Slf4j
 @Component
@@ -117,8 +117,8 @@ public class UserContextResolver {
      * </ul>
      *
      * @param logDTO 操作日志 DTO，不能为 null
-     * @see com.zmbdp.common.security.service.TokenService#getLoginUser(String)
-     * @see com.zmbdp.common.core.utils.ServletUtil#getRequest()
+     * @see TokenService#getLoginUser(String)
+     * @see ServletUtil#getRequest()
      */
     public void fill(OperationLogDTO logDTO) {
         try {

@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  *
  * @author 稚名不带撇
  * @see org.slf4j.MDC
- * @see com.zmbdp.common.log.domain.dto.OperationLogDTO
+ * @see OperationLogDTO
  */
 @Slf4j
 @Component
@@ -96,7 +96,7 @@ public class TraceResolver {
      *
      * @param logDTO 操作日志 DTO，不能为 null
      * @see org.slf4j.MDC#get(String)
-     * @see com.zmbdp.common.core.utils.ServletUtil#getRequest()
+     * @see ServletUtil#getRequest()
      */
     public void fill(OperationLogDTO logDTO) {
         try {
