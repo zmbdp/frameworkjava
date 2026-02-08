@@ -33,50 +33,55 @@ scrape_configs:
         labels:
           service: 'skywalking-oap'
 
-  # 网关服务监控
+  # 网关服务监控（Test 环境 - 服务部署在 Docker 容器）
   - job_name: 'zmbdp-gateway'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:10030' ]  # 服务部署在同一台服务器
+      - targets: [ 'frameworkjava-gateway-test:10030' ]
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
+          environment: 'test'
 
-  # 管理服务监控
+  # 管理服务监控（Test 环境 - 服务部署在 Docker 容器）
   - job_name: 'zmbdp-admin'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18081' ]  # 服务部署在同一台服务器
+      - targets: [ 'frameworkjava-admin-test:18081' ]
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
+          environment: 'test'
 
-  # 门户服务监控
+  # 门户服务监控（Test 环境 - 服务部署在 Docker 容器）
   - job_name: 'zmbdp-portal'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18083' ]  # 服务部署在同一台服务器
+      - targets: [ 'frameworkjava-portal-test:18083' ]
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
+          environment: 'test'
 
-  # 文件服务监控
+  # 文件服务监控（Test 环境 - 服务部署在 Docker 容器）
   - job_name: 'zmbdp-file'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18082' ]  # 服务部署在同一台服务器
+      - targets: [ 'frameworkjava-file-test:18082' ]
         labels:
           service: 'zmbdp-file'
           application: 'file'
+          environment: 'test'
 
-  # 模板服务监控
+  # 模板服务监控（Test 环境 - 服务部署在 Docker 容器）
   - job_name: 'zmbdp-mstemplate'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: [ 'localhost:18085' ]  # 服务部署在同一台服务器
+      - targets: [ 'frameworkjava-mstemplate-test:18085' ]
         labels:
           service: 'zmbdp-mstemplate'
           application: 'mstemplate'
+          environment: 'test'
 
   # RabbitMQ 监控
   - job_name: 'rabbitmq'
