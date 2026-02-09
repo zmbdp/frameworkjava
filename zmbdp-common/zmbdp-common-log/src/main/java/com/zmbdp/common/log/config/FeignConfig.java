@@ -40,8 +40,7 @@ public class FeignConfig {
     /**
      * 注册 Feign 链路追踪拦截器
      * <p>
-     * 该拦截器会在所有 Feign 请求发送前执行，
-     * 自动将 MDC 中的 traceId 添加到请求头中。
+     * 该拦截器会在所有 Feign 请求发送前执行，自动将 MDC 中的 traceId 添加到请求头中。
      *
      * @return Feign 请求拦截器
      */
@@ -51,8 +50,16 @@ public class FeignConfig {
         return new FeignTraceInterceptor();
     }
 
+    /**
+     * 注册 TraceIdFilter
+     * <p>
+     * 该过滤器会在所有请求处理之前执行，自动将 MDC 中的 traceId 添加到响应头中。
+     *
+     * @return TraceIdFilter
+     */
     @Bean
     public Filter traceIdFilter() {
+        log.info("注册 TraceIdFilter");
         return new TraceIdFilter();
     }
 }
