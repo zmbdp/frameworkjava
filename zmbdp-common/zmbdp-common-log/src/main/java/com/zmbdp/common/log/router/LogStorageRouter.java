@@ -232,4 +232,3 @@ public class LogStorageRouter {
         return Character.toLowerCase(className.charAt(0)) + className.substring(1);
     }
 }
-
