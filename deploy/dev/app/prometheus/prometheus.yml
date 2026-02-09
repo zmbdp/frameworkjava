@@ -41,7 +41,7 @@ scrape_configs:
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
-          environment: 'local-dev'
+          environment: 'dev'
 
   # 管理服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-admin'
@@ -51,7 +51,7 @@ scrape_configs:
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
-          environment: 'local-dev'
+          environment: 'dev'
 
   # 门户服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-portal'
@@ -61,7 +61,7 @@ scrape_configs:
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
-          environment: 'local-dev'
+          environment: 'dev'
 
   # 文件服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-file'
@@ -71,7 +71,7 @@ scrape_configs:
         labels:
           service: 'zmbdp-file'
           application: 'file'
-          environment: 'local-dev'
+          environment: 'dev'
 
   # 模板服务监控（本地开发环境通过 SSH 反向隧道）
   - job_name: 'zmbdp-mstemplate'
@@ -81,7 +81,7 @@ scrape_configs:
         labels:
           service: 'zmbdp-mstemplate'
           application: 'mstemplate'
-          environment: 'local-dev'
+          environment: 'dev'
 
   # MySQL 监控（可选，需要安装 mysqld_exporter）
   # - job_name: 'mysql'
