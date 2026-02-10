@@ -31,5 +31,5 @@ public interface ArgumentServiceApi {
      * @return 多个参数对象
      */
     @GetMapping("/keys")
-    List<ArgumentDTO> getByConfigKeys(@RequestParam List<String> configKeys);
+    List<ArgumentDTO> getByConfigKeys(@RequestParam("configKeys") List<String> configKeys);
 }
