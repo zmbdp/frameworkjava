@@ -163,7 +163,6 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
         List<SysArgument> sysArguments = sysArgumentMapper.selectList(new LambdaQueryWrapper<SysArgument>()
                 .in(SysArgument::getConfigKey, configKeys)
         );
-        List<ArgumentDTO> result = BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
-        return result;
+        return BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
     }
 }
