@@ -126,11 +126,12 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         }
         // 存在的话就判断字典类型的键是否存在一致的, 如果说，键不一样，但是值一样了，那么就返回字典类型已存在,
         // 因为键不允许修改，添加的时候也不允许重复，所以说键肯定不会相同
-        if (sysDictionaryTypeMapper.selectOne(new LambdaQueryWrapper<SysDictionaryType>()
-                // 查出不一样的键
-                .ne(SysDictionaryType::getTypeKey, dictionaryTypeWriteReqDTO.getTypeKey())
-                // 查出一样的值
-                .eq(SysDictionaryType::getValue, dictionaryTypeWriteReqDTO.getValue())
+        if (sysDictionaryTypeMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryType>()
+                        // 查出不一样的键
+                        .ne(SysDictionaryType::getTypeKey, dictionaryTypeWriteReqDTO.getTypeKey())
+                        // 查出一样的值
+                        .eq(SysDictionaryType::getValue, dictionaryTypeWriteReqDTO.getValue())
         ) != null) {
             log.warn("SysDictionaryServiceImpl.editType: [字典类型值已存在: {} ]", dictionaryTypeWriteReqDTO);
             throw new ServiceException("字典类型的值已存在");
@@ -234,10 +235,11 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
             throw new ServiceException("字典数据不存在");
         }
         // 然后再看字典数据的 value 是否已经存在
-        if (sysDictionaryDataMapper.selectOne(new LambdaQueryWrapper<SysDictionaryData>()
-                // 如果说字典数据 key 不一样的情况下，value 一样了，就说明字典数据 value 已经存在了，就抛异常
-                .ne(SysDictionaryData::getDataKey, dictionaryDataEditReqDTO.getDataKey())
-                .eq(SysDictionaryData::getValue, dictionaryDataEditReqDTO.getValue())) != null
+        if (sysDictionaryDataMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        // 如果说字典数据 key 不一样的情况下，value 一样了，就说明字典数据 value 已经存在了，就抛异常
+                        .ne(SysDictionaryData::getDataKey, dictionaryDataEditReqDTO.getDataKey())
+                        .eq(SysDictionaryData::getValue, dictionaryDataEditReqDTO.getValue())) != null
         ) {
             log.warn("SysDictionaryServiceImpl.editData: [字典数据值已存在: {} ]", dictionaryDataEditReqDTO);
             throw new ServiceException("字典数据值已存在");
@@ -265,8 +267,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
     @Override
     public List<DictionaryDataDTO> selectDictDataByType(String typeKey) {
         // 先获取到表里符合要求的数据
-        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
-                .eq(SysDictionaryData::getTypeKey, typeKey)
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .eq(SysDictionaryData::getTypeKey, typeKey)
         );
         // 然后直接 BeanCopy 转换
         return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
@@ -284,8 +287,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
             return Collections.emptyMap();
         }
         // 根据传过来的字典类型 key 获取数据
-        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
-                .in(SysDictionaryData::getTypeKey, typeKeys)
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .in(SysDictionaryData::getTypeKey, typeKeys)
         );
         List<DictionaryDataDTO> dtoList = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
         Map<String, List<DictionaryDataDTO>> result = new LinkedHashMap<>();
@@ -310,8 +314,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
     @Override
     public DictionaryDataDTO getDicDataByKey(String dataKey) {
         // 根据字典数据业务主键获取字典数据对象
-        SysDictionaryData dictionaryData = sysDictionaryDataMapper.selectOne(new LambdaQueryWrapper<SysDictionaryData>()
-                .eq(SysDictionaryData::getDataKey, dataKey)
+        SysDictionaryData dictionaryData = sysDictionaryDataMapper.selectOne(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .eq(SysDictionaryData::getDataKey, dataKey)
         );
         // 对象转换
         return BeanCopyUtil.copyProperties(dictionaryData, DictionaryDataDTO::new);
@@ -329,8 +334,9 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
             return Collections.emptyList();
         }
         // 获取符合要求的所有数据
-        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(new LambdaQueryWrapper<SysDictionaryData>()
-                .in(SysDictionaryData::getDataKey, dataKeys)
+        List<SysDictionaryData> list = sysDictionaryDataMapper.selectList(
+                new LambdaQueryWrapper<SysDictionaryData>()
+                        .in(SysDictionaryData::getDataKey, dataKeys)
         );
         // 然后直接转换对象
         return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);

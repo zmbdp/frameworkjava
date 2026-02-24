@@ -47,10 +47,11 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
     @Override
     public Long addArgument(ArgumentAddReqDTO argumentAddReqDTO) {
         // 查一下看看有没有重复的 参数业务主键 (configKey) 或者是 参数名称 (name)
-        SysArgument sysArgument = sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
-                .eq(SysArgument::getConfigKey, argumentAddReqDTO.getConfigKey())
-                .or()
-                .eq(SysArgument::getName, argumentAddReqDTO.getName())
+        SysArgument sysArgument = sysArgumentMapper.selectOne(
+                new LambdaQueryWrapper<SysArgument>()
+                        .eq(SysArgument::getConfigKey, argumentAddReqDTO.getConfigKey())
+                        .or()
+                        .eq(SysArgument::getName, argumentAddReqDTO.getName())
         );
         if (sysArgument != null) {
             log.warn("SysArgumentServiceImplImpl.addArgument: [参数业务主键或参数名称重复: {} ]", argumentAddReqDTO);
@@ -103,17 +104,19 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
     @Override
     public Long editArgument(ArgumentEditReqDTO argumentEditReqDTO) {
         // 根据参数业务逐渐查询出信息
-        SysArgument sysArgument = sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
-                .eq(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
+        SysArgument sysArgument = sysArgumentMapper.selectOne(
+                new LambdaQueryWrapper<SysArgument>()
+                        .eq(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
         );
         if (sysArgument == null) {
             log.warn("SysArgumentServiceImplImpl.editArgument: [参数业务主键不存在: {} ]", argumentEditReqDTO);
             throw new ServiceException("参数业务主键不存在");
         }
         // 说明存在这个参数主键，但是名字不能重复，就是说再主键不同的情况下，name 相同了
-        if (sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
-                .ne(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
-                .eq(SysArgument::getName, argumentEditReqDTO.getName())) != null
+        if (sysArgumentMapper.selectOne(
+                new LambdaQueryWrapper<SysArgument>()
+                        .ne(SysArgument::getConfigKey, argumentEditReqDTO.getConfigKey())
+                        .eq(SysArgument::getName, argumentEditReqDTO.getName())) != null
         ) {
             log.warn("SysArgumentServiceImplImpl.editArgument: [参数名称已存在: {} ]", argumentEditReqDTO);
             throw new ServiceException("参数名称已存在");
@@ -139,8 +142,9 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
     @Override
     public ArgumentDTO getByConfigKey(String configKey) {
         // 直接查数据库就好了
-        SysArgument sysArgument = sysArgumentMapper.selectOne(new LambdaQueryWrapper<SysArgument>()
-                .eq(SysArgument::getConfigKey, configKey)
+        SysArgument sysArgument = sysArgumentMapper.selectOne(
+                new LambdaQueryWrapper<SysArgument>()
+                        .eq(SysArgument::getConfigKey, configKey)
         );
         ArgumentDTO argumentDTO = new ArgumentDTO();
         if (sysArgument != null) {
@@ -160,8 +164,9 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
         if (configKeys == null || configKeys.isEmpty()) {
             return Collections.emptyList();
         }
-        List<SysArgument> sysArguments = sysArgumentMapper.selectList(new LambdaQueryWrapper<SysArgument>()
-                .in(SysArgument::getConfigKey, configKeys)
+        List<SysArgument> sysArguments = sysArgumentMapper.selectList(
+                new LambdaQueryWrapper<SysArgument>()
+                        .in(SysArgument::getConfigKey, configKeys)
         );
         return BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
     }
