@@ -51,6 +51,7 @@ frameworkjava/
 - **redis**：Redis 操作封装
 - **security**：JWT 认证、权限校验
 - **snowflake**：分布式 ID 生成
+- **datapermission**：数据权限控制（基于 MyBatis 拦截器）
 
 ### zmbdp-admin
 **职责**：基础服务

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmbdp.mstemplate.service.test.mapper.TestOrderMapper">
+
+    <!-- 查询订单列表 - 使用默认配置 -->
+    <select id="selectListDefault" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 仅本人数据 -->
+    <select id="selectListSelf" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 本部门数据 -->
+    <select id="selectListDept" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 本部门及子部门数据 -->
+    <select id="selectListDeptAndChild" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 全部数据 -->
+    <select id="selectListAll" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 自定义条件 -->
+    <select id="selectListCustom" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 自定义用户字段名 -->
+    <select id="selectListCustomUserColumn" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 自定义部门字段名 -->
+    <select id="selectListCustomDeptColumn" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 启用多租户过滤 -->
+    <select id="selectListWithTenant" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+    </select>
+
+    <!-- 查询订单列表 - 使用表别名 -->
+    <select id="selectListWithAlias" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select o.*
+        from test_order o
+    </select>
+
+    <!-- 根据订单号查询 -->
+    <select id="selectByOrderNo" resultType="com.zmbdp.mstemplate.service.test.domain.entity.TestOrder">
+        select *
+        from test_order
+        where order_no = #{orderNo}
+    </select>
+
+</mapper>

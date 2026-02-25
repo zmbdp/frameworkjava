@@ -11,6 +11,7 @@
 - [三级缓存架构](CACHE_ARCHITECTURE.md)
 - [分布式幂等性](IDEMPOTENT.md)
 - [频控 / 防刷](RATELIMIT.md)
+- [数据权限控制](DATAPERMISSION.md)
 - [操作日志](LOG.md)
 - [链路追踪](TRACING.md)
 - [服务监控与告警](MONITORING.md)
