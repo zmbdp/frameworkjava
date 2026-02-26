@@ -1,9 +1,9 @@
-package com.zmbdp.mstemplate.service.test.mapper;
+package com.zmbdp.mstemplate.service.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zmbdp.common.datapermission.annotation.DataPermission;
 import com.zmbdp.common.datapermission.enums.DataPermissionType;
-import com.zmbdp.mstemplate.service.test.domain.entity.TestOrder;
+import com.zmbdp.mstemplate.service.domain.entity.TestOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

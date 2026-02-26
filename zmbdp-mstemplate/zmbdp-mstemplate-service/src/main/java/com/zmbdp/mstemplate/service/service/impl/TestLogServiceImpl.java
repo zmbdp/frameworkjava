@@ -3,7 +3,7 @@ package com.zmbdp.mstemplate.service.service.impl;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.log.annotation.LogAction;
-import com.zmbdp.mstemplate.service.domain.LogTestDTO;
+import com.zmbdp.mstemplate.service.domain.dto.LogTestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

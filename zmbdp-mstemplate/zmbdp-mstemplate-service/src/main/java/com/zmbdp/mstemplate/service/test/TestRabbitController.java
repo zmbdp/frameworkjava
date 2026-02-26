@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.common.domain.domain.Result;
-import com.zmbdp.mstemplate.service.domain.MessageDTO;
+import com.zmbdp.mstemplate.service.domain.dto.MessageDTO;
 import com.zmbdp.mstemplate.service.rabbit.Producer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

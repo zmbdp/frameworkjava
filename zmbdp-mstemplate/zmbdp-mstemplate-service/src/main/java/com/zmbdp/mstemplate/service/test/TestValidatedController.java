@@ -1,6 +1,6 @@
 package com.zmbdp.mstemplate.service.test;
 
-import com.zmbdp.mstemplate.service.domain.ValidationUserReqDTO;
+import com.zmbdp.mstemplate.service.domain.dto.ValidationUserReqDTO;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

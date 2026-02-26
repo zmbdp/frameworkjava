@@ -1,4 +1,4 @@
-package com.zmbdp.mstemplate.service.test.domain.entity;
+package com.zmbdp.mstemplate.service.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zmbdp.common.domain.domain.entity.BaseDO;
