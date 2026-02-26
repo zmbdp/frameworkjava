@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.test;
 
 import com.zmbdp.common.domain.domain.Result;
-import com.zmbdp.mstemplate.service.domain.LogTestDTO;
+import com.zmbdp.mstemplate.service.domain.dto.LogTestDTO;
 import com.zmbdp.mstemplate.service.service.impl.TestLogServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

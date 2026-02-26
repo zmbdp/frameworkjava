@@ -3,7 +3,7 @@ package com.zmbdp.mstemplate.service.rabbit;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.idempotent.annotation.Idempotent;
-import com.zmbdp.mstemplate.service.domain.MessageDTO;
+import com.zmbdp.mstemplate.service.domain.dto.MessageDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

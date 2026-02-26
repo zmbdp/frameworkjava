@@ -128,22 +128,22 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsg(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">produceMsg</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsg(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">produceMsg</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">发送消息到 testQueue 队列</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotent(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">produceMsgIdempotent</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotent(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">produceMsgIdempotent</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">发送消息到 testQueueIdempotent 队列（幂等性测试队列）</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotentFailure(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">produceMsgIdempotentFailure</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotentFailure(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">produceMsgIdempotentFailure</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">发送消息到 testQueueIdempotentFailure 队列（幂等性失败测试队列）</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotentHeader(com.zmbdp.mstemplate.service.domain.MessageDTO,java.lang.String)" class="member-name-link">produceMsgIdempotentHeader</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#produceMsgIdempotentHeader(com.zmbdp.mstemplate.service.domain.dto.MessageDTO,java.lang.String)" class="member-name-link">produceMsgIdempotentHeader</a><wbr>(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;idempotentToken)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">发送消息到 testQueueIdempotentHeader 队列（消息头方式幂等性测试队列）
@@ -196,7 +196,7 @@ loadScripts(document, 'script');</script>
 <h2>方法详细资料</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="produceMsg(com.zmbdp.mstemplate.service.domain.MessageDTO)">
+<section class="detail" id="produceMsg(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)">
 <h3>produceMsg</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">produceMsg</span><wbr><span class="parameters">(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</span></div>
 <div class="block">发送消息到 testQueue 队列</div>
@@ -207,7 +207,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="produceMsgIdempotent(com.zmbdp.mstemplate.service.domain.MessageDTO)">
+<section class="detail" id="produceMsgIdempotent(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)">
 <h3>produceMsgIdempotent</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">produceMsgIdempotent</span><wbr><span class="parameters">(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</span></div>
 <div class="block">发送消息到 testQueueIdempotent 队列（幂等性测试队列）</div>
@@ -218,7 +218,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="produceMsgIdempotentFailure(com.zmbdp.mstemplate.service.domain.MessageDTO)">
+<section class="detail" id="produceMsgIdempotentFailure(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)">
 <h3>produceMsgIdempotentFailure</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">produceMsgIdempotentFailure</span><wbr><span class="parameters">(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO)</span></div>
 <div class="block">发送消息到 testQueueIdempotentFailure 队列（幂等性失败测试队列）</div>
@@ -229,7 +229,7 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="produceMsgIdempotentHeader(com.zmbdp.mstemplate.service.domain.MessageDTO,java.lang.String)">
+<section class="detail" id="produceMsgIdempotentHeader(com.zmbdp.mstemplate.service.domain.dto.MessageDTO,java.lang.String)">
 <h3>produceMsgIdempotentHeader</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">produceMsgIdempotentHeader</span><wbr><span class="parameters">(<a href="../domain/MessageDTO.html" title="com.zmbdp.mstemplate.service.domain中的类">MessageDTO</a>&nbsp;messageDTO,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;idempotentToken)</span></div>

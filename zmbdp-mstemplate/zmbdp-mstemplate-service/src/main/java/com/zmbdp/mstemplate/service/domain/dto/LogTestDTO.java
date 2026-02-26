@@ -1,4 +1,4 @@
-package com.zmbdp.mstemplate.service.domain;
+package com.zmbdp.mstemplate.service.domain.dto;
 
 import lombok.Data;
 
