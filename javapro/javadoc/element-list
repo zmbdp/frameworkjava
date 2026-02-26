@@ -112,13 +112,14 @@ com.zmbdp.gateway.filter
 com.zmbdp.gateway.handler
 com.zmbdp.mstemplate.service
 com.zmbdp.mstemplate.service.domain
+com.zmbdp.mstemplate.service.domain.dto
+com.zmbdp.mstemplate.service.domain.entity
+com.zmbdp.mstemplate.service.feign
+com.zmbdp.mstemplate.service.mapper
 com.zmbdp.mstemplate.service.rabbit
 com.zmbdp.mstemplate.service.service
 com.zmbdp.mstemplate.service.service.impl
 com.zmbdp.mstemplate.service.test
-com.zmbdp.mstemplate.service.test.domain.entity
-com.zmbdp.mstemplate.service.test.feign
-com.zmbdp.mstemplate.service.test.mapper
 com.zmbdp.portal.service
 com.zmbdp.portal.service.user.controller
 com.zmbdp.portal.service.user.domain.dto
