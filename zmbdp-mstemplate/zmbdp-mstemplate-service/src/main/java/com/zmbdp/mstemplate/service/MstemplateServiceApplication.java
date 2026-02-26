@@ -22,7 +22,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
         FileServiceApi.class, MapServiceApi.class,
         DictionaryServiceApi.class, ArgumentServiceApi.class,
         IdempotentTestApi.class, RateLimitTestApi.class
-}, basePackages = "com.zmbdp.mstemplate.service.feign") // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
+}) // 告诉 SpringCloud 这个类需要调用 FileServiceApi 服务
 public class MstemplateServiceApplication {
 
     /**
