@@ -37,6 +37,13 @@ com.zmbdp.common.cache.utils
 com.zmbdp.common.core.config
 com.zmbdp.common.core.enums
 com.zmbdp.common.core.utils
+com.zmbdp.common.datapermission.annotation
+com.zmbdp.common.datapermission.config
+com.zmbdp.common.datapermission.enums
+com.zmbdp.common.datapermission.handler
+com.zmbdp.common.datapermission.handler.impl
+com.zmbdp.common.datapermission.interceptor
+com.zmbdp.common.datapermission.utils
 com.zmbdp.common.domain.constants
 com.zmbdp.common.domain.domain
 com.zmbdp.common.domain.domain.dto
@@ -109,7 +116,9 @@ com.zmbdp.mstemplate.service.rabbit
 com.zmbdp.mstemplate.service.service
 com.zmbdp.mstemplate.service.service.impl
 com.zmbdp.mstemplate.service.test
+com.zmbdp.mstemplate.service.test.domain.entity
 com.zmbdp.mstemplate.service.test.feign
+com.zmbdp.mstemplate.service.test.mapper
 com.zmbdp.portal.service
 com.zmbdp.portal.service.user.controller
 com.zmbdp.portal.service.user.domain.dto
