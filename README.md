@@ -245,7 +245,7 @@ mvn spring-boot:run
 
 SDK 开发文档位于项目 `javapro/javadoc` 目录下，基于 JavaDoc 自动生成。
 
-**访问方式**：在项目根目录找到 `javapro/javadoc/index.html`，使用浏览器打开即可浏览完整 API 文档。
+**访问方式**：在项目根目录找到 `javapro/javadoc/index.html`，使用浏览器打开即可浏览完整 SDK 文档。
 
 ---
 
