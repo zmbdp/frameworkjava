@@ -11,6 +11,7 @@
     <file url="file://$PROJECT_DIR$/zmbdp-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-cache/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-datapermission/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-domain/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-excel/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/zmbdp-common/zmbdp-common-filter/src/main/java" charset="UTF-8" />
