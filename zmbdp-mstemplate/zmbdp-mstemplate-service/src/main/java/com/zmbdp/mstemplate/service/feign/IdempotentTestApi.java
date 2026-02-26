@@ -1,4 +1,4 @@
-package com.zmbdp.mstemplate.service.test.feign;
+package com.zmbdp.mstemplate.service.feign;
 
 import com.zmbdp.common.domain.domain.Result;
 import org.springframework.cloud.openfeign.FeignClient;

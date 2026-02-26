@@ -184,22 +184,22 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">关键词搜索字典数据列表</div>
 </dd>
-<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueue(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">listenerQueue(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
+<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueue(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">listenerQueue(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
 <dd>
 <div class="block">普通消费者（不使用幂等性）
  用于对比测试</div>
 </dd>
-<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotent(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">listenerQueueIdempotent(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
+<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotent(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">listenerQueueIdempotent(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
 <dd>
 <div class="block">幂等性消费者（从消息对象获取Token）
  使用SpEL表达式从MessageDTO.idempotentToken获取Token</div>
 </dd>
-<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotentFailure(com.zmbdp.mstemplate.service.domain.MessageDTO)" class="member-name-link">listenerQueueIdempotentFailure(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
+<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotentFailure(com.zmbdp.mstemplate.service.domain.dto.MessageDTO)" class="member-name-link">listenerQueueIdempotentFailure(MessageDTO)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
 <dd>
 <div class="block">幂等性消费者 - 测试业务失败场景
  业务失败时Token会被删除，允许重试</div>
 </dd>
-<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotentHeader(com.zmbdp.mstemplate.service.domain.MessageDTO,org.springframework.amqp.core.Message)" class="member-name-link">listenerQueueIdempotentHeader(MessageDTO, Message)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
+<dt><a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html#listenerQueueIdempotentHeader(com.zmbdp.mstemplate.service.domain.dto.MessageDTO,org.springframework.amqp.core.Message)" class="member-name-link">listenerQueueIdempotentHeader(MessageDTO, Message)</a> - 类中的方法 com.zmbdp.mstemplate.service.rabbit.<a href="../com/zmbdp/mstemplate/service/rabbit/Consumer.html" title="com.zmbdp.mstemplate.service.rabbit中的类">Consumer</a></dt>
 <dd>
 <div class="block">幂等性消费者 - 从消息头获取Token（方式二）
  使用消息头方式传递Token

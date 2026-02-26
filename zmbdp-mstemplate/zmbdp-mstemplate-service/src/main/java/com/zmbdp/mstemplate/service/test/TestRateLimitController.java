@@ -5,7 +5,7 @@ import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.ResultCode;
 import com.zmbdp.common.ratelimit.annotation.RateLimit;
 import com.zmbdp.common.ratelimit.enums.RateLimitDimension;
-import com.zmbdp.mstemplate.service.test.feign.RateLimitTestApi;
+import com.zmbdp.mstemplate.service.feign.RateLimitTestApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
