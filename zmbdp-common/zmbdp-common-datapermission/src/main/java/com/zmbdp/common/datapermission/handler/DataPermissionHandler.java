@@ -51,4 +51,3 @@ public interface DataPermissionHandler {
      */
     String buildCondition(DataPermission annotation, DataPermissionContext context);
 }
-

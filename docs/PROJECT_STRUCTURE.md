@@ -8,15 +8,20 @@ FrameworkJava 采用模块化微服务架构，遵循 **API 与 Service 分离**
 frameworkjava/
 ├── zmbdp-gateway/              # 网关服务
 ├── zmbdp-common/               # 公共基础模块
-│   ├── zmbdp-common-core/      # 核心工具类
-│   ├── zmbdp-common-domain/    # 领域模型
-│   ├── zmbdp-common-security/  # 安全认证
-│   ├── zmbdp-common-redis/     # Redis 封装
 │   ├── zmbdp-common-cache/     # 缓存组件
+│   ├── zmbdp-common-core/      # 核心工具类
+│   ├── zmbdp-common-datapermission/ # 数据权限组件
+│   ├── zmbdp-common-domain/    # 领域模型
+│   ├── zmbdp-common-excel/     # Excel 处理
+│   ├── zmbdp-common-filter/    # 过滤器（布隆过滤器）
 │   ├── zmbdp-common-idempotent/# 幂等性组件
-│   ├── zmbdp-common-rabbitmq/  # 消息队列
+│   ├── zmbdp-common-log/       # 操作日志组件
 │   ├── zmbdp-common-message/   # 消息服务
-│   ├── zmbdp-common-filter/    # 过滤器
+│   ├── zmbdp-common-monitor/   # 监控组件
+│   ├── zmbdp-common-rabbitmq/  # 消息队列
+│   ├── zmbdp-common-ratelimit/ # 限流组件
+│   ├── zmbdp-common-redis/     # Redis 封装
+│   ├── zmbdp-common-security/  # 安全认证
 │   └── zmbdp-common-snowflake/ # 雪花算法
 ├── zmbdp-admin/                # 基础服务
 │   ├── zmbdp-admin-api/        # API 接口定义
@@ -42,16 +47,20 @@ frameworkjava/
 ### zmbdp-common
 **职责**：公共能力下沉
 - **cache**：三级缓存实现（布隆过滤器 + Caffeine + Redis）
-- **core**：基础工具类（23 个）、常量、异常定义
+- **core**：基础工具类（20+ 个）、常量、异常定义
+- **datapermission**：数据权限控制（基于 MyBatis 拦截器）
 - **domain**：领域模型、实体基类
-- **filter**：通用过滤器
+- **excel**：Excel 处理（导入导出、单元格合并）
+- **filter**：布隆过滤器（Redis/Fast/Safe 三种实现）
 - **idempotent**：分布式幂等性控制
-- **message**：消息服务能力
+- **log**：操作日志组件（支持多种存储方式）
+- **message**：消息服务能力（短信、邮件验证码）
+- **monitor**：监控组件（Prometheus 指标采集）
 - **rabbitmq**：消息队列封装
-- **redis**：Redis 操作封装
+- **ratelimit**：限流组件（令牌桶、滑动窗口）
+- **redis**：Redis 操作封装、Redisson 分布式锁
 - **security**：JWT 认证、权限校验
 - **snowflake**：分布式 ID 生成
-- **datapermission**：数据权限控制（基于 MyBatis 拦截器）
 
 ### zmbdp-admin
 **职责**：基础服务

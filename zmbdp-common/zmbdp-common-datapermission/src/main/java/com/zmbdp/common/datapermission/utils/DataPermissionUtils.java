@@ -84,7 +84,7 @@ public class DataPermissionUtils {
      * context.setDeptId(deptId);
      * context.setPermissionType(DataPermissionType.DEPT);
      * DataPermissionUtils.set(context);
-     * 
+     *
      * try {
      *     List<Order> orders = orderMapper.selectList();
      * } finally {
@@ -173,7 +173,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 添加权限过滤后
      * SELECT * FROM t_order WHERE status = '1' AND user_id = 4
      * }</pre>
@@ -208,7 +208,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 添加权限过滤后
      * SELECT * FROM t_order WHERE status = '1' AND dept_id = 5
      * }</pre>
@@ -246,7 +246,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 添加权限过滤后
      * SELECT * FROM t_order WHERE status = '1' AND dept_id IN (5, 6, 7)
      * }</pre>
@@ -286,7 +286,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 不添加权限过滤（保持原样）
      * SELECT * FROM t_order WHERE status = '1'
      * }</pre>
@@ -323,7 +323,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 添加权限过滤后
      * SELECT * FROM t_order WHERE status = '1' AND user_id = 4 AND tenant_id = 1
      * }</pre>
@@ -361,7 +361,7 @@ public class DataPermissionUtils {
      * <pre>{@code
      * -- 原始 SQL
      * SELECT * FROM t_order WHERE status = '1'
-     * 
+     *
      * -- 添加权限过滤后
      * SELECT * FROM t_order WHERE status = '1' AND dept_id = 5 AND tenant_id = 1
      * }</pre>
@@ -518,7 +518,7 @@ public class DataPermissionUtils {
      *     .tenantId(tenantId)
      *     .permissionType(DataPermissionType.DEPT)
      *     .build();
-     * 
+     *
      * List<Order> orders = DataPermissionUtils.executeWith(context, () -> {
      *     return orderMapper.selectList();
      * });
@@ -556,7 +556,7 @@ public class DataPermissionUtils {
      *     .permissionType(DataPermissionType.DEPT)
      *     .isAdmin(false)
      *     .build();
-     * 
+     *
      * try {
      *     List<Order> orders = orderMapper.selectList();
      * } finally {
@@ -666,4 +666,3 @@ public class DataPermissionUtils {
         }
     }
 }
-

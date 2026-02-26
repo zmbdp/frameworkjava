@@ -1,6 +1,5 @@
 package com.zmbdp.common.datapermission.handler.impl;
 
-import com.zmbdp.common.core.utils.StringUtil;
 import com.zmbdp.common.datapermission.annotation.DataPermission;
 import com.zmbdp.common.datapermission.enums.DataPermissionType;
 import com.zmbdp.common.datapermission.handler.DataPermissionContext;
@@ -20,11 +19,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class AllDataPermissionHandler implements DataPermissionHandler {
 
+    /**
+     * 获取支持的数据权限类型
+     *
+     * @return 数据权限类型枚举
+     */
     @Override
     public DataPermissionType getSupportType() {
         return DataPermissionType.ALL;
     }
 
+    /**
+     * 构建全部数据权限过滤条件
+     *
+     * @param annotation 数据权限注解
+     * @param context    数据权限上下文
+     * @return 数据权限过滤条件
+     */
     @Override
     public String buildCondition(DataPermission annotation, DataPermissionContext context) {
         // 全部数据权限，不添加任何过滤条件
@@ -32,4 +43,3 @@ public class AllDataPermissionHandler implements DataPermissionHandler {
         return null;
     }
 }
-

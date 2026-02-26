@@ -86,4 +86,3 @@ public enum DataPermissionType {
         return SELF; // 默认返回仅本人权限
     }
 }
-

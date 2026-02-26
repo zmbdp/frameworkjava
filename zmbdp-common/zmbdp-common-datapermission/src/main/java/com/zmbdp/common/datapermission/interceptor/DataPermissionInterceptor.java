@@ -68,11 +68,13 @@ public class DataPermissionInterceptor implements Interceptor {
      * 数据权限处理器缓存（权限类型 -> 处理器）
      */
     private final Map<DataPermissionType, DataPermissionHandler> handlerMap = new ConcurrentHashMap<>();
+
     /**
      * 数据权限处理器列表（策略模式）
      */
     @Autowired
     private List<DataPermissionHandler> handlers;
+
     /**
      * 是否启用数据权限（从 Nacos 配置中心读取）
      */
@@ -91,6 +93,13 @@ public class DataPermissionInterceptor implements Interceptor {
     @Value("${datapermission.enable-tenant:false}")
     private Boolean enableTenant;
 
+    /**
+     * 拦截 StatementHandler 的 prepare 方法，进行数据权限过滤
+     *
+     * @param invocation 拦截器调用链
+     * @return 拦截结果
+     * @throws Throwable 拦截异常
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         // 检查是否启用数据权限
@@ -153,6 +162,12 @@ public class DataPermissionInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
+    /**
+     * 创建 MyBatis 拦截器
+     *
+     * @param target 目标对象
+     * @return 拦截器
+     */
     @Override
     public Object plugin(Object target) {
         if (target instanceof StatementHandler) {
@@ -262,14 +277,18 @@ public class DataPermissionInterceptor implements Interceptor {
 
     /**
      * 改写 SQL，添加 WHERE 条件
+     * <p>
+     * 根据原始 SQL 是否包含 WHERE 子句，采用不同的改写策略：
+     * <ul>
+     *     <li>已有 WHERE：在 WHERE 后添加条件，使用 AND 连接</li>
+     *     <li>无 WHERE：在 ORDER BY、GROUP BY、LIMIT 等关键字前添加 WHERE 子句</li>
+     * </ul>
      *
      * @param originalSql 原始 SQL
      * @param condition   过滤条件
      * @return 改写后的 SQL
      */
     private String rewriteSql(String originalSql, String condition) {
-        // 简单实现：在 WHERE 子句后添加条件
-        // 注意：这是简化实现，生产环境建议使用 JSqlParser 进行 SQL 解析和改写
         String lowerSql = originalSql.toLowerCase();
 
         if (lowerSql.contains("where")) {
@@ -308,12 +327,11 @@ public class DataPermissionInterceptor implements Interceptor {
      * @return 数据权限处理器
      */
     private DataPermissionHandler getHandler(DataPermissionType permissionType) {
-        // 先从缓存获取
+        // 先从缓存获取，如果没有就再从处理器里面获取
         DataPermissionHandler handler = handlerMap.get(permissionType);
         if (handler != null) {
             return handler;
         }
-
         // 从处理器列表中查找
         for (DataPermissionHandler h : handlers) {
             if (h.getSupportType() == permissionType) {
@@ -321,7 +339,6 @@ public class DataPermissionInterceptor implements Interceptor {
                 return h;
             }
         }
-
         return null;
     }
 }

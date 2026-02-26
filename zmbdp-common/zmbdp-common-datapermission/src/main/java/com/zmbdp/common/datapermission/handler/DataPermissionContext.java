@@ -24,6 +24,11 @@ import java.util.List;
 public class DataPermissionContext {
 
     /**
+     * ThreadLocal 存储当前线程的数据权限上下文
+     */
+    private static final ThreadLocal<DataPermissionContext> CONTEXT_HOLDER = new ThreadLocal<>();
+
+    /**
      * 当前用户 ID
      * <p>
      * 用于构建 {@code SELF} 权限的过滤条件
@@ -64,11 +69,6 @@ public class DataPermissionContext {
      * 超级管理员不受数据权限限制，可以查看所有数据
      */
     private Boolean isAdmin;
-
-    /**
-     * ThreadLocal 存储当前线程的数据权限上下文
-     */
-    private static final ThreadLocal<DataPermissionContext> CONTEXT_HOLDER = new ThreadLocal<>();
 
     /**
      * 设置当前线程的数据权限上下文

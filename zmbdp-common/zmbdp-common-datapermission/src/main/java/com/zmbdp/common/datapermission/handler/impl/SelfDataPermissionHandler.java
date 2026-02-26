@@ -35,11 +35,23 @@ public class SelfDataPermissionHandler implements DataPermissionHandler {
     @Value("${datapermission.default-user-column:user_id}")
     private String defaultUserColumn;
 
+    /**
+     * 获取支持的数据权限类型
+     *
+     * @return 数据权限类型枚举
+     */
     @Override
     public DataPermissionType getSupportType() {
         return DataPermissionType.SELF;
     }
 
+    /**
+     * 构建仅本人数据权限过滤条件
+     *
+     * @param annotation 数据权限注解
+     * @param context    数据权限上下文
+     * @return SQL 过滤条件，如果不需要过滤返回 null
+     */
     @Override
     public String buildCondition(DataPermission annotation, DataPermissionContext context) {
         if (context == null || context.getUserId() == null) {
@@ -62,4 +74,3 @@ public class SelfDataPermissionHandler implements DataPermissionHandler {
         return condition;
     }
 }
-

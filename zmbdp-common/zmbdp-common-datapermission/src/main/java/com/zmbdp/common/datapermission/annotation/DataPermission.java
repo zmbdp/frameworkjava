@@ -386,4 +386,3 @@ public @interface DataPermission {
      */
     String customCondition() default "";
 }
-

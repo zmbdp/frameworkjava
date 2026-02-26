@@ -26,11 +26,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomDataPermissionHandler implements DataPermissionHandler {
 
+    /**
+     * 获取处理器支持的权限类型
+     *
+     * @return 数据权限类型
+     */
     @Override
     public DataPermissionType getSupportType() {
         return DataPermissionType.CUSTOM;  
     }
 
+    /**
+     * 构建自定义数据权限过滤条件
+     *
+     * @param annotation 数据权限注解
+     * @param context    数据权限上下文
+     * @return SQL 过滤条件，如果不需要过滤返回 null
+     */
     @Override
     public String buildCondition(DataPermission annotation, DataPermissionContext context) {
         String customCondition = annotation.customCondition();
@@ -44,4 +56,3 @@ public class CustomDataPermissionHandler implements DataPermissionHandler {
         return customCondition;
     }
 }
-

@@ -102,6 +102,11 @@ JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系，**
 基于 AOP + Redis 的幂等性方案，支持 HTTP / MQ 场景，**针对高并发做了专项优化**，保障数据一致性  
 *（支持防重模式/强幂等模式，Redis + Lua 脚本保证原子性，支持并发穿透控制）*
 
+### 🔒 数据权限控制
+
+基于 MyBatis 拦截器的数据权限方案，支持本人/本部门/本部门及子部门/全部/自定义五种权限类型，**自动过滤 SQL，零侵入实现数据隔离**  
+*（支持多租户隔离、自定义字段、表别名，适用于 SaaS 系统和企业内部系统）*
+
 ### 🔍 全链路追踪（SkyWalking）
 
 **无侵入式链路追踪**，自动追踪微服务间的调用链路，支持性能分析、慢查询定位、服务拓扑图、日志关联 TraceId  
@@ -225,6 +230,7 @@ mvn spring-boot:run
 | [配置中心与环境配置](docs/CONFIGURATION.md)   | Nacos 配置、多环境切换指南              |
 | [三级缓存架构](docs/CACHE_ARCHITECTURE.md) | 布隆过滤器 + Caffeine + Redis 缓存设计 |
 | [分布式幂等性设计](docs/IDEMPOTENT.md)       | 幂等性控制原理与使用指南                  |
+| [数据权限控制](docs/DATAPERMISSION.md)      | 数据权限控制原理与使用指南                 |
 | [频控 / 防刷](docs/RATELIMIT.md)         | 限流组件说明与使用指南                   |
 | [操作日志](docs/LOG.md)                  | 操作日志组件说明与使用指南                 |
 | [链路追踪](docs/TRACING.md)              | SkyWalking 链路追踪使用指南           |

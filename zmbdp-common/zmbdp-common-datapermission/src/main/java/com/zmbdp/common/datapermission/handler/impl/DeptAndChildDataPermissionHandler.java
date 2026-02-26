@@ -38,11 +38,23 @@ public class DeptAndChildDataPermissionHandler implements DataPermissionHandler 
     @Value("${datapermission.default-dept-column:dept_id}")
     private String defaultDeptColumn;
 
+    /**
+     * 获取支持的数据权限类型
+     *
+     * @return 数据权限类型枚举
+     */
     @Override
     public DataPermissionType getSupportType() {
         return DataPermissionType.DEPT_AND_CHILD;
     }
 
+    /**
+     * 构建本部门及子部门数据权限过滤条件
+     *
+     * @param annotation 数据权限注解
+     * @param context    数据权限上下文
+     * @return SQL 过滤条件，如果不需要过滤返回 null
+     */
     @Override
     public String buildCondition(DataPermission annotation, DataPermissionContext context) {
         if (context == null || context.getDeptIds() == null || context.getDeptIds().isEmpty()) {
@@ -71,4 +83,3 @@ public class DeptAndChildDataPermissionHandler implements DataPermissionHandler 
         return condition;
     }
 }
-
