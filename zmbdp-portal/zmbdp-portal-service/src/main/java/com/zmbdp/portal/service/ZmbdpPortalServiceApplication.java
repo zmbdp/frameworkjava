@@ -1,5 +1,6 @@
 package com.zmbdp.portal.service;
 
+import com.zmbdp.admin.api.appuser.feign.AppUserApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,9 +13,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @Slf4j
 @SpringBootApplication
-@EnableFeignClients(
-        clients = {com.zmbdp.admin.api.appuser.feign.AppUserApi.class}
-)
+@EnableFeignClients(clients = {
+        AppUserApi.class
+})
 public class ZmbdpPortalServiceApplication {
 
     /**
