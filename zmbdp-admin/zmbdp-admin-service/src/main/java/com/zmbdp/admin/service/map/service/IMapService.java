@@ -54,7 +54,6 @@ public interface IMapService {
      */
     BasePageDTO<SearchPoiDTO> searchSuggestOnMap(PlaceSearchReqDTO placeSearchReqDTO);
 
-
     /**
      * 根据经纬度获取城市的信息
      *

@@ -100,7 +100,6 @@ public class StringUtil extends StringUtils {
         return false;
     }
 
-
     /**
      * 判断 URL 是否与规则匹配（Ant 风格路径匹配）
      * <p>

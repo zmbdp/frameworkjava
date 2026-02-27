@@ -165,7 +165,6 @@ public class MailUtil {
         return account;
     }
 
-
     /* ========================= 基于默认 MailAccount 的快捷方法 ========================= */
 
     /**
@@ -348,7 +347,6 @@ public class MailUtil {
     ) {
         return send(getMailAccount(), true, tos, ccs, bccs, subject, content, null, null, isHtml, files);
     }
-
 
     /* ========================= 带图片（cid）的快捷方法 ========================= */
 
@@ -747,7 +745,6 @@ public class MailUtil {
         return send(mailAccount, false, tos, ccs, bccs, subject, content, imageMap, null, isHtml, files);
     }
 
-
     /* ========================= Session 获取 ========================= */
 
     /**
@@ -783,7 +780,6 @@ public class MailUtil {
                 Session.getDefaultInstance(mailAccount.getSmtpProps(), authenticator) :
                 Session.getInstance(mailAccount.getSmtpProps(), authenticator);
     }
-
 
     /* ========================= 私有底层发送逻辑 ========================= */
 

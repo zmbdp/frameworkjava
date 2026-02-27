@@ -52,7 +52,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
     @Value("${jwt.token.secret}")
     private String secret;
 
-
     /**
      * 鉴权
      *
