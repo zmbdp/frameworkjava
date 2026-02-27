@@ -112,7 +112,6 @@ public class LogActionAspect {
     @Autowired
     private LogConfigRouter logConfigRouter;
 
-
     /**
      * 定义切点：拦截带有 @LogAction 注解的方法或类
      * <p>
