@@ -76,7 +76,6 @@ public class OSSProperties {
      */
     private Integer maxLen;
 
-
     /**
      * 获取外网访问的 URL
      *
