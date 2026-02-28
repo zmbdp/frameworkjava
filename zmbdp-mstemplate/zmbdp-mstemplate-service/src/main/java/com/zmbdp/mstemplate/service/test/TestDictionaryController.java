@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 字典数据测试控制器
+ * 测试字典查询功能
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @RequestMapping("/test/dictionary")
 public class TestDictionaryController {

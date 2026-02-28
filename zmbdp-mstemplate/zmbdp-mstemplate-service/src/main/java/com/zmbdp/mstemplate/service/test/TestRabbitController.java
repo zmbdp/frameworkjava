@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * RabbitMQ 测试控制器
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @Slf4j
 @RequestMapping("/test/rabbit")
@@ -17,6 +22,11 @@ public class TestRabbitController {
     @Autowired
     private Producer producer;
 
+    /**
+     * 发送消息测试
+     *
+     * @return 结果
+     */
     @PostMapping("/send")
     public Result<Void> send() {
         MessageDTO messageDTO = new MessageDTO();
@@ -25,6 +35,4 @@ public class TestRabbitController {
         producer.produceMsg(messageDTO);
         return Result.success();
     }
-
-
 }

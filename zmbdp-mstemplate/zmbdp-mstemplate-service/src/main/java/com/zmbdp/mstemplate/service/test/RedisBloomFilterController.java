@@ -36,7 +36,7 @@ public class RedisBloomFilterController {
     private BloomFilterService bloomFilterService;
 
     /**
-     * 1️⃣ 一键全流程测试（基础测试）<p>
+     * 1 一键全流程测试（基础测试）<p>
      * 包含：重置 -> 批量插入 -> 校验存在/不存在 -> 打印状态与计数
      */
     @PostMapping("/fullCheck")
@@ -44,17 +44,17 @@ public class RedisBloomFilterController {
         log.info("🧩========== RedisBloomFilter 全流程测试开始 ==========");
 
         try {
-            // 1️⃣ 重置布隆过滤器
+            // 1 重置布隆过滤器
             log.info("[Step 1] 重置布隆过滤器...");
             bloomFilterService.reset();
             bloomFilterService.clear();
 
-            // 2️⃣ 添加一批测试数据
+            // 2 添加一批测试数据
             List<String> testData = Arrays.asList("user_1", "user_2", "user_3", "admin", "guest");
             log.info("[Step 2] 批量添加测试数据: {}", testData);
             bloomFilterService.putAll(testData);
 
-            // 3️⃣ 校验存在的键
+            // 3 校验存在的键
             log.info("[Step 3] 校验已存在的键...");
             List<String> existKeys = Arrays.asList("admin", "user_1", "guest");
             for (String key : existKeys) {
@@ -62,7 +62,7 @@ public class RedisBloomFilterController {
                 log.info("✔️ 键 '{}' 存在检测结果: {}", key, exists);
             }
 
-            // 4️⃣ 校验不存在的键
+            // 4 校验不存在的键
             log.info("[Step 4] 校验不存在的键...");
             List<String> nonExistKeys = Arrays.asList("nonexist", "xxx", "test_999");
             for (String key : nonExistKeys) {
@@ -70,12 +70,12 @@ public class RedisBloomFilterController {
                 log.info("❌ 键 '{}' 存在检测结果: {}", key, exists);
             }
 
-            // 5️⃣ 校验集合中是否至少有一个存在
+            // 5 校验集合中是否至少有一个存在
             log.info("[Step 5] 校验集合存在性...");
             boolean anyExist = bloomFilterService.mightContainAny(Arrays.asList("foo", "bar", "admin"));
             log.info("集合 [foo, bar, admin] 是否至少有一个存在: {}", anyExist);
 
-            // 6️⃣ 打印状态与计数
+            // 6 打印状态与计数
             log.info("[Step 6] 获取状态与计数...");
             String status = bloomFilterService.getStatus();
             long count = bloomFilterService.exactElementCount();
@@ -92,7 +92,7 @@ public class RedisBloomFilterController {
     }
 
     /**
-     * 2️⃣ 高并发写入测试
+     * 2 高并发写入测试
      *
      * @param totalOps 总操作数
      * @param threads  线程数
@@ -144,7 +144,7 @@ public class RedisBloomFilterController {
     }
 
     /**
-     * 3️⃣ 清空验证
+     * 3 清空验证
      */
     @PostMapping("/clearTest")
     public Result<Void> clearTest() {
@@ -158,7 +158,7 @@ public class RedisBloomFilterController {
     }
 
     /**
-     * 4️⃣ 性能统计测试
+     * 4 性能统计测试
      *
      * @param ops     操作数
      * @param threads 线程数
@@ -198,7 +198,7 @@ public class RedisBloomFilterController {
     }
 
     /**
-     * 5️⃣ RedisBloom 单个 VS lua脚本 前后对比测试
+     * 5 RedisBloom 单个 VS lua脚本 前后对比测试
      *
      * @param ops     操作数
      * @param threads 线程数
@@ -217,7 +217,7 @@ public class RedisBloomFilterController {
         }
 
         // -------------------
-        // 1️⃣ 单条 put
+        // 1 单条 put
         // -------------------
         log.info("Step 1: 单条 put 测试开始");
         bloomFilterService.reset();
@@ -239,7 +239,7 @@ public class RedisBloomFilterController {
         log.info("单条 put 完成: {} 条数据, 耗时 {} ms, 吞吐量 {} ops/s", ops, (end1 - start1), String.format("%.2f", ops1));
 
         // -------------------
-        // 2️⃣ Lua 批量 put
+        // 2 Lua 批量 put
         // -------------------
         log.info("Step 2: Lua 批量 put 测试开始");
         bloomFilterService.reset();
@@ -251,7 +251,7 @@ public class RedisBloomFilterController {
         log.info("Lua 批量 put 完成: {} 条数据, 耗时 {} ms, 吞吐量 {} ops/s", ops, (end2 - start2), String.format("%.2f", ops2));
 
         // -------------------
-        // 3️⃣ 单条查询 mightContain
+        // 3 单条查询 mightContain
         // -------------------
         log.info("Step 3: 单条查询 mightContain 测试开始");
         long start3 = System.currentTimeMillis();
@@ -264,7 +264,7 @@ public class RedisBloomFilterController {
         log.info("单条查询完成: {} 条数据, 耗时 {} ms, 吞吐量 {} ops/s", ops, (end3 - start3), String.format("%.2f", ops3));
 
         // -------------------
-        // 4️⃣ Lua 批量查询 mightContainAny
+        // 4 Lua 批量查询 mightContainAny
         // -------------------
         log.info("Step 4: Lua 批量查询 mightContainAny 测试开始");
         long start4 = System.currentTimeMillis();
@@ -280,7 +280,7 @@ public class RedisBloomFilterController {
     }
 
     /**
-     * 6️⃣ 全面测试（包含边界情况、并发安全、误判率等）
+     * 6 全面测试（包含边界情况、并发安全、误判率等）
      */
     @PostMapping("/comprehensiveTest")
     public Result<Void> comprehensiveTest() {
@@ -288,14 +288,14 @@ public class RedisBloomFilterController {
 
         try {
             // ------------------------------
-            // 1️⃣ 初始化与清空
+            // 1 初始化与清空
             // ------------------------------
             log.info("--- 初始化与清空测试 ---");
             bloomFilterService.clear();
             log.info("布隆过滤器已清空");
 
             // ------------------------------
-            // 2️⃣ 基础功能测试
+            // 2 基础功能测试
             // ------------------------------
             log.info("--- 基础功能测试 ---");
             List<String> basicData = Arrays.asList("test1", "test2", "test3");
@@ -309,7 +309,7 @@ public class RedisBloomFilterController {
                     key, bloomFilterService.mightContain(key)));
 
             // ------------------------------
-            // 3️⃣ 边界值测试
+            // 3 边界值测试
             // ------------------------------
             log.info("--- 边界值测试 ---");
             bloomFilterService.put(null);
@@ -323,7 +323,7 @@ public class RedisBloomFilterController {
             log.info("重复插入 'test1' 后负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
 
             // ------------------------------
-            // 4️⃣ 大量数据测试（控制在10000以内）
+            // 4 大量数据测试（控制在10000以内）
             // ------------------------------
             log.info("--- 大量数据测试 ---");
             int largeDataCount = 9000; // 控制在 10000 以内
@@ -343,7 +343,7 @@ public class RedisBloomFilterController {
             log.info("批量添加 {} 个元素耗时: {} ms", largeDataCount, (end - start));
 
             // ------------------------------
-            // 5️⃣ 误判率测试
+            // 5 误判率测试
             // ------------------------------
             log.info("--- 误判率测试 ---");
             int testCount = 10000;
@@ -359,7 +359,7 @@ public class RedisBloomFilterController {
                     testCount, falsePositiveCount, String.format("%.2f", falsePositiveRate));
 
             // ------------------------------
-            // 6️⃣ 并发测试（小规模）
+            // 6 并发测试（小规模）
             // ------------------------------
             log.info("--- 并发测试 ---");
             ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -376,7 +376,7 @@ public class RedisBloomFilterController {
             log.info("并发插入完成，精确计数: {}", bloomFilterService.exactElementCount());
 
             // ------------------------------
-            // 7️⃣ 清空与重置测试
+            // 7 清空与重置测试
             // ------------------------------
             log.info("负载因子: {}", String.format("%.2f", bloomFilterService.calculateLoadFactor()));
             log.info("--- 清空与重置测试 ---");
@@ -387,7 +387,7 @@ public class RedisBloomFilterController {
             log.info("重置后精确计数: {}", bloomFilterService.exactElementCount());
 
             // ------------------------------
-            // 8️⃣ 状态检查
+            // 8 状态检查
             // ------------------------------
             log.info("--- 状态检查 ---");
             String status = bloomFilterService.getStatus();

@@ -9,8 +9,8 @@ import com.zmbdp.common.idempotent.annotation.Idempotent;
 import com.zmbdp.common.idempotent.enums.IdempotentMode;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.mstemplate.service.domain.dto.MessageDTO;
-import com.zmbdp.mstemplate.service.rabbit.Producer;
 import com.zmbdp.mstemplate.service.feign.IdempotentTestApi;
+import com.zmbdp.mstemplate.service.rabbit.Producer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 幂等性功能测试控制器
- * 使用 OpenFeign 客户端，一键测试所有功能，无需手动传参
+ * 测试 HTTP 和 MQ 的幂等性功能
  *
  * @author 稚名不带撇
  */

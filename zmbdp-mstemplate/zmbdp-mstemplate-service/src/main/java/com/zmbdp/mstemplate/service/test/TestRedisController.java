@@ -14,9 +14,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.Stream;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Redis 功能测试控制器
+ * 测试 String、List、Set、ZSet、Hash、事务等功能
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @Slf4j
 @RequestMapping("/test/redis")
@@ -25,6 +33,12 @@ public class TestRedisController {
     @Autowired
     private RedisService redisService;
 
+    /**
+     * 测试Redis基本操作
+     * 包括String类型的增删改查、对象存储、计数器等
+     *
+     * @return 测试结果
+     */
     @PostMapping("/add")
     public Result<Void> add() {
         redisService.setCacheObject("test", "abc");
@@ -70,6 +84,12 @@ public class TestRedisController {
         return Result.success();
     }
 
+    /**
+     * 测试Redis数据获取
+     * 包括String、对象、复杂泛型的获取
+     *
+     * @return 测试结果
+     */
     @GetMapping("/get")
     public Result<Void> get() {
         String str = redisService.getCacheObject("test", String.class);
@@ -84,6 +104,12 @@ public class TestRedisController {
         return Result.success();
     }
 
+    /**
+     * 测试Redis List操作
+     * 包括头插、尾插、删除、范围查询等
+     *
+     * @return 测试结果
+     */
     @PostMapping("/list/add")
     public Result<Void> listAdd() {
         String key = "listkey";
@@ -175,6 +201,12 @@ public class TestRedisController {
         return Result.success();
     }
 
+    /**
+     * Redis全面功能测试
+     * 测试Set、ZSet、Hash等所有数据结构及复杂泛型
+     *
+     * @return 测试结果
+     */
     @PostMapping("/comprehensive/test")
     public Result<Void> comprehensiveTest() {
         try {
@@ -1075,7 +1107,7 @@ public class TestRedisController {
         redisService.deleteObject(Arrays.asList(keyNormal, keyRollback, keyError, keyComplex, keyConcurrent));
 
         try {
-            // 1️⃣ 正常事务提交
+            // 1 正常事务提交
             log.info("[1] 测试正常事务提交");
             redisService.executeInTransaction(ops -> {
                 ops.opsForValue().set(keyNormal, "ok");
@@ -1085,7 +1117,7 @@ public class TestRedisController {
             result.put("normalTx", ok ? "✅ 正常提交成功" : "❌ 提交失败");
             log.info("[1] 验证结果：{}", ok);
 
-            // 2️⃣ 模拟异常回滚（预期行为）
+            // 2 模拟异常回滚（预期行为）
             log.info("[2] 测试事务中异常回滚（预期会抛出异常）");
             try {
                 redisService.executeInTransaction(ops -> {
@@ -1099,7 +1131,7 @@ public class TestRedisController {
                 log.info("[2] 捕获到预期异常：{}", e.getMessage());
             }
 
-            // 3️⃣ 逻辑错误测试（非预期异常）
+            // 3 逻辑错误测试（非预期异常）
             log.info("[3] 测试 Redis 类型错误（非预期异常）");
             redisService.setCacheObject(keyError, "stringValue");
             try {
@@ -1113,7 +1145,7 @@ public class TestRedisController {
                 log.warn("[3] 捕获到 Redis WRONGTYPE 异常（这是 bug 级的）", e);
             }
 
-            // 4️⃣ 复杂事务
+            // 4 复杂事务
             log.info("[4] 测试复杂事务（多类型操作）");
             redisService.executeInTransaction(ops -> {
                 ops.opsForValue().set(keyComplex + ":v", "123");
@@ -1128,7 +1160,7 @@ public class TestRedisController {
                             "hv1".equals(hashMap.get("h1"));
             result.put("complexTx", complexOK ? "✅ 复杂事务成功" : "❌ 复杂事务执行错误");
 
-            // 5️⃣ 并发事务测试
+            // 5 并发事务测试
             log.info("[5] 测试并发事务");
             redisService.setCacheObject(keyConcurrent, 0L);
             int threadCount = 10;

@@ -5,9 +5,13 @@ import com.zmbdp.mstemplate.service.domain.dto.LogTestDTO;
 import com.zmbdp.mstemplate.service.service.impl.TestLogServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 操作日志注解（@LogAction）全面测试控制器
@@ -75,25 +79,25 @@ public class TestLogController {
         log.info("========================================");
         log.info("=== 开始一键测试所有存储方式的所有场景 ===");
         log.info("========================================");
-        
+
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("测试时间", new Date().toString());
         result.put("测试说明", "一键测试所有存储方式（console、database、file、redis、mq）的所有场景");
-        
+
         Map<String, Map<String, String>> allResults = new LinkedHashMap<>();
         allResults.put("console存储", testConsoleStorage());
         allResults.put("database存储", testDatabaseStorage());
         allResults.put("file存储", testFileStorage());
         allResults.put("redis存储", testRedisStorage());
         allResults.put("mq存储", testMqStorage());
-        
+
         result.put("测试结果", allResults);
         result.put("结果说明", "✅=通过 ❌=失败 ⚠️=异常 🔵=不应记录（正常）");
-        
+
         log.info("========================================");
         log.info("=== 所有存储方式测试完成 ===");
         log.info("========================================");
-        
+
         return Result.success(result);
     }
 
@@ -152,21 +156,21 @@ public class TestLogController {
     public Result<Map<String, Object>> queryRedisLogs() {
         log.info(">>> 开始查询 Redis 中的日志数据");
         Map<String, Object> result = new LinkedHashMap<>();
-        
+
         try {
             // 检查今天的日志
             String today = java.time.LocalDate.now().toString();
             String redisKey = "log:operation:" + today;
-            
+
             result.put("查询时间", new Date().toString());
             result.put("Redis Key", redisKey);
             result.put("说明", "日志存储在 Redis List 中，Key 格式：log:operation:yyyy-MM-dd");
-            
+
             // 提示：需要手动在 Redis 中查询
             result.put("查询命令", "LLEN " + redisKey + " (查看日志数量)");
             result.put("查看日志", "LRANGE " + redisKey + " 0 -1 (查看所有日志)");
             result.put("查看最新", "LRANGE " + redisKey + " -10 -1 (查看最新10条)");
-            
+
             log.info("<<< Redis 日志查询信息已返回");
             return Result.success(result);
         } catch (Exception e) {
@@ -194,7 +198,7 @@ public class TestLogController {
     private Map<String, String> testConsoleStorage() {
         Map<String, String> result = new LinkedHashMap<>();
         LogTestDTO dto = createTestDTO();
-        
+
         result.put("01-基础测试", test(() -> testLogServiceImpl.console01Basic()));
         result.put("02-参数记录", test(() -> testLogServiceImpl.console02RecordParams(dto)));
         result.put("03-返回值记录", test(() -> testLogServiceImpl.console03RecordResult()));
@@ -208,7 +212,7 @@ public class TestLogController {
         result.put("11-敏感字段脱敏", test(() -> testLogServiceImpl.console11Desensitize(createSensitiveDTO())));
         result.put("12-模块业务类型", test(() -> testLogServiceImpl.console12ModuleBusiness()));
         result.put("13-void返回值", testVoid(() -> testLogServiceImpl.console13VoidReturn()));
-        
+
         return result;
     }
 
@@ -218,7 +222,7 @@ public class TestLogController {
     private Map<String, String> testDatabaseStorage() {
         Map<String, String> result = new LinkedHashMap<>();
         LogTestDTO dto = createTestDTO();
-        
+
         result.put("01-基础测试", test(() -> testLogServiceImpl.database01Basic()));
         result.put("02-参数记录", test(() -> testLogServiceImpl.database02RecordParams(dto)));
         result.put("03-返回值记录", test(() -> testLogServiceImpl.database03RecordResult()));
@@ -232,7 +236,7 @@ public class TestLogController {
         result.put("11-敏感字段脱敏", test(() -> testLogServiceImpl.database11Desensitize(createSensitiveDTO())));
         result.put("12-模块业务类型", test(() -> testLogServiceImpl.database12ModuleBusiness()));
         result.put("13-void返回值", testVoid(() -> testLogServiceImpl.database13VoidReturn()));
-        
+
         return result;
     }
 
