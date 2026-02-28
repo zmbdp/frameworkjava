@@ -27,9 +27,10 @@ public class TestTreeUtilController {
 
     /**
      * 一键测试所有功能
-     * 直接调用此接口即可测试所有树形结构功能，无需传参
+     * <p>
+     * 测试 TreeUtil 的所有功能，包括：构建、遍历、查找、过滤、排序、子树提取、统计分析、安全版本方法
      *
-     * @return 详细的测试结果
+     * @return 详细的测试结果，包含每个功能的测试状态和数据
      */
     @GetMapping("/all")
     public Result<Map<String, Object>> testAll() {
@@ -926,16 +927,13 @@ public class TestTreeUtilController {
 
     /**
      * 创建测试数据
-     * 模拟一个菜单树结构：
-     * - 系统管理 (1)
-     * - 用户管理 (2)
-     * - 角色管理 (3)
-     * - 角色列表 (4)
-     * - 权限分配 (5)
-     * - 内容管理 (6)
-     * - 文章管理 (7)
-     * - 分类管理 (8)
-     * - 设置 (9)
+     * <p>
+     * 模拟一个包含 9 个节点的菜单树结构：
+     * <ul>
+     *     <li>第一层：系统管理(1)、内容管理(6)、设置(9)</li>
+     *     <li>第二层：用户管理(2)、角色管理(3)、文章管理(7)、分类管理(8)</li>
+     *     <li>第三层：角色列表(4)、权限分配(5)</li>
+     * </ul>
      *
      * @return 扁平化的节点列表
      */
@@ -964,7 +962,12 @@ public class TestTreeUtilController {
 
     /**
      * 捕获树结构的完整快照（用于比较前后是否改变）
-     * 包括每个节点的ID、parentId、children的ID列表
+     * <p>
+     * 递归遍历树结构，生成包含每个节点完整信息的字符串表示，
+     * 包括节点的 ID、parentId、name、sort、enabled 以及 children 的完整结构
+     *
+     * @param obj 要捕获的对象（可以是 List 或 MenuNode）
+     * @return 树结构的字符串表示
      */
     private String captureTreeStructure(Object obj) {
         if (obj == null) {
@@ -1010,7 +1013,13 @@ public class TestTreeUtilController {
     }
 
     /**
-     * 完整验证树结构（检查每个节点的ID、parentId、children是否正确）
+     * 完整验证树结构（检查每个节点的 ID、parentId、children 是否正确）
+     * <p>
+     * 递归验证树中每个节点的父子关系是否正确，确保子节点的 parentId 与父节点的 id 一致
+     *
+     * @param tree                  树形结构的根节点列表
+     * @param expectedRootParentId  期望的根节点 parentId
+     * @return 验证结果，包含"验证通过"和"错误详情"（如果有错误）
      */
     private Map<String, Object> validateTreeStructure(List<MenuNode> tree, Long expectedRootParentId) {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -1040,6 +1049,11 @@ public class TestTreeUtilController {
 
     /**
      * 递归验证节点及其子节点
+     * <p>
+     * 检查节点的 children 是否为 null，以及每个子节点的 parentId 是否正确指向父节点
+     *
+     * @param node   当前节点
+     * @param errors 错误信息列表
      */
     private void validateNode(MenuNode node, List<String> errors) {
         if (node == null) {
@@ -1071,6 +1085,11 @@ public class TestTreeUtilController {
 
     /**
      * 打印树结构（用于调试）
+     * <p>
+     * 以缩进的方式打印整棵树的结构，显示每个节点的 ID、parentId、name 和子节点数量
+     *
+     * @param tree 树形结构的根节点列表
+     * @return 格式化的树结构字符串
      */
     private String printTree(List<MenuNode> tree) {
         StringBuilder sb = new StringBuilder();
@@ -1081,7 +1100,13 @@ public class TestTreeUtilController {
     }
 
     /**
-     * 递归打印节点
+     * 递归打印单个节点及其子节点
+     * <p>
+     * 按层级缩进打印节点信息
+     *
+     * @param node  当前节点
+     * @param level 当前层级（用于控制缩进）
+     * @param sb    字符串构建器
      */
     private void printNode(MenuNode node, int level, StringBuilder sb) {
         String indent = "  ".repeat(level);
@@ -1099,7 +1124,12 @@ public class TestTreeUtilController {
     }
 
     /**
-     * 验证树结构是否正确（无重复节点）
+     * 验证树结构中是否有重复节点
+     * <p>
+     * 遍历整棵树，检查是否存在 ID 重复的节点
+     *
+     * @param tree 树形结构的根节点列表
+     * @return true 表示无重复节点，false 表示存在重复节点
      */
     private boolean validateTreeStructureNoDuplicate(List<MenuNode> tree) {
         Set<Long> visitedIds = new HashSet<>();
@@ -1107,7 +1137,13 @@ public class TestTreeUtilController {
     }
 
     /**
-     * 递归验证节点（检查是否有重复ID）
+     * 递归验证节点列表中是否有重复 ID
+     * <p>
+     * 使用 Set 记录已访问的节点 ID，检测重复
+     *
+     * @param nodes      节点列表
+     * @param visitedIds 已访问的节点 ID 集合
+     * @return true 表示无重复，false 表示有重复
      */
     private boolean validateNodeNoDuplicate(List<MenuNode> nodes, Set<Long> visitedIds) {
         if (nodes == null) {
@@ -1132,6 +1168,11 @@ public class TestTreeUtilController {
 
     /**
      * 获取树验证详情（找出重复的节点）
+     * <p>
+     * 统计每个节点 ID 出现的次数，找出重复的节点
+     *
+     * @param tree 树形结构的根节点列表
+     * @return 重复节点的详细信息，如果无重复则返回"无重复"
      */
     private String getTreeValidationDetails(List<MenuNode> tree) {
         Map<Long, Integer> idCount = new HashMap<>();
@@ -1148,7 +1189,12 @@ public class TestTreeUtilController {
     }
 
     /**
-     * 统计节点ID出现次数
+     * 统计节点 ID 出现次数
+     * <p>
+     * 递归遍历树结构，统计每个节点 ID 出现的次数
+     *
+     * @param nodes   节点列表
+     * @param idCount ID 出现次数的映射表
      */
     private void countNodeIds(List<MenuNode> nodes, Map<Long, Integer> idCount) {
         if (nodes == null) {
@@ -1163,6 +1209,8 @@ public class TestTreeUtilController {
 
     /**
      * 树节点测试类
+     * <p>
+     * 用于测试 TreeUtil 的菜单节点实体类，包含基本的树节点属性和业务属性
      */
     @Data
     @NoArgsConstructor
