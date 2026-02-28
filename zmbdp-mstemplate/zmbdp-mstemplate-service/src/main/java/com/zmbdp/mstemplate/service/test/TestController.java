@@ -16,16 +16,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 基础功能测试控制器
+ * 测试 Result、异常处理、BeanCopyUtil 等基础功能
+ *
+ * @author 稚名不带撇
+ */
 @Slf4j
 @RestController
 @RequestMapping("/test")
 public class TestController {
-    // /test/info
+
+    /**
+     * 基础接口调用测试
+     */
     @GetMapping("/info")
     public void info() {
         log.info("接口调用测试");
     }
 
+    /**
+     * Result 返回值测试
+     *
+     * @param id ID参数
+     * @return 结果
+     */
     @GetMapping("/result")
     public Result<Void> result(int id) {
         if (id < 0) {
@@ -34,6 +49,12 @@ public class TestController {
         return Result.success();
     }
 
+    /**
+     * Result 返回对象测试
+     *
+     * @param id ID参数
+     * @return 用户对象
+     */
     @GetMapping("/resultUser")
     public Result<User> resultId(int id) {
         if (id < 0) {
@@ -45,6 +66,12 @@ public class TestController {
         return Result.success(user);
     }
 
+    /**
+     * 异常处理测试
+     *
+     * @param id ID参数
+     * @return 结果
+     */
     @GetMapping("/exception")
     public Result<Void> exception(int id) {
         if (id < 0) {
@@ -59,6 +86,11 @@ public class TestController {
         return Result.success();
     }
 
+    /**
+     * BeanCopyUtil.copyMapProperties 测试
+     *
+     * @return Map拷贝结果
+     */
     @GetMapping("/copyMapProperties")
     public Result<Map<String, User>> copyMapProperties() {
         // 创建测试数据
@@ -89,6 +121,11 @@ public class TestController {
         return Result.success(resultMap);
     }
 
+    /**
+     * BeanCopyUtil.copyMapListProperties 测试
+     *
+     * @return Map<List>拷贝结果
+     */
     @GetMapping("/copyMapListProperties")
     public Result<Map<String, List<User>>> copyMapListProperties() {
         // 创建测试数据

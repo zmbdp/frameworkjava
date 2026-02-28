@@ -50,7 +50,7 @@ CREATE TABLE `sys_region`
     `longitude`   decimal(10, 7) DEFAULT NULL COMMENT '经度',
     `latitude`    decimal(10, 7) DEFAULT NULL COMMENT '纬度',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3951 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3951 DEFAULT CHARSET=utf8mb4 COMMENT='行政区划表';
 
 INSERT INTO sys_region (id, code, parent_id, parent_code, name, full_name, pinyin, `level`, longitude, latitude)
 VALUES (1, '110000', NULL, NULL, '北京', '北京市', 'beijing', '1', 116.7245020, 39.9050230),

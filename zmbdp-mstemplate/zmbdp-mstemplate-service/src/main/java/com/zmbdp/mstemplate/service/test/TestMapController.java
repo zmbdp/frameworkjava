@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 地图服务测试控制器
+ * 测试城市查询、区域查询、地点搜索等功能
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @RequestMapping("/test/map")
 public class TestMapController {

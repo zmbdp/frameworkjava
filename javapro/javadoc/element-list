@@ -34,7 +34,9 @@ com.zmbdp.common.bloomfilter.service
 com.zmbdp.common.bloomfilter.service.impl
 com.zmbdp.common.cache.config
 com.zmbdp.common.cache.utils
+com.zmbdp.common.core
 com.zmbdp.common.core.config
+com.zmbdp.common.core.domain
 com.zmbdp.common.core.enums
 com.zmbdp.common.core.utils
 com.zmbdp.common.datapermission.annotation

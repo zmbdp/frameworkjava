@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Token 测试控制器
+ * 测试 JWT Token 生成、解析、续期、删除等功能
+ *
+ * @author 稚名不带撇
+ */
 @RefreshScope
 @RestController
 @RequestMapping("/test/token")
@@ -43,7 +49,12 @@ public class TestTokenController {
     }
     // 生成的 token： eyJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX2Zyb20iOiJ0ZXN0IiwidXNlcl9rZXkiOiIzMmE4YjNlNC01NjY4LTRhNzAtYjg3Ni1mYWM4YzAxNTBmM2MiLCJ1c2VybmFtZSI6InRlc3QifQ.GsdrAyyc9xORoWZLSe_jp9rKwMLSRUtra2c6zadsve8HWcg4H2H2OWOiSSn5uAlhY4r78uWi3vq-7XcES7kHBQ
 
-    // 然后根据这个 token 获取数据
+    /**
+     * 根据token获取登录用户信息
+     *
+     * @param token JWT token
+     * @return 登录用户信息
+     */
     @GetMapping("/getLoginUser")
     public LoginUserDTO getLoginUser(String token) {
         return tokenService.getLoginUser(token, secret);
@@ -89,9 +100,9 @@ public class TestTokenController {
     }
 
     /**
-     * 根据用户 ID 和来源删除登录状态
+     * 根据用户ID和来源删除登录状态
      *
-     * @param userId 用户ID
+     * @param userId   用户ID
      * @param userFrom 用户来源
      * @return 操作结果
      */

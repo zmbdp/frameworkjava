@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 系统参数配置测试控制器
+ * 测试参数查询功能
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @RequestMapping("/test/argument")
 public class TestArgumentController {
@@ -32,7 +38,7 @@ public class TestArgumentController {
     /**
      * 根据多个参数键查询多个参数对象
      *
-     * @return 多个参数对象
+     * @return 参数对象列表
      */
     @GetMapping("/keys")
     List<ArgumentDTO> getByConfigKeys() {

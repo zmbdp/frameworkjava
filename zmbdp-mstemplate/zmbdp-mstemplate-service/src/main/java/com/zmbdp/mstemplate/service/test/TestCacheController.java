@@ -22,6 +22,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 缓存功能测试控制器
+ * 测试二级缓存、布隆过滤器、缓存穿透防护等功能
+ *
+ * @author 稚名不带撇
+ */
 @Slf4j
 @RestController
 @RequestMapping("/test/cache")
@@ -46,7 +52,11 @@ public class TestCacheController {
     @Autowired
     private BloomFilterConfig bloomFilterConfig;
 
-
+    /**
+     * 测试二级缓存获取
+     *
+     * @return 测试结果
+     */
     @GetMapping("/get")
     public Result<Void> get() {
         String key = "testKey";
@@ -55,6 +65,12 @@ public class TestCacheController {
         return Result.success();
     }
 
+    /**
+     * 测试服装价格缓存
+     *
+     * @param proId 产品ID
+     * @return 价格
+     */
     @GetMapping("/cloth/get")
     public Result<Integer> clothGet(Long proId) {
         return Result.success(clothService.clothPriceGet(proId));
@@ -301,6 +317,11 @@ public class TestCacheController {
         }
     }
 
+    /**
+     * 测试布隆过滤器配置
+     *
+     * @return 测试结果
+     */
     @PostMapping("/bloom/config")
     public Result<Void> testBloomFilterConfig() {
         try {
@@ -516,6 +537,11 @@ public class TestCacheController {
         }
     }
 
+    /**
+     * 测试布隆过滤器线程安全
+     *
+     * @return 测试结果
+     */
     @PostMapping("/threads/bloom")
     public Result<Void> testBloomFilterThreads() {
         log.info("开始布隆过滤器线程安全测试");
@@ -667,6 +693,11 @@ public class TestCacheController {
         }
     }
 
+    /**
+     * 布隆过滤器压力测试
+     *
+     * @return 测试结果
+     */
     @PostMapping("/threads/bloom/stress")
     public Result<Void> stressTestBloomFilter() {
         log.info("🧪 开始布隆过滤器压力测试");
@@ -739,7 +770,11 @@ public class TestCacheController {
 
         // 验证状态一致性
         String status1 = bloomFilterService.getStatus();
-        try { Thread.sleep(100); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         String status2 = bloomFilterService.getStatus();
 
         if (status1.equals(status2)) {

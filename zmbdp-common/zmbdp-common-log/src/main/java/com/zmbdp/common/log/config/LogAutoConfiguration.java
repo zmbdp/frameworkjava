@@ -86,6 +86,10 @@ public class LogAutoConfiguration {
     @ConditionalOnBean(SqlSessionFactory.class)
     @MapperScan("com.zmbdp.common.log.mapper")
     static class LogMapperConfiguration {
+
+        /**
+         * 创建操作日志 Mapper 扫描配置
+         */
         public LogMapperConfiguration() {
             log.info("初始化操作日志 Mapper 扫描（检测到数据源配置）");
         }

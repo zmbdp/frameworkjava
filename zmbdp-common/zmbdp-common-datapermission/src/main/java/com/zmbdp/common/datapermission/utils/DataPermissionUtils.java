@@ -576,6 +576,10 @@ public class DataPermissionUtils {
      * 使用 Builder 模式构建数据权限上下文，支持链式调用。
      */
     public static class ContextBuilder {
+
+        /**
+         * 数据权限上下文
+         */
         private final DataPermissionContext context = new DataPermissionContext();
 
         /**
