@@ -5,35 +5,37 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 /**
  * 树形结构工具类
  * <p>
- * 提供便捷的树形结构构建、遍历、查找、转换等功能，支持任意类型的树节点对象。<br>
- * 适用于菜单树、组织架构树、分类树、权限树等各种树形数据结构的处理。
+ * 提供全面的树形结构处理能力，支持任意类型的树节点对象。<br>
+ * 支持菜单树、组织架构树、分类树、权限树等多种业务的树结构常见操作。
  * <p>
- * <b>核心功能：</b>
+ * <b>主要功能：</b>
  * <ul>
- *     <li>树形结构构建：将扁平化列表转换为树形结构</li>
- *     <li>树形结构遍历：深度优先遍历、广度优先遍历</li>
- *     <li>树形结构查找：根据条件查找节点、查找路径</li>
- *     <li>树形结构转换：树转列表、提取所有叶子节点</li>
- *     <li>树形结构过滤：根据条件过滤节点</li>
- *     <li>树形结构排序：对树节点进行排序</li>
+ *     <li>树形结构构建：将扁平列表（如数据库返回的 List）高效转为树形结构</li>
+ *     <li>树形遍历：支持深度优先、广度优先等多种遍历方式，以及节点批量操作</li>
+ *     <li>树形查找：任意条件查找单个/多个节点，查找节点路径、祖先、后代</li>
+ *     <li>树转列表：支持将树结构“拉平成”列表，按需返回所有节点</li>
+ *     <li>子树提取：快速获取任意节点的指定层级子树，或某节点的全部后代</li>
+ *     <li>过滤/排序：按条件过滤树节点，或对整棵树递归排序</li>
+ *     <li>统计分析：支持节点总数、最大深度、叶子节点数/提取等统计</li>
  * </ul>
- * <p>
- * <b>使用场景：</b>
+ * <b>典型用法示例：</b>
  * <ul>
- *     <li>菜单树构建与展示</li>
- *     <li>组织架构树管理</li>
- *     <li>商品分类树处理</li>
- *     <li>权限树构建</li>
- *     <li>文件目录树展示</li>
+ *     <li>build() —— 扁平数据一键转树</li>
+ *     <li>toList() —— 树转全部节点列表</li>
+ *     <li>findFirst()/findPath() —— 查找节点/路径</li>
+ *     <li>filter()/sort() —— 过滤、排序树</li>
+ *     <li>getSubTree()/getDescendants() —— 获取子树、后代节点</li>
+ * </ul>
+ * <b>适用场景：</b>
+ * <ul>
+ *     <li>菜单树、组织/部门架构、权限树、商品分类、文件目录、自定义层级结构等</li>
+ *     <li>支持树的懒加载、分页加载、按层级截取、业务数据（如启用禁用）筛选等场景</li>
  * </ul>
  *
  * @author 稚名不带撇
@@ -46,6 +48,13 @@ public class TreeUtil {
      * <p>
      * 将扁平化的列表转换为树形结构，从指定的根节点 ID 开始构建。<br>
      * 适用于已知根节点 ID 的场景，如菜单树、组织架构树等。
+     * <p>
+     * <b>重要提示：</b>
+     * <ul>
+     *     <li>此方法会<b>直接修改原始list中节点的children属性</b></li>
+     *     <li>每次调用都会先清空所有节点的children，避免重复构建时累加</li>
+     *     <li>如果需要保留原始数据，请传入list的副本</li>
+     * </ul>
      * <p>
      * <b>算法说明：</b>
      * <ul>
@@ -104,31 +113,39 @@ public class TreeUtil {
             Function<T, List<T>> childrenGetter,
             BiConsumer<T, List<T>> childrenSetter
     ) {
+        // 如果是空的话就直接返回一个空列表
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
 
-        // 构建 ID -> 节点的映射，方便快速查找
+        // 构建 ID -> 节点的映射表，用于 O(1) 时间复杂度查找父节点
+        // 如果有重复ID，保留第一个节点 (o1, o2) -> o1
         Map<ID, T> nodeMap = list.stream().collect(
                 Collectors.toMap(
-                        idGetter, Function.identity(),
-                        (o1, o2) -> o1
+                        idGetter, // key: 节点ID
+                        Function.identity(), // value: 节点本身
+                        (o1, o2) -> o1 // 冲突处理：保留第一个
                 )
         );
 
-        // 存储根节点
+        // 先清空所有节点的 children，避免重复调用 build 时累加子节点
+        for (T node : list) {
+            childrenSetter.accept(node, new ArrayList<>());
+        }
+
+        // 存储所有根节点（parentId == rootId 的节点）
         List<T> rootNodes = new ArrayList<>();
 
         // 遍历所有节点，构建父子关系
         for (T node : list) {
             ID parentId = parentIdGetter.apply(node);
 
-            // 判断是否为根节点
+            // 判断是否为根节点（父ID 等于指定的 根ID）
             if (Objects.equals(parentId, rootId)) {
                 rootNodes.add(node);
             } else {
-                // 查找父节点
-                establishParentChildRelation(childrenGetter, childrenSetter, node, nodeMap, parentId);
+                // 非根节点：查找父节点并建立父子关系
+                establishParentChildRelation(childrenGetter, node, nodeMap, parentId);
             }
         }
 
@@ -140,6 +157,13 @@ public class TreeUtil {
      * <p>
      * 将扁平化的列表转换为树形结构，自动识别根节点（父节点 ID 不在列表中的节点）。<br>
      * 适用于不确定根节点 ID 的场景，或者数据中根节点的父 ID 各不相同的情况。
+     * <p>
+     * <b>重要提示：</b>
+     * <ul>
+     *     <li>此方法会<b>直接修改原始list中节点的children属性</b></li>
+     *     <li>每次调用都会先清空所有节点的children，避免重复构建时累加</li>
+     *     <li>如果需要保留原始数据，请传入list的副本</li>
+     * </ul>
      * <p>
      * <b>算法说明：</b>
      * <ul>
@@ -186,19 +210,26 @@ public class TreeUtil {
             Function<T, List<T>> childrenGetter,
             BiConsumer<T, List<T>> childrenSetter
     ) {
+        // 空列表直接返回
         if (CollectionUtils.isEmpty(list)) {
             return new ArrayList<>();
         }
 
-        // 构建 ID -> 节点的映射
+        // 构建 ID -> 节点的映射表，用于快速查找
         Map<ID, T> nodeMap = list.stream().collect(
                 Collectors.toMap(
-                        idGetter, Function.identity(),
-                        (o1, o2) -> o1
+                        idGetter, // key: 节点ID
+                        Function.identity(), // value: 节点本身
+                        (o1, o2) -> o1 // 冲突处理：保留第一个
                 )
         );
 
-        // 收集所有存在的 ID
+        // 先清空所有节点的 children，避免重复调用 build 时累加子节点
+        for (T node : list) {
+            childrenSetter.accept(node, new ArrayList<>());
+        }
+
+        // 收集所有存在的节点 ID（用于判断父节点是否存在）
         Set<ID> existingIds = nodeMap.keySet();
 
         // 存储根节点
@@ -208,12 +239,14 @@ public class TreeUtil {
         for (T node : list) {
             ID parentId = parentIdGetter.apply(node);
 
-            // 判断是否为根节点（父节点 ID 为 null 或父节点不存在）
+            // 判断是否为根节点：
+            // 1. 父节点ID 为 null
+            // 2. 父节点ID 不在现有节点列表中（孤儿节点也视为根节点）
             if (parentId == null || !existingIds.contains(parentId)) {
                 rootNodes.add(node);
             } else {
-                // 查找父节点
-                establishParentChildRelation(childrenGetter, childrenSetter, node, nodeMap, parentId);
+                // 非根节点：查找父节点并建立父子关系
+                establishParentChildRelation(childrenGetter, node, nodeMap, parentId);
             }
         }
 
@@ -227,7 +260,6 @@ public class TreeUtil {
      * 如果父节点的 children 列表为 null，会自动创建一个新的 ArrayList。
      *
      * @param childrenGetter 获取子节点列表的函数
-     * @param childrenSetter 设置子节点列表的函数
      * @param node           子节点
      * @param nodeMap        节点 ID 到节点的映射
      * @param parentId       父节点 ID
@@ -236,19 +268,18 @@ public class TreeUtil {
      */
     private static <T, ID> void establishParentChildRelation(
             Function<T, List<T>> childrenGetter,
-            BiConsumer<T, List<T>> childrenSetter,
             T node, Map<ID, T> nodeMap, ID parentId
     ) {
+        // 从映射表中查找父节点
         T parentNode = nodeMap.get(parentId);
         if (parentNode != null) {
-            // 获取父节点的子节点列表（如果没有则创建）
+            // 获取父节点的子节点列表（build方法已经初始化，不会为null）
             List<T> children = childrenGetter.apply(parentNode);
-            if (children == null) {
-                children = new ArrayList<>();
-                childrenSetter.accept(parentNode, children);
-            }
+
+            // 将当前节点添加到父节点的 children 列表中
             children.add(node);
         }
+        // 如果父节点不存在，该节点会被忽略（孤儿节点）
     }
 
     /**
@@ -285,10 +316,14 @@ public class TreeUtil {
             return new ArrayList<>();
         }
 
+        // 创建结果列表，用于收集所有节点
         List<T> result = new ArrayList<>();
+
+        // 遍历每个根节点，深度优先遍历并收集所有节点
         for (T node : tree) {
             traverseDepthFirst(node, childrenGetter, result::add);
         }
+
         return result;
     }
 
@@ -346,11 +381,13 @@ public class TreeUtil {
             return;
         }
 
-        // 先处理当前节点（先序遍历）
+        // 先序遍历：先处理当前节点
         consumer.accept(node);
 
-        // 再递归处理子节点
+        // 获取当前节点的子节点列表
         List<T> children = childrenGetter.apply(node);
+
+        // 递归处理每个子节点
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
                 traverseDepthFirst(child, childrenGetter, consumer);
@@ -397,13 +434,20 @@ public class TreeUtil {
             return;
         }
 
+        // 使用队列实现广度优先遍历（层序遍历）
         Queue<T> queue = new LinkedList<>(tree);
 
         while (!queue.isEmpty()) {
+            // 从队列头部取出一个节点
             T node = queue.poll();
+
+            // 处理当前节点
             consumer.accept(node);
 
+            // 获取当前节点的所有子节点
             List<T> children = childrenGetter.apply(node);
+
+            // 将子节点加入队列尾部（先进先出，保证层序遍历）
             if (CollectionUtils.isNotEmpty(children)) {
                 queue.addAll(children);
             }
@@ -444,13 +488,15 @@ public class TreeUtil {
             return null;
         }
 
+        // 遍历每个根节点，深度优先查找第一个符合条件的节点
         for (T node : tree) {
             T found = findFirst(node, childrenGetter, predicate);
             if (found != null) {
-                return found;
+                return found; // 找到了，立即返回
             }
         }
 
+        // 所有根节点的子树都没找到
         return null;
     }
 
@@ -470,22 +516,26 @@ public class TreeUtil {
             return null;
         }
 
-        // 先判断当前节点是否符合条件（提前返回，优化性能）
+        // 先判断当前节点是否符合条件
         if (predicate.test(node)) {
+            // 符合的话直接返回
             return node;
         }
 
-        // 再递归查找子节点
+        // 当前节点不符合，继续在子节点中查找
         List<T> children = childrenGetter.apply(node);
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
+                // 递归查找子节点
                 T found = findFirst(child, childrenGetter, predicate);
                 if (found != null) {
-                    return found; // 找到后立即返回，避免不必要的遍历
+                    // 如果不为空就说明找到了
+                    return found;
                 }
             }
         }
 
+        // 当前节点及其子树都没找到
         return null;
     }
 
@@ -519,11 +569,13 @@ public class TreeUtil {
      * @return 所有符合条件的节点列表，如果没有找到则返回空列表
      */
     public static <T> List<T> findAll(List<T> tree, Function<T, List<T>> childrenGetter, Predicate<T> predicate) {
+        // 创建结果列表，用于收集所有符合条件的节点
         List<T> result = new ArrayList<>();
         if (CollectionUtils.isEmpty(tree)) {
             return result;
         }
 
+        // 遍历每个根节点，递归查找所有符合条件的节点
         for (T node : tree) {
             findAll(node, childrenGetter, predicate, result);
         }
@@ -552,10 +604,11 @@ public class TreeUtil {
 
         // 判断当前节点是否符合条件
         if (predicate.test(node)) {
-            result.add(node);
+            result.add(node); // 符合条件，加入结果列表
         }
 
-        // 递归查找子节点（无论当前节点是否符合条件，都要继续查找子节点）
+        // 无论当前节点是否符合条件，都要继续递归查找子节点
+        // （因为子节点可能符合条件）
         List<T> children = childrenGetter.apply(node);
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
@@ -594,6 +647,13 @@ public class TreeUtil {
      * 根据条件过滤树形结构，保留符合条件的节点及其祖先节点。<br>
      * 如果父节点不符合条件但子节点符合，父节点也会被保留。
      * <p>
+     * <b>重要提示：</b>
+     * <ul>
+     *     <li>此方法会<b>直接修改原始树节点的children</b>，不会创建新节点</li>
+     *     <li>如果需要保留原始树，请在调用前先深拷贝树结构</li>
+     *     <li>多次调用会基于上次修改的结果继续过滤</li>
+     * </ul>
+     * <p>
      * <b>使用示例：</b>
      * <pre>{@code
      * // 过滤出所有启用的菜单（包含其父节点）
@@ -622,11 +682,13 @@ public class TreeUtil {
             return new ArrayList<>();
         }
 
+        // 过滤每个根节点及其子树
         List<T> result = new ArrayList<>();
         for (T node : tree) {
+            // 递归过滤当前节点及其子树
             T filtered = filter(node, childrenGetter, childrenSetter, predicate);
             if (filtered != null) {
-                result.add(filtered);
+                result.add(filtered); // 保留符合条件的节点
             }
         }
 
@@ -655,26 +717,29 @@ public class TreeUtil {
             return null;
         }
 
-        // 递归过滤子节点
+        // 先递归过滤所有子节点
         List<T> children = childrenGetter.apply(node);
         List<T> filteredChildren = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
+                // 递归过滤每个子节点
                 T filtered = filter(child, childrenGetter, childrenSetter, predicate);
                 if (filtered != null) {
-                    filteredChildren.add(filtered);
+                    filteredChildren.add(filtered); // 子节点符合条件，保留
                 }
             }
         }
 
-        // 如果当前节点符合条件，或者有符合条件的子节点，则保留当前节点
+        // 判断是否保留当前节点：
+        // 1. 当前节点本身符合条件，或
+        // 2. 当前节点有符合条件的子节点（需要保留父节点以维持树结构）
         if (predicate.test(node) || !filteredChildren.isEmpty()) {
-            childrenSetter.accept(node, filteredChildren);
-            return node;
+            childrenSetter.accept(node, filteredChildren); // 更新子节点列表
+            return node; // 保留当前节点
         }
 
-        // 节点及其子树都不符合条件，返回 null
+        // 当前节点及其子树都不符合条件，过滤掉
         return null;
     }
 
@@ -683,6 +748,12 @@ public class TreeUtil {
      * <p>
      * 对树形结构的每一层节点进行排序。<br>
      * 适用于需要对树节点排序的场景，如按名称、序号等排序。
+     * <p>
+     * <b>重要提示：</b>
+     * <ul>
+     *     <li>此方法会<b>直接修改原始树节点的children</b>，不会创建新节点</li>
+     *     <li>如果需要保留原始树，请在调用前先深拷贝树结构</li>
+     * </ul>
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
@@ -720,15 +791,17 @@ public class TreeUtil {
             return new ArrayList<>();
         }
 
-        // 对当前层排序
+        // 对当前层的节点进行排序
         List<T> sortedList = new ArrayList<>(tree);
         sortedList.sort(comparator);
 
-        // 递归对子节点排序
+        // 递归对每个节点的子节点进行排序
         for (T node : sortedList) {
             List<T> children = childrenGetter.apply(node);
             if (CollectionUtils.isNotEmpty(children)) {
+                // 递归排序子节点
                 List<T> sortedChildren = sort(children, childrenGetter, childrenSetter, comparator);
+                // 更新节点的子节点列表为排序后的列表
                 childrenSetter.accept(node, sortedChildren);
             }
         }
@@ -764,13 +837,16 @@ public class TreeUtil {
             return new ArrayList<>();
         }
 
+        // 遍历每个根节点，尝试查找路径
         for (T node : tree) {
-            List<T> path = new ArrayList<>();
+            List<T> path = new ArrayList<>(); // 用于记录路径
+            // 在当前根节点的子树中查找目标节点
             if (findPath(node, childrenGetter, predicate, path)) {
-                return path;
+                return path; // 找到了，返回完整路径
             }
         }
 
+        // 所有根节点的子树都没找到目标节点
         return new ArrayList<>();
     }
 
@@ -795,25 +871,27 @@ public class TreeUtil {
             return false;
         }
 
-        // 将当前节点加入路径
+        // 将当前节点加入路径（尝试这条路径）
         path.add(node);
 
         // 判断当前节点是否为目标节点
         if (predicate.test(node)) {
-            return true;
+            return true; // 找到了！路径已完整
         }
 
-        // 递归查找子节点
+        // 当前节点不是目标，继续在子节点中查找
         List<T> children = childrenGetter.apply(node);
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
+                // 递归查找子节点
                 if (findPath(child, childrenGetter, predicate, path)) {
-                    return true; // 找到目标节点，返回 true
+                    return true; // 在子树中找到了目标节点
                 }
             }
         }
 
-        // 如果没有找到，移除当前节点（回溯）
+        // 当前节点及其子树都没找到目标节点
+        // 回溯：从路径中移除当前节点，尝试其他路径
         path.remove(path.size() - 1);
         return false;
     }
@@ -837,12 +915,15 @@ public class TreeUtil {
      */
     public static <T> int getMaxDepth(List<T> tree, Function<T, List<T>> childrenGetter) {
         if (CollectionUtils.isEmpty(tree)) {
-            return 0;
+            return 0; // 空树深度为0
         }
 
+        // 遍历所有根节点，找出最大深度
         int maxDepth = 0;
         for (T node : tree) {
+            // 计算当前根节点的深度（根节点深度为1）
             int depth = getMaxDepth(node, childrenGetter, 1);
+            // 取所有根节点中的最大深度
             maxDepth = Math.max(maxDepth, depth);
         }
 
@@ -865,14 +946,20 @@ public class TreeUtil {
             return currentDepth - 1;
         }
 
+        // 获取当前节点的子节点
         List<T> children = childrenGetter.apply(node);
+
+        // 如果是叶子节点（没有子节点），返回当前深度
         if (CollectionUtils.isEmpty(children)) {
-            return currentDepth; // 叶子节点，返回当前深度
+            return currentDepth;
         }
 
+        // 有子节点，递归计算所有子节点的最大深度
         int maxDepth = currentDepth;
         for (T child : children) {
+            // 递归计算子节点深度（深度+1）
             int depth = getMaxDepth(child, childrenGetter, currentDepth + 1);
+            // 取最大值
             maxDepth = Math.max(maxDepth, depth);
         }
 
@@ -898,9 +985,10 @@ public class TreeUtil {
      */
     public static <T> int countNodes(List<T> tree, Function<T, List<T>> childrenGetter) {
         if (CollectionUtils.isEmpty(tree)) {
-            return 0;
+            return 0; // 空树节点数为0
         }
 
+        // 累加所有根节点及其子树的节点数
         int count = 0;
         for (T node : tree) {
             count += countNodes(node, childrenGetter);
@@ -924,10 +1012,13 @@ public class TreeUtil {
             return 0;
         }
 
-        int count = 1; // 当前节点计数
+        // 当前节点计数为1
+        int count = 1;
 
+        // 获取子节点列表
         List<T> children = childrenGetter.apply(node);
         if (CollectionUtils.isNotEmpty(children)) {
+            // 递归统计每个子节点及其子树的节点数
             for (T child : children) {
                 count += countNodes(child, childrenGetter);
             }
@@ -986,12 +1077,14 @@ public class TreeUtil {
      * @return 祖先节点列表（不包含目标节点），如果没有找到则返回空列表
      */
     public static <T> List<T> getAncestors(List<T> tree, Function<T, List<T>> childrenGetter, Predicate<T> predicate) {
+        // 先查找从根到目标节点的完整路径
         List<T> path = findPath(tree, childrenGetter, predicate);
         if (path.isEmpty()) {
-            return new ArrayList<>();
+            return new ArrayList<>(); // 没找到节点，返回空列表
         }
 
-        // 移除最后一个元素（目标节点本身）
+        // 移除最后一个元素（目标节点本身），剩下的就是祖先节点
+        // 例如：路径是 [根节点, 父节点, 目标节点]，返回 [根节点, 父节点]
         return path.subList(0, path.size() - 1);
     }
 
@@ -1018,20 +1111,659 @@ public class TreeUtil {
      * @return 后代节点列表（不包含目标节点），如果没有找到则返回空列表
      */
     public static <T> List<T> getDescendants(List<T> tree, Function<T, List<T>> childrenGetter, Predicate<T> predicate) {
+        // 先查找目标节点
         T node = findFirst(tree, childrenGetter, predicate);
         if (node == null) {
-            return new ArrayList<>();
+            return new ArrayList<>(); // 没找到节点，返回空列表
         }
 
+        // 收集所有后代节点（不包含节点本身）
         List<T> descendants = new ArrayList<>();
         List<T> children = childrenGetter.apply(node);
 
+        // 遍历所有子节点，深度优先收集所有后代
         if (CollectionUtils.isNotEmpty(children)) {
             for (T child : children) {
+                // 递归遍历子节点及其所有后代，加入结果列表
                 traverseDepthFirst(child, childrenGetter, descendants::add);
             }
         }
 
         return descendants;
+    }
+
+    /**
+     * 获取指定层级的子树
+     * <p>
+     * 获取所有根节点下面指定层级的子孙节点（不包括根节点本身）。<br>
+     * 适用于懒加载树形菜单、分页加载树节点等场景。
+     * <p>
+     * <b>重要提示：</b>
+     * <ul>
+     *     <li>此方法会<b>直接修改原始树节点的children</b>，截断超出层级的子节点</li>
+     *     <li>如果需要保留原始树，请在调用前先深拷贝树结构</li>
+     *     <li>多次调用会基于上次修改的结果继续截断</li>
+     * </ul>
+     * <p>
+     * <b>层级说明：</b>
+     * <ul>
+     *     <li>levels=1：返回根节点下面1层（子节点），不包括根节点</li>
+     *     <li>levels=2：返回根节点下面2层（子节点 + 孙节点），不包括根节点</li>
+     *     <li>levels=3：返回根节点下面3层（子节点 + 孙节点 + 曾孙节点），不包括根节点</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 获取所有根节点下面2层（子节点 + 孙节点），不包括根节点
+     * List<MenuNode> subTree = TreeUtil.getSubTree(
+     *     tree,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     2
+     * );
+     * }</pre>
+     *
+     * @param tree           树形结构的根节点列表，可以为 null 或空列表
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param <T>            树节点类型
+     * @return 指定层级的子孙节点列表（不包括根节点），如果 tree 为 null 或空则返回空列表
+     */
+    public static <T> List<T> getSubTree(
+            List<T> tree, Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter, int levels
+    ) {
+        if (CollectionUtils.isEmpty(tree) || levels <= 0) {
+            return new ArrayList<>();
+        }
+
+        // 收集所有根节点下面指定层级的子孙节点
+        List<T> result = new ArrayList<>();
+        for (T node : tree) {
+            // 获取当前根节点的子节点
+            List<T> children = childrenGetter.apply(node);
+            if (CollectionUtils.isNotEmpty(children)) {
+                // 收集该节点下面指定层级的子孙节点
+                collectSubTreeChildren(children, childrenGetter, childrenSetter, levels - 1, result);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 获取指定节点的子树（通过节点ID查找）
+     * <p>
+     * 在整棵树中查找指定ID的节点，并返回该节点下面指定层级的子孙节点（不包括该节点本身）。<br>
+     * 常用于树形结构的懒加载和按需分页等场景。
+     * <p>
+     * <b>层级说明：</b>
+     * <ul>
+     *     <li>levels=1：返回目标节点下面1层（子节点），不包括目标节点</li>
+     *     <li>levels=2：返回目标节点下面2层（子节点 + 孙节点），不包括目标节点</li>
+     *     <li>levels=3：返回目标节点下面3层（子节点 + 孙节点 + 曾孙节点），不包括目标节点</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 获取 ID 为 1 的节点下面2层（子节点 + 孙节点），不包括节点1
+     * List<MenuNode> subTree = TreeUtil.getSubTree(
+     *     tree,
+     *     MenuNode::getId,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     1L,
+     *     2
+     * );
+     * }</pre>
+     *
+     * @param tree           树结构根节点列表，可为 null 或空
+     * @param idGetter       获取节点ID的方法，不能为null
+     * @param childrenGetter 获取子节点集合的方法，不能为null
+     * @param childrenSetter 设置子节点集合的方法，不能为null
+     * @param nodeId         目标节点ID
+     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param <T>            树节点类型
+     * @param <ID>           节点ID类型
+     * @return 目标节点下面指定层级的子孙节点列表（不包括目标节点），没找到则返回空列表
+     */
+    public static <T, ID> List<T> getSubTree(
+            List<T> tree, Function<T, ID> idGetter,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            ID nodeId, int levels
+    ) {
+        if (CollectionUtils.isEmpty(tree) || nodeId == null || levels <= 0) {
+            return new ArrayList<>();
+        }
+
+        // 查找指定 ID 的节点
+        T targetNode = findFirst(tree, childrenGetter, node -> Objects.equals(idGetter.apply(node), nodeId));
+        if (targetNode == null) {
+            return new ArrayList<>();
+        }
+
+        // 获取该节点的子节点
+        List<T> children = childrenGetter.apply(targetNode);
+        if (CollectionUtils.isEmpty(children)) {
+            return new ArrayList<>();
+        }
+
+        // 收集该节点下面指定层级的子孙节点
+        List<T> result = new ArrayList<>();
+        collectSubTreeChildren(children, childrenGetter, childrenSetter, levels - 1, result);
+        return result;
+    }
+
+    /**
+     * 收集子节点下面指定层级的子孙节点
+     * <p>
+     * 遍历子节点列表，对每个子节点保留其下面指定层级的子孙节点，并收集到结果列表中。<br>
+     * 用于 getSubTree 的两个重载方法，避免代码重复。
+     *
+     * @param children       子节点列表
+     * @param childrenGetter 获取子节点列表的函数
+     * @param childrenSetter 设置子节点列表的函数
+     * @param levels         要保留的层级数
+     * @param result         结果列表（用于收集处理后的子节点）
+     * @param <T>            树节点类型
+     */
+    private static <T> void collectSubTreeChildren(
+            List<T> children,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            int levels, List<T> result
+    ) {
+        for (T child : children) {
+            // 对每个子节点，保留其下面指定层级
+            T subTree = getSubTreeNode(child, childrenGetter, childrenSetter, levels);
+            if (subTree != null) {
+                result.add(subTree);
+            }
+        }
+    }
+
+    /**
+     * 获取单个节点指定层级的子树
+     * <p>
+     * 递归获取节点及其指定层级的子节点。
+     * <p>
+     * <b>层级说明：</b>
+     * <ul>
+     *     <li>levels=0：只保留当前节点，清空所有子节点</li>
+     *     <li>levels=1：保留当前节点及其直接子节点，清空孙节点</li>
+     *     <li>levels=2：保留当前节点、子节点、孙节点，清空曾孙节点</li>
+     * </ul>
+     *
+     * @param node           当前节点
+     * @param childrenGetter 获取子节点列表的函数
+     * @param childrenSetter 设置子节点列表的函数
+     * @param levels         要保留的子节点层级数（0=不保留子节点，1=保留1层子节点，2=保留2层子孙节点）
+     * @param <T>            树节点类型
+     * @return 指定层级的子树节点
+     */
+    private static <T> T getSubTreeNode(
+            T node, Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter, int levels
+    ) {
+        if (node == null || levels < 0) {
+            return null;
+        }
+
+        // 获取当前节点的子节点列表
+        List<T> children = childrenGetter.apply(node);
+
+        // 如果 levels=0，表示不保留任何子节点
+        if (levels == 0) {
+            childrenSetter.accept(node, new ArrayList<>());
+            return node;
+        }
+
+        // levels > 0：需要保留子节点，递归处理
+        if (CollectionUtils.isNotEmpty(children)) {
+            List<T> subChildren = new ArrayList<>();
+            for (T child : children) {
+                // 递归获取子节点的子树（层级减一）
+                // levels=1 时，子节点会收到 levels=0，表示子节点不再保留其子节点
+                T subChild = getSubTreeNode(child, childrenGetter, childrenSetter, levels - 1);
+                if (subChild != null) {
+                    subChildren.add(subChild);
+                }
+            }
+            // 更新当前节点的子节点列表为处理后的子树
+            childrenSetter.accept(node, subChildren);
+        } else {
+            // 当前节点没有子节点，保持为空列表
+            childrenSetter.accept(node, new ArrayList<>());
+        }
+
+        return node;
+    }
+
+    // ==================== 安全版本方法（不修改原树结构） ====================
+
+    /**
+     * 构建树形结构（指定根节点 ID）- 安全版本
+     * <p>
+     * 将扁平化的列表转换为树形结构，从指定的根节点 ID 开始构建。<br>
+     * <b>此方法不会修改原始数据</b>，会先进行深拷贝，适合需要保留原始数据的场景。
+     * <p>
+     * <b>与 build() 的区别：</b>
+     * <ul>
+     *     <li>build()：直接修改原始list中的节点，性能更好，适合一次性操作</li>
+     *     <li>buildSafe()：先深拷贝再构建，不修改原始数据，适合需要保留原数据的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * List<MenuNode> menuList = menuService.findAll();
+     * // 构建树形结构，不影响原始 menuList
+     * List<MenuNode> tree = TreeUtil.buildSafe(
+     *     menuList,
+     *     0L,
+     *     MenuNode::getId,
+     *     MenuNode::getParentId,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     MenuNode::new
+     * );
+     * // menuList 保持不变
+     * }</pre>
+     *
+     * @param list           扁平化的节点列表，可以为 null 或空列表
+     * @param rootId         根节点的 ID（通常为 0 或 null）
+     * @param idGetter       获取节点 ID 的函数，不能为 null
+     * @param parentIdGetter 获取父节点 ID 的函数，不能为 null
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @param <ID>           节点 ID 类型（需要正确实现 equals 和 hashCode 方法）
+     * @return 树形结构的根节点列表，如果 list 为 null 或空则返回空列表
+     */
+    public static <T, ID> List<T> buildSafe(
+            List<T> list, ID rootId, Function<T, ID> idGetter,
+            Function<T, ID> parentIdGetter,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        // 深拷贝列表，避免修改原始数据
+        List<T> copiedList = BeanCopyUtil.copyListProperties(list, nodeSupplier);
+        // 在拷贝的数据上构建树
+        return build(copiedList, rootId, idGetter, parentIdGetter, childrenGetter, childrenSetter);
+    }
+
+    /**
+     * 构建树形结构（自动识别根节点）- 安全版本
+     * <p>
+     * 将扁平化的列表转换为树形结构，自动识别根节点（父节点 ID 不在列表中的节点）。<br>
+     * <b>此方法不会修改原始数据</b>，会先进行深拷贝，适合需要保留原始数据的场景。
+     * <p>
+     * <b>与 build() 的区别：</b>
+     * <ul>
+     *     <li>build()：直接修改原始list中的节点，性能更好，适合一次性操作</li>
+     *     <li>buildSafe()：先深拷贝再构建，不修改原始数据，适合需要保留原数据的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * List<MenuNode> menuList = menuService.findAll();
+     * // 构建树形结构，不影响原始 menuList
+     * List<MenuNode> tree = TreeUtil.buildSafe(
+     *     menuList,
+     *     MenuNode::getId,
+     *     MenuNode::getParentId,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     MenuNode::new
+     * );
+     * // menuList 保持不变
+     * }</pre>
+     *
+     * @param list           扁平化的节点列表，可以为 null 或空列表
+     * @param idGetter       获取节点 ID 的函数，不能为 null
+     * @param parentIdGetter 获取父节点 ID 的函数，不能为 null
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @param <ID>           节点 ID 类型（需要正确实现 equals 和 hashCode 方法）
+     * @return 树形结构的根节点列表，如果 list 为 null 或空则返回空列表
+     */
+    public static <T, ID> List<T> buildSafe(
+            List<T> list, Function<T, ID> idGetter,
+            Function<T, ID> parentIdGetter,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(list)) {
+            return new ArrayList<>();
+        }
+        // 深拷贝列表，避免修改原始数据
+        List<T> copiedList = BeanCopyUtil.copyListProperties(list, nodeSupplier);
+        // 在拷贝的数据上构建树
+        return build(copiedList, idGetter, parentIdGetter, childrenGetter, childrenSetter);
+    }
+
+    /**
+     * 过滤树形结构 - 安全版本
+     * <p>
+     * 根据条件过滤树形结构，保留符合条件的节点及其祖先节点。<br>
+     * <b>此方法不会修改原始树</b>，会先进行深拷贝，适合需要保留原始树的场景。
+     * <p>
+     * <b>与 filter() 的区别：</b>
+     * <ul>
+     *     <li>filter()：直接修改原始树节点，性能更好，适合一次性操作</li>
+     *     <li>filterSafe()：先深拷贝再过滤，不修改原始树，适合需要保留原树的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 过滤出所有启用的菜单，不影响原始 tree
+     * List<MenuNode> filteredTree = TreeUtil.filterSafe(
+     *     tree,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     n -> n.getEnabled(),
+     *     MenuNode::new
+     * );
+     * // tree 保持不变
+     * }</pre>
+     *
+     * @param tree           树形结构的根节点列表，可以为 null 或空列表
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param predicate      过滤条件，不能为 null
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @return 过滤后的树形结构，如果 tree 为 null 或空则返回空列表
+     */
+    public static <T> List<T> filterSafe(
+            List<T> tree,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            Predicate<T> predicate,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(tree)) {
+            return new ArrayList<>();
+        }
+        // 深拷贝树结构
+        List<T> copiedTree = deepCopyTree(tree, childrenGetter, childrenSetter, nodeSupplier);
+        // 在拷贝的树上进行过滤
+        return filter(copiedTree, childrenGetter, childrenSetter, predicate);
+    }
+
+    /**
+     * 对树形结构进行排序 - 安全版本
+     * <p>
+     * 对树形结构的每一层节点进行排序。<br>
+     * <b>此方法不会修改原始树</b>，会先进行深拷贝，适合需要保留原始树的场景。
+     * <p>
+     * <b>与 sort() 的区别：</b>
+     * <ul>
+     *     <li>sort()：直接修改原始树节点，性能更好，适合一次性操作</li>
+     *     <li>sortSafe()：先深拷贝再排序，不修改原始树，适合需要保留原树的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 按排序号升序排序，不影响原始 tree
+     * List<MenuNode> sortedTree = TreeUtil.sortSafe(
+     *     tree,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     Comparator.comparing(MenuNode::getSort),
+     *     MenuNode::new
+     * );
+     * // tree 保持不变
+     * }</pre>
+     *
+     * @param tree           树形结构的根节点列表，可以为 null 或空列表
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param comparator     排序比较器，不能为 null
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @return 排序后的树形结构，如果 tree 为 null 或空则返回空列表
+     */
+    public static <T> List<T> sortSafe(
+            List<T> tree,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            Comparator<T> comparator,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(tree)) {
+            return new ArrayList<>();
+        }
+        // 深拷贝树结构
+        List<T> copiedTree = deepCopyTree(tree, childrenGetter, childrenSetter, nodeSupplier);
+        // 在拷贝的树上进行排序
+        return sort(copiedTree, childrenGetter, childrenSetter, comparator);
+    }
+
+    /**
+     * 获取指定层级的子树 - 安全版本
+     * <p>
+     * 获取所有根节点下面指定层级的子孙节点（不包括根节点本身）。<br>
+     * <b>此方法不会修改原始树</b>，会先进行深拷贝，适合需要保留原始树的场景。
+     * <p>
+     * <b>与 getSubTree() 的区别：</b>
+     * <ul>
+     *     <li>getSubTree()：直接修改原始树节点，性能更好，适合一次性操作</li>
+     *     <li>getSubTreeSafe()：先深拷贝再截取，不修改原始树，适合需要保留原树的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 获取所有根节点下面2层，不影响原始 tree
+     * List<MenuNode> subTree = TreeUtil.getSubTreeSafe(
+     *     tree,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     2,
+     *     MenuNode::new
+     * );
+     * // tree 保持不变
+     * }</pre>
+     *
+     * @param tree           树形结构的根节点列表，可以为 null 或空列表
+     * @param childrenGetter 获取子节点列表的函数，不能为 null
+     * @param childrenSetter 设置子节点列表的函数，不能为 null
+     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @return 指定层级的子孙节点列表（不包括根节点），如果 tree 为 null 或空则返回空列表
+     */
+    public static <T> List<T> getSubTreeSafe(
+            List<T> tree, Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter, int levels,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(tree) || levels <= 0) {
+            return new ArrayList<>();
+        }
+        // 深拷贝树结构
+        List<T> copiedTree = deepCopyTree(tree, childrenGetter, childrenSetter, nodeSupplier);
+        // 在拷贝的树上进行截取
+        return getSubTree(copiedTree, childrenGetter, childrenSetter, levels);
+    }
+
+    /**
+     * 获取指定节点的子树（通过节点ID查找）- 安全版本
+     * <p>
+     * 在整棵树中查找指定ID的节点，并返回该节点下面指定层级的子孙节点（不包括该节点本身）。<br>
+     * <b>此方法不会修改原始树</b>，会先进行深拷贝，适合需要保留原始树的场景。
+     * <p>
+     * <b>与 getSubTree() 的区别：</b>
+     * <ul>
+     *     <li>getSubTree()：直接修改原始树节点，性能更好，适合一次性操作</li>
+     *     <li>getSubTreeSafe()：先深拷贝再截取，不修改原始树，适合需要保留原树的场景</li>
+     * </ul>
+     * <p>
+     * <b>使用示例：</b>
+     * <pre>{@code
+     * // 获取 ID 为 1 的节点下面2层，不影响原始 tree
+     * List<MenuNode> subTree = TreeUtil.getSubTreeSafe(
+     *     tree,
+     *     MenuNode::getId,
+     *     MenuNode::getChildren,
+     *     MenuNode::setChildren,
+     *     1L,
+     *     2,
+     *     MenuNode::new
+     * );
+     * // tree 保持不变
+     * }</pre>
+     *
+     * @param tree           树结构根节点列表，可为 null 或空
+     * @param idGetter       获取节点ID的方法，不能为null
+     * @param childrenGetter 获取子节点集合的方法，不能为null
+     * @param childrenSetter 设置子节点集合的方法，不能为null
+     * @param nodeId         目标节点ID
+     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
+     * @param <T>            树节点类型
+     * @param <ID>           节点ID类型
+     * @return 目标节点下面指定层级的子孙节点列表（不包括目标节点），没找到则返回空列表
+     */
+    public static <T, ID> List<T> getSubTreeSafe(
+            List<T> tree, Function<T, ID> idGetter,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            ID nodeId, int levels,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(tree) || nodeId == null || levels <= 0) {
+            return new ArrayList<>();
+        }
+        // 深拷贝树结构
+        List<T> copiedTree = deepCopyTree(tree, childrenGetter, childrenSetter, nodeSupplier);
+        // 在拷贝的树上进行截取
+        return getSubTree(copiedTree, idGetter, childrenGetter, childrenSetter, nodeId, levels);
+    }
+
+    /**
+     * 深拷贝树结构（安全版本方法的通用逻辑）
+     * <p>
+     * 将树转为扁平列表，深拷贝后重建树结构。<br>
+     * 用于所有安全版本方法，避免代码重复。
+     *
+     * @param tree           原始树结构
+     * @param childrenGetter 获取子节点列表的函数
+     * @param childrenSetter 设置子节点列表的函数
+     * @param nodeSupplier   节点对象的创建函数
+     * @param <T>            树节点类型
+     * @return 深拷贝后的树结构
+     */
+    private static <T> List<T> deepCopyTree(
+            List<T> tree,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter,
+            Supplier<T> nodeSupplier
+    ) {
+        if (CollectionUtils.isEmpty(tree)) {
+            return new ArrayList<>();
+        }
+        // 先将树转为列表，深拷贝，再重建树
+        List<T> flatList = toList(tree, childrenGetter);
+        List<T> copiedList = BeanCopyUtil.copyListProperties(flatList, nodeSupplier);
+        return rebuildTree(copiedList, childrenGetter, childrenSetter);
+    }
+
+    /**
+     * 重建树结构（从扁平列表）
+     * <p>
+     * 用于在深拷贝后重建树的父子关系。<br>
+     * 通过分析节点的children来推断parentId，然后重建树结构。
+     *
+     * @param flatList       扁平化的节点列表
+     * @param childrenGetter 获取子节点列表的函数
+     * @param childrenSetter 设置子节点列表的函数
+     * @param <T>            树节点类型
+     * @return 重建后的树结构
+     */
+    private static <T> List<T> rebuildTree(
+            List<T> flatList,
+            Function<T, List<T>> childrenGetter,
+            BiConsumer<T, List<T>> childrenSetter
+    ) {
+        if (CollectionUtils.isEmpty(flatList)) {
+            return new ArrayList<>();
+        }
+
+        // 创建节点映射（使用对象引用作为key）
+        Map<T, List<T>> parentChildMap = new HashMap<>();
+        Set<T> allNodes = new HashSet<>(flatList);
+        Set<T> childNodes = new HashSet<>();
+
+        // 第一遍：收集所有父子关系
+        for (T node : flatList) {
+            List<T> children = childrenGetter.apply(node);
+            if (CollectionUtils.isNotEmpty(children)) {
+                // 记录这个节点有哪些子节点
+                List<T> newChildren = new ArrayList<>();
+                for (T child : children) {
+                    // 在flatList中找到对应的节点对象
+                    for (T flatNode : flatList) {
+                        if (isSameNode(child, flatNode)) {
+                            newChildren.add(flatNode);
+                            childNodes.add(flatNode);
+                            break;
+                        }
+                    }
+                }
+                parentChildMap.put(node, newChildren);
+            }
+        }
+
+        // 第二遍：重建children关系
+        for (T node : flatList) {
+            List<T> children = parentChildMap.get(node);
+            if (children != null) {
+                childrenSetter.accept(node, children);
+            } else {
+                childrenSetter.accept(node, new ArrayList<>());
+            }
+        }
+
+        // 找出根节点（不是任何节点的子节点）
+        List<T> rootNodes = new ArrayList<>();
+        for (T node : allNodes) {
+            if (!childNodes.contains(node)) {
+                rootNodes.add(node);
+            }
+        }
+
+        return rootNodes;
+    }
+
+    /**
+     * 判断两个节点是否是同一个节点（通过比较所有属性）
+     * <p>
+     * 简单实现：比较对象的字符串表示（如果节点实现了合理的toString）
+     *
+     * @param node1 节点1
+     * @param node2 节点2
+     * @param <T>   树节点类型
+     * @return 是否是同一个节点
+     */
+    private static <T> boolean isSameNode(T node1, T node2) {
+        if (node1 == node2) {
+            return true;
+        }
+        if (node1 == null || node2 == null) {
+            return false;
+        }
+        // 简单比较：使用toString（假设节点实现了合理的toString或使用了Lombok的@Data）
+        // 注意：这里需要排除children字段的比较，因为children在拷贝后引用已经不同
+        return node1.toString().equals(node2.toString());
     }
 }

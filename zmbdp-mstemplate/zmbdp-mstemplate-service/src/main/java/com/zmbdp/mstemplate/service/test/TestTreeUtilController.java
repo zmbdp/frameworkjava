@@ -51,17 +51,34 @@ public class TestTreeUtilController {
                     MenuNode::getChildren,
                     MenuNode::setChildren
             );
-            buildTest.put("指定根节点构建", !tree1.isEmpty() ? "✅ 成功，根节点数: " + tree1.size() : "❌ 失败");
+
+            // 完整验证树结构
+            Map<String, Object> validation1 = validateTreeStructure(tree1, 0L);
+            boolean noDuplicate1 = validateTreeStructureNoDuplicate(tree1);
+            buildTest.put("指定根节点构建-父子关系正确", validation1.get("验证通过"));
+            if (!(Boolean) validation1.get("验证通过")) {
+                buildTest.put("指定根节点构建-父子关系错误", validation1.get("错误详情"));
+            }
+            buildTest.put("指定根节点构建-无重复节点", noDuplicate1 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree1));
+            buildTest.put("指定根节点构建-树结构", printTree(tree1));
 
             // 2. 自动识别根节点构建树
+            List<MenuNode> flatList2 = createTestData();
             List<MenuNode> tree2 = TreeUtil.build(
-                    flatList,
+                    flatList2,
                     MenuNode::getId,
                     MenuNode::getParentId,
                     MenuNode::getChildren,
                     MenuNode::setChildren
             );
-            buildTest.put("自动识别根节点", !tree2.isEmpty() ? "✅ 成功，根节点数: " + tree2.size() : "❌ 失败");
+
+            Map<String, Object> validation2 = validateTreeStructure(tree2, 0L);
+            boolean noDuplicate2 = validateTreeStructureNoDuplicate(tree2);
+            buildTest.put("自动识别根节点-父子关系正确", validation2.get("验证通过"));
+            if (!(Boolean) validation2.get("验证通过")) {
+                buildTest.put("自动识别根节点-父子关系错误", validation2.get("错误详情"));
+            }
+            buildTest.put("自动识别根节点-无重复节点", noDuplicate2 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree2));
 
             // 3. 空列表测试
             List<MenuNode> emptyTree = TreeUtil.build(
@@ -72,10 +89,24 @@ public class TestTreeUtilController {
                     MenuNode::getChildren,
                     MenuNode::setChildren
             );
-            buildTest.put("空列表构建", emptyTree.isEmpty() ? "✅ 成功，返回空列表" : "❌ 失败");
+            buildTest.put("空列表构建", emptyTree.isEmpty() ? "✅ 成功" : "❌ 失败");
+
+            // 4. 重复构建测试
+            List<MenuNode> flatList3 = createTestData();
+            TreeUtil.build(flatList3, 0L, MenuNode::getId, MenuNode::getParentId, MenuNode::getChildren, MenuNode::setChildren);
+            List<MenuNode> tree3 = TreeUtil.build(flatList3, 0L, MenuNode::getId, MenuNode::getParentId, MenuNode::getChildren, MenuNode::setChildren);
+
+            Map<String, Object> validation3 = validateTreeStructure(tree3, 0L);
+            boolean noDuplicate3 = validateTreeStructureNoDuplicate(tree3);
+            buildTest.put("重复构建测试-父子关系正确", validation3.get("验证通过"));
+            if (!(Boolean) validation3.get("验证通过")) {
+                buildTest.put("重复构建测试-父子关系错误", validation3.get("错误详情"));
+            }
+            buildTest.put("重复构建测试-无重复节点", noDuplicate3 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree3));
 
         } catch (Exception e) {
-            buildTest.put("错误", "❌ 树形结构构建测试异常: " + e.getMessage());
+            buildTest.put("错误", "❌ 异常: " + e.getMessage());
+            e.printStackTrace();
         }
         result.put("树形结构构建", buildTest);
 
@@ -158,23 +189,30 @@ public class TestTreeUtilController {
         // ========== 树形结构操作测试 ==========
         Map<String, Object> operationTest = new LinkedHashMap<>();
         try {
-            List<MenuNode> tree = TreeUtil.build(
-                    flatList,
+            // 1. 获取所有叶子节点
+            List<MenuNode> tree1 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
                     0L,
                     MenuNode::getId,
                     MenuNode::getParentId,
                     MenuNode::getChildren,
                     MenuNode::setChildren
             );
-
-            // 1. 获取所有叶子节点
-            List<MenuNode> leafNodes = TreeUtil.getLeafNodes(tree, MenuNode::getChildren);
+            List<MenuNode> leafNodes = TreeUtil.getLeafNodes(tree1, MenuNode::getChildren);
             String leafNames = leafNodes.stream().map(MenuNode::getName).collect(Collectors.joining(", "));
             operationTest.put("获取叶子节点", !leafNodes.isEmpty() ? "✅ 成功，叶子节点: " + leafNames : "❌ 失败");
 
             // 2. 过滤树（只保留启用的节点）
+            List<MenuNode> tree2 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
             List<MenuNode> filteredTree = TreeUtil.filter(
-                    tree,
+                    tree2,
                     MenuNode::getChildren,
                     MenuNode::setChildren,
                     MenuNode::getEnabled
@@ -183,8 +221,16 @@ public class TestTreeUtilController {
             operationTest.put("过滤树结构", filteredCount > 0 ? "✅ 成功，过滤后节点数: " + filteredCount : "❌ 失败");
 
             // 3. 排序树（按 sort 字段升序）
+            List<MenuNode> tree3 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
             List<MenuNode> sortedTree = TreeUtil.sort(
-                    tree,
+                    tree3,
                     MenuNode::getChildren,
                     MenuNode::setChildren,
                     Comparator.comparing(MenuNode::getSort)
@@ -227,6 +273,345 @@ public class TestTreeUtilController {
         }
         result.put("树形结构统计", statisticsTest);
 
+        // ========== 子树获取测试 ==========
+        Map<String, Object> subTreeTest = new LinkedHashMap<>();
+        try {
+            // 1. 获取所有根节点及其下2层数据
+            List<MenuNode> tree1 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            List<MenuNode> subTree2Levels = TreeUtil.getSubTree(
+                    tree1,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    2
+            );
+            int count2Levels = TreeUtil.countNodes(subTree2Levels, MenuNode::getChildren);
+            subTreeTest.put("获取根节点下2层", count2Levels > 0 ? "✅ 成功，节点数: " + count2Levels : "❌ 失败");
+
+            // 2. 获取指定节点(ID=1)及其下1层数据
+            List<MenuNode> tree2 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            List<MenuNode> subTreeById = TreeUtil.getSubTree(
+                    tree2,
+                    MenuNode::getId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    1L,
+                    1
+            );
+            int countById = TreeUtil.countNodes(subTreeById, MenuNode::getChildren);
+            subTreeTest.put("获取节点1下1层", countById > 0 ? "✅ 成功，节点数: " + countById : "❌ 失败");
+
+            // 3. 获取指定节点(ID=1)及其下2层数据（使用新的树对象）
+            List<MenuNode> tree2b = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            List<MenuNode> subTreeById2 = TreeUtil.getSubTree(
+                    tree2b,
+                    MenuNode::getId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    1L,
+                    2
+            );
+            int countById2 = TreeUtil.countNodes(subTreeById2, MenuNode::getChildren);
+            subTreeTest.put("获取节点1下2层", countById2 > 0 ? "✅ 成功，节点数: " + countById2 : "❌ 失败");
+
+            // 4. 获取只有1层（只有根节点）
+            List<MenuNode> tree3 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            List<MenuNode> subTree1Level = TreeUtil.getSubTree(
+                    tree3,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    1
+            );
+            int count1Level = TreeUtil.countNodes(subTree1Level, MenuNode::getChildren);
+            subTreeTest.put("获取所有根节点下1层", count1Level > 0 ? "✅ 成功，节点数: " + count1Level : "❌ 失败");
+
+            // 5. 获取不存在的节点
+            List<MenuNode> tree4 = TreeUtil.build(
+                    createTestData(), // 每次都用新数据
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            List<MenuNode> notFound = TreeUtil.getSubTree(
+                    tree4,
+                    MenuNode::getId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    999L,
+                    2
+            );
+            subTreeTest.put("获取不存在节点", notFound.isEmpty() ? "✅ 成功，返回空列表" : "❌ 失败");
+
+        } catch (Exception e) {
+            subTreeTest.put("错误", "❌ 子树获取测试异常: " + e.getMessage());
+        }
+        result.put("子树获取", subTreeTest);
+
+        // ========== 安全版本方法测试 ==========
+        Map<String, Object> safeMethodsTest = new LinkedHashMap<>();
+        try {
+            // 1. buildSafe 测试（指定根节点）
+            List<MenuNode> originalList1 = createTestData();
+            String originalStructure1 = captureTreeStructure(originalList1);
+
+            List<MenuNode> treeSafe1 = TreeUtil.buildSafe(
+                    originalList1,
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    MenuNode::new
+            );
+
+            String afterStructure1 = captureTreeStructure(originalList1);
+            Map<String, Object> validation1 = validateTreeStructure(treeSafe1, 0L);
+            boolean noDuplicate1 = validateTreeStructureNoDuplicate(treeSafe1);
+
+            safeMethodsTest.put("buildSafe(指定根节点)-父子关系正确", validation1.get("验证通过"));
+            if (!(Boolean) validation1.get("验证通过")) {
+                safeMethodsTest.put("buildSafe(指定根节点)-父子关系错误", validation1.get("错误详情"));
+            }
+            safeMethodsTest.put("buildSafe(指定根节点)-无重复节点", noDuplicate1 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(treeSafe1));
+            safeMethodsTest.put("buildSafe(指定根节点)-原列表未改变",
+                    originalStructure1.equals(afterStructure1) ? "✅ 成功" : "❌ 失败，原列表被修改");
+
+            // 2. buildSafe 测试（自动识别根节点）
+            List<MenuNode> originalList2 = createTestData();
+            String originalStructure2 = captureTreeStructure(originalList2);
+
+            List<MenuNode> treeSafe2 = TreeUtil.buildSafe(
+                    originalList2,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    MenuNode::new
+            );
+
+            String afterStructure2 = captureTreeStructure(originalList2);
+            Map<String, Object> validation2 = validateTreeStructure(treeSafe2, 0L);
+            boolean noDuplicate2 = validateTreeStructureNoDuplicate(treeSafe2);
+
+            safeMethodsTest.put("buildSafe(自动识别)-父子关系正确", validation2.get("验证通过"));
+            if (!(Boolean) validation2.get("验证通过")) {
+                safeMethodsTest.put("buildSafe(自动识别)-父子关系错误", validation2.get("错误详情"));
+            }
+            safeMethodsTest.put("buildSafe(自动识别)-无重复节点", noDuplicate2 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(treeSafe2));
+            safeMethodsTest.put("buildSafe(自动识别)-原列表未改变",
+                    originalStructure2.equals(afterStructure2) ? "✅ 成功" : "❌ 失败，原列表被修改");
+
+            // 3. filterSafe 测试
+            List<MenuNode> treeForFilter = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            String beforeFilterStructure = captureTreeStructure(treeForFilter);
+
+            List<MenuNode> filteredSafe = TreeUtil.filterSafe(
+                    treeForFilter,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    MenuNode::getEnabled,
+                    MenuNode::new
+            );
+
+            String afterFilterStructure = captureTreeStructure(treeForFilter);
+            Map<String, Object> filterValidation = validateTreeStructure(filteredSafe, 0L);
+            boolean noDuplicateFilter = validateTreeStructureNoDuplicate(filteredSafe);
+
+            safeMethodsTest.put("filterSafe-过滤后父子关系正确", filterValidation.get("验证通过"));
+            if (!(Boolean) filterValidation.get("验证通过")) {
+                safeMethodsTest.put("filterSafe-父子关系错误", filterValidation.get("错误详情"));
+            }
+            safeMethodsTest.put("filterSafe-过滤后无重复节点", noDuplicateFilter ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(filteredSafe));
+            safeMethodsTest.put("filterSafe-原树未改变",
+                    beforeFilterStructure.equals(afterFilterStructure) ? "✅ 成功" : "❌ 失败，原树被修改");
+            safeMethodsTest.put("filterSafe-过滤结果",
+                    "过滤后节点数: " + TreeUtil.countNodes(filteredSafe, MenuNode::getChildren));
+
+            // 4. sortSafe 测试
+            List<MenuNode> treeForSort = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            String beforeSortStructure = captureTreeStructure(treeForSort);
+
+            List<MenuNode> sortedSafe = TreeUtil.sortSafe(
+                    treeForSort,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    Comparator.comparing(MenuNode::getSort),
+                    MenuNode::new
+            );
+
+            String afterSortStructure = captureTreeStructure(treeForSort);
+            Map<String, Object> sortValidation = validateTreeStructure(sortedSafe, 0L);
+            boolean noDuplicateSort = validateTreeStructureNoDuplicate(sortedSafe);
+
+            safeMethodsTest.put("sortSafe-排序后父子关系正确", sortValidation.get("验证通过"));
+            if (!(Boolean) sortValidation.get("验证通过")) {
+                safeMethodsTest.put("sortSafe-父子关系错误", sortValidation.get("错误详情"));
+            }
+            safeMethodsTest.put("sortSafe-排序后无重复节点", noDuplicateSort ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(sortedSafe));
+            safeMethodsTest.put("sortSafe-原树未改变",
+                    beforeSortStructure.equals(afterSortStructure) ? "✅ 成功" : "❌ 失败，原树被修改");
+
+            // 5. getSubTreeSafe 测试（按层级）
+            List<MenuNode> treeForSubTree1 = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            String beforeSubTree1Structure = captureTreeStructure(treeForSubTree1);
+
+            List<MenuNode> subTreeSafe1 = TreeUtil.getSubTreeSafe(
+                    treeForSubTree1,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    2,
+                    MenuNode::new
+            );
+
+            String afterSubTree1Structure = captureTreeStructure(treeForSubTree1);
+            boolean noDuplicateSubTree1 = validateTreeStructureNoDuplicate(subTreeSafe1);
+
+            safeMethodsTest.put("getSubTreeSafe(层级)-原树未改变",
+                    beforeSubTree1Structure.equals(afterSubTree1Structure) ? "✅ 成功" : "❌ 失败，原树被修改");
+            safeMethodsTest.put("getSubTreeSafe(层级)-无重复节点", noDuplicateSubTree1 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(subTreeSafe1));
+            safeMethodsTest.put("getSubTreeSafe(层级)-结果",
+                    "获取到 " + TreeUtil.countNodes(subTreeSafe1, MenuNode::getChildren) + " 个节点");
+
+            // 6. getSubTreeSafe 测试（按节点ID）
+            List<MenuNode> treeForSubTree2 = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            String beforeSubTree2Structure = captureTreeStructure(treeForSubTree2);
+
+            List<MenuNode> subTreeSafe2 = TreeUtil.getSubTreeSafe(
+                    treeForSubTree2,
+                    MenuNode::getId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    1L,
+                    2,
+                    MenuNode::new
+            );
+
+            String afterSubTree2Structure = captureTreeStructure(treeForSubTree2);
+            boolean noDuplicateSubTree2 = validateTreeStructureNoDuplicate(subTreeSafe2);
+
+            safeMethodsTest.put("getSubTreeSafe(节点ID)-原树未改变",
+                    beforeSubTree2Structure.equals(afterSubTree2Structure) ? "✅ 成功" : "❌ 失败，原树被修改");
+            safeMethodsTest.put("getSubTreeSafe(节点ID)-无重复节点", noDuplicateSubTree2 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(subTreeSafe2));
+            safeMethodsTest.put("getSubTreeSafe(节点ID)-结果",
+                    "获取到 " + TreeUtil.countNodes(subTreeSafe2, MenuNode::getChildren) + " 个节点");
+
+            // 7. 多次调用安全版本测试
+            List<MenuNode> treeForMultiple = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            String originalMultipleStructure = captureTreeStructure(treeForMultiple);
+
+            // 第1次调用：获取节点1下1层
+            List<MenuNode> result1 = TreeUtil.getSubTreeSafe(treeForMultiple, MenuNode::getId, MenuNode::getChildren, MenuNode::setChildren, 1L, 1, MenuNode::new);
+            String afterCall1 = captureTreeStructure(treeForMultiple);
+            boolean noDuplicateResult1 = validateTreeStructureNoDuplicate(result1);
+            int count1 = TreeUtil.countNodes(result1, MenuNode::getChildren);
+
+            // 第2次调用：获取节点1下2层
+            List<MenuNode> result2 = TreeUtil.getSubTreeSafe(treeForMultiple, MenuNode::getId, MenuNode::getChildren, MenuNode::setChildren, 1L, 2, MenuNode::new);
+            String afterCall2 = captureTreeStructure(treeForMultiple);
+            boolean noDuplicateResult2 = validateTreeStructureNoDuplicate(result2);
+            int count2 = TreeUtil.countNodes(result2, MenuNode::getChildren);
+
+            // 第3次调用：过滤启用的节点
+            List<MenuNode> result3 = TreeUtil.filterSafe(treeForMultiple, MenuNode::getChildren, MenuNode::setChildren, MenuNode::getEnabled, MenuNode::new);
+            String afterCall3 = captureTreeStructure(treeForMultiple);
+            Map<String, Object> result3Validation = validateTreeStructure(result3, 0L);
+            boolean noDuplicateResult3 = validateTreeStructureNoDuplicate(result3);
+            int count3 = TreeUtil.countNodes(result3, MenuNode::getChildren);
+
+            boolean unchanged1 = originalMultipleStructure.equals(afterCall1);
+            boolean unchanged2 = originalMultipleStructure.equals(afterCall2);
+            boolean unchanged3 = originalMultipleStructure.equals(afterCall3);
+
+            safeMethodsTest.put("多次调用-第1次结果正确",
+                    (count1 > 0 && noDuplicateResult1) ? "✅ 成功，节点数: " + count1 : "❌ 失败");
+            safeMethodsTest.put("多次调用-第1次原树未改变", unchanged1 ? "✅ 成功" : "❌ 失败");
+
+            safeMethodsTest.put("多次调用-第2次结果正确",
+                    (count2 > 0 && noDuplicateResult2) ? "✅ 成功，节点数: " + count2 : "❌ 失败");
+            safeMethodsTest.put("多次调用-第2次原树未改变", unchanged2 ? "✅ 成功" : "❌ 失败");
+
+            safeMethodsTest.put("多次调用-第3次结果父子关系正确", result3Validation.get("验证通过"));
+            if (!(Boolean) result3Validation.get("验证通过")) {
+                safeMethodsTest.put("多次调用-第3次父子关系错误", result3Validation.get("错误详情"));
+            }
+            safeMethodsTest.put("多次调用-第3次结果无重复",
+                    noDuplicateResult3 ? "✅ 成功，节点数: " + count3 : "❌ 失败: " + getTreeValidationDetails(result3));
+            safeMethodsTest.put("多次调用-第3次原树未改变", unchanged3 ? "✅ 成功" : "❌ 失败");
+
+            safeMethodsTest.put("多次调用-总结",
+                    (unchanged1 && unchanged2 && unchanged3 && noDuplicateResult1 && noDuplicateResult2 && noDuplicateResult3)
+                            ? "✅ 所有调用结果正确且未修改原树" : "❌ 存在问题");
+
+        } catch (Exception e) {
+            safeMethodsTest.put("错误", "❌ 安全版本方法测试异常: " + e.getMessage());
+            e.printStackTrace();
+        }
+        result.put("安全版本方法", safeMethodsTest);
+
         log.info("=== 测试完成 ===");
         return Result.success(result);
     }
@@ -253,6 +638,15 @@ public class TestTreeUtilController {
                 MenuNode::getParentId,
                 MenuNode::getChildren,
                 MenuNode::setChildren
+        );
+
+        List<MenuNode> tree2 = TreeUtil.buildSafe(
+                flatList,
+                MenuNode::getId,
+                MenuNode::getParentId,
+                MenuNode::getChildren,
+                MenuNode::setChildren,
+                MenuNode::new
         );
 
         result.put("原始数据", flatList);
@@ -354,6 +748,7 @@ public class TestTreeUtilController {
         log.info("=== 测试树形结构过滤 ===");
         Map<String, Object> result = new LinkedHashMap<>();
 
+        // 每次都创建新的数据，避免被修改
         List<MenuNode> flatList = createTestData();
         List<MenuNode> tree = TreeUtil.build(
                 flatList,
@@ -365,8 +760,17 @@ public class TestTreeUtilController {
         );
 
         // 过滤：只保留启用的节点
+        List<MenuNode> flatList2 = createTestData();  // 重新创建数据
+        List<MenuNode> tree2 = TreeUtil.build(
+                flatList2,
+                0L,
+                MenuNode::getId,
+                MenuNode::getParentId,
+                MenuNode::getChildren,
+                MenuNode::setChildren
+        );
         List<MenuNode> filteredTree = TreeUtil.filter(
-                tree,
+                tree2,
                 MenuNode::getChildren,
                 MenuNode::setChildren,
                 MenuNode::getEnabled
@@ -400,17 +804,26 @@ public class TestTreeUtilController {
                 MenuNode::setChildren
         );
 
-        // 排序：按 sort 字段升序
+        // 获取排序前的顺序
+        List<String> beforeSort = new ArrayList<>();
+        TreeUtil.traverseDepthFirst(tree, MenuNode::getChildren, node -> beforeSort.add(node.getName()));
+
+        // 排序：按 sort 字段升序（使用新数据）
+        List<MenuNode> flatList2 = createTestData();  // 重新创建数据
+        List<MenuNode> tree2 = TreeUtil.build(
+                flatList2,
+                0L,
+                MenuNode::getId,
+                MenuNode::getParentId,
+                MenuNode::getChildren,
+                MenuNode::setChildren
+        );
         List<MenuNode> sortedTree = TreeUtil.sort(
-                tree,
+                tree2,
                 MenuNode::getChildren,
                 MenuNode::setChildren,
                 Comparator.comparing(MenuNode::getSort)
         );
-
-        // 获取排序前后的顺序
-        List<String> beforeSort = new ArrayList<>();
-        TreeUtil.traverseDepthFirst(tree, MenuNode::getChildren, node -> beforeSort.add(node.getName()));
 
         List<String> afterSort = new ArrayList<>();
         TreeUtil.traverseDepthFirst(sortedTree, MenuNode::getChildren, node -> afterSort.add(node.getName()));
@@ -456,6 +869,62 @@ public class TestTreeUtilController {
     }
 
     /**
+     * 测试获取指定层级的子树
+     *
+     * @param nodeId 节点ID（可选）
+     * @param levels 层级数
+     * @return 测试结果
+     */
+    @GetMapping("/subtree")
+    public Result<Map<String, Object>> testSubTree(
+            @RequestParam(required = false) Long nodeId,
+            @RequestParam(defaultValue = "2") int levels
+    ) {
+        log.info("=== 测试获取子树，节点ID: {}, 层级: {} ===", nodeId, levels);
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // 每次都创建新的数据
+        List<MenuNode> flatList = createTestData();
+        List<MenuNode> tree = TreeUtil.build(
+                flatList,
+                0L,
+                MenuNode::getId,
+                MenuNode::getParentId,
+                MenuNode::getChildren,
+                MenuNode::setChildren
+        );
+
+        List<MenuNode> subTree;
+        if (nodeId == null) {
+            // 获取所有根节点及其指定层级的子树
+            subTree = TreeUtil.getSubTree(
+                    tree,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    levels
+            );
+            result.put("说明", "获取所有根节点及其下 " + levels + " 层的数据");
+        } else {
+            // 获取指定节点及其指定层级的子树
+            subTree = TreeUtil.getSubTree(
+                    tree,
+                    MenuNode::getId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren,
+                    nodeId,
+                    levels
+            );
+            result.put("说明", "获取节点 " + nodeId + " 及其下 " + levels + " 层的数据");
+        }
+
+        result.put("子树结构", subTree);
+        result.put("子树节点数", TreeUtil.countNodes(subTree, MenuNode::getChildren));
+        result.put("子树最大深度", TreeUtil.getMaxDepth(subTree, MenuNode::getChildren));
+
+        return Result.success(result);
+    }
+
+    /**
      * 创建测试数据
      * 模拟一个菜单树结构：
      * - 系统管理 (1)
@@ -492,6 +961,205 @@ public class TestTreeUtilController {
     }
 
     /*=============================================    辅助方法    =============================================*/
+
+    /**
+     * 捕获树结构的完整快照（用于比较前后是否改变）
+     * 包括每个节点的ID、parentId、children的ID列表
+     */
+    private String captureTreeStructure(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+
+        if (obj instanceof List<?> list) {
+            StringBuilder sb = new StringBuilder("[");
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) sb.append(",");
+                sb.append(captureTreeStructure(list.get(i)));
+            }
+            sb.append("]");
+            return sb.toString();
+        }
+
+        if (obj instanceof MenuNode node) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{id=").append(node.getId());
+            sb.append(",pid=").append(node.getParentId());
+            sb.append(",name=").append(node.getName());
+            sb.append(",sort=").append(node.getSort());
+            sb.append(",enabled=").append(node.getEnabled());
+
+            List<MenuNode> children = node.getChildren();
+            if (children == null) {
+                sb.append(",children=null");
+            } else if (children.isEmpty()) {
+                sb.append(",children=[]");
+            } else {
+                sb.append(",children=[");
+                for (int i = 0; i < children.size(); i++) {
+                    if (i > 0) sb.append(",");
+                    sb.append(captureTreeStructure(children.get(i)));
+                }
+                sb.append("]");
+            }
+            sb.append("}");
+            return sb.toString();
+        }
+
+        return obj.toString();
+    }
+
+    /**
+     * 完整验证树结构（检查每个节点的ID、parentId、children是否正确）
+     */
+    private Map<String, Object> validateTreeStructure(List<MenuNode> tree, Long expectedRootParentId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        if (tree == null) {
+            errors.add("树结构为null");
+            result.put("验证通过", false);
+            result.put("错误详情", errors);
+            return result;
+        }
+
+        // 验证根节点
+        for (MenuNode root : tree) {
+            if (!Objects.equals(root.getParentId(), expectedRootParentId)) {
+                errors.add("根节点ID=" + root.getId() + " 的parentId=" + root.getParentId() + "，期望=" + expectedRootParentId);
+            }
+            validateNode(root, errors);
+        }
+
+        result.put("验证通过", errors.isEmpty());
+        if (!errors.isEmpty()) {
+            result.put("错误详情", errors);
+        }
+        return result;
+    }
+
+    /**
+     * 递归验证节点及其子节点
+     */
+    private void validateNode(MenuNode node, List<String> errors) {
+        if (node == null) {
+            errors.add("发现null节点");
+            return;
+        }
+
+        List<MenuNode> children = node.getChildren();
+        if (children == null) {
+            errors.add("节点ID=" + node.getId() + " 的children为null，应该是空列表");
+            return;
+        }
+
+        // 验证每个子节点的parentId是否指向当前节点
+        for (MenuNode child : children) {
+            if (child == null) {
+                errors.add("节点ID=" + node.getId() + " 的children中包含null元素");
+                continue;
+            }
+
+            if (!Objects.equals(child.getParentId(), node.getId())) {
+                errors.add("子节点ID=" + child.getId() + " 的parentId=" + child.getParentId() +
+                        "，但其父节点ID=" + node.getId() + "，不匹配！");
+            }
+            // 递归验证子节点
+            validateNode(child, errors);
+        }
+    }
+
+    /**
+     * 打印树结构（用于调试）
+     */
+    private String printTree(List<MenuNode> tree) {
+        StringBuilder sb = new StringBuilder();
+        for (MenuNode node : tree) {
+            printNode(node, 0, sb);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 递归打印节点
+     */
+    private void printNode(MenuNode node, int level, StringBuilder sb) {
+        String indent = "  ".repeat(level);
+        sb.append(indent).append("├─ ID=").append(node.getId())
+                .append(", parentId=").append(node.getParentId())
+                .append(", name=").append(node.getName())
+                .append(", children=").append(node.getChildren() == null ? "null" : node.getChildren().size())
+                .append("\n");
+
+        if (node.getChildren() != null) {
+            for (MenuNode child : node.getChildren()) {
+                printNode(child, level + 1, sb);
+            }
+        }
+    }
+
+    /**
+     * 验证树结构是否正确（无重复节点）
+     */
+    private boolean validateTreeStructureNoDuplicate(List<MenuNode> tree) {
+        Set<Long> visitedIds = new HashSet<>();
+        return validateNodeNoDuplicate(tree, visitedIds);
+    }
+
+    /**
+     * 递归验证节点（检查是否有重复ID）
+     */
+    private boolean validateNodeNoDuplicate(List<MenuNode> nodes, Set<Long> visitedIds) {
+        if (nodes == null) {
+            return true;
+        }
+
+        for (MenuNode node : nodes) {
+            // 检查节点ID是否重复
+            if (visitedIds.contains(node.getId())) {
+                return false;  // 发现重复节点
+            }
+            visitedIds.add(node.getId());
+
+            // 递归检查子节点
+            if (!validateNodeNoDuplicate(node.getChildren(), visitedIds)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 获取树验证详情（找出重复的节点）
+     */
+    private String getTreeValidationDetails(List<MenuNode> tree) {
+        Map<Long, Integer> idCount = new HashMap<>();
+        countNodeIds(tree, idCount);
+
+        List<String> duplicates = new ArrayList<>();
+        for (Map.Entry<Long, Integer> entry : idCount.entrySet()) {
+            if (entry.getValue() > 1) {
+                duplicates.add("节点ID=" + entry.getKey() + " 出现了 " + entry.getValue() + " 次");
+            }
+        }
+
+        return duplicates.isEmpty() ? "无重复" : String.join(", ", duplicates);
+    }
+
+    /**
+     * 统计节点ID出现次数
+     */
+    private void countNodeIds(List<MenuNode> nodes, Map<Long, Integer> idCount) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (MenuNode node : nodes) {
+            idCount.put(node.getId(), idCount.getOrDefault(node.getId(), 0) + 1);
+            countNodeIds(node.getChildren(), idCount);
+        }
+    }
 
     /**
      * 树节点测试类
