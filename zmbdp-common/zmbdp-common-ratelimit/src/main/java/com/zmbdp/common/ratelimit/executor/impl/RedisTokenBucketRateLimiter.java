@@ -122,6 +122,11 @@ public class RedisTokenBucketRateLimiter implements RateLimiterExecutor {
      */
     private final StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 构造函数，注入 Redis 模板
+     *
+     * @param stringRedisTemplate Redis 模板
+     */
     public RedisTokenBucketRateLimiter(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }

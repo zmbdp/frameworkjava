@@ -96,6 +96,8 @@ public class MailUtil {
 
     /**
      * 从 Spring 容器获取默认的 JavaMailSender
+     *
+     * @return JavaMailSender 邮件发送器
      */
     private static JavaMailSender getDefaultJavaMailSender() {
         return SpringUtil.getBean(JavaMailSender.class);

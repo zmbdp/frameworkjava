@@ -15,6 +15,8 @@ public class LogExceptionUtil {
 
     /**
      * 获取异常堆栈字符串
+     *
+     * @param throwable 异常对象
      */
     public static String getStackTrace(Throwable throwable) {
         if (throwable == null) {
