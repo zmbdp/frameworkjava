@@ -42,3 +42,4 @@ build/
 /PROJECT_STRUCTURE_DETAILED.md
 /logs/
 /**/apache-skywalking-java-agent-9.5.0/
+/.idea/

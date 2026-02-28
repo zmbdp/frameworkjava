@@ -89,7 +89,7 @@ public class OSSFileServiceImpl implements IFileService {
             InputStream inputStream = file.getInputStream();
             // 获取原始的文件名
             String originalFilename = file.getOriginalFilename();
-            String extName = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            String extName = Objects.requireNonNull(originalFilename).substring(originalFilename.lastIndexOf(".") + 1);
             //在 oss 中存储名字就是 UUID + 文件的后缀名
             String objectName = ossProperties.getPathPrefix() + UUID.randomUUID() + "." + extName;
 

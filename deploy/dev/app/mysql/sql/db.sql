@@ -114,7 +114,7 @@ create table `sys_region`
     `longitude`   decimal(10, 7) default null comment '经度',
     `latitude`    decimal(10, 7) default null comment '纬度',
     primary key (`id`)
-) engine=innodb auto_increment=1 default charset=utf8mb4;
+) engine=innodb auto_increment=1 default charset=utf8mb4 comment='行政区划表';
 
 
 -- 省级数据 (level=1)

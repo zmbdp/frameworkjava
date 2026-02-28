@@ -28,6 +28,9 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "datapermission", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class DataPermissionAutoConfiguration {
 
+    /**
+     * 构造函数，打印启动日志
+     */
     public DataPermissionAutoConfiguration() {
         log.info("数据权限模块已启用");
     }

@@ -66,6 +66,12 @@ public enum DataPermissionType {
      */
     private final String description;
 
+    /**
+     * 构造函数
+     *
+     * @param code        权限类型编码
+     * @param description 权限类型描述
+     */
     DataPermissionType(String code, String description) {
         this.code = code;
         this.description = description;

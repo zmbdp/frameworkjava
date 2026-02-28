@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Redisson 分布式锁测试控制器
+ * 测试分布式锁在秒杀场景的应用
+ *
+ * @author 稚名不带撇
+ */
 @RestController
 @Slf4j
 @RequestMapping("/test/redisson")
@@ -23,6 +29,11 @@ public class TestRedissonController {
     @Autowired
     private RedissonLockService redissonLockService;
 
+    /**
+     * 秒杀扣减库存（使用Redis原生锁）
+     *
+     * @return 秒杀结果
+     */
     @PostMapping("/delStock")
     public String delStock() {
         String proKey = "proKey";
@@ -46,6 +57,11 @@ public class TestRedissonController {
         return "success";   // 秒杀成功
     }
 
+    /**
+     * 秒杀扣减库存（使用Redisson分布式锁）
+     *
+     * @return 秒杀结果
+     */
     @PostMapping("/delStock/redisson")
     public String delStockRedisson() {
         String proKey = "proKey";
