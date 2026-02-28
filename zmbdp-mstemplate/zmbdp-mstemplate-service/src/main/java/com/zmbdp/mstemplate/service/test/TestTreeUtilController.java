@@ -56,8 +56,9 @@ public class TestTreeUtilController {
             // 完整验证树结构
             Map<String, Object> validation1 = validateTreeStructure(tree1, 0L);
             boolean noDuplicate1 = validateTreeStructureNoDuplicate(tree1);
-            buildTest.put("指定根节点构建-父子关系正确", validation1.get("验证通过"));
-            if (!(Boolean) validation1.get("验证通过")) {
+            boolean isValid1 = (Boolean) validation1.get("验证通过");
+            buildTest.put("指定根节点构建-父子关系正确", isValid1 ? "✅ 成功" : "❌ 失败");
+            if (!isValid1) {
                 buildTest.put("指定根节点构建-父子关系错误", validation1.get("错误详情"));
             }
             buildTest.put("指定根节点构建-无重复节点", noDuplicate1 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree1));
@@ -75,8 +76,9 @@ public class TestTreeUtilController {
 
             Map<String, Object> validation2 = validateTreeStructure(tree2, 0L);
             boolean noDuplicate2 = validateTreeStructureNoDuplicate(tree2);
-            buildTest.put("自动识别根节点-父子关系正确", validation2.get("验证通过"));
-            if (!(Boolean) validation2.get("验证通过")) {
+            boolean isValid2 = (Boolean) validation2.get("验证通过");
+            buildTest.put("自动识别根节点-父子关系正确", isValid2 ? "✅ 成功" : "❌ 失败");
+            if (!isValid2) {
                 buildTest.put("自动识别根节点-父子关系错误", validation2.get("错误详情"));
             }
             buildTest.put("自动识别根节点-无重复节点", noDuplicate2 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree2));
@@ -99,8 +101,9 @@ public class TestTreeUtilController {
 
             Map<String, Object> validation3 = validateTreeStructure(tree3, 0L);
             boolean noDuplicate3 = validateTreeStructureNoDuplicate(tree3);
-            buildTest.put("重复构建测试-父子关系正确", validation3.get("验证通过"));
-            if (!(Boolean) validation3.get("验证通过")) {
+            boolean isValid3 = (Boolean) validation3.get("验证通过");
+            buildTest.put("重复构建测试-父子关系正确", isValid3 ? "✅ 成功" : "❌ 失败");
+            if (!isValid3) {
                 buildTest.put("重复构建测试-父子关系错误", validation3.get("错误详情"));
             }
             buildTest.put("重复构建测试-无重复节点", noDuplicate3 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(tree3));
@@ -397,9 +400,10 @@ public class TestTreeUtilController {
             String afterStructure1 = captureTreeStructure(originalList1);
             Map<String, Object> validation1 = validateTreeStructure(treeSafe1, 0L);
             boolean noDuplicate1 = validateTreeStructureNoDuplicate(treeSafe1);
+            boolean isValid1 = (Boolean) validation1.get("验证通过");
 
-            safeMethodsTest.put("buildSafe(指定根节点)-父子关系正确", validation1.get("验证通过"));
-            if (!(Boolean) validation1.get("验证通过")) {
+            safeMethodsTest.put("buildSafe(指定根节点)-父子关系正确", isValid1 ? "✅ 成功" : "❌ 失败");
+            if (!isValid1) {
                 safeMethodsTest.put("buildSafe(指定根节点)-父子关系错误", validation1.get("错误详情"));
             }
             safeMethodsTest.put("buildSafe(指定根节点)-无重复节点", noDuplicate1 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(treeSafe1));
@@ -422,9 +426,10 @@ public class TestTreeUtilController {
             String afterStructure2 = captureTreeStructure(originalList2);
             Map<String, Object> validation2 = validateTreeStructure(treeSafe2, 0L);
             boolean noDuplicate2 = validateTreeStructureNoDuplicate(treeSafe2);
+            boolean isValid2 = (Boolean) validation2.get("验证通过");
 
-            safeMethodsTest.put("buildSafe(自动识别)-父子关系正确", validation2.get("验证通过"));
-            if (!(Boolean) validation2.get("验证通过")) {
+            safeMethodsTest.put("buildSafe(自动识别)-父子关系正确", isValid2 ? "✅ 成功" : "❌ 失败");
+            if (!isValid2) {
                 safeMethodsTest.put("buildSafe(自动识别)-父子关系错误", validation2.get("错误详情"));
             }
             safeMethodsTest.put("buildSafe(自动识别)-无重复节点", noDuplicate2 ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(treeSafe2));
@@ -453,9 +458,10 @@ public class TestTreeUtilController {
             String afterFilterStructure = captureTreeStructure(treeForFilter);
             Map<String, Object> filterValidation = validateTreeStructure(filteredSafe, 0L);
             boolean noDuplicateFilter = validateTreeStructureNoDuplicate(filteredSafe);
+            boolean isValidFilter = (Boolean) filterValidation.get("验证通过");
 
-            safeMethodsTest.put("filterSafe-过滤后父子关系正确", filterValidation.get("验证通过"));
-            if (!(Boolean) filterValidation.get("验证通过")) {
+            safeMethodsTest.put("filterSafe-过滤后父子关系正确", isValidFilter ? "✅ 成功" : "❌ 失败");
+            if (!isValidFilter) {
                 safeMethodsTest.put("filterSafe-父子关系错误", filterValidation.get("错误详情"));
             }
             safeMethodsTest.put("filterSafe-过滤后无重复节点", noDuplicateFilter ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(filteredSafe));
@@ -486,9 +492,10 @@ public class TestTreeUtilController {
             String afterSortStructure = captureTreeStructure(treeForSort);
             Map<String, Object> sortValidation = validateTreeStructure(sortedSafe, 0L);
             boolean noDuplicateSort = validateTreeStructureNoDuplicate(sortedSafe);
+            boolean isValidSort = (Boolean) sortValidation.get("验证通过");
 
-            safeMethodsTest.put("sortSafe-排序后父子关系正确", sortValidation.get("验证通过"));
-            if (!(Boolean) sortValidation.get("验证通过")) {
+            safeMethodsTest.put("sortSafe-排序后父子关系正确", isValidSort ? "✅ 成功" : "❌ 失败");
+            if (!isValidSort) {
                 safeMethodsTest.put("sortSafe-父子关系错误", sortValidation.get("错误详情"));
             }
             safeMethodsTest.put("sortSafe-排序后无重复节点", noDuplicateSort ? "✅ 成功" : "❌ 失败: " + getTreeValidationDetails(sortedSafe));
@@ -581,6 +588,7 @@ public class TestTreeUtilController {
             String afterCall3 = captureTreeStructure(treeForMultiple);
             Map<String, Object> result3Validation = validateTreeStructure(result3, 0L);
             boolean noDuplicateResult3 = validateTreeStructureNoDuplicate(result3);
+            boolean isValidResult3 = (Boolean) result3Validation.get("验证通过");
             int count3 = TreeUtil.countNodes(result3, MenuNode::getChildren);
 
             boolean unchanged1 = originalMultipleStructure.equals(afterCall1);
@@ -595,8 +603,8 @@ public class TestTreeUtilController {
                     (count2 > 0 && noDuplicateResult2) ? "✅ 成功，节点数: " + count2 : "❌ 失败");
             safeMethodsTest.put("多次调用-第2次原树未改变", unchanged2 ? "✅ 成功" : "❌ 失败");
 
-            safeMethodsTest.put("多次调用-第3次结果父子关系正确", result3Validation.get("验证通过"));
-            if (!(Boolean) result3Validation.get("验证通过")) {
+            safeMethodsTest.put("多次调用-第3次结果父子关系正确", isValidResult3 ? "✅ 成功" : "❌ 失败");
+            if (!isValidResult3) {
                 safeMethodsTest.put("多次调用-第3次父子关系错误", result3Validation.get("错误详情"));
             }
             safeMethodsTest.put("多次调用-第3次结果无重复",
