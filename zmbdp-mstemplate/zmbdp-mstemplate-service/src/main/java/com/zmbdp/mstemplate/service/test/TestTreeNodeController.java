@@ -122,9 +122,51 @@ public class TestTreeNodeController {
             List<TreeNode<Long>> flatResult = TreeUtil.toList(tree, TreeNode::getChildren);
             traverseTest.put("树转列表-节点数", flatResult.size());
 
+            // 4. 树转 Map（新增测试）
+            Map<Long, TreeNode<Long>> nodeMap = TreeUtil.toMap(tree, TreeNode::getId, TreeNode::getChildren);
+            traverseTest.put("树转Map-Map大小", nodeMap.size());
+            traverseTest.put("树转Map-验证", nodeMap.containsKey(5L) && nodeMap.containsKey(10L) ? "✅ 成功" : "❌ 失败");
+
+            // 验证 Map 查找效率
+            TreeNode<Long> node5 = nodeMap.get(5L);
+            TreeNode<Long> node10 = nodeMap.get(10L);
+            boolean mapCorrect = node5 != null && node5.getId().equals(5L) &&
+                    node10 != null && node10.getId().equals(10L);
+            traverseTest.put("树转Map-O(1)查找", mapCorrect ? "✅ 成功，节点5和10都找到" : "❌ 失败");
+
+            // 5. 添加层级信息（新增测试）
+            List<TreeNode<Long>> treeForLevel = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    TreeNode::getId,
+                    TreeNode::getParentId,
+                    TreeNode::getChildren,
+                    TreeNode::setChildren
+            );
+            TreeUtil.enrichWithLevel(treeForLevel, TreeNode::getChildren, TreeNode::setLevel);
+
+            // 收集层级信息
+            Map<Long, Integer> levelMap = new HashMap<>();
+            TreeUtil.traverseDepthFirst(treeForLevel, TreeNode::getChildren, node -> {
+                levelMap.put(node.getId(), node.getLevel());
+            });
+            traverseTest.put("添加层级信息-节点数", levelMap.size());
+
+            // 验证层级正确性
+            boolean level1Correct = levelMap.get(1L) == 1 && levelMap.get(2L) == 1;  // 根节点
+            boolean level2Correct = levelMap.get(3L) == 2 && levelMap.get(5L) == 2;  // 第二层
+            boolean level3Correct = levelMap.get(7L) == 3 && levelMap.get(10L) == 3; // 第三层
+            boolean level4Correct = levelMap.get(9L) == 3;  // 第三层
+
+            traverseTest.put("层级验证-第1层", level1Correct ? "✅ 节点1,2层级=1" : "❌ 失败");
+            traverseTest.put("层级验证-第2层", level2Correct ? "✅ 节点3,5层级=2" : "❌ 失败");
+            traverseTest.put("层级验证-第3层", level3Correct && level4Correct ? "✅ 节点7,9,10层级=3" : "❌ 失败");
+            traverseTest.put("层级详情", levelMap.toString());
+
             result.put("2. 树形遍历", traverseTest);
         } catch (Exception e) {
             traverseTest.put("异常", e.getMessage());
+            e.printStackTrace();
             result.put("2. 树形遍历", traverseTest);
         }
 
