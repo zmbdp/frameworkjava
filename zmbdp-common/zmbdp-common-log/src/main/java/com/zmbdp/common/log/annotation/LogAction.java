@@ -24,6 +24,17 @@ import java.lang.annotation.Target;
  *     <li>类注解通常用于设置默认策略（如全局记录参数、全局开启异步等）</li>
  * </ul>
  * <p>
+ * <b>工作原理：</b>
+ * <ol>
+ *     <li>拦截带 {@code @LogAction} 的方法（通过 {@link com.zmbdp.common.log.aspect.LogActionAspect}）</li>
+ *     <li>合并方法注解和类注解配置（方法注解优先级更高）</li>
+ *     <li>检查全局开关 {@code log.enabled}，关闭则跳过日志记录</li>
+ *     <li>构建日志上下文（用户信息、请求信息、时间戳）并提取方法参数</li>
+ *     <li>执行目标方法，捕获返回值和异常，计算方法耗时</li>
+ *     <li>评估条件表达式（如果配置了 {@code condition}），条件不满足则不记录</li>
+ *     <li>路由到存储服务（console/database/file/redis/mq）并异步保存日志</li>
+ * </ol>
+ * <p>
  * <b>功能说明：</b>
  * <ul>
  *     <li>记录方法执行和业务行为（如"新增用户"、"删除订单"）</li>
@@ -135,7 +146,15 @@ import java.lang.annotation.Target;
  * }</pre>
  * </p>
  * <p>
- * <b>通用注意事项：</b>
+ * <b>配置优先级：</b>
+ * <ol>
+ *     <li>方法注解参数（value、recordParams、recordResult 等）</li>
+ *     <li>类注解参数（作为默认配置）</li>
+ *     <li>Nacos 全局配置（log.enabled、log.async-enabled 等）</li>
+ *     <li>代码默认值</li>
+ * </ol>
+ * <p>
+ * <b>注意事项：</b>
  * <ul>
  *     <li>注解可以标注在方法上或类上，支持同时使用</li>
  *     <li>方法注解优先级高于类注解，方法注解存在时完全使用方法注解的配置</li>
