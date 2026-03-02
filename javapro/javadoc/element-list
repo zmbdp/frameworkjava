@@ -41,10 +41,11 @@ com.zmbdp.common.core.enums
 com.zmbdp.common.core.utils
 com.zmbdp.common.datapermission.annotation
 com.zmbdp.common.datapermission.config
+com.zmbdp.common.datapermission.context
 com.zmbdp.common.datapermission.enums
-com.zmbdp.common.datapermission.handler
-com.zmbdp.common.datapermission.handler.impl
 com.zmbdp.common.datapermission.interceptor
+com.zmbdp.common.datapermission.strategy
+com.zmbdp.common.datapermission.strategy.impl
 com.zmbdp.common.datapermission.utils
 com.zmbdp.common.domain.constants
 com.zmbdp.common.domain.domain
