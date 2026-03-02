@@ -107,6 +107,19 @@ public class DataPermissionInterceptor implements Interceptor {
             return invocation.proceed();
         }
 
+        // 获取当前用户的数据权限上下文
+        DataPermissionContext context = DataPermissionContext.get();
+        if (context == null) {
+            log.warn("数据权限：上下文为空，跳过过滤");
+            return invocation.proceed();
+        }
+
+        // 如果是超级管理员，不进行过滤
+        if (Boolean.TRUE.equals(context.getIsAdmin())) {
+            log.debug("数据权限：超级管理员，跳过过滤");
+            return invocation.proceed();
+        }
+
         // 获取 StatementHandler
         StatementHandler statementHandler = PluginUtils.realTarget(invocation.getTarget());
         MetaObject metaObject = SystemMetaObject.forObject(statementHandler);
@@ -123,19 +136,6 @@ public class DataPermissionInterceptor implements Interceptor {
         DataPermission annotation = getDataPermissionAnnotation(mappedStatement);
         if (annotation == null) {
             // 没有注解，不进行过滤
-            return invocation.proceed();
-        }
-
-        // 获取当前用户的数据权限上下文
-        DataPermissionContext context = DataPermissionContext.get();
-        if (context == null) {
-            log.warn("数据权限：上下文为空，跳过过滤");
-            return invocation.proceed();
-        }
-
-        // 如果是超级管理员，不进行过滤
-        if (Boolean.TRUE.equals(context.getIsAdmin())) {
-            log.debug("数据权限：超级管理员，跳过过滤");
             return invocation.proceed();
         }
 
