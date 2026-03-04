@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -39,8 +40,14 @@ public class FileLogStorageService implements ILogStorageService {
     /**
      * 日志文件路径（可通过配置修改）
      */
-    @Value("${log.file.path:./logs/operation.log}")
+    @Value("${log.file.path:./logs/operation/}")
     private String logFilePath;
+
+    /**
+     * 服务名称，用于日志文件名
+     */
+    @Value("${spring.application.name}")
+    private String appName;
 
     /**
      * 保存操作日志
@@ -52,14 +59,22 @@ public class FileLogStorageService implements ILogStorageService {
     @Override
     public void save(OperationLogDTO logDTO) {
         try {
-            // 转换为 JSON 字符串
             String logJson = JsonUtil.classToJson(logDTO);
 
-            // 追加到文件（自动创建目录和文件）
-            File logFile = new File(logFilePath);
+            // 日期字符串
+            String dateStr = LocalDate.now().format(DATE_FORMATTER);
+
+            // 动态文件路径：./logs/operation/{服务名}/{日期}.log
+            File logFile = new File(logFilePath + appName + "/" + dateStr + ".log");
+            // 创建父目录（如果不存在）
+            File parentDir = logFile.getParentFile();
+            if (!parentDir.exists()) {
+                FileUtil.mkdir(parentDir); // 正确创建目录
+            }
+
+            // 追加日志
             FileUtil.appendUtf8String(logJson + "\n", logFile);
         } catch (Exception e) {
-            // 存储失败不应该影响业务，只记录错误日志
             log.error("保存操作日志到文件失败: {}, 文件路径: {}", e.getMessage(), logFilePath, e);
         }
     }
