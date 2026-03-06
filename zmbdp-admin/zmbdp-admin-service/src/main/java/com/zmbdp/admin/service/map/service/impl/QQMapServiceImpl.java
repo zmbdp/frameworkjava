@@ -39,7 +39,7 @@ public class QQMapServiceImpl implements IMapProvider {
     /**
      * 调用腾讯位置服务的秘钥
      */
-    @Value("${qqmap.key:IWFBZ-FJPW7-JADXW-PURZL-2AJPQ-A5F46}")
+    @Value("${qqmap.key:}")
     private String key;
 
     /**

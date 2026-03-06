@@ -142,8 +142,56 @@ public class TestTreeUtilController {
             List<MenuNode> flatResult = TreeUtil.toList(tree, MenuNode::getChildren);
             traverseTest.put("树转列表", !flatResult.isEmpty() ? "✅ 成功，节点数: " + flatResult.size() : "❌ 失败");
 
+            // 4. 树转 Map（新增测试）
+            Map<Long, MenuNode> nodeMap = TreeUtil.toMap(tree, MenuNode::getId, MenuNode::getChildren);
+            boolean mapCorrect = nodeMap.size() == flatResult.size();
+            traverseTest.put("树转Map", mapCorrect ? "✅ 成功，Map大小: " + nodeMap.size() : "❌ 失败");
+
+            // 验证 Map 中的节点是否正确
+            MenuNode node3 = nodeMap.get(3L);
+            boolean node3Correct = node3 != null && "角色管理".equals(node3.getName());
+            traverseTest.put("树转Map-查找节点3", node3Correct ? "✅ 成功，找到: " + node3.getName() : "❌ 失败");
+
+            MenuNode node5 = nodeMap.get(5L);
+            boolean node5Correct = node5 != null && "权限分配".equals(node5.getName());
+            traverseTest.put("树转Map-查找节点5", node5Correct ? "✅ 成功，找到: " + node5.getName() : "❌ 失败");
+
+            // 5. 添加层级信息（新增测试）
+            List<MenuNode> treeForLevel = TreeUtil.build(
+                    createTestData(),
+                    0L,
+                    MenuNode::getId,
+                    MenuNode::getParentId,
+                    MenuNode::getChildren,
+                    MenuNode::setChildren
+            );
+            TreeUtil.enrichWithLevel(treeForLevel, MenuNode::getChildren, MenuNode::setLevel);
+
+            // 验证层级信息
+            List<String> levelInfo = new ArrayList<>();
+            TreeUtil.traverseDepthFirst(treeForLevel, MenuNode::getChildren, node -> {
+                levelInfo.add(node.getName() + "(层级" + node.getLevel() + ")");
+            });
+            traverseTest.put("添加层级信息", "✅ 成功");
+            traverseTest.put("层级信息详情", String.join(", ", levelInfo));
+
+            // 验证具体节点的层级
+            MenuNode rootNode = TreeUtil.findFirst(treeForLevel, MenuNode::getChildren, n -> n.getId().equals(1L));
+            MenuNode level2Node = TreeUtil.findFirst(treeForLevel, MenuNode::getChildren, n -> n.getId().equals(2L));
+            MenuNode level3Node = TreeUtil.findFirst(treeForLevel, MenuNode::getChildren, n -> n.getId().equals(4L));
+
+            boolean levelCorrect = rootNode != null && rootNode.getLevel() == 1 &&
+                    level2Node != null && level2Node.getLevel() == 2 &&
+                    level3Node != null && level3Node.getLevel() == 3;
+            traverseTest.put("层级验证", levelCorrect ?
+                    "✅ 成功，根节点层级=" + (rootNode != null ? rootNode.getLevel() : "null") +
+                            ", 二级节点层级=" + (level2Node != null ? level2Node.getLevel() : "null") +
+                            ", 三级节点层级=" + (level3Node != null ? level3Node.getLevel() : "null") :
+                    "❌ 失败");
+
         } catch (Exception e) {
             traverseTest.put("错误", "❌ 树形结构遍历测试异常: " + e.getMessage());
+            e.printStackTrace();
         }
         result.put("树形结构遍历", traverseTest);
 
@@ -1025,8 +1073,8 @@ public class TestTreeUtilController {
      * <p>
      * 递归验证树中每个节点的父子关系是否正确，确保子节点的 parentId 与父节点的 id 一致
      *
-     * @param tree                  树形结构的根节点列表
-     * @param expectedRootParentId  期望的根节点 parentId
+     * @param tree                 树形结构的根节点列表
+     * @param expectedRootParentId 期望的根节点 parentId
      * @return 验证结果，包含"验证通过"和"错误详情"（如果有错误）
      */
     private Map<String, Object> validateTreeStructure(List<MenuNode> tree, Long expectedRootParentId) {
@@ -1229,6 +1277,7 @@ public class TestTreeUtilController {
         private String name;
         private Integer sort;
         private Boolean enabled;
+        private Integer level;  // 新增：层级字段
         private List<MenuNode> children;
 
         public MenuNode(Long id, Long parentId, String name, Integer sort, Boolean enabled) {
