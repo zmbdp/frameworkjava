@@ -47,7 +47,7 @@ public interface MapServiceApi {
      * @return 子集区域列表
      */
     @GetMapping("/region_children_list")
-    Result<List<RegionVO>> regionChildren(@RequestParam("parentId") Long parentId);
+    Result<List<RegionVO>> regionChildren(@RequestParam(value = "parentId", required = false) Long parentId);
 
     /**
      * 获取热门城市列表

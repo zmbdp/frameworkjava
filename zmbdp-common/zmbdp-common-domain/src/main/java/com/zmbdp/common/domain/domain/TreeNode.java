@@ -64,6 +64,11 @@ public class TreeNode<ID> implements Serializable {
     private Object data;
 
     /**
+     * 节点层级
+     */
+    private Integer level;
+
+    /**
      * 构造函数（不包含 data）
      *
      * @param id       节点 ID

@@ -1,6 +1,9 @@
 package com.zmbdp.admin.service.map.domain.dto;
 
+import com.zmbdp.common.domain.domain.TreeNode;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 区域信息 DTO
@@ -49,4 +52,9 @@ public class SysRegionDTO {
      * 纬度
      */
     private Double latitude;
+
+    /**
+     * 子集区域列表
+     */
+    private List<SysRegionDTO> children;
 }

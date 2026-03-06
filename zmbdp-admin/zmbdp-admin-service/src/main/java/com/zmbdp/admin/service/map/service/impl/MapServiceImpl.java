@@ -13,7 +13,9 @@ import com.zmbdp.admin.service.map.service.IMapProvider;
 import com.zmbdp.admin.service.map.service.IMapService;
 import com.zmbdp.common.cache.utils.CacheUtil;
 import com.zmbdp.common.core.utils.BeanCopyUtil;
+import com.zmbdp.common.core.utils.JsonUtil;
 import com.zmbdp.common.core.utils.PageUtil;
+import com.zmbdp.common.core.utils.TreeUtil;
 import com.zmbdp.common.domain.constants.CommonConstants;
 import com.zmbdp.common.domain.domain.dto.BasePageDTO;
 import com.zmbdp.common.redis.service.RedisService;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -229,7 +232,8 @@ public class MapServiceImpl implements IMapService {
     }
 
     /**
-     * 获取全量地区列表, 缓存预热方案，先预热所有的城市到缓存中，有的话直接返回了，没有再去查数据库
+     * 获取全量地区列表<br>
+     * 缓存预热方案，先预热所有的城市到缓存中，有的话直接返回了，没有再去查数据库
      *
      * @return 全量地区列表
      */
@@ -239,10 +243,15 @@ public class MapServiceImpl implements IMapService {
         List<SysRegionDTO> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
         }, caffeineCache);
         if (resultDTO == null) {
-            log.warn("缓存中无数据, resultDTO: {}", resultDTO);
+            log.warn("缓存中无数据, resultDTO: {}", (Object) null);
             return getCityListV1();
         }
-        return resultDTO;
+        return TreeUtil.build(
+                resultDTO,
+                SysRegionDTO::getId,
+                SysRegionDTO::getParentId,
+                SysRegionDTO::getChildren,
+                SysRegionDTO::setChildren);
     }
 
     /**
@@ -252,9 +261,8 @@ public class MapServiceImpl implements IMapService {
      */
     @Override
     public Map<String, List<SysRegionDTO>> getCityPylist() {
-        Map<String, List<SysRegionDTO>> resultDTO = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_PINYIN_KEY, new TypeReference<Map<String, List<SysRegionDTO>>>() {
+        return CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_PINYIN_KEY, new TypeReference<Map<String, List<SysRegionDTO>>>() {
         }, caffeineCache);
-        return resultDTO;
     }
 
     /**
@@ -274,18 +282,23 @@ public class MapServiceImpl implements IMapService {
         if (resultRegions != null) {
             return resultRegions;
         }
-        // 3 如果说没查询到，则从数据库中查询
+        // 如果说没查询到，就从数据库中查询
         List<SysRegion> list = regionMapper.selectAllRegion();
         List<SysRegionDTO> result = new ArrayList<>();
         for (SysRegion sysRegion : list) {
-            // 判断父节点不为空，并且父节点是符合的才返回
-            if (sysRegion.getParentId() != null && sysRegion.getParentId().equals(parentId)) {
-                SysRegionDTO sysRegionDTO = new SysRegionDTO();
-                BeanCopyUtil.copyProperties(sysRegion, sysRegionDTO);
-                result.add(sysRegionDTO);
+            // 如果 parentId 为 null，返回顶级节点（parentId 为 null 的数据）
+            if (parentId == null) {
+                if (sysRegion.getParentId() == null) {
+                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO::new));
+                }
+            } else {
+                // 判断父节点不为空，并且父节点是符合的才返回
+                if (sysRegion.getParentId() != null && sysRegion.getParentId().equals(parentId)) {
+                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO::new));
+                }
             }
         }
-        // 4 设置缓存
+        // 设置缓存
         CacheUtil.setL2Cache(redisService, key, result, caffeineCache, 120L, TimeUnit.MINUTES);
         return result;
     }
@@ -363,30 +376,79 @@ public class MapServiceImpl implements IMapService {
      */
     @Override
     public RegionCityDTO getCityByLocation(LocationReqDTO locationReqDTO) {
-        // 构建腾讯地图经纬度请求参数
+        // 构建腾讯地图请求参数
         LocationDTO locationDTO = new LocationDTO();
         BeanCopyUtil.copyProperties(locationReqDTO, locationDTO);
-        // 调用腾讯地图接口
+
+        // 调用腾讯地图
         GeoResultDTO geoResultDTO = iMapProvider.getQQMapDistrictByLonLat(locationDTO);
-        RegionCityDTO result = new RegionCityDTO();
-        // 拿到这个城市所有的信息之后，进行对象转换
-        if (geoResultDTO != null && geoResultDTO.getResult() != null && geoResultDTO.getResult().getAd_info() != null) {
-            String cityName = geoResultDTO.getResult().getAd_info().getCity();
-            // 查缓存看看有没有这个城市
-            // 获取缓存中所有的城市列表
-            List<SysRegionDTO> cacheCityS = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
-            }, caffeineCache);
-            // 获取成功直接查
-            if (cacheCityS != null) {
-                for (SysRegionDTO sysRegionDTO : cacheCityS) {
-                    // 然后比较
-                    if (sysRegionDTO.getFullName().equals(cityName)) {
-                        BeanCopyUtil.copyProperties(sysRegionDTO, result);
-                        return result;
-                    }
-                }
-            }
+
+        String cityName =
+                        geoResultDTO != null &&
+                        geoResultDTO.getStatus() == 0 &&
+                        geoResultDTO.getResult() != null &&
+                        geoResultDTO.getResult().getAd_info() != null ?
+                        geoResultDTO.getResult().getAd_info().getCity() :
+                        null;
+
+        // 如果没有获取到城市名称，则返回默认城市
+        if (cityName == null) {
+            log.warn("经纬度获取城市名称失败，使用默认城市。lat: {}, lng: {}", locationReqDTO.getLat(), locationReqDTO.getLng());
+            return buildDefaultCity();
         }
+
+        // 获取城市缓存
+        List<SysRegionDTO> cityList = getCityListFromCache();
+
+        // 说明数据库中没有城市信息，则返回默认城市
+        if (CollectionUtils.isEmpty(cityList)) {
+            log.warn("数据库中没有城市信息，使用默认城市，geoResultDTO: {}", JsonUtil.classToJson(geoResultDTO));
+            return buildDefaultCity();
+        }
+
+        // 查找城市
+        return cityList.stream()
+                .filter(city -> cityName.equals(city.getFullName()))
+                .findFirst()
+                .map(city -> {
+                    RegionCityDTO result = new RegionCityDTO();
+                    BeanCopyUtil.copyProperties(city, result);
+                    return result;
+                })
+                .orElseGet(this::buildDefaultCity);
+    }
+
+    /**
+     * 获取城市列表缓存
+     *
+     * @return 城市列表缓存
+     */
+    private List<SysRegionDTO> getCityListFromCache() {
+        // 先从缓存中查询，看看有没有
+        List<SysRegionDTO> cityList = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
+        }, caffeineCache);
+
+        // 没有的话，就去数据库里面查，然后再放到缓存里面，再把缓存里面的数据返回
+        if (cityList == null) {
+            log.info("缓存中没有城市列表，从数据库加载");
+            initCityMap();
+
+            cityList = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, new TypeReference<List<SysRegionDTO>>() {
+            }, caffeineCache);
+        }
+        return cityList;
+    }
+
+    /**
+     * 构建默认城市
+     *
+     * @return 默认城市
+     */
+    private RegionCityDTO buildDefaultCity() {
+        RegionCityDTO result = new RegionCityDTO();
+        result.setId(1L);
+        result.setName("北京");
+        result.setFullName("北京市");
         return result;
     }
 }

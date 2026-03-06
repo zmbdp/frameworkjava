@@ -36,9 +36,9 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/deploy/test/app/config/cert/ca.pem
-/deploy/test/app/config/cert/cert.pem
-/deploy/test/app/config/cert/key.pem
+/**/ca.pem
+/**/cert.pem
+/**/key.pem
 /PROJECT_STRUCTURE_DETAILED.md
 /logs/
 /**/apache-skywalking-java-agent-9.5.0/

@@ -12,7 +12,7 @@ log:
   # true: 即使没有 @LogAction 注解的方法，也记录基本信息（异常堆栈、方法耗时、traceId、调用链等）
   # false: 只记录带 @LogAction 注解的方法
   # 注意：全局默认记录只记录基本信息，不记录参数和返回值
-  global-record-enabled: false
+  global-record-enabled: true
 
   # 日志存储类型（console/database/file/redis/mq，默认：console）
   # console: 输出到控制台/日志文件（SLF4J），默认方式，无需额外配置
@@ -25,8 +25,8 @@ log:
 
   # 文件存储配置（当 storage-type=file 时生效）
   file:
-    # 日志文件路径（默认：./logs/operation.log）
-    path: ./logs/operation.log
+    # 日志文件路径（默认：./logs/operation/）
+    path: ./logs/operation/
 
   # Redis 存储配置（当 storage-type=redis 时生效）
   redis:
@@ -61,3 +61,11 @@ log:
     # false: 默认不抛出异常，仅记录日志，适合非关键业务操作
     # 建议：生产环境 true（保证业务逻辑正确），特殊场景可设置为 false
     throw-exception: true
+
+# ==================== 日志配置（关联 TraceId）====================
+# 这⼀配置用于定义应用在控制台输出日志时所遵循的格式规则
+logging:
+  level:
+    com.zmbdp.common.log.service.impl: debug
+    com.zmbdp.common.log.mq: debug
+    com.zmbdp..mapper: debug

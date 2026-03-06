@@ -1,7 +1,7 @@
 package com.zmbdp.common.datapermission.utils;
 
 import com.zmbdp.common.datapermission.enums.DataPermissionType;
-import com.zmbdp.common.datapermission.handler.DataPermissionContext;
+import com.zmbdp.common.datapermission.context.DataPermissionContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
