@@ -2,6 +2,8 @@ package com.zmbdp.admin.api.map.domain.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 区域信息 VO
  *
@@ -49,4 +51,9 @@ public class RegionVO {
      * 纬度
      */
     private Double latitude;
+
+    /**
+     * 子集区域列表
+     */
+    private List<RegionVO> children;
 }
