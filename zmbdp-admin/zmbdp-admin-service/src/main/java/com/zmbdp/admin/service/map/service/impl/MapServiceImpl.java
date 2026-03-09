@@ -100,7 +100,7 @@ public class MapServiceImpl implements IMapService {
      */
     private void loadCityInfo(List<SysRegion> cityList) {
         // 先对象转换城 DTO
-        List<SysRegionDTO> result = BeanCopyUtil.copyListProperties(cityList, SysRegionDTO::new);
+        List<SysRegionDTO> result = BeanCopyUtil.copyListProperties(cityList, SysRegionDTO.class);
         CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, result, caffeineCache, 120L, TimeUnit.MINUTES);
     }
 
@@ -111,7 +111,7 @@ public class MapServiceImpl implements IMapService {
      */
     private void loadCityPinyinInfo(List<SysRegion> cityList) {
         // 先对象转换城 DTO
-        List<SysRegionDTO> result = BeanCopyUtil.copyListProperties(cityList, SysRegionDTO::new);
+        List<SysRegionDTO> result = BeanCopyUtil.copyListProperties(cityList, SysRegionDTO.class);
         // 然后从 DTO 中获取拼音首字母，创建 A - Z 分类
         Map<String, List<SysRegionDTO>> map = new LinkedHashMap<>();
         for (SysRegionDTO sysRegionDTO : result) {
@@ -152,7 +152,7 @@ public class MapServiceImpl implements IMapService {
                 sysRegionList.add(sysRegion);
             }
         }
-        List<SysRegionDTO> hotCityList = BeanCopyUtil.copyListProperties(sysRegionList, SysRegionDTO::new);
+        List<SysRegionDTO> hotCityList = BeanCopyUtil.copyListProperties(sysRegionList, SysRegionDTO.class);
         // 设置缓存
         CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_HOT_CITY, hotCityList, caffeineCache, 120L, TimeUnit.MINUTES);
     }
@@ -181,7 +181,7 @@ public class MapServiceImpl implements IMapService {
             // 查数据库
             List<SysRegion> list = regionMapper.selectAllRegion();
             // 拷贝成 dto 返回
-            resultDTO = BeanCopyUtil.copyListProperties(list, SysRegionDTO::new);
+            resultDTO = BeanCopyUtil.copyListProperties(list, SysRegionDTO.class);
             // 然后再存储到缓存中
             CacheUtil.setL2Cache(redisService, MapConstants.CACHE_MAP_CITY_KEY, resultDTO, caffeineCache, 120L, TimeUnit.MINUTES);
             return resultDTO;
@@ -251,7 +251,8 @@ public class MapServiceImpl implements IMapService {
                 SysRegionDTO::getId,
                 SysRegionDTO::getParentId,
                 SysRegionDTO::getChildren,
-                SysRegionDTO::setChildren);
+                SysRegionDTO::setChildren
+        );
     }
 
     /**
@@ -261,6 +262,12 @@ public class MapServiceImpl implements IMapService {
      */
     @Override
     public Map<String, List<SysRegionDTO>> getCityPylist() {
+        Map<String, List<SysRegionDTO>> result = CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_PINYIN_KEY, new TypeReference<Map<String, List<SysRegionDTO>>>() {
+        }, caffeineCache);
+        if (result != null) {
+            return result;
+        }
+        loadCityPinyinInfo(BeanCopyUtil.copyListProperties(getCityListFromCache(), SysRegion.class));
         return CacheUtil.getL2Cache(redisService, MapConstants.CACHE_MAP_CITY_PINYIN_KEY, new TypeReference<Map<String, List<SysRegionDTO>>>() {
         }, caffeineCache);
     }
@@ -289,12 +296,12 @@ public class MapServiceImpl implements IMapService {
             // 如果 parentId 为 null，返回顶级节点（parentId 为 null 的数据）
             if (parentId == null) {
                 if (sysRegion.getParentId() == null) {
-                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO::new));
+                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO.class));
                 }
             } else {
                 // 判断父节点不为空，并且父节点是符合的才返回
                 if (sysRegion.getParentId() != null && sysRegion.getParentId().equals(parentId)) {
-                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO::new));
+                    result.add(BeanCopyUtil.copyProperties(sysRegion, SysRegionDTO.class));
                 }
             }
         }
@@ -383,13 +390,12 @@ public class MapServiceImpl implements IMapService {
         // 调用腾讯地图
         GeoResultDTO geoResultDTO = iMapProvider.getQQMapDistrictByLonLat(locationDTO);
 
-        String cityName =
-                        geoResultDTO != null &&
-                        geoResultDTO.getStatus() == 0 &&
-                        geoResultDTO.getResult() != null &&
-                        geoResultDTO.getResult().getAd_info() != null ?
-                        geoResultDTO.getResult().getAd_info().getCity() :
-                        null;
+        String cityName = geoResultDTO != null &&
+                geoResultDTO.getStatus() == 0 &&
+                geoResultDTO.getResult() != null &&
+                geoResultDTO.getResult().getAd_info() != null ?
+                geoResultDTO.getResult().getAd_info().getCity() :
+                null;
 
         // 如果没有获取到城市名称，则返回默认城市
         if (cityName == null) {
@@ -410,11 +416,7 @@ public class MapServiceImpl implements IMapService {
         return cityList.stream()
                 .filter(city -> cityName.equals(city.getFullName()))
                 .findFirst()
-                .map(city -> {
-                    RegionCityDTO result = new RegionCityDTO();
-                    BeanCopyUtil.copyProperties(city, result);
-                    return result;
-                })
+                .map(city -> BeanCopyUtil.copyProperties(city, RegionCityDTO.class))
                 .orElseGet(this::buildDefaultCity);
     }
 

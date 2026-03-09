@@ -63,7 +63,7 @@ public class SysUserController {
     @PostMapping("/list")
     public Result<List<SysUserVO>> getUserList(@RequestBody SysUserListReqDTO sysUserListReqDTO) {
         List<SysUserDTO> sysUserDTOS = sysUserService.getUserList(sysUserListReqDTO);
-        List<SysUserVO> result = BeanCopyUtil.copyListProperties(sysUserDTOS, SysUserVO::new);
+        List<SysUserVO> result = BeanCopyUtil.copyListProperties(sysUserDTOS, SysUserVO.class);
         return Result.success(result);
     }
 

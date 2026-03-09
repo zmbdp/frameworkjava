@@ -98,7 +98,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
         );
         // 类型转换成返回的数据
         // 先拷贝 data 里面的数据
-        List<DictionaryTypeVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryTypeVO::new);
+        List<DictionaryTypeVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryTypeVO.class);
         // 然后外面的公共数据先 set 进去
         result.setTotals((int) page.getTotal());
         result.setTotalPages((int) page.getPages());
@@ -208,7 +208,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 queryWrapper
         );
         // 然后再构建返回参数
-        List<DictionaryDataVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVO::new);
+        List<DictionaryDataVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), DictionaryDataVO.class);
         result.setTotals((int) page.getTotal());
         result.setTotalPages((int) page.getPages());
         result.setList(list);
@@ -272,7 +272,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                         .eq(SysDictionaryData::getTypeKey, typeKey)
         );
         // 然后直接 BeanCopy 转换
-        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO.class);
     }
 
     /**
@@ -291,7 +291,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                 new LambdaQueryWrapper<SysDictionaryData>()
                         .in(SysDictionaryData::getTypeKey, typeKeys)
         );
-        List<DictionaryDataDTO> dtoList = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        List<DictionaryDataDTO> dtoList = BeanCopyUtil.copyListProperties(list, DictionaryDataDTO.class);
         Map<String, List<DictionaryDataDTO>> result = new LinkedHashMap<>();
         // 然后再循环分组
         for (DictionaryDataDTO dictionaryDataDTO : dtoList) {
@@ -319,7 +319,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                         .eq(SysDictionaryData::getDataKey, dataKey)
         );
         // 对象转换
-        return BeanCopyUtil.copyProperties(dictionaryData, DictionaryDataDTO::new);
+        return BeanCopyUtil.copyProperties(dictionaryData, DictionaryDataDTO.class);
     }
 
     /**
@@ -339,6 +339,6 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
                         .in(SysDictionaryData::getDataKey, dataKeys)
         );
         // 然后直接转换对象
-        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO::new);
+        return BeanCopyUtil.copyListProperties(list, DictionaryDataDTO.class);
     }
 }
