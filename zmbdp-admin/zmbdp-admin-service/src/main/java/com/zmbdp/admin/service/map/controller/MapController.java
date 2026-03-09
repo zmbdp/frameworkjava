@@ -14,6 +14,7 @@ import com.zmbdp.common.core.utils.BeanCopyUtil;
 import com.zmbdp.common.domain.domain.Result;
 import com.zmbdp.common.domain.domain.dto.BasePageDTO;
 import com.zmbdp.common.domain.domain.vo.BasePageVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ import java.util.Map;
  *
  * @author 稚名不带撇
  */
+@Slf4j
 @RestController
 @RequestMapping("/map")
 public class MapController implements MapServiceApi {
@@ -47,7 +49,7 @@ public class MapController implements MapServiceApi {
     public Result<List<RegionVO>> getCityList() {
         // 先用 dto 接收
         List<SysRegionDTO> cityListDTO = mapService.getCityList();
-        // 再 copy 成 vo
+        // 再 copy 成 vo (要深拷贝，里面有复杂泛型)
         List<RegionVO> result = BeanCopyUtil.copyListProperties(cityListDTO, RegionVO::new);
         return Result.success(result);
     }
@@ -61,10 +63,14 @@ public class MapController implements MapServiceApi {
     public Result<Map<String, List<RegionVO>>> getCityPyList() {
         // 先用 dto 接收
         Map<String, List<SysRegionDTO>> pinyinList = mapService.getCityPylist();
+        if (pinyinList == null) {
+            log.error("获取城市列表失败");
+            return Result.success();
+        }
         // 再 copy 成 vo
         Map<String, List<RegionVO>> result = new LinkedHashMap<>();
         for (Map.Entry<String, List<SysRegionDTO>> entry : pinyinList.entrySet()) {
-            result.put(entry.getKey(), BeanCopyUtil.copyListProperties(entry.getValue(), RegionVO::new));
+            result.put(entry.getKey(), BeanCopyUtil.copyListProperties(entry.getValue(), RegionVO.class));
         }
         return Result.success(result);
     }
@@ -78,7 +84,11 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<List<RegionVO>> regionChildren(Long parentId) {
         List<SysRegionDTO> regionDTOS = mapService.getRegionChildren(parentId);
-        List<RegionVO> result = BeanCopyUtil.copyListProperties(regionDTOS, RegionVO::new);
+        if (regionDTOS == null) {
+            log.error("获取子集区域列表失败");
+            return Result.success();
+        }
+        List<RegionVO> result = BeanCopyUtil.copyListProperties(regionDTOS, RegionVO.class);
         return Result.success(result);
     }
 
@@ -90,7 +100,11 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<List<RegionVO>> getHotCityList() {
         List<SysRegionDTO> hotCityListDTO = mapService.getHotCityList();
-        List<RegionVO> result = BeanCopyUtil.copyListProperties(hotCityListDTO, RegionVO::new);
+        if (hotCityListDTO == null) {
+            log.error("获取热门城市列表失败");
+            return Result.success();
+        }
+        List<RegionVO> result = BeanCopyUtil.copyListProperties(hotCityListDTO, RegionVO.class);
         return Result.success(result);
     }
 
@@ -103,6 +117,10 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<BasePageVO<SearchPoiVO>> searchSuggestOnMap(@Validated PlaceSearchReqDTO placeSearchReqDTO) {
         BasePageDTO<SearchPoiDTO> basePageReqDTO = mapService.searchSuggestOnMap(placeSearchReqDTO);
+        if (basePageReqDTO == null) {
+            log.error("根据关键词搜索失败");
+            return Result.success();
+        }
         BasePageVO<SearchPoiVO> result = new BasePageVO<>();
         BeanCopyUtil.copyProperties(basePageReqDTO, result);
         return Result.success(result);
@@ -117,6 +135,10 @@ public class MapController implements MapServiceApi {
     @Override
     public Result<RegionCityVO> locateCityByLocation(@Validated LocationReqDTO locationReqDTO) {
         RegionCityDTO regionCityDTO = mapService.getCityByLocation(locationReqDTO);
+        if (regionCityDTO == null) {
+            log.error("根据经纬度获取城市信息失败");
+            return Result.success();
+        }
         RegionCityVO result = new RegionCityVO();
         BeanCopyUtil.copyProperties(regionCityDTO, result);
         return Result.success(result);

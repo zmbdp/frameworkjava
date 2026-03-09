@@ -87,7 +87,7 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
                 queryWrapper
         );
         // 转换对象设置参数返回
-        List<ArgumentVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), ArgumentVO::new);
+        List<ArgumentVO> list = BeanCopyUtil.copyListProperties(page.getRecords(), ArgumentVO.class);
         BasePageVO<ArgumentVO> result = new BasePageVO<>();
         result.setTotals((int) page.getTotal());
         result.setTotalPages((int) page.getPages());
@@ -168,6 +168,6 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
                 new LambdaQueryWrapper<SysArgument>()
                         .in(SysArgument::getConfigKey, configKeys)
         );
-        return BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO::new);
+        return BeanCopyUtil.copyListProperties(sysArguments, ArgumentDTO.class);
     }
 }
