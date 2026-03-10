@@ -273,7 +273,7 @@ public class TreeUtil {
         // 从映射表中查找父节点
         T parentNode = nodeMap.get(parentId);
         if (parentNode != null) {
-            // 获取父节点的子节点列表（build方法已经初始化，不会为null）
+            // 获取父节点的子节点列表（build 方法已经初始化，不会为 null）
             List<T> children = childrenGetter.apply(parentNode);
 
             // 将当前节点添加到父节点的 children 列表中
@@ -377,9 +377,9 @@ public class TreeUtil {
         // 转换为 Map（ID -> 节点）
         return flatList.stream().collect(
                 Collectors.toMap(
-                        idGetter,              // key: 节点ID
-                        Function.identity(),   // value: 节点本身
-                        (o1, o2) -> o1        // 冲突处理：保留第一个
+                        idGetter, // key: 节点ID
+                        Function.identity(), // value: 节点本身
+                        (o1, o2) -> o1 // 冲突处理：保留第一个
                 )
         );
     }
@@ -1060,13 +1060,13 @@ public class TreeUtil {
      */
     public static <T> int getMaxDepth(List<T> tree, Function<T, List<T>> childrenGetter) {
         if (CollectionUtils.isEmpty(tree)) {
-            return 0; // 空树深度为0
+            return 0; // 空树深度为 0
         }
 
         // 遍历所有根节点，找出最大深度
         int maxDepth = 0;
         for (T node : tree) {
-            // 计算当前根节点的深度（根节点深度为1）
+            // 计算当前根节点的深度（根节点深度为 1）
             int depth = getMaxDepth(node, childrenGetter, 1);
             // 取所有根节点中的最大深度
             maxDepth = Math.max(maxDepth, depth);
@@ -1102,7 +1102,7 @@ public class TreeUtil {
         // 有子节点，递归计算所有子节点的最大深度
         int maxDepth = currentDepth;
         for (T child : children) {
-            // 递归计算子节点深度（深度+1）
+            // 递归计算子节点深度（深度 + 1）
             int depth = getMaxDepth(child, childrenGetter, currentDepth + 1);
             // 取最大值
             maxDepth = Math.max(maxDepth, depth);
@@ -1157,7 +1157,7 @@ public class TreeUtil {
             return 0;
         }
 
-        // 当前节点计数为1
+        // 当前节点计数为 1
         int count = 1;
 
         // 获取子节点列表
@@ -1292,14 +1292,14 @@ public class TreeUtil {
      * <p>
      * <b>层级说明：</b>
      * <ul>
-     *     <li>levels=1：返回根节点下面1层（子节点），不包括根节点</li>
-     *     <li>levels=2：返回根节点下面2层（子节点 + 孙节点），不包括根节点</li>
-     *     <li>levels=3：返回根节点下面3层（子节点 + 孙节点 + 曾孙节点），不包括根节点</li>
+     *     <li>levels = 1：返回根节点下面 1 层（子节点），不包括根节点</li>
+     *     <li>levels = 2：返回根节点下面 2 层（子节点 + 孙节点），不包括根节点</li>
+     *     <li>levels = 3：返回根节点下面 3 层（子节点 + 孙节点 + 曾孙节点），不包括根节点</li>
      * </ul>
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
-     * // 获取所有根节点下面2层（子节点 + 孙节点），不包括根节点
+     * // 获取所有根节点下面 2 层（子节点 + 孙节点），不包括根节点
      * List<MenuNode> subTree = TreeUtil.getSubTree(
      *     tree,
      *     MenuNode::getChildren,
@@ -1311,7 +1311,7 @@ public class TreeUtil {
      * @param tree           树形结构的根节点列表，可以为 null 或空列表
      * @param childrenGetter 获取子节点列表的函数，不能为 null
      * @param childrenSetter 设置子节点列表的函数，不能为 null
-     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param levels         往下的层级数（1 = 下面 1 层，2 = 下面 2 层，以此类推）
      * @param <T>            树节点类型
      * @return 指定层级的子孙节点列表（不包括根节点），如果 tree 为 null 或空则返回空列表
      */
@@ -1338,21 +1338,21 @@ public class TreeUtil {
     }
 
     /**
-     * 获取指定节点的子树（通过节点ID查找）
+     * 获取指定节点的子树（通过 节点ID 查找）
      * <p>
-     * 在整棵树中查找指定ID的节点，并返回该节点下面指定层级的子孙节点（不包括该节点本身）。<br>
+     * 在整棵树中查找 指定ID 的节点，并返回该节点下面指定层级的子孙节点（不包括该节点本身）。<br>
      * 常用于树形结构的懒加载和按需分页等场景。
      * <p>
      * <b>层级说明：</b>
      * <ul>
-     *     <li>levels=1：返回目标节点下面1层（子节点），不包括目标节点</li>
-     *     <li>levels=2：返回目标节点下面2层（子节点 + 孙节点），不包括目标节点</li>
-     *     <li>levels=3：返回目标节点下面3层（子节点 + 孙节点 + 曾孙节点），不包括目标节点</li>
+     *     <li>levels = 1：返回目标节点下面 1 层（子节点），不包括目标节点</li>
+     *     <li>levels = 2：返回目标节点下面 2 层（子节点 + 孙节点），不包括目标节点</li>
+     *     <li>levels = 3：返回目标节点下面 3 层（子节点 + 孙节点 + 曾孙节点），不包括目标节点</li>
      * </ul>
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
-     * // 获取 ID 为 1 的节点下面2层（子节点 + 孙节点），不包括节点1
+     * // 获取 ID 为 1 的节点下面 2 层（子节点 + 孙节点），不包括节点 1
      * List<MenuNode> subTree = TreeUtil.getSubTree(
      *     tree,
      *     MenuNode::getId,
@@ -1364,13 +1364,13 @@ public class TreeUtil {
      * }</pre>
      *
      * @param tree           树结构根节点列表，可为 null 或空
-     * @param idGetter       获取节点ID的方法，不能为null
-     * @param childrenGetter 获取子节点集合的方法，不能为null
-     * @param childrenSetter 设置子节点集合的方法，不能为null
+     * @param idGetter       获取 节点ID 的方法，不能为 null
+     * @param childrenGetter 获取子节点集合的方法，不能为 null
+     * @param childrenSetter 设置子节点集合的方法，不能为 null
      * @param nodeId         目标节点ID
-     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param levels         往下的层级数（1 = 下面 1 层，2 = 下面 2 层，以此类推）
      * @param <T>            树节点类型
-     * @param <ID>           节点ID类型
+     * @param <ID>           节点ID 类型
      * @return 目标节点下面指定层级的子孙节点列表（不包括目标节点），没找到则返回空列表
      */
     public static <T, ID> List<T> getSubTree(
@@ -1436,15 +1436,15 @@ public class TreeUtil {
      * <p>
      * <b>层级说明：</b>
      * <ul>
-     *     <li>levels=0：只保留当前节点，清空所有子节点</li>
-     *     <li>levels=1：保留当前节点及其直接子节点，清空孙节点</li>
-     *     <li>levels=2：保留当前节点、子节点、孙节点，清空曾孙节点</li>
+     *     <li>levels = 0：只保留当前节点，清空所有子节点</li>
+     *     <li>levels = 1：保留当前节点及其直接子节点，清空孙节点</li>
+     *     <li>levels = 2：保留当前节点、子节点、孙节点，清空曾孙节点</li>
      * </ul>
      *
      * @param node           当前节点
      * @param childrenGetter 获取子节点列表的函数
      * @param childrenSetter 设置子节点列表的函数
-     * @param levels         要保留的子节点层级数（0=不保留子节点，1=保留1层子节点，2=保留2层子孙节点）
+     * @param levels         要保留的子节点层级数（0 = 不保留子节点，1 = 保留 1 层子节点，2 = 保留 2 层子孙节点）
      * @param <T>            树节点类型
      * @return 指定层级的子树节点
      */
@@ -1459,7 +1459,7 @@ public class TreeUtil {
         // 获取当前节点的子节点列表
         List<T> children = childrenGetter.apply(node);
 
-        // 如果 levels=0，表示不保留任何子节点
+        // 如果 levels = 0，表示不保留任何子节点
         if (levels == 0) {
             childrenSetter.accept(node, new ArrayList<>());
             return node;
@@ -1470,7 +1470,7 @@ public class TreeUtil {
             List<T> subChildren = new ArrayList<>();
             for (T child : children) {
                 // 递归获取子节点的子树（层级减一）
-                // levels=1 时，子节点会收到 levels=0，表示子节点不再保留其子节点
+                // levels = 1 时，子节点会收到 levels = 0，表示子节点不再保留其子节点
                 T subChild = getSubTreeNode(child, childrenGetter, childrenSetter, levels - 1);
                 if (subChild != null) {
                     subChildren.add(subChild);
@@ -1708,7 +1708,7 @@ public class TreeUtil {
      * <p>
      * <b>使用示例：</b>
      * <pre>{@code
-     * // 获取所有根节点下面2层，不影响原始 tree
+     * // 获取所有根节点下面 2 层，不影响原始 tree
      * List<MenuNode> subTree = TreeUtil.getSubTreeSafe(
      *     tree,
      *     MenuNode::getChildren,
@@ -1722,7 +1722,7 @@ public class TreeUtil {
      * @param tree           树形结构的根节点列表，可以为 null 或空列表
      * @param childrenGetter 获取子节点列表的函数，不能为 null
      * @param childrenSetter 设置子节点列表的函数，不能为 null
-     * @param levels         往下的层级数（1=下面1层，2=下面2层，以此类推）
+     * @param levels         往下的层级数（1 = 下面 1 层，2 = 下面 2 层，以此类推）
      * @param nodeSupplier   节点对象的创建函数（例如：MenuNode::new），用于深拷贝，不能为 null
      * @param <T>            树节点类型
      * @return 指定层级的子孙节点列表（不包括根节点），如果 tree 为 null 或空则返回空列表

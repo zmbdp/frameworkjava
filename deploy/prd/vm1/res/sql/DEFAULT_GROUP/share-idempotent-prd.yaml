@@ -1,0 +1,23 @@
+# 幂等性配置
+idempotent:
+  # Redis Key 前缀（可选，默认值：idempotent:token:）
+  key-prefix: "idempotent:token:"
+
+  # Token 过期时间（秒，全局配置）
+  # 优先级：注解值 > 全局配置 > 默认值（300秒，即 5分钟）
+  # 建议根据业务场景设置，如支付场景可设置 1800（30分钟），查询场景可设置 300（5分钟）
+  expire-time: 300
+
+  # 是否启用强幂等模式（全局配置）
+  # true: 强幂等模式 - 重复请求返回第一次的结果
+  # false: 防重模式 - 重复请求直接报错（默认）
+  return-cached-result: false
+
+  # 强幂等模式：等待结果的最大重试次数（可选，默认值：30）
+  # 总等待时间 = max-retry-count × retry-interval-ms（默认：30 × 100ms = 3秒）
+  # 建议根据业务场景设置，高并发接口可适当减少重试次数，避免长时间阻塞
+  max-retry-count: 3
+
+  # 强幂等模式：每次重试的等待时间（毫秒，可选，默认值：100）
+  # 建议根据业务场景设置，业务执行时间较长的可适当增加等待时间
+  retry-interval-ms: 100

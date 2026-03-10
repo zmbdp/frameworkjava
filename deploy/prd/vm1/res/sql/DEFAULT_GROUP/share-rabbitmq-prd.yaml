@@ -1,0 +1,6 @@
+spring:
+  rabbitmq:
+    port: 5672
+    host: 你的云服务器1内网ip/你的虚拟机1内网ip:5673,你的云服务器2内网ip/你的虚拟机2内网ip:5673
+    username: zmbdp
+    password: Hf@173503494

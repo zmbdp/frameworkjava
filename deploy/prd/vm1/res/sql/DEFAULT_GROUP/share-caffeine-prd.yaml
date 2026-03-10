@@ -1,0 +1,8 @@
+caffeine:
+  build:
+    # 设置本地缓存初始容量
+    initial-capacity: 100
+    # 设置本地缓存最大容量
+    maximum-size: 1000
+    # 设置本地缓存过期时间 (秒)
+    expire: 30
