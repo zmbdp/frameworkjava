@@ -1,0 +1,12 @@
+# 数据权限配置（可选，不配置也能用）
+datapermission:
+  # 是否启用，默认 true
+  enabled: true
+  # 默认用户字段，默认 user_id
+  default-user-column: user_id
+  # 默认部门字段，默认 dept_id
+  default-dept-column: dept_id
+  # 默认租户字段，默认 tenant_id
+  default-tenant-column: tenant_id
+  # 是否启用多租户，默认 false
+  enable-tenant: true

@@ -1,0 +1,7 @@
+server:
+  port: 18083
+# 微信小程序
+wx:
+  applet:
+    app-id: # 微信小程序 appId
+    app-secret: # 微信小程序 appSecret
