@@ -1,0 +1,15 @@
+# redis 相关配置
+spring:
+  data:
+    redis:
+      password: Hf@173503494
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 5
+          min-idle: 0
+          max-wait: 5000
+      database: 0
+      cluster:
+        nodes: 你的云服务器1内网ip/你的虚拟机1内网ip:6380,你的云服务器1内网ip/你的虚拟机1内网ip:6381,你的云服务器1内网ip/你的虚拟机1内网ip:6382,你的云服务器2内网ip/你的虚拟机2内网ip:6383,你的云服务器2内网ip/你的虚拟机2内网ip:6384,你的云服务器2内网ip/你的虚拟机2内网ip:6385
+      connect-timeout: 5000

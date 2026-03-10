@@ -1,0 +1,7 @@
+server:
+  port: 18081
+
+appuser:
+  info:
+    # C端用户默认头像路径
+    defaultAvatar: # 你的阿里云OSS地址
