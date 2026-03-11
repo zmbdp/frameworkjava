@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * 基础功能测试控制器
@@ -113,7 +114,7 @@ public class TestController {
         region2.setParentId(0L);
         sourceMap.put("region2", region2);
 
-        // 使用BeanCopyUtil.copyMapProperties进行拷贝
+        // 使用 BeanCopyUtil.copyMapProperties 进行拷贝
         Map<String, User> resultMap = BeanCopyUtil.copyMapProperties(sourceMap, User.class);
 
         return Result.success(resultMap);
@@ -329,6 +330,593 @@ public class TestController {
         result.put("8_复杂对象_copyMapListProperties", data);
 
         return Result.success(result);
+    }
+
+    /**
+     * 测试带字段映射的所有新增 copyProperties 重载方法
+     * <p>
+     * 使用独立的 MappingSource / MappingTarget 对象，与上方深/浅拷贝测试对象完全隔离。<br>
+     * MappingSource.nickName（String）→ MappingTarget.displayName（String）<br>
+     * MappingSource.score（Integer）→ MappingTarget.point（Integer）<br>
+     * 其余同名字段（id、parentId、children）走普通拷贝。
+     */
+    @GetMapping("/testFieldMapping")
+    public Result<Map<String, Object>> testFieldMapping() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        // ==================== 构造测试数据 ====================
+        MappingSourceNode rootNode = new MappingSourceNode();
+        rootNode.setAge(18);
+        rootNode.setName("张三");
+
+        MappingSourceNode child1Node = new MappingSourceNode();
+        child1Node.setAge(20);
+        child1Node.setName("李四");
+
+        MappingSourceNode child2Node = new MappingSourceNode();
+        child2Node.setAge(25);
+        child2Node.setName("王五");
+
+        MappingSourceNode node2Node = new MappingSourceNode();
+        node2Node.setAge(30);
+        node2Node.setName("赵六");
+
+
+        MappingSource root = new MappingSource();
+        root.setId(1L);
+        root.setNickName("系统管理"); // nickName -> 映射到 displayName
+        root.setScore(100); // score    -> 映射到 point
+        root.setParentId(0L);
+        root.setSourceNode(rootNode);
+
+        MappingSourceChildren children1 = new MappingSourceChildren();
+        children1.setAge(10);
+        children1.setName("张三");
+
+        MappingSourceChildren children2 = new MappingSourceChildren();
+        children2.setAge(20);
+        children2.setName("王五");
+
+        MappingSource child1 = new MappingSource();
+        child1.setId(2L);
+        child1.setNickName("用户管理");
+        child1.setScore(90);
+        child1.setParentId(1L);
+        child1.setSourceNode(child1Node);
+
+        MappingSource child2 = new MappingSource();
+        child2.setId(3L);
+        child2.setNickName("角色管理");
+        child2.setScore(80);
+        child2.setParentId(1L);
+        child2.setSourceNode(child2Node);
+        root.setChildren(Arrays.asList(children1, children2));
+        root.setChildren1(Arrays.asList(child1, child2));
+
+        MappingSource node2 = new MappingSource();
+        node2.setId(10L);
+        node2.setNickName("日志管理");
+        node2.setScore(70);
+        node2.setParentId(0L);
+        node2.setSourceNode(node2Node);
+        node2.setChildren(Collections.singletonList(children2));
+        node2.setChildren1(Collections.singletonList(child2));
+
+        // ==================== 1. 单对象浅拷贝 + 字段映射（.class） ====================
+        MappingTarget shallow1 = BeanCopyUtil.copyProperties(root, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
+                        )
+                )
+        );
+        Map<String, Object> case1 = new LinkedHashMap<>();
+        case1.put("说明", "浅拷贝：nickName->displayName，score->point，children是引用拷贝");
+        case1.put("原nickName", root.getNickName());
+        case1.put("拷贝后_displayName（应=系统管理）", shallow1.getDisplayName());
+        case1.put("原score", root.getScore());
+        case1.put("拷贝后_point（应=100）", shallow1.getPoint());
+        result.put("1_单对象_浅拷贝_字段映射", case1);
+
+        // ==================== 2. 单对象深拷贝 + 字段映射（::new） ====================
+        MappingTarget deep1 = BeanCopyUtil.copyProperties(root, (Supplier<MappingTarget>) MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
+                        )
+                )
+        );
+        Map<String, Object> case2 = new LinkedHashMap<>();
+        case2.put("说明", "深拷贝：nickName->displayName，score->point，children被递归深拷贝");
+        case2.put("拷贝后_displayName（应=系统管理）", deep1.getDisplayName());
+        case2.put("拷贝后_point（应=100）", deep1.getPoint());
+        case2.put("拷贝后_children数量（应=2）", deep1.getChildren2() != null ? deep1.getChildren2().size() : 0);
+        result.put("2_单对象_深拷贝_字段映射", case2);
+
+        // ==================== 3. 单对象 source=null 测试 ====================
+        MappingTarget nullShallow = BeanCopyUtil.copyProperties(null, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+
+        );
+        MappingTarget nullDeep = BeanCopyUtil.copyProperties(null, (Supplier<MappingTarget>) MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case3 = new LinkedHashMap<>();
+        case3.put("说明", "source为null时应返回null");
+        case3.put("浅拷贝结果（应为null）", nullShallow);
+        case3.put("深拷贝结果（应为null）", nullDeep);
+        result.put("3_单对象_null_测试", case3);
+
+        // ==================== 4. 不传 mappings 退化为普通拷贝 ====================
+        MappingTarget noMapping = BeanCopyUtil.copyProperties(root, MappingTarget.class);
+        Map<String, Object> case4 = new LinkedHashMap<>();
+        case4.put("说明", "不传mappings时退化为普通拷贝，displayName/point应为null");
+        case4.put("拷贝后_displayName（应为null）", noMapping.getDisplayName());
+        case4.put("拷贝后_point（应为null）", noMapping.getPoint());
+        case4.put("拷贝后_id（应=1，同名字段正常拷贝）", noMapping.getId());
+        result.put("4_单对象_不传mappings退化", case4);
+
+        // ==================== 5. List 浅拷贝 + 字段映射（.class） ====================
+        List<MappingSource> sourceList = Arrays.asList(root, node2);
+        List<MappingTarget> shallowList = BeanCopyUtil.copyListProperties(sourceList, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case5 = new LinkedHashMap<>();
+        case5.put("说明", "List浅拷贝：每个元素的nickName->displayName，score->point");
+        case5.put("元素数量（应=2）", shallowList.size());
+        case5.put("第1个_displayName（应=系统管理）", shallowList.get(0).getDisplayName());
+        case5.put("第1个_point（应=100）", shallowList.get(0).getPoint());
+        case5.put("第2个_displayName（应=日志管理）", shallowList.get(1).getDisplayName());
+        case5.put("第2个_point（应=70）", shallowList.get(1).getPoint());
+        result.put("5_List_浅拷贝_字段映射", case5);
+
+        // ==================== 6. List 深拷贝 + 字段映射（::new） ====================
+        List<MappingTarget> deepList = BeanCopyUtil.copyListProperties(sourceList, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case6 = new LinkedHashMap<>();
+        case6.put("说明", "List深拷贝：children被深拷贝，nickName->displayName，score->point");
+        case6.put("元素数量（应=2）", deepList.size());
+        case6.put("第1个_displayName（应=系统管理）", deepList.get(0).getDisplayName());
+        case6.put("第1个_point（应=100）", deepList.get(0).getPoint());
+        case6.put("第1个_children数量（应=2）", deepList.get(0).getChildren2() != null ? deepList.get(0).getChildren2().size() : 0);
+        case6.put("第2个_displayName（应=日志管理）", deepList.get(1).getDisplayName());
+        result.put("6_List_深拷贝_字段映射", case6);
+
+        // ==================== 7. List source=null 测试 ====================
+        List<MappingTarget> nullList1 = BeanCopyUtil.copyListProperties(null, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        List<MappingTarget> nullList2 = BeanCopyUtil.copyListProperties(null, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case7 = new LinkedHashMap<>();
+        case7.put("说明", "List source为null时应返回空集合");
+        case7.put("浅拷贝结果_size（应=0）", nullList1.size());
+        case7.put("深拷贝结果_size（应=0）", nullList2.size());
+        result.put("7_List_null_测试", case7);
+
+        // ==================== 8. Map 浅拷贝 + 字段映射（.class） ====================
+        Map<String, MappingSource> sourceMap = new LinkedHashMap<>();
+        sourceMap.put("root", root);
+        sourceMap.put("node2", node2);
+        sourceMap.put("nullValue", null);
+        Map<String, MappingTarget> shallowMap = BeanCopyUtil.copyMapProperties(sourceMap, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case8 = new LinkedHashMap<>();
+        case8.put("说明", "Map浅拷贝：nickName->displayName，score->point，null value不报错");
+        case8.put("root_displayName（应=系统管理）", shallowMap.get("root") != null ? shallowMap.get("root").getDisplayName() : "null");
+        case8.put("root_point（应=100）", shallowMap.get("root") != null ? shallowMap.get("root").getPoint() : "null");
+        case8.put("node2_displayName（应=日志管理）", shallowMap.get("node2") != null ? shallowMap.get("node2").getDisplayName() : "null");
+        case8.put("nullValue_结果（应=非null空对象）", shallowMap.get("nullValue"));
+        result.put("8_Map_浅拷贝_字段映射", case8);
+
+        // ==================== 9. Map 深拷贝 + 字段映射（::new） ====================
+        Map<String, MappingTarget> deepMap = BeanCopyUtil.copyMapProperties(sourceMap, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case9 = new LinkedHashMap<>();
+        case9.put("说明", "Map深拷贝：children被深拷贝，nickName->displayName，score->point");
+        case9.put("root_displayName（应=系统管理）", deepMap.get("root") != null ? deepMap.get("root").getDisplayName() : "null");
+        case9.put("root_point（应=100）", deepMap.get("root") != null ? deepMap.get("root").getPoint() : "null");
+        case9.put("root_children数量（应=2）", deepMap.get("root") != null && deepMap.get("root").getChildren2() != null ? deepMap.get("root").getChildren2().size() : 0);
+        case9.put("node2_displayName（应=日志管理）", deepMap.get("node2") != null ? deepMap.get("node2").getDisplayName() : "null");
+        result.put("9_Map_深拷贝_字段映射", case9);
+
+        // ==================== 10. Map source=null 测试 ====================
+        Map<String, MappingTarget> nullMap1 = BeanCopyUtil.copyMapProperties(null, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, MappingTarget> nullMap2 = BeanCopyUtil.copyMapProperties(null, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case10 = new LinkedHashMap<>();
+        case10.put("说明", "Map source为null时应返回空Map");
+        case10.put("浅拷贝结果_size（应=0）", nullMap1.size());
+        case10.put("深拷贝结果_size（应=0）", nullMap2.size());
+        result.put("10_Map_null_测试", case10);
+
+        // ==================== 11. MapList 浅拷贝 + 字段映射（.class） ====================
+        Map<String, List<MappingSource>> sourceMapList = new LinkedHashMap<>();
+        sourceMapList.put("group1", Arrays.asList(root, node2));
+        sourceMapList.put("group2", Collections.singletonList(child1));
+        sourceMapList.put("emptyGroup", new ArrayList<>());
+        sourceMapList.put("nullGroup", null);
+        Map<String, List<MappingTarget>> shallowMapList = BeanCopyUtil.copyMapListProperties(sourceMapList, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case11 = new LinkedHashMap<>();
+        case11.put("说明", "MapList浅拷贝：nickName->displayName，score->point，空/null列表不报错");
+        case11.put("group1_size（应=2）", shallowMapList.get("group1") != null ? shallowMapList.get("group1").size() : 0);
+        case11.put("group1_第1个_displayName（应=系统管理）", shallowMapList.get("group1") != null && !shallowMapList.get("group1").isEmpty() ? shallowMapList.get("group1").get(0).getDisplayName() : "null");
+        case11.put("group1_第1个_point（应=100）", shallowMapList.get("group1") != null && !shallowMapList.get("group1").isEmpty() ? shallowMapList.get("group1").get(0).getPoint() : "null");
+        case11.put("emptyGroup_size（应=0）", shallowMapList.get("emptyGroup") != null ? shallowMapList.get("emptyGroup").size() : 0);
+        case11.put("nullGroup_size（应=0）", shallowMapList.get("nullGroup") != null ? shallowMapList.get("nullGroup").size() : 0);
+        result.put("11_MapList_浅拷贝_字段映射", case11);
+
+        // ==================== 12. MapList 深拷贝 + 字段映射（::new） ====================
+        Map<String, List<MappingTarget>> deepMapList = BeanCopyUtil.copyMapListProperties(sourceMapList, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case12 = new LinkedHashMap<>();
+        case12.put("说明", "MapList深拷贝：children被深拷贝，nickName->displayName，score->point");
+        case12.put("group1_size（应=2）", deepMapList.get("group1") != null ? deepMapList.get("group1").size() : 0);
+        case12.put("group1_第1个_displayName（应=系统管理）", deepMapList.get("group1") != null && !deepMapList.get("group1").isEmpty() ? deepMapList.get("group1").get(0).getDisplayName() : "null");
+        case12.put("group1_第1个_point（应=100）", deepMapList.get("group1") != null && !deepMapList.get("group1").isEmpty() ? deepMapList.get("group1").get(0).getPoint() : "null");
+        case12.put("group1_第1个_children数量（应=2）", deepMapList.get("group1") != null && !deepMapList.get("group1").isEmpty() && deepMapList.get("group1").get(0).getChildren2() != null ? deepMapList.get("group1").get(0).getChildren2().size() : 0);
+        case12.put("emptyGroup_size（应=0）", deepMapList.get("emptyGroup") != null ? deepMapList.get("emptyGroup").size() : 0);
+        case12.put("nullGroup_size（应=0）", deepMapList.get("nullGroup") != null ? deepMapList.get("nullGroup").size() : 0);
+        result.put("12_MapList_深拷贝_字段映射", case12);
+
+        // ==================== 13. MapList source=null 测试 ====================
+        Map<String, List<MappingTarget>> nullMapList1 = BeanCopyUtil.copyMapListProperties(null, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, List<MappingTarget>> nullMapList2 = BeanCopyUtil.copyMapListProperties(null, MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case13 = new LinkedHashMap<>();
+        case13.put("说明", "MapList source为null时应返回空Map");
+        case13.put("浅拷贝结果_size（应=0）", nullMapList1.size());
+        case13.put("深拷贝结果_size（应=0）", nullMapList2.size());
+        result.put("13_MapList_null_测试", case13);
+
+        // ==================== 14. 多字段映射同时生效 ====================
+        MappingTarget multiMapping = BeanCopyUtil.copyProperties(root, MappingTarget.class,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(MappingSource::getId, MappingTarget::setId),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren,
+                        MappingTarget::setChildren,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTargetChildren.class,
+                                BeanCopyUtil.mapping(MappingSourceChildren::getAge, MappingTargetChildren::setAge),
+                                BeanCopyUtil.mapping(MappingSourceChildren::getName, MappingTargetChildren::setName)
+                        )
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        MappingTarget multiMapping2 = BeanCopyUtil.copyProperties(root, (Supplier<MappingTarget>) MappingTarget::new,
+                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                BeanCopyUtil.mapping(MappingSource::getId, MappingTarget::setId),
+                BeanCopyUtil.mapping(
+                        MappingSource::getSourceNode,
+                        MappingTarget::setTargetNode,
+                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                ),
+                BeanCopyUtil.mapping(
+                        MappingSource::getChildren1,
+                        MappingTarget::setChildren2,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
+                                BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                        )
+                )
+        );
+        Map<String, Object> case14 = new LinkedHashMap<>();
+        case14.put("说明", "三个字段映射同时生效：nickName->displayName，score->point，id->id");
+        case14.put("displayName（应=系统管理）", multiMapping.getDisplayName());
+        case14.put("point（应=100）", multiMapping.getPoint());
+        case14.put("id（应=1）", multiMapping.getId());
+        result.put("14_多字段映射", case14);
+
+        return Result.success(result);
+    }
+
+    /**
+     * 字段映射测试用源对象
+     * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     */
+    @Data
+    public static class MappingSourceNode {
+        private Integer age;
+        private String name;
+    }
+
+    @Data
+    public static class MappingSourceChildren {
+        private Integer age;
+        private String name;
+        private List<MappingSourceChildren> children;
+    }
+
+    /**
+     * 字段映射测试用源对象
+     * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     */
+    @Data
+    public static class MappingSource {
+        private Long id;
+        private String nickName; // 对应 MappingTarget.displayName
+        private Integer score; // 对应 MappingTarget.point
+        private Long parentId;
+        private MappingSourceNode sourceNode;
+        private List<MappingSourceChildren> children;
+        private List<MappingSource> children1;
+    }
+
+    /**
+     * 字段映射测试用源对象
+     * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     */
+    @Data
+    public static class MappingTargetNode {
+        private Integer age;
+        private String name;
+    }
+
+    @Data
+    public static class MappingTargetChildren {
+        private Integer age;
+        private String name;
+        private List<MappingTargetChildren> children;
+    }
+
+    /**
+     * 字段映射测试用目标对象
+     * displayName、point 与源对象字段名不一致，用于验证 mapping 映射
+     */
+    @Data
+    public static class MappingTarget {
+        private Long id;
+        private String displayName;
+        private Integer point;
+        private Long parentId;
+        private MappingTargetNode targetNode;
+        private List<MappingTargetChildren> children;
+        private List<MappingTarget> children2;
     }
 
     /**
