@@ -361,7 +361,6 @@ public class TestController {
         node2Node.setAge(30);
         node2Node.setName("赵六");
 
-
         MappingSource root = new MappingSource();
         root.setId(1L);
         root.setNickName("系统管理"); // nickName -> 映射到 displayName
