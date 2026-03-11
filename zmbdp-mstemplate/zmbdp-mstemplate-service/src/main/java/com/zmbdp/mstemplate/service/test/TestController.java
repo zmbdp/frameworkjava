@@ -476,7 +476,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
 
@@ -493,7 +498,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -527,7 +537,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -554,7 +569,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -580,7 +600,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -596,7 +621,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -624,7 +654,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -650,7 +685,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -675,7 +715,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -691,7 +736,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -720,7 +770,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -747,7 +802,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -774,7 +834,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -790,7 +855,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -823,7 +893,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget.class,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
@@ -841,7 +916,12 @@ public class TestController {
                         MappingTarget::setChildren2,
                         list -> BeanCopyUtil.copyListProperties(list, MappingTarget::new,
                                 BeanCopyUtil.mapping(MappingSource::getNickName, MappingTarget::setDisplayName),
-                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint)
+                                BeanCopyUtil.mapping(MappingSource::getScore, MappingTarget::setPoint),
+                                BeanCopyUtil.mapping(
+                                        MappingSource::getSourceNode,
+                                        MappingTarget::setTargetNode,
+                                        sourceNode -> BeanCopyUtil.copyProperties(sourceNode, MappingTargetNode.class)
+                                )
                         )
                 )
         );
