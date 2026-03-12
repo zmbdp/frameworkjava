@@ -344,62 +344,117 @@ public class TestController {
     public Result<Map<String, Object>> testFieldMapping() {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        // ==================== 构造测试数据 ====================
-        MappingSourceNode rootNode = new MappingSourceNode();
-        rootNode.setAge(18);
-        rootNode.setName("张三");
+        // ==================== 构造测试数据（四层嵌套）====================
+        // 第4层（叶子节点）
+        MappingSource level4 = new MappingSource();
+        level4.setId(4L);
+        level4.setNickName("第4层-权限详情");
+        level4.setScore(10);
+        level4.setParentId(3L);
+        level4.setSourceNode(new MappingSourceNode());
+        level4.getSourceNode().setAge(14);
+        level4.getSourceNode().setName("L4节点");
+        level4.setChildren(new ArrayList<>());
+        level4.setChildren1(new ArrayList<>());
 
-        MappingSourceNode child1Node = new MappingSourceNode();
-        child1Node.setAge(20);
-        child1Node.setName("李四");
+        // 第3层
+        MappingSource level3 = new MappingSource();
+        level3.setId(3L);
+        level3.setNickName("第3层-权限管理");
+        level3.setScore(30);
+        level3.setParentId(2L);
+        level3.setSourceNode(new MappingSourceNode());
+        level3.getSourceNode().setAge(13);
+        level3.getSourceNode().setName("L3节点");
+        level3.setChildren(new ArrayList<>());
+        level3.setChildren1(Collections.singletonList(level4));
 
-        MappingSourceNode child2Node = new MappingSourceNode();
-        child2Node.setAge(25);
-        child2Node.setName("王五");
+        // 第2层
+        MappingSource level2 = new MappingSource();
+        level2.setId(2L);
+        level2.setNickName("第2层-用户管理");
+        level2.setScore(60);
+        level2.setParentId(1L);
+        level2.setSourceNode(new MappingSourceNode());
+        level2.getSourceNode().setAge(12);
+        level2.getSourceNode().setName("L2节点");
+        level2.setChildren(new ArrayList<>());
+        level2.setChildren1(Collections.singletonList(level3));
 
-        MappingSourceNode node2Node = new MappingSourceNode();
-        node2Node.setAge(30);
-        node2Node.setName("赵六");
+        // 第2层（另一个子节点）
+        MappingSource level2b = new MappingSource();
+        level2b.setId(5L);
+        level2b.setNickName("第2层-角色管理");
+        level2b.setScore(55);
+        level2b.setParentId(1L);
+        level2b.setSourceNode(new MappingSourceNode());
+        level2b.getSourceNode().setAge(15);
+        level2b.getSourceNode().setName("L2b节点");
+        level2b.setChildren(new ArrayList<>());
+        level2b.setChildren1(new ArrayList<>());
 
+        // 第1层（根节点）
         MappingSource root = new MappingSource();
         root.setId(1L);
-        root.setNickName("系统管理"); // nickName -> 映射到 displayName
-        root.setScore(100); // score    -> 映射到 point
+        root.setNickName("第1层-系统管理");
+        root.setScore(100);
         root.setParentId(0L);
-        root.setSourceNode(rootNode);
+        root.setSourceNode(new MappingSourceNode());
+        root.getSourceNode().setAge(11);
+        root.getSourceNode().setName("L1节点");
+        // children 第3层（叶子）
+        MappingSourceChildren sc3a = new MappingSourceChildren();
+        sc3a.setAge(31);
+        sc3a.setName("子项C-1");
+        sc3a.setChildren(new ArrayList<>());
 
-        MappingSourceChildren children1 = new MappingSourceChildren();
-        children1.setAge(10);
-        children1.setName("张三");
+        MappingSourceChildren sc3b = new MappingSourceChildren();
+        sc3b.setAge(32);
+        sc3b.setName("子项C-2");
+        sc3b.setChildren(new ArrayList<>());
 
-        MappingSourceChildren children2 = new MappingSourceChildren();
-        children2.setAge(20);
-        children2.setName("王五");
+        // children 第3层（另一个分支的叶子）
+        MappingSourceChildren sc3c = new MappingSourceChildren();
+        sc3c.setAge(33);
+        sc3c.setName("子项D-1");
+        sc3c.setChildren(new ArrayList<>());
 
-        MappingSource child1 = new MappingSource();
-        child1.setId(2L);
-        child1.setNickName("用户管理");
-        child1.setScore(90);
-        child1.setParentId(1L);
-        child1.setSourceNode(child1Node);
+        // children 第2层
+        MappingSourceChildren sc2a = new MappingSourceChildren();
+        sc2a.setAge(21);
+        sc2a.setName("子项B-1");
+        sc2a.setChildren(Arrays.asList(sc3a, sc3b));
 
-        MappingSource child2 = new MappingSource();
-        child2.setId(3L);
-        child2.setNickName("角色管理");
-        child2.setScore(80);
-        child2.setParentId(1L);
-        child2.setSourceNode(child2Node);
-        root.setChildren(Arrays.asList(children1, children2));
-        root.setChildren1(Arrays.asList(child1, child2));
+        MappingSourceChildren sc2b = new MappingSourceChildren();
+        sc2b.setAge(22);
+        sc2b.setName("子项B-2");
+        sc2b.setChildren(Collections.singletonList(sc3c));
+
+        // children 第1层（root 的直接子项）
+        MappingSourceChildren sc1 = new MappingSourceChildren();
+        sc1.setAge(10);
+        sc1.setName("子项A");
+        sc1.setChildren(Arrays.asList(sc2a, sc2b));
+        sc1.setChildrenNode(new MappingSourceChildren());
+
+        MappingSourceChildren sc2 = new MappingSourceChildren();
+        sc2.setAge(20);
+        sc2.setName("子项B");
+        sc2.setChildren(Collections.singletonList(sc2a));
+
+        root.setChildren(Arrays.asList(sc1, sc2));
+        root.setChildren1(Arrays.asList(level2, level2b));
 
         MappingSource node2 = new MappingSource();
         node2.setId(10L);
         node2.setNickName("日志管理");
         node2.setScore(70);
         node2.setParentId(0L);
-        node2.setSourceNode(node2Node);
-        node2.setChildren(Collections.singletonList(children2));
-        node2.setChildren1(Collections.singletonList(child2));
+        node2.setSourceNode(new MappingSourceNode());
+        node2.getSourceNode().setAge(30);
+        node2.getSourceNode().setName("日志节点");
+        node2.setChildren(new ArrayList<>());
+        node2.setChildren1(Collections.singletonList(level2));
 
         // ==================== 1. 单对象浅拷贝 + 字段映射（.class） ====================
         MappingTarget shallow1 = BeanCopyUtil.copyProperties(root, MappingTarget.class,
@@ -514,6 +569,7 @@ public class TestController {
 
         // ==================== 4. 不传 mappings 退化为普通拷贝 ====================
         MappingTarget noMapping = BeanCopyUtil.copyProperties(root, MappingTarget.class);
+        MappingTarget noMapping2 = BeanCopyUtil.copyProperties(root, MappingTarget::new);
         Map<String, Object> case4 = new LinkedHashMap<>();
         case4.put("说明", "不传mappings时退化为普通拷贝，displayName/point应为null");
         case4.put("拷贝后_displayName（应为null）", noMapping.getDisplayName());
@@ -753,7 +809,7 @@ public class TestController {
         // ==================== 11. MapList 浅拷贝 + 字段映射（.class） ====================
         Map<String, List<MappingSource>> sourceMapList = new LinkedHashMap<>();
         sourceMapList.put("group1", Arrays.asList(root, node2));
-        sourceMapList.put("group2", Collections.singletonList(child1));
+        sourceMapList.put("group2", Collections.singletonList(level2));
         sourceMapList.put("emptyGroup", new ArrayList<>());
         sourceMapList.put("nullGroup", null);
         Map<String, List<MappingTarget>> shallowMapList = BeanCopyUtil.copyMapListProperties(sourceMapList, MappingTarget.class,
@@ -882,7 +938,7 @@ public class TestController {
                 BeanCopyUtil.mapping(
                         MappingSource::getChildren,
                         MappingTarget::setChildren,
-                        list -> BeanCopyUtil.copyListProperties(list, MappingTargetChildren.class,
+                        list -> BeanCopyUtil.copyListProperties(list, MappingTargetChildren.class, // children 里面有个 List，所以一定要深拷贝，不然只会拷贝一层
                                 BeanCopyUtil.mapping(MappingSourceChildren::getAge, MappingTargetChildren::setAge),
                                 BeanCopyUtil.mapping(MappingSourceChildren::getName, MappingTargetChildren::setName)
                         )
@@ -948,6 +1004,7 @@ public class TestController {
     public static class MappingSourceChildren {
         private Integer age;
         private String name;
+        private MappingSourceChildren childrenNode;
         private List<MappingSourceChildren> children;
     }
 
@@ -980,6 +1037,7 @@ public class TestController {
     public static class MappingTargetChildren {
         private Integer age;
         private String name;
+        private MappingTargetChildren childrenNode;
         private List<MappingTargetChildren> children;
     }
 
