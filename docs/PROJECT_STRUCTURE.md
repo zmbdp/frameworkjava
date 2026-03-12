@@ -6,33 +6,33 @@ FrameworkJava 采用模块化微服务架构，遵循 **API 与 Service 分离**
 
 ```
 frameworkjava/
-├── zmbdp-gateway/              # 网关服务
-├── zmbdp-common/               # 公共基础模块
-│   ├── zmbdp-common-cache/     # 缓存组件
-│   ├── zmbdp-common-core/      # 核心工具类
-│   ├── zmbdp-common-datapermission/ # 数据权限组件
-│   ├── zmbdp-common-domain/    # 领域模型
-│   ├── zmbdp-common-excel/     # Excel 处理
-│   ├── zmbdp-common-filter/    # 过滤器（布隆过滤器）
-│   ├── zmbdp-common-idempotent/# 幂等性组件
-│   ├── zmbdp-common-log/       # 操作日志组件
-│   ├── zmbdp-common-message/   # 消息服务
-│   ├── zmbdp-common-monitor/   # 监控组件
-│   ├── zmbdp-common-rabbitmq/  # 消息队列
-│   ├── zmbdp-common-ratelimit/ # 限流组件
-│   ├── zmbdp-common-redis/     # Redis 封装
-│   ├── zmbdp-common-security/  # 安全认证
-│   └── zmbdp-common-snowflake/ # 雪花算法
-├── zmbdp-admin/                # 基础服务
-│   ├── zmbdp-admin-api/        # API 接口定义
-│   └── zmbdp-admin-service/    # 服务实现
-├── zmbdp-portal/               # C 端服务
-│   ├── zmbdp-portal-api/       # API 接口定义
-│   └── zmbdp-portal-service/   # 服务实现
-├── zmbdp-file/                 # 文件服务
-│   ├── zmbdp-file-api/         # API 接口定义
-│   └── zmbdp-file-service/     # 服务实现
-└── zmbdp-mstemplate/           # 微服务模板
+├── zmbdp-gateway/                     # 网关服务
+├── zmbdp-common/                      # 公共基础模块
+│   ├── zmbdp-common-cache/            # 缓存组件
+│   ├── zmbdp-common-core/             # 核心工具类
+│   ├── zmbdp-common-datapermission/   # 数据权限组件
+│   ├── zmbdp-common-domain/           # 领域模型
+│   ├── zmbdp-common-excel/            # Excel 处理
+│   ├── zmbdp-common-filter/           # 过滤器（布隆过滤器）
+│   ├── zmbdp-common-idempotent/       # 幂等性组件
+│   ├── zmbdp-common-log/              # 操作日志组件
+│   ├── zmbdp-common-message/          # 消息服务
+│   ├── zmbdp-common-monitor/          # 监控组件
+│   ├── zmbdp-common-rabbitmq/         # 消息队列
+│   ├── zmbdp-common-ratelimit/        # 限流组件
+│   ├── zmbdp-common-redis/            # Redis 封装
+│   ├── zmbdp-common-security/         # 安全认证
+│   └── zmbdp-common-snowflake/        # 雪花算法
+├── zmbdp-admin/                       # 基础服务
+│   ├── zmbdp-admin-api/               # API 接口定义
+│   └── zmbdp-admin-service/           # 服务实现
+├── zmbdp-portal/                      # C 端服务
+│   ├── zmbdp-portal-api/              # API 接口定义
+│   └── zmbdp-portal-service/          # 服务实现
+├── zmbdp-file/                        # 文件服务
+│   ├── zmbdp-file-api/                # API 接口定义
+│   └── zmbdp-file-service/            # 服务实现
+└── zmbdp-mstemplate/                  # 微服务模板
 ```
 
 ## 模块职责说明
