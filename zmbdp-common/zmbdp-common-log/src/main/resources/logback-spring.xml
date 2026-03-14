@@ -7,7 +7,7 @@
     <!-- 控制台输出 -->
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %yellow([%X{traceId}]) %highlight(%-5level) %cyan([%thread]) %green(%logger{36}) : %highlight(%msg%n%ex)</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %yellow([%X{traceId}]) %highlight(%-5level) %green([%thread]) %boldMagenta(%logger{36}) : %msg%n%ex</pattern>
         </encoder>
     </appender>
 
