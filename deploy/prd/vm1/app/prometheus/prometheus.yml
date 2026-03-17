@@ -43,7 +43,7 @@ scrape_configs:
           application: 'gateway'
           instance: 'vm1'
           environment: 'prd'
-      - targets: [ 'vm2_ip:10030' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
+      - targets: [ '你的云服务器2内网ip/你的虚拟机2内网ip:10030' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
         labels:
           service: 'zmbdp-gateway'
           application: 'gateway'
@@ -60,7 +60,7 @@ scrape_configs:
           application: 'admin'
           instance: 'vm1'
           environment: 'prd'
-      - targets: [ 'vm2_ip:18081' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
+      - targets: [ '你的云服务器2内网ip/你的虚拟机2内网ip:18081' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
         labels:
           service: 'zmbdp-admin'
           application: 'admin'
@@ -77,7 +77,7 @@ scrape_configs:
           application: 'portal'
           instance: 'vm1'
           environment: 'prd'
-      - targets: [ 'vm2_ip:18083' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
+      - targets: [ '你的云服务器2内网ip/你的虚拟机2内网ip:18083' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
         labels:
           service: 'zmbdp-portal'
           application: 'portal'
@@ -94,7 +94,7 @@ scrape_configs:
           application: 'file'
           instance: 'vm1'
           environment: 'prd'
-      - targets: [ 'vm2_ip:18082' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 vm2_ip 为实际 IP
+      - targets: [ '你的云服务器2内网ip/你的虚拟机2内网ip:18082' ]  # vm2 容器（通过宿主机 IP + 映射端口），请替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
         labels:
           service: 'zmbdp-file'
           application: 'file'
@@ -109,7 +109,7 @@ scrape_configs:
           service: 'rabbitmq'
           node: 'rabbitmq01'
           instance: 'vm1'
-      - targets: [ 'vm2_ip:15673' ]  # vm2 RabbitMQ02（端口是15673），请替换 vm2_ip 为实际 IP
+      - targets: [ '你的云服务器2内网ip/你的虚拟机2内网ip:15673' ]  # vm2 RabbitMQ02（端口是15673），请替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
         labels:
           service: 'rabbitmq'
           node: 'rabbitmq02'
@@ -123,7 +123,7 @@ scrape_configs:
   #         service: 'mysql'
   #         role: 'master'
   #         instance: 'vm1'
-  #     - targets: ['vm2_ip:9105']  # vm2 从库，替换 vm2_ip 为实际 IP
+  #     - targets: ['你的云服务器2内网ip/你的虚拟机2内网ip:9105']  # vm2 从库，替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
   #       labels:
   #         service: 'mysql'
   #         role: 'slave'
@@ -137,17 +137,17 @@ scrape_configs:
   #         service: 'redis'
   #         node: 'redis'
   #         instance: 'vm1'
-  #     - targets: ['vm2_ip:9122']  # vm2 redis04，替换 vm2_ip 为实际 IP
+  #     - targets: ['你的云服务器2内网ip/你的虚拟机2内网ip:9122']  # vm2 redis04，替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
   #       labels:
   #         service: 'redis'
   #         node: 'redis04'
   #         instance: 'vm2'
-  #     - targets: ['vm2_ip:9123']  # vm2 redis05
+  #     - targets: ['你的云服务器2内网ip/你的虚拟机2内网ip:9123']  # vm2 redis05
   #       labels:
   #         service: 'redis'
   #         node: 'redis05'
   #         instance: 'vm2'
-  #     - targets: ['vm2_ip:9124']  # vm2 redis06
+  #     - targets: ['你的云服务器2内网ip/你的虚拟机2内网ip:9124']  # vm2 redis06
   #       labels:
   #         service: 'redis'
   #         node: 'redis06'
@@ -162,7 +162,7 @@ scrape_configs:
   #         service: 'nacos'
   #         node: 'nacos01'
   #         instance: 'vm1'
-  #     - targets: ['vm2_ip:8858']  # vm2 nacos03，替换 vm2_ip 为实际 IP
+  #     - targets: ['你的云服务器2内网ip/你的虚拟机2内网ip:8858']  # vm2 nacos03，替换 你的云服务器2内网ip/你的虚拟机2内网ip 为实际 IP
   #       labels:
   #         service: 'nacos'
   #         node: 'nacos03'

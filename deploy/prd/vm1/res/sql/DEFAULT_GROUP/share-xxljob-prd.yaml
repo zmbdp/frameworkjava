@@ -1,0 +1,21 @@
+# XXL-Job 执行器配置
+xxl:
+  job:
+    admin:
+      # 调度中心地址（多个地址用逗号分隔）
+      addresses: http://你的云服务器1内网ip/你的虚拟机1内网ip:8081/xxl-job-admin
+    executor:
+      # 执行器 AppName（需与调度中心配置一致）
+      appname: ${spring.application.name}-executor
+      # 执行器注册地址（为空则自动获取 IP）
+      address:
+      # 执行器 IP（为空则自动获取）
+      ip:
+      # 执行器端口（-1 则自动获取可用端口）
+      port: -1
+      # 访问令牌（需与调度中心配置一致）
+      accessToken: frameworkjava_prd
+      # 执行器日志路径
+      logpath: /data/applogs/xxl-job/executor
+      # 执行器日志保留天数（-1 永不清理）
+      logretentiondays: 30
