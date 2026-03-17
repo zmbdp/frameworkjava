@@ -9,12 +9,6 @@ bloom:
     falseProbability: 0.01
     # 布隆过滤器扩容阈值
     warningThreshold: 0.7
-    # 刷新布隆过滤器相关配置
-    refresh:
-      # 刷新布隆过滤器时间配置
-      cron: "0 0 4 * * ?"  # 每天凌晨四点执行一次
-      # 是否刷新布隆过滤器 true - 是; false - 否
-      enabled: true
     # 是否开启布隆过滤器阈值检查
     checkWarning: true
     # putAll 每批最多传输多少条数据（个人测试最大 7500 左右）

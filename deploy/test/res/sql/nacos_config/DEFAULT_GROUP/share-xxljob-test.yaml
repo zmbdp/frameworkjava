@@ -3,7 +3,9 @@ xxl:
   job:
     admin:
       # 调度中心地址（多个地址用逗号分隔）
-      addresses: http://你的云服务器内网ip/你的虚拟机内网ip:8081/xxl-job-admin
+      # 如果业务服务也跑在同一个 Docker Compose 网络里，用 http://xxl-job-admin:8080/xxl-job-admin
+      # 如果业务服务跑在宿主机或其他网络，就填内网 IP + 8081
+      addresses: http://xxl-job-admin:8080/xxl-job-admin
     executor:
       # 执行器 AppName（需与调度中心配置一致）
       appname: ${spring.application.name}-executor
@@ -19,3 +21,10 @@ xxl:
       logpath: /data/applogs/xxl-job/executor
       # 执行器日志保留天数（-1 永不清理）
       logretentiondays: 30
+
+# 布隆过滤器 XXL-Job 降级配置
+bloom:
+  filter:
+    fallback:
+      enabled: false
+      cron: 0 0 4 * * ?
