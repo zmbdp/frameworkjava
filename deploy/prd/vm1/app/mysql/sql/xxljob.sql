@@ -107,7 +107,7 @@ CREATE TABLE `xxl_job_group`
 (
     `id`           INT(11)     NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `app_name`     VARCHAR(64) NOT NULL COMMENT '执行器AppName',
-    `title`        VARCHAR(12) NOT NULL COMMENT '执行器名称',
+    `title`        VARCHAR(50) NOT NULL COMMENT '执行器名称',
     `address_type` TINYINT(4)  NOT NULL DEFAULT '0' COMMENT '执行器地址类型：0=自动注册、1=手动录入',
     `address_list` TEXT COMMENT '执行器地址列表，多地址逗号分隔',
     `update_time`  DATETIME DEFAULT NULL COMMENT '更新时间',
