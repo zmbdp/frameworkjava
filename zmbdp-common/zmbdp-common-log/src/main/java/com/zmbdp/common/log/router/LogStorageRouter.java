@@ -193,7 +193,7 @@ public class LogStorageRouter {
             if (applicationContext.containsBean(beanName)) {
                 return applicationContext.getBean(beanName, ILogStorageService.class);
             }
-            log.warn("存储服务 Bean 不存在，使用默认: storageType={}, beanName={}", storageType, beanName);
+            log.warn("存储服务 Bean 不存在，使用默认: storageType = {}, beanName = {}", storageType, beanName);
         } catch (Exception e) {
             log.warn("获取存储服务失败，使用默认: {}", e.getMessage());
         }

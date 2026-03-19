@@ -27,3 +27,12 @@ oss:
   minLen: 0
   # 上传到 oss对象存储 的文件最大限制 (字节)
   maxLen: 1073741824
+
+# XXL-Job 执行器端口覆盖
+# 每个服务使用独立端口，避免多服务本地同时运行时端口冲突
+# 需在 XShell 新增 Remote 隧道：0.0.0.0:9982 -> 127.0.0.1:9982
+xxl:
+  job:
+    executor:
+      port: 9982
+      address: http://host.docker.internal:9982

@@ -260,10 +260,10 @@ public class RateLimitAspect {
                 allowed = rateLimiter.tryAcquire(key, config.limit(), config.windowMs());
             } catch (Exception e) {
                 // Redis 连接异常等系统错误
-                log.error("RateLimit: 限流执行异常 key={}", key, e);
+                log.error("RateLimit: 限流执行异常 key = {}", key, e);
                 if (config.failOpen()) {
                     // 降级策略：失败放行（保证可用性）
-                    log.warn("RateLimit: Redis 异常，降级放行 key={}", key);
+                    log.warn("RateLimit: Redis 异常，降级放行 key = {}", key);
                     continue; // 跳过当前 key，继续下一个
                 } else {
                     // 默认策略：失败拒绝（保证安全性）
@@ -273,7 +273,7 @@ public class RateLimitAspect {
 
             if (!allowed) {
                 // 业务限流：触发限流（令牌桶：无可用令牌；滑动窗口：超过时间窗口内最大请求数）
-                log.info("RateLimit: 触发限流 key={} limit={} windowSec={}", key, config.limit(), config.windowSec());
+                log.info("RateLimit: 触发限流 key = {} limit = {} windowSec = {}", key, config.limit(), config.windowSec());
                 throw new ServiceException(config.message(), ResultCode.REQUEST_TOO_FREQUENT.getCode());
             }
         }
