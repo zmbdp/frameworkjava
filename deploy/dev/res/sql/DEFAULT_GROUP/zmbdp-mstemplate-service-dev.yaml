@@ -1,2 +1,11 @@
 server:
   port: 18085
+
+# XXL-Job 执行器端口覆盖
+# 每个服务使用独立端口，避免多服务本地同时运行时端口冲突
+# 需在 XShell 新增 Remote 隧道：0.0.0.0:9985 -> 127.0.0.1:9985
+xxl:
+  job:
+    executor:
+      port: 9985
+      address: http://host.docker.internal:9985

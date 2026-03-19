@@ -41,7 +41,7 @@ public class Consumer {
     public void listenerQueueIdempotent(MessageDTO messageDTO) {
         log.info("=== MQ幂等性消费者 - 收到消息: {} ===", messageDTO);
         // 模拟业务处理
-        log.info("业务处理完成：type={}, desc={}, token={}",
+        log.info("业务处理完成：type = {}, desc = {}, token = {}",
                 messageDTO.getType(), messageDTO.getDesc(), messageDTO.getIdempotentToken());
     }
 
@@ -64,7 +64,7 @@ public class Consumer {
             throw new ServiceException("模拟业务异常，Token会被删除，允许重试", ResultCode.ERROR.getCode());
         }
 
-        log.info("业务处理成功：type={}, desc={}, token={}",
+        log.info("业务处理成功：type = {}, desc = {}, token = {}",
                 messageDTO.getType(), messageDTO.getDesc(), messageDTO.getIdempotentToken());
     }
 
@@ -82,6 +82,6 @@ public class Consumer {
     public void listenerQueueIdempotentHeader(MessageDTO messageDTO, org.springframework.amqp.core.Message message) {
         log.info("=== MQ幂等性消费者（消息头方式） - 收到消息: {} ===", messageDTO);
         // 模拟业务处理
-        log.info("业务处理完成：type={}, desc={}", messageDTO.getType(), messageDTO.getDesc());
+        log.info("业务处理完成：type = {}, desc = {}", messageDTO.getType(), messageDTO.getDesc());
     }
 }

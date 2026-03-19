@@ -3,7 +3,7 @@ package com.zmbdp.admin.service.user.service.impl;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.AppUserListReqDTO;
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
-import com.zmbdp.admin.service.timedtask.bloom.ResetBloomFilterTimedTask;
+import com.zmbdp.admin.service.timedtask.bloom.ResetBloomFilterJobHandler;
 import com.zmbdp.admin.service.user.config.RabbitConfig;
 import com.zmbdp.admin.service.user.domain.entity.AppUser;
 import com.zmbdp.admin.service.user.mapper.AppUserMapper;
@@ -87,7 +87,7 @@ public class AppUserServiceImpl implements IAppUserService {
      * 重置布隆过滤器任务
      */
     @Autowired
-    private ResetBloomFilterTimedTask resetBloomFilterTimedTask;
+    private ResetBloomFilterJobHandler resetBloomFilterJobHandler;
 
     /**
      * 布隆过滤器预热
@@ -103,7 +103,7 @@ public class AppUserServiceImpl implements IAppUserService {
      */
     private void refreshAppUserBloomFilter() {
         log.info("布隆过滤器初始化开始 -----");
-        resetBloomFilterTimedTask.refreshAppUserBloomFilter();
+        resetBloomFilterJobHandler.refreshAppUserBloomFilter();
         log.info("布隆过滤器初始化结束 -----");
     }
 

@@ -896,7 +896,7 @@ public class RedisService {
         try {
             return redisTemplate.opsForValue().increment(key);
         } catch (Exception e) {
-            log.warn("RedisService.incr error: key={}", key, e);
+            log.warn("RedisService.incr error: key = {}", key, e);
             return -1L;
         }
     }
@@ -950,7 +950,7 @@ public class RedisService {
         try {
             return redisTemplate.opsForValue().increment(key, delta);
         } catch (Exception e) {
-            log.warn("RedisService.incr error: key={}", key, e);
+            log.warn("RedisService.incr error: key = {}", key, e);
             return -1L;
         }
     }

@@ -89,4 +89,3 @@ scrape_configs:
       - targets: [ 'frameworkjava-rabbit:15692' ]
         labels:
           service: 'rabbitmq'
-

@@ -30,6 +30,7 @@
         <module>zmbdp-common-log</module>
         <module>zmbdp-common-monitor</module>
         <module>zmbdp-common-datapermission</module>
+        <module>zmbdp-common-xxljob</module>
     </modules>
 
     <properties>

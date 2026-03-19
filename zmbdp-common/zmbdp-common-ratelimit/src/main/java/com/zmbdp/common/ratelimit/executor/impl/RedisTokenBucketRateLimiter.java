@@ -192,7 +192,7 @@ public class RedisTokenBucketRateLimiter implements RateLimiterExecutor {
                 String tokensStr = tokensObj.toString();
                 remainingTokens = Integer.parseInt(tokensStr);
             } catch (NumberFormatException e) {
-                log.warn("令牌桶剩余令牌数解析失败：key={}, tokens={}", key, tokensObj);
+                log.warn("令牌桶剩余令牌数解析失败：key = {}, tokens = {}", key, tokensObj);
             }
         }
 
