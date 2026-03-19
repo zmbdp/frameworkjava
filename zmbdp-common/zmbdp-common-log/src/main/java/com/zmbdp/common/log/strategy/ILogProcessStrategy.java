@@ -73,4 +73,3 @@ public interface ILogProcessStrategy {
      */
     String getType();
 }
-
