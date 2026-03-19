@@ -140,10 +140,10 @@ CREATE TABLE `xxl_job_lock`
 
 -- 初始化执行器（示例）
 INSERT INTO `xxl_job_group`(`id`, `app_name`, `title`, `address_type`, `address_list`, `update_time`)
-VALUES (1, 'zmbdp-admin-executor', 'Admin服务执行器', 0, NULL, NOW()),
-       (2, 'zmbdp-portal-executor', 'Portal服务执行器', 0, NULL, NOW()),
-       (3, 'zmbdp-file-executor', 'File服务执行器', 0, NULL, NOW()),
-       (4, 'zmbdp-mstemplate-executor', 'Template服务执行器', 0, NULL, NOW());
+VALUES(1, 'zmbdp-admin-service-executor', 'Admin服务执行器', 0, NULL, NOW()),
+       (2, 'zmbdp-portal-service-executor', '门户服务执行器', 0, NULL, NOW()),
+       (3, 'zmbdp-file-service-executor', '文件服务执行器', 0, NULL, NOW()),
+       (4, 'zmbdp-mstemplate-service-executor', '模板服务执行器', 0, NULL, NOW());
 
 -- 初始化示例任务（布隆过滤器重置任务）
 INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`,

@@ -1,25 +1,34 @@
 package com.zmbdp.admin.service.timedtask.bloom;
 
-import com.zmbdp.admin.service.user.domain.entity.AppUser;
-import com.zmbdp.admin.service.user.mapper.AppUserMapper;
-import com.zmbdp.common.bloomfilter.service.BloomFilterService;
-import com.zmbdp.common.domain.constants.BloomFilterConstants;
-import com.zmbdp.common.redis.service.RedissonLockService;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 /**
- * 重置布隆过滤器
+ * 布隆过滤器重置兜底任务（Spring Scheduled 降级方案）
+ *
+ * <p><b>架构说明：</b>
+ * 正常情况下，布隆过滤器重置由 XXL-Job 调度中心统一管理（参见 {@link ResetBloomFilterJobHandler}）。
+ * 本类作为 <b>降级兜底</b>：当 XXL-Job 调度中心不可用时，
+ * 通过将 {@code bloom.filter.fallback.enabled} 设为 {@code true} 启用本地定时任务，
+ * 保证布隆过滤器在任何情况下都能得到重置，不影响系统可用性。
+ *
+ * <p><b>默认行为：</b>禁用（由 XXL-Job 接管调度）。
+ *
+ * <p><b>开启方式：</b>在 Nacos 配置中心动态下发以下配置：
+ * <pre>
+ * bloom:
+ *   filter:
+ *     fallback:
+ *       enabled: true
+ *       cron: 0 0 4 * * ?
+ * </pre>
  *
  * @author 稚名不带撇
+ * @see ResetBloomFilterJobHandler XXL-Job 主调度 Handler
  */
 @Slf4j
 @Component
@@ -27,133 +36,33 @@ import java.util.concurrent.TimeUnit;
 public class ResetBloomFilterTimedTask {
 
     /**
-     * 用户前缀
-     */
-    private static final String APP_USER_PREFIX = BloomFilterConstants.APP_USER_PREFIX;
-
-    /**
-     * 用户手机号前缀
-     */
-    private static final String APP_USER_PHONE_NUMBER_PREFIX = BloomFilterConstants.APP_USER_PHONE_NUMBER_PREFIX;
-
-    /**
-     * 用户微信 ID 前缀
-     */
-    private static final String APP_USER_OPEN_ID_PREFIX = BloomFilterConstants.APP_USER_OPEN_ID_PREFIX;
-
-    /**
-     * 用户邮箱前缀
-     */
-    private static final String APP_USER_EMAIL_PREFIX = BloomFilterConstants.APP_USER_EMAIL_PREFIX;
-
-    /**
-     * 布隆过滤器锁 key
-     */
-    private static final String BLOOM_FILTER_TASK_LOCK = "bloom:filter:task:lock";
-
-    /**
-     * 布隆过滤器服务
+     * XXL-Job Handler（降级时委托给它执行，避免重复代码）
      */
     @Autowired
-    private BloomFilterService bloomFilterService;
+    private ResetBloomFilterJobHandler resetBloomFilterJobHandler;
 
     /**
-     * C端用户表
+     * 是否启用降级本地定时任务（默认 false，由 XXL-Job 接管）
      */
-    @Autowired
-    private AppUserMapper appUserMapper;
+    @Value("${bloom.filter.fallback.enabled:false}")
+    private boolean fallbackEnabled;
 
     /**
-     * Redisson 分布式锁服务
+     * 降级兜底定时任务
+     *
+     * <p>仅在 {@code bloom.filter.fallback.enabled=true} 时实际执行。
+     * CRON 支持通过 Nacos 动态刷新（@RefreshScope）。
      */
-    @Autowired
-    private RedissonLockService redissonLockService;
-
-    /**
-     * 是否启用布隆过滤器刷新任务
-     */
-    @Value("${bloom.filter.refresh.enabled:true}")
-    private boolean enabled;
-
-    /**
-     * 执行布隆过滤器刷新任务
-     * 清空当前布隆过滤器并将数据库中所有用户加密手机号和微信 ID 重新加载
-     */
-    @Scheduled(cron = "${bloom.filter.refresh.cron:0 0 4 * * ?}")
-    public void refreshBloomFilter() {
-        // 如果任务被禁用，则跳过执行
-        if (!enabled) {
-            log.info("布隆过滤器刷新任务已禁用，跳过执行");
+    @Scheduled(cron = "${bloom.filter.fallback.cron:0 0 4 * * ?}")
+    public void fallbackRefreshBloomFilter() {
+        if (!fallbackEnabled) {
             return;
         }
-
-        // 获取锁
-        RLock lock = redissonLockService.acquire(BLOOM_FILTER_TASK_LOCK, 10, TimeUnit.SECONDS);
-
-        if (null == lock) {
-            log.info("布隆过滤器刷新任务已获取锁失败，跳过执行");
-            return;
-        }
-        log.info("开始执行布隆过滤器刷新任务 =======================");
-
-        // 重置布隆过滤器
-        // 打印一下数量
-        log.info("布隆过滤器重置开始，当前数量为: {}", bloomFilterService.approximateElementCount());
-        bloomFilterService.reset();
-        log.info("布隆过滤器重置完成，当前数量为: {}", bloomFilterService.approximateElementCount());
-
+        log.warn("[Fallback] XXL-Job 降级模式激活：通过本地 Spring Scheduled 执行布隆过滤器重置");
         try {
-            // 刷新 C端用户的布隆过滤器
-            refreshAppUserBloomFilter();
-
-            log.info("布隆过滤器刷新任务执行完成 =======================");
+            resetBloomFilterJobHandler.resetBloomFilter();
         } catch (Exception e) {
-            log.error("布隆过滤器刷新任务执行失败 =======================", e);
-        } finally {
-            // 释放锁
-            redissonLockService.releaseLock(lock);
+            log.error("[Fallback] 布隆过滤器降级重置任务执行失败", e);
         }
-    }
-
-    /**
-     * 重置 C端用户的布隆过滤器
-     */
-    public void refreshAppUserBloomFilter() {
-        log.info("开始执行布隆过滤器刷新用户任务 -----------------------");
-        // 查询所有用户
-        List<AppUser> appUsers = appUserMapper.selectList(null);
-
-        log.info("从数据库加载到 {} 个用户", appUsers.size());
-
-        // 将所有用户加密手机号和微信 ID 添加到布隆过滤器中
-        int count = 0;
-        for (AppUser appUser : appUsers) {
-            // 添加加密手机号（如果存在）
-            if (appUser.getPhoneNumber() != null && !appUser.getPhoneNumber().isEmpty()) {
-                bloomFilterService.put(APP_USER_PHONE_NUMBER_PREFIX + appUser.getPhoneNumber());
-                count++;
-            }
-
-            // 添加微信 ID（如果存在）
-            if (appUser.getOpenId() != null && !appUser.getOpenId().isEmpty()) {
-                bloomFilterService.put(APP_USER_OPEN_ID_PREFIX + appUser.getOpenId());
-                count++;
-            }
-
-            // 添加邮箱（如果存在）
-            if (appUser.getEmail() != null && !appUser.getEmail().isEmpty()) {
-                bloomFilterService.put(APP_USER_EMAIL_PREFIX + appUser.getEmail());
-                count++;
-            }
-
-            // 添加用户 ID
-            bloomFilterService.put(APP_USER_PREFIX + appUser.getId());
-        }
-
-        if (count != appUsers.size()) {
-            log.warn("布隆过滤器刷新用户任务执行完成，但加载的用户数据数量( {} )与数据库用户数量( {} )不一致，请检查 -----------------------", count, appUsers.size());
-            return;
-        }
-        log.info("布隆过滤器刷新用户任务执行完成，共加载 {} 个用户数据 -----------------------", count);
     }
 }

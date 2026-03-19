@@ -2,18 +2,28 @@
 xxl:
   job:
     admin:
-      # 调度中心地址（多个地址用逗号分隔）
-      # 如果业务服务也跑在同一个 Docker Compose 网络里，用 http://xxl-job-admin:8080/xxl-job-admin
-      # 如果业务服务跑在宿主机或其他网络，就填内网 IP + 8081
-      addresses: http://xxl-job-admin:8080/xxl-job-admin
+      # 调度中心地址
+      # Dev 环境：组件在云服务器，服务在本地，通过 XShell 隧道连接
+      # XShell 需开启本地端口转发：Local 127.0.0.1:8081 -> 云服务器内网ip:8081
+      # 这样本地服务访问 127.0.0.1:8081 即可到达云服务器上的 XXL-Job 调度中心
+      addresses: http://127.0.0.1:8081/xxl-job-admin
     executor:
       # 执行器 AppName（需与调度中心配置一致）
       appname: ${spring.application.name}-executor
-      # 执行器注册地址（为空则自动获取 IP）
+      # 执行器注册地址：Dev 环境关键配置！
+      # 调度中心运行在 Docker 容器内，容器内的 127.0.0.1 是容器自身，不是宿主机
+      # host.docker.internal 已在 docker-compose extra_hosts 中配置，指向宿主机网关
+      # 链路：调度中心容器 -> host.docker.internal:{port} -> 宿主机XShell隧道 -> 本地{port} -> 执行器
+      # address 和 port 不在此处指定，由各服务自身的 Nacos 配置覆盖
+      # 例如在 zmbdp-xxx-service-dev.yaml 中添加：
+      #   xxl:
+      #     job:
+      #       executor:
+      #         port: 99xx
+      #         address: http://host.docker.internal:99xx
+      # 同时在 XShell 新增对应的 Remote 隧道：0.0.0.0:99xx -> 127.0.0.1:99xx
       address:
-      # 执行器 IP（为空则自动获取）
       ip:
-      # 执行器端口（-1 则自动获取可用端口）
       port: -1
       # 访问令牌（需与调度中心配置一致）
       accessToken: frameworkjava_dev

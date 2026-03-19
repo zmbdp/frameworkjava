@@ -49,3 +49,5 @@ spring:
             refresh: true # 配置是否支持动态刷新
           - data-id: share-monitor-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
             refresh: true # 配置是否支持动态刷新
+          - data-id: share-xxljob-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+            refresh: true # 配置是否支持动态刷新

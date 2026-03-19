@@ -1,4 +1,4 @@
-version: '3.8'
+﻿version: '3.8'
 #启动命令 docker compose -p frameworkjava -f docker-compose-mid.yml up -d
 services:
   frameworkjava-mysql:
@@ -267,6 +267,9 @@ services:
     volumes:
       - ../data/frameworkjavadata/xxljob/logs:/data/applogs
     restart: always
+    # Dev 环境：允许容器通过 host.docker.internal 访问宿主机（让调度中心能回调 XShell 隧道转发的本地端口）
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - frameworkjava_network_dev
     depends_on:
