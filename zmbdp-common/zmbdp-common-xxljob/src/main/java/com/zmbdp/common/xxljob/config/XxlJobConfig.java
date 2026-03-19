@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * XXL-Job 执行器自动配置
+ * XXL-JOB 执行器自动配置
  * <p>
  * 通过 Nacos 统一下发 xxl.job.* 配置，各服务无需重复编写执行器初始化代码。
  * 只需在 pom.xml 中引入 zmbdp-common-xxljob 依赖，并在 Nacos 共享配置中
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * xxl:
  *   job:
  *     admin:
- *       addresses: http://xxl-job-admin:8080/xxl-job-admin
+ *       addresses: http://frameworkjava-xxljob-admin:8080/xxl-job-admin
  *     executor:
  *       appname: ${spring.application.name}-executor
  *       address:
@@ -88,7 +88,7 @@ public class XxlJobConfig {
     private int logRetentionDays;
 
     /**
-     * 注册 XXL-Job Spring 执行器 Bean
+     * 注册 XXL-JOB Spring 执行器 Bean
      * <p>
      * {@link ConditionalOnMissingBean} 保证业务服务可覆盖此默认配置。
      * </p>
@@ -98,7 +98,7 @@ public class XxlJobConfig {
     @Bean
     @ConditionalOnMissingBean
     public XxlJobSpringExecutor xxlJobSpringExecutor() {
-        log.info("[XXL-Job] 执行器初始化：appname = {}, adminAddresses = {}, port = {}", appname, adminAddresses, port);
+        log.info("[XXL-JOB] 执行器初始化：appname = {}, adminAddresses = {}, port = {}", appname, adminAddresses, port);
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(adminAddresses);
         xxlJobSpringExecutor.setAccessToken(accessToken);

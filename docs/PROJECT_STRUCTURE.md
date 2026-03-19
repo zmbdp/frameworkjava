@@ -22,7 +22,8 @@ frameworkjava/
 │   ├── zmbdp-common-ratelimit/        # 限流组件
 │   ├── zmbdp-common-redis/            # Redis 封装
 │   ├── zmbdp-common-security/         # 安全认证
-│   └── zmbdp-common-snowflake/        # 雪花算法
+│   ├── zmbdp-common-snowflake/        # 雪花算法
+│   └── zmbdp-common-xxljob/           # XXL-JOB 执行器自动配置
 ├── zmbdp-admin/                       # 基础服务
 │   ├── zmbdp-admin-api/               # API 接口定义
 │   └── zmbdp-admin-service/           # 服务实现
@@ -61,13 +62,14 @@ frameworkjava/
 - **redis**：Redis 操作封装、Redisson 分布式锁
 - **security**：JWT 认证、权限校验
 - **snowflake**：分布式 ID 生成
+- **xxljob**：XXL-JOB 执行器自动配置，各服务引入依赖后即可注册执行器，无需重复编写初始化代码
 
 ### zmbdp-admin
 **职责**：基础服务
 - **用户管理**：B端系统用户管理（登录、增删改查）、C端应用用户管理（注册、查询、编辑）
 - **配置管理**：系统参数配置、数据字典管理（字典类型、字典数据）
 - **地图服务**：城市列表、区域查询、POI搜索、定位等
-- **定时任务**：布隆过滤器重置等系统级定时任务
+- **定时任务**：基于 XXL-JOB 的系统级定时任务（如布隆过滤器每日重置），同时提供 Spring Scheduled 降级兜底方案
 
 ### zmbdp-portal
 **职责**：C 端门户服务

@@ -15,6 +15,7 @@
 - [操作日志](LOG.md)
 - [链路追踪](TRACING.md)
 - [服务监控与告警](MONITORING.md)
+- [分布式定时任务（XXL-JOB）](XXLJOB.md)
 
 ## 开发指南
 - [新增业务模块](ADD_NEW_MODULE.md)

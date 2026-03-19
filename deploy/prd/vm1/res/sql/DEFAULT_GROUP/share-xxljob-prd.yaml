@@ -1,9 +1,9 @@
-# XXL-Job 执行器配置
+# XXL-JOB 执行器配置
 xxl:
   job:
     admin:
       # 调度中心地址（多个地址用逗号分隔）
-      # 如果业务服务也跑在同一个 Docker Compose 网络里，用 http://xxl-job-admin:8080/xxl-job-admin
+      # 如果业务服务也跑在同一个 Docker Compose 网络里，用 http://frameworkjava-xxljob-admin:8080/xxl-job-admin
       # 如果业务服务跑在宿主机或其他网络，就填内网 IP + 8081
       addresses: http://你的云服务器1内网ip/你的虚拟机1内网ip:8081/xxl-job-admin
     executor:
@@ -22,7 +22,7 @@ xxl:
       # 执行器日志保留天数（-1 永不清理）
       logretentiondays: 30
 
-# 布隆过滤器 XXL-Job 降级配置
+# 布隆过滤器 XXL-JOB 降级配置
 bloom:
   filter:
     fallback:
