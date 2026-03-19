@@ -265,7 +265,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # ==================== 定时任务调度 XXL-Job ====================
+  # ==================== 定时任务调度 XXL-JOB ====================
   frameworkjava-xxljob-admin:
     container_name: frameworkjava-xxljob-admin
     image: xuxueli/xxl-job-admin:2.4.2

@@ -166,7 +166,7 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- XXL-Job 分布式定时任务 -->
+        <!-- XXL-JOB 分布式定时任务 -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-xxljob</artifactId>

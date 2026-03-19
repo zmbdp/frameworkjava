@@ -270,21 +270,28 @@ public class LogParamExtractStrategy implements ILogProcessStrategy {
             return obj;
         }
         try {
+            Map<String, Object> result;
             if (obj instanceof Map) {
-                Map<String, Object> map = (Map<String, Object>) obj;
-                // 按逗号分隔脱敏字段列表
-                for (String field : desensitizeFields.split(CommonConstants.COMMA_SEPARATOR)) {
-                    field = field.trim();
-                    // 获取字段值
-                    Object value = map.get(field);
-                    if (value instanceof String) {
-                        // 根据字段名选择脱敏方式并替换原值
-                        map.put(field, desensitizeByFieldName(field, (String) value));
-                    }
+                result = (Map<String, Object>) obj;
+            } else {
+                // POJO 类型：先通过 JSON 转换为 Map，再做脱敏
+                String json = JsonUtil.classToJson(obj);
+                result = JsonUtil.jsonToClass(json, Map.class);
+                if (result == null) {
+                    return obj;
                 }
-                return map;
             }
-            return obj;
+            // 按逗号分割脱敏字段列表
+            for (String field : desensitizeFields.split(CommonConstants.COMMA_SEPARATOR)) {
+                field = field.trim();
+                // 获取字段值
+                Object value = result.get(field);
+                if (value instanceof String) {
+                    // 根据字段名选择脱敏方式并替换原值
+                    result.put(field, desensitizeByFieldName(field, (String) value));
+                }
+            }
+            return result;
         } catch (Exception e) {
             log.warn("脱敏处理失败: {}", e.getMessage());
             return obj;
@@ -336,4 +343,3 @@ public class LogParamExtractStrategy implements ILogProcessStrategy {
         return value;
     }
 }
-
