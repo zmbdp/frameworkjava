@@ -138,13 +138,14 @@ public class LogActionAspect {
      * <p>
      * <b>注意：</b>需要在 Nacos 中配置 {@code log.global-record-enabled=true} 才会生效
      */
-    @Pointcut(
-            "(@within(org.springframework.web.bind.annotation.RestController) || " +
+    @Pointcut("(" +
+            "@within(org.springframework.web.bind.annotation.RestController) || " +
             "@within(org.springframework.stereotype.Controller) || " +
             "@within(org.springframework.stereotype.Service)) && " +
             "execution(public * *(..)) && " +
             "!within(com.zmbdp.common.log.service.impl..*) && " +
-                    "!within(com.zmbdp.common.log.aspect.LogActionAspect)"
+            "!within(com.zmbdp.common.log.aspect.LogActionAspect" +
+            ")"
     )
     public void globalRecordPointcut() {
     }

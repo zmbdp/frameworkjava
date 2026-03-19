@@ -6,7 +6,7 @@ appuser:
     # C端用户默认头像路径
     defaultAvatar: # 你的阿里云OSS地址
 
-# XXL-Job 执行器端口覆盖
+# XXL-JOB 执行器端口覆盖
 # 每个服务使用独立端口，避免多服务本地同时运行时端口冲突
 # 需在 XShell 新增 Remote 隧道：0.0.0.0:9981 -> 127.0.0.1:9981
 xxl:

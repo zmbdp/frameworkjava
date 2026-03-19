@@ -210,7 +210,7 @@
                 <version>${skywalking.version}</version>
             </dependency>
 
-            <!-- XXL-Job 分布式定时任务 -->
+            <!-- XXL-JOB 分布式定时任务 -->
             <dependency>
                 <groupId>com.xuxueli</groupId>
                 <artifactId>xxl-job-core</artifactId>
