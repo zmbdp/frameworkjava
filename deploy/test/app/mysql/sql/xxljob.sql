@@ -1,6 +1,5 @@
-﻿-- ==================== XXL-JOB 调度中心数据库初始化 ====================
-USE
-`frameworkjava_xxljob_test`;
+-- ==================== XXL-JOB 调度中心数据库初始化 ====================
+USE `frameworkjava_xxljob_test`;
 
 SET NAMES utf8mb4;
 
