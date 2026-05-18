@@ -221,9 +221,15 @@ public class DataPermissionInterceptor implements Interceptor {
 
         // 获取 StatementHandler
         StatementHandler statementHandler = PluginUtils.realTarget(invocation.getTarget());
+        // 通过 MetaObject 反射获取 MappedStatement
         MetaObject metaObject = SystemMetaObject.forObject(statementHandler);
 
-        // 获取 MappedStatement
+        /*
+        获取 MappedStatement，用于获取 XML/注解中 定义的一条 SQL 的完整描述对象，比如 SQL 语句、参数映射、结果映射等信息
+        <select id="selectUser">
+            SELECT * FROM user WHERE id = #{id}
+        </select> 这种就属于 SQL 的完整描述对象
+        */
         MappedStatement mappedStatement = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
 
         // 只拦截 SELECT 语句
