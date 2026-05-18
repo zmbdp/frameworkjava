@@ -44,6 +44,11 @@ services:
       nofile:
         soft: 20000
         hard: 40000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frameworkjava-nacos:
     container_name: frameworkjava-nacos
     image: nacos/nacos-server:v2.2.2
@@ -78,6 +83,11 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frameworkjava-redis:
     container_name: frameworkjava-redis
     # 带有布隆过滤器版本的 redis 镜像
@@ -98,6 +108,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   frameworkjava-rabbitmq:
     image: rabbitmq:3.12.6-management
     container_name: frameworkjava-rabbit
@@ -121,7 +136,11 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-  
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   # ==================== 链路追踪 SkyWalking ====================
   frameworkjava-skywalking-oap:
     container_name: frameworkjava-skywalking-oap
@@ -155,6 +174,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-skywalking-ui:
     container_name: frameworkjava-skywalking-ui
@@ -171,6 +194,10 @@ services:
     depends_on:
       frameworkjava-skywalking-oap:
         condition: service_healthy
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ==================== 服务监控 Prometheus + Grafana ====================
   frameworkjava-prometheus:
@@ -201,6 +228,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-grafana:
     container_name: frameworkjava-grafana
@@ -228,6 +259,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-alertmanager:
     container_name: frameworkjava-alertmanager
@@ -249,6 +284,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ==================== 定时任务调度 XXL-JOB ====================
   frameworkjava-xxljob-admin:
@@ -281,6 +320,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   frameworkjava_network_dev:
