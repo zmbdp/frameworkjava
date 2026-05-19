@@ -79,7 +79,7 @@ public class UserContextResolver {
      * 配置项：jwt.token.secret，默认为空字符串。<br>
      * 如果未配置，则跳过 Token 解析。
      */
-    @Value("${jwt.token.secret:}")
+    @Value("${jwt.token.secret}")
     private String jwtSecret;
 
     /**
