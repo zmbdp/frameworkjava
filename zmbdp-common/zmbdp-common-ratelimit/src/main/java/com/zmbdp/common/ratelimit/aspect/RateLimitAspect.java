@@ -141,7 +141,7 @@ public class RateLimitAspect {
     /**
      * JWT Token 密钥（用于从 Token 中提取 userId）
      */
-    @Value("${jwt.token.secret:}")
+    @Value("${jwt.token.secret}")
     private String jwtSecret;
 
     /**
