@@ -124,7 +124,7 @@ public void doSomething() {
     // RLock lock = redissonLockService.acquire("lock:key", 5, TimeUnit.SECONDS);
     
     if (lock == null) {
-        throw new BusinessException("获取锁失败");
+        throw new ServiceException("获取锁失败");
     }
     try {
         // 业务逻辑
@@ -197,7 +197,7 @@ Long stock = redisService.decrement("stock:product:" + productId);
 if (stock < 0) {
     // 库存不足，回滚
     redisService.increment("stock:product:" + productId);
-    throw new BusinessException("库存不足");
+    throw new ServiceException("库存不足");
 }
 ```
 
@@ -214,13 +214,13 @@ RLock lock = redissonLockService.acquire("lock:stock:" + productId, 3, TimeUnit.
 // RLock lock = redissonLockService.acquire("lock:stock:" + productId, 3, 10, TimeUnit.SECONDS);
 
 if (lock == null) {
-    throw new BusinessException("获取锁失败，请稍后重试");
+    throw new ServiceException("获取锁失败，请稍后重试");
 }
 try {
     // 获取库存
     Integer stock = redisService.getCacheObject("stock:product:" + productId, Integer.class);
     if (stock == null || stock <= 0) {
-        throw new BusinessException("库存不足");
+        throw new ServiceException("库存不足");
     }
     // 扣减库存
     stock--;
@@ -240,7 +240,7 @@ order.setVersion(order.getVersion() + 1);
 int rows = orderMapper.updateById(order);
 if (rows == 0) {
     // 版本号冲突，说明已被其他线程修改
-    throw new BusinessException("库存已被占用，请重试");
+    throw new ServiceException("库存已被占用，请重试");
 }
 ```
 
