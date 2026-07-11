@@ -4,6 +4,7 @@
 create database if not exists `frameworkjava_nacos_dev` default character set utf8mb4 collate utf8mb4_general_ci;
 create database if not exists `frameworkjava_dev` default character set utf8mb4 collate utf8mb4_general_ci;
 create database if not exists `frameworkjava_xxljob_dev` default character set utf8mb4 collate utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS `frameworkjava_skywalking_dev` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 create user 'zmbdpdev'@'%' identified BY 'Hf@173503494';
 
@@ -11,5 +12,6 @@ grant replication slave, replication client on *.* to 'zmbdpdev'@'%';
 grant all privileges on frameworkjava_nacos_dev.* to 'zmbdpdev'@'%';
 grant all privileges on frameworkjava_dev.* to 'zmbdpdev'@'%';
 grant all privileges on frameworkjava_xxljob_dev.* to 'zmbdpdev'@'%';
+GRANT ALL PRIVILEGES ON frameworkjava_skywalking_dev.* TO 'zmbdpdev'@'%';
 FLUSH PRIVILEGES;
 

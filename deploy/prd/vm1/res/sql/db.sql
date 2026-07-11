@@ -3,7 +3,7 @@
 
 SET NAMES utf8mb4;
 
-use `frameworkjava_prd`;
+USE `frameworkjava_prd`;
 
 DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`
@@ -4561,7 +4561,7 @@ VALUES (3941, '813300', 424, '810000', '屯门区', '屯门区', 'tunmenqu', '3'
        (3949, '820200', 425, '820000', '氹仔岛', '氹仔岛', 'dangzidao', '3', 113.5615700, 22.1540200),
        (3950, '820300', 425, '820000', '路环岛', '路环岛', 'luhuandao', '3', 113.5727050, 22.1234690);
 
-drop table if exists `sys_argument`;
+DROP TABLE IF EXISTS `sys_argument`;
 create table `sys_argument`
 (
     `id`         bigint(20) unsigned not null auto_increment primary key comment '自增主键',
@@ -4575,8 +4575,8 @@ create table `sys_argument`
 INSERT INTO sys_argument (name, config_key, value)
 VALUES ('热门城市', 'sys_hot_city', '35,108,234,236,289,342');
 
-drop table if exists `sys_dictionary_type`;
-create table `sys_dictionary_type`
+DROP TABLE IF EXISTS `sys_dictionary_type`;
+CREATE TABLE `sys_dictionary_type`
 (
     `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
     `type_key` varchar(64) default '' comment '字典类型键',
@@ -4590,8 +4590,8 @@ INSERT INTO sys_dictionary_type (type_key, value, remark, status)
 VALUES ('admin', '管理员', 'sit', 1),
        ('common_status', '公共状态', '', 1);
 
-drop table if exists `sys_dictionary_data`;
-create table `sys_dictionary_data`
+DROP TABLE IF EXISTS `sys_dictionary_data`;
+CREATE TABLE `sys_dictionary_data`
 (
     `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
     `type_key` varchar(64) default '' comment '字典类型键',
@@ -4639,8 +4639,8 @@ CREATE TABLE `sys_user`
     UNIQUE KEY `uk_phone` (`phone_number`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=10000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='管理端人员表';
 
-insert into `sys_user` (nick_name, phone_number, password, identity, remark, status)
-values ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
+INSERT INTO `sys_user` (nick_name, phone_number, password, identity, remark, status)
+VALUES ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
         '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
 
 commit;

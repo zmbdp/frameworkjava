@@ -5,6 +5,7 @@
 CREATE database if NOT EXISTS `frameworkjava_nacos_test` default character set utf8mb4 collate utf8mb4_general_ci;
 CREATE database if NOT EXISTS `frameworkjava_test` default character set utf8mb4 collate utf8mb4_general_ci;
 CREATE database if NOT EXISTS `frameworkjava_xxljob_test` default character set utf8mb4 collate utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS `frameworkjava_skywalking_test` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE USER 'zmbdptest'@'%' IDENTIFIED BY 'Hf@173503494';
 grant replication slave, replication client on *.* to 'zmbdptest'@'%';
@@ -12,5 +13,6 @@ grant replication slave, replication client on *.* to 'zmbdptest'@'%';
 GRANT ALL PRIVILEGES ON frameworkjava_nacos_test.* TO  'zmbdptest'@'%';
 GRANT ALL PRIVILEGES ON frameworkjava_test.* TO  'zmbdptest'@'%';
 GRANT ALL PRIVILEGES ON frameworkjava_xxljob_test.* TO  'zmbdptest'@'%';
+GRANT ALL PRIVILEGES ON frameworkjava_skywalking_test.* TO 'zmbdptest'@'%';
 
 FLUSH PRIVILEGES;
