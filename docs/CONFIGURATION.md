@@ -9,7 +9,7 @@ FrameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理�
 配置文件命名格式：`{服务名}-{环境}.yaml`
 
 示例：
-- `zmbdp-gateway-service-dev.yaml`
+- `zmbdp-gateway-dev.yaml`
 - `zmbdp-admin-service-test.yaml`
 - `zmbdp-portal-service-prd.yaml`
 
