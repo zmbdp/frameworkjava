@@ -44,6 +44,10 @@ services:
       nofile:
         soft: 20000
         hard: 40000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   frameworkjava-nacos:
     container_name: frameworkjava-nacos
     image: nacos/nacos-server:v2.2.2
@@ -78,26 +82,83 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-  frameworkjava-redis:
-    container_name: frameworkjava-redis
-    # 带有布隆过滤器版本的 redis 镜像
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  frameworkjava-redis01:
+    container_name: frameworkjava-redis01
     image: redislabs/rebloom:latest
-    # 普通版本 redis 镜像
-    #    image: redis:7.0.15
     ports:
-      - "6379:6379"
+      - "6380:6380"
+      - "16380:16380"
     volumes:
-      - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
-      - ../data/frameworkjavadata/redis/data:/data
+      - ./redis/conf/redis01.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis01/data:/data
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
       - frameworkjava_network_prd
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
+      test: [ "CMD", "redis-cli","-p","6380", "ping" ]
+      start_period: 3s
+      interval: 3s
       timeout: 5s
-      retries: 10
+      retries: 3
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frameworkjava-redis02:
+    container_name: frameworkjava-redis02
+    image: redislabs/rebloom:latest
+    ports:
+      - "6381:6381"
+      - "16381:16381"
+    volumes:
+      - ./redis/conf/redis02.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis02/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    networks:
+      - frameworkjava_network_prd
+    healthcheck:
+      test: [ "CMD", "redis-cli","-p","6381", "ping" ]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frameworkjava-redis03:
+    container_name: frameworkjava-redis03
+    image: redislabs/rebloom:latest
+    # 普通版本 redis 镜像
+    #    image: redis:7.0.15
+    ports:
+      - "6382:6382"
+      - "16382:16382"
+    volumes:
+      - ./redis/conf/redis03.conf:/usr/local/etc/redis/redis.conf
+      - ../data/frameworkjavadata/redis03/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    networks:
+      - frameworkjava_network_prd
+    healthcheck:
+      test: [ "CMD", "redis-cli","-p","6382", "ping" ]
+      start_period: 3s
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   frameworkjava-rabbitmq:
     image: rabbitmq:3.12.6-management
     container_name: frameworkjava-rabbit
@@ -121,6 +182,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   
   frameworkjava-web:
     image: nginx:1.24.0
@@ -138,12 +203,16 @@ services:
       nofile:
         soft: 20000
         hard: 40000
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   
   # ==================== 链路追踪 SkyWalking ====================
   frameworkjava-skywalking-oap:
     container_name: frameworkjava-skywalking-oap
     build:
-      context: ./skywalking
+      context: ../../skywalking
       dockerfile: Dockerfile
     image: frameworkjava-skywalking-oap:9.7.0-mysql
     ports:
@@ -172,6 +241,10 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-skywalking-ui:
     container_name: frameworkjava-skywalking-ui
@@ -188,6 +261,10 @@ services:
     depends_on:
       frameworkjava-skywalking-oap:
         condition: service_healthy
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ==================== 服务监控 Prometheus + Grafana ====================
   frameworkjava-prometheus:
@@ -203,7 +280,8 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=90d'
+      - '--storage.tsdb.retention.time=7d'
+      - '--storage.tsdb.retention.size=5GB'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
@@ -216,6 +294,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-grafana:
     container_name: frameworkjava-grafana
@@ -243,6 +325,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   frameworkjava-alertmanager:
     container_name: frameworkjava-alertmanager
@@ -264,6 +350,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # ==================== 定时任务调度 XXL-JOB ====================
   frameworkjava-xxljob-admin:
@@ -288,11 +378,15 @@ services:
       frameworkjava-mysql:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/xxl-job-admin/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/xxl-job-admin" ]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   frameworkjava_network_prd:

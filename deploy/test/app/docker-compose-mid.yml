@@ -143,7 +143,7 @@ services:
   frameworkjava-skywalking-oap:
     container_name: frameworkjava-skywalking-oap
     build:
-      context: ./skywalking
+      context: ../../skywalking
       dockerfile: Dockerfile
     image: frameworkjava-skywalking-oap:9.7.0-mysql
     ports:
@@ -203,7 +203,8 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.time=7d'
+      - '--storage.tsdb.retention.size=5GB'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
@@ -288,7 +289,7 @@ services:
       frameworkjava-mysql:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/xxl-job-admin/actuator/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/xxl-job-admin" ]
       interval: 30s
       timeout: 10s
       retries: 5
