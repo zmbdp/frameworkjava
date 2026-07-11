@@ -1,57 +1,105 @@
 version: '3.8'
-#启动命令 docker compose -p frameworkjava -f docker-compose-mid.yml up -d
+#启动命令 docker compose -p frameworkjava -f docker-compose-app.yml up -d
 services:
   frameworkjava-admin:
     build:
       context: service/admin
-    image: frameworkjavaprd/zmbdp-admin-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/frameworkjava_zmbdp/zmbdp-admin-service:1.0-SNAPSHOT
     container_name: frameworkjava-admin-prd
     ports:
       - "18081:18081"
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-admin -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+    volumes:
+      - ../../skywalking/apache-skywalking-java-agent-9.5.0:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:18081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   frameworkjava-file:
     build:
       context: service/file
     ports:
       - "18082:18082"
-    image: frameworkjavaprd/zmbdp-file-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/frameworkjava_zmbdp/zmbdp-file-service:1.0-SNAPSHOT
     container_name: frameworkjava-file-prd
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-file -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+    volumes:
+      - ../../skywalking/apache-skywalking-java-agent-9.5.0:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:18082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   frameworkjava-gateway:
     build:
       context: service/gateway
     ports:
       - "10030:10030"
-    image: frameworkjavaprd/zmbdp-gateway-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/frameworkjava_zmbdp/zmbdp-gateway:1.0-SNAPSHOT
     container_name: frameworkjava-gateway-prd
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-gateway -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+    volumes:
+      - ../../skywalking/apache-skywalking-java-agent-9.5.0:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:10030/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
   frameworkjava-portal:
     build:
       context: service/portal
     ports:
       - "18083:18083"
-    image: frameworkjavaprd/zmbdp-portal-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/frameworkjava_zmbdp/zmbdp-portal-service:1.0-SNAPSHOT
     container_name: frameworkjava-portal-prd
     environment:
       RUN_ENV: prd
       NACOS_ADDR: 你的云服务器1内网ip/你的虚拟机1内网ip:8854,你的云服务器1内网ip/你的虚拟机1内网ip:8856,你的云服务器2内网ip/你的虚拟机2内网ip:8858
-      JAVA_OPTS: -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+      JAVA_OPTS: -javaagent:/skywalking-agent/skywalking-agent.jar -Dskywalking.agent.service_name=zmbdp-portal -Dskywalking.collector.backend_service=你的云服务器1内网ip/你的虚拟机1内网ip:11800 -Xmx256m -Dspring.cloud.nacos.discovery.ip=你的云服务器2内网ip/你的虚拟机2内网ip
+    volumes:
+      - ../../skywalking/apache-skywalking-java-agent-9.5.0:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
       frameworkjava_network_prd:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:18083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 networks:
   frameworkjava_network_prd:

@@ -29,7 +29,7 @@ scrape_configs:
   # SkyWalking OAP 监控
   - job_name: 'skywalking-oap'
     static_configs:
-      - targets: [ 'frameworkjava-skywalking-oap:1234' ]
+      - targets: [ 'frameworkjava-skywalking-oap:12800' ]
         labels:
           service: 'skywalking-oap'
 
