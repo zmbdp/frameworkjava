@@ -151,7 +151,7 @@ java -jar zmbdp-gateway.jar
 ```bash
 # 配置 SkyWalking Agent
 java -javaagent:/path/to/skywalking-agent.jar \
-     -Dskywalking.agent.service_name=zmbdp-gateway-service \
+     -Dskywalking.agent.service_name=zmbdp-gateway \
      -Dskywalking.collector.backend_service=skywalking-oap:11800 \
      -jar zmbdp-gateway.jar
 ```

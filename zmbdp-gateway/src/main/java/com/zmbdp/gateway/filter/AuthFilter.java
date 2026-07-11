@@ -86,7 +86,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange, ResultCode.TOKEN_INVALID);
         }
         String userKey = JwtUtil.getUserKey(claims);
-//        String userKey = JwtUtil.getUserKey(token, secret);
         if (!redisService.hasKey(getTokenKey(userKey))) {
             // 拿到令牌，但是用户信息为空，说明令牌已过期
             return unauthorizedResponse(exchange, ResultCode.LOGIN_STATUS_OVERTIME);
