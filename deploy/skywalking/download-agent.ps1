@@ -1,7 +1,9 @@
 $agentVersion = "9.5.0"
 $agentDir = "apache-skywalking-java-agent-${agentVersion}"
-$agentZip = "${agentDir}.zip"
-$downloadUrl = "https://archive.apache.org/dist/skywalking/${agentVersion}/${agentZip}"
+$agentTar = "${agentDir}.tgz"
+$downloadUrl = "https://archive.apache.org/dist/skywalking/java-agent/${agentVersion}/${agentTar}"
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 if (Test-Path $agentDir) {
     Write-Host "SkyWalking Agent already exists: $agentDir"
@@ -9,12 +11,13 @@ if (Test-Path $agentDir) {
 }
 
 Write-Host "Downloading SkyWalking Agent ${agentVersion}..."
-Invoke-WebRequest -Uri $downloadUrl -OutFile $agentZip
+Invoke-WebRequest -Uri $downloadUrl -OutFile $agentTar
 
 Write-Host "Extracting..."
-Expand-Archive -Path $agentZip -DestinationPath .
+tar -xzf $agentTar
 
 Write-Host "Cleaning up..."
-Remove-Item $agentZip
+Remove-Item $agentTar
 
-Write-Host "Done! Agent path: $(Get-Location)/${agentDir}"
+$finalPath = Join-Path (Get-Location) $agentDir
+Write-Host "Done! Agent path: $finalPath"
