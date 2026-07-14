@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frameworkjava-mysql-slave:
     container_name: frameworkjava-mysql-slave
-    image: mysql:8.4.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/mysql:8.4.2
     ports:
       - "3308:3306"
     volumes:
@@ -49,7 +49,7 @@ services:
   frameworkjava-redis04:
     container_name: frameworkjava-redis04
     # 带有布隆过滤器版本的 redis 镜像
-    image: redislabs/rebloom:latest
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rebloom:latest
     # 普通版本 redis 镜像
     #    image: redis:7.0.15
     ports:
@@ -75,7 +75,7 @@ services:
   frameworkjava-redis05:
     container_name: frameworkjava-redis05
     # 带有布隆过滤器版本的 redis 镜像
-    image: redislabs/rebloom:latest
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rebloom:latest
     # 普通版本 redis 镜像
     #    image: redis:7.0.15
     ports:
@@ -101,7 +101,7 @@ services:
   frameworkjava-redis06:
     container_name: frameworkjava-redis06
     # 带有布隆过滤器版本的 redis 镜像
-    image: redislabs/rebloom:latest
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rebloom:latest
     # 普通版本 redis 镜像
     #    image: redis:7.0.15
     ports:
@@ -126,7 +126,7 @@ services:
         max-file: "3"
   frameworkjava-nacos03:
     container_name: frameworkjava-nacos03
-    image: nacos/nacos-server:v2.2.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nacos-server:v2.2.2
     environment:
       - MODE=cluster
       - JVM_XMS=512m
@@ -162,9 +162,9 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-  frameworkjava-webnacos:
+  frameworkjava-web-prd02:
     image: nginx:1.24.0
-    container_name: frameworkjava-webnacos
+    container_name: frameworkjava-web-prd02
     restart: always
     networks:
       frameworkjava_network_prd:
@@ -177,7 +177,7 @@ services:
         max-size: "10m"
         max-file: "3"
   frameworkjava-rabbitmq02:
-    image: rabbitmq:3.12.6-management
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rabbitmq:3.12.6-management
     container_name: frameworkjava-rabbitmq02
     restart: always
     hostname: frameworkjava-rabbitmq02

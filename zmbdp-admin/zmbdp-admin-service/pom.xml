@@ -177,9 +177,7 @@
                                     <JAVA_OPTS>${java.opts.default}</JAVA_OPTS>
                                 </env>
                                 <volumes>
-                                    <bind>
-                                        /opt/framework/deploy/skywalking/apache-skywalking-java-agent-9.5.0:/opt/skywalking/agent
-                                    </bind>
+                                    <bind>${skywalking.path}</bind>
                                 </volumes>
                             </run>
                         </image>
