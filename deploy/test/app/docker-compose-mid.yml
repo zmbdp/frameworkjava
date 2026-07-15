@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frameworkjava-mysql:
     container_name: frameworkjava-mysql
-    image: mysql:8.4.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/mysql:8.4.2
     ports:
       - "3306:3306"
     volumes:
@@ -46,7 +46,7 @@ services:
         hard: 40000
   frameworkjava-nacos:
     container_name: frameworkjava-nacos
-    image: nacos/nacos-server:v2.2.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nacos-server:v2.2.2
     environment:
       - MODE=standalone
       - JVM_XMS=512m
@@ -81,7 +81,7 @@ services:
   frameworkjava-redis:
     container_name: frameworkjava-redis
     # 带有布隆过滤器版本的 redis 镜像
-    image: redislabs/rebloom:latest
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rebloom:latest
     # 普通版本 redis 镜像
     #    image: redis:7.0.15
     ports:
@@ -99,7 +99,7 @@ services:
       timeout: 5s
       retries: 10
   frameworkjava-rabbitmq:
-    image: rabbitmq:3.12.6-management
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/rabbitmq:3.12.6-management
     container_name: frameworkjava-rabbit
     restart: always
     hostname: frameworkjava-rabbit
@@ -122,9 +122,9 @@ services:
       timeout: 10s
       retries: 10
   
-  frameworkjava-web:
+  frameworkjava-web-test:
     image: nginx:1.24.0
-    container_name: frameworkjava-web
+    container_name: frameworkjava-web-test
     restart: always
     networks:
       - frameworkjava_network_test
@@ -145,7 +145,7 @@ services:
     build:
       context: ../../skywalking
       dockerfile: Dockerfile
-    image: frameworkjava-skywalking-oap:9.7.0-mysql
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/skywalking-oap:9.7.0-mysql
     ports:
       - "11800:11800"  # gRPC 端口（Agent 上报数据）
       - "12800:12800"  # HTTP 端口（UI 查询数据）
@@ -175,7 +175,7 @@ services:
 
   frameworkjava-skywalking-ui:
     container_name: frameworkjava-skywalking-ui
-    image: apache/skywalking-ui:9.7.0
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/skywalking-ui:9.7.0
     ports:
       - "8080:8080"
     environment:
@@ -192,7 +192,7 @@ services:
   # ==================== 服务监控 Prometheus + Grafana ====================
   frameworkjava-prometheus:
     container_name: frameworkjava-prometheus
-    image: prom/prometheus:v2.48.0
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/prometheus:v2.48.0
     user: "0:0"
     ports:
       - "9090:9090"
@@ -220,7 +220,7 @@ services:
 
   frameworkjava-grafana:
     container_name: frameworkjava-grafana
-    image: grafana/grafana:10.2.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/grafana:10.2.2
     user: "0:0"
     ports:
       - "3000:3000"
@@ -247,7 +247,7 @@ services:
 
   frameworkjava-alertmanager:
     container_name: frameworkjava-alertmanager
-    image: prom/alertmanager:v0.26.0
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/alertmanager:v0.26.0
     user: "0:0"
     ports:
       - "9093:9093"
@@ -269,7 +269,7 @@ services:
   # ==================== 定时任务调度 XXL-JOB ====================
   frameworkjava-xxljob-admin:
     container_name: frameworkjava-xxljob-admin
-    image: xuxueli/xxl-job-admin:2.4.2
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/xxl-job-admin:2.4.2
     ports:
       - "8081:8080"
     environment:

@@ -1,3 +1,21 @@
+# 自动处理文本文件换行符
+* text=auto
+
+# Shell 脚本强制使用 LF（Linux 必须）
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows 批处理保持 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件不处理
+*.jar binary
+*.zip binary
+*.tgz binary
+*.png binary
+*.jpg binary
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -41,5 +59,5 @@ build/
 /**/key.pem
 /PROJECT_STRUCTURE_DETAILED.md
 /logs/
-/**/apache-skywalking-java-agent-9.5.0/
 /.idea/
+/deploy/skywalking/skywalking-agent/
