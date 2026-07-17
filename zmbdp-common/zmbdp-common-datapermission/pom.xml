@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.zmbdp</groupId>
         <artifactId>zmbdp-common</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>zmbdp-common-datapermission</artifactId>
@@ -61,21 +61,21 @@
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- 公共领域模块 -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-domain</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- 安全模块（获取当前用户信息） -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-security</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
     </dependencies>

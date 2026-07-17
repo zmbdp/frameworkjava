@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.zmbdp</groupId>
         <artifactId>zmbdp-common</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <artifactId>zmbdp-common-log</artifactId>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-rabbitmq</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
             <optional>true</optional>
         </dependency>
 
@@ -56,35 +56,35 @@
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-monitor</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- 公共领域对象（异常、常量等） -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-domain</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- 核心工具类 -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- 安全工具类（用于获取用户信息） -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-security</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- Redis 服务（可选，用于 Redis 存储） -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-redis</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
             <optional>true</optional>
         </dependency>
 
