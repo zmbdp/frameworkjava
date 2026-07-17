@@ -33,8 +33,7 @@ CREATE TABLE `tb_xxl_job_info`
     `trigger_last_time`         BIGINT(13)   NOT NULL DEFAULT '0' COMMENT '上次调度时间',
     `trigger_next_time`         BIGINT(13)   NOT NULL DEFAULT '0' COMMENT '下次调度时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务信息表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='任务信息表';
 
 -- 任务日志表
 CREATE TABLE `xxl_job_log`
@@ -57,8 +56,7 @@ CREATE TABLE `xxl_job_log`
     PRIMARY KEY (`id`),
     KEY                         `idx_trigger_time` (`trigger_time`),
     KEY                         `idx_handle_code` (`handle_code`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志表';
 
 -- 任务日志报表（用于首页统计）
 CREATE TABLE `xxl_job_log_report`
@@ -71,8 +69,7 @@ CREATE TABLE `xxl_job_log_report`
     `update_time`   DATETIME DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_trigger_day` (`trigger_day`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志报表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志报表';
 
 -- GLUE源码版本记录表
 CREATE TABLE `xxl_job_logglue`
@@ -85,8 +82,7 @@ CREATE TABLE `xxl_job_logglue`
     `add_time`    DATETIME    DEFAULT NULL COMMENT '创建时间',
     `update_time` DATETIME    DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='GLUE源码版本记录表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='GLUE源码版本记录表';
 
 -- 执行器注册表
 CREATE TABLE `xxl_job_registry`
@@ -98,8 +94,7 @@ CREATE TABLE `xxl_job_registry`
     `update_time`    DATETIME DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY              `idx_g_k_v` (`registry_group`, `registry_key`, `registry_value`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='执行器注册表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='执行器注册表';
 
 -- 执行器配置表
 CREATE TABLE `xxl_job_group`
@@ -111,8 +106,7 @@ CREATE TABLE `xxl_job_group`
     `address_list` TEXT COMMENT '执行器地址列表，多地址逗号分隔',
     `update_time`  DATETIME DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='执行器配置表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='执行器配置表';
 
 -- 用户表
 CREATE TABLE `xxl_job_user`
@@ -124,16 +118,14 @@ CREATE TABLE `xxl_job_user`
     `permission` VARCHAR(255) DEFAULT NULL COMMENT '权限：执行器ID列表，多个逗号分割',
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_username` (`username`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
 
 -- 分布式锁表
 CREATE TABLE `xxl_job_lock`
 (
     `lock_name` VARCHAR(50) NOT NULL COMMENT '锁名称',
     PRIMARY KEY (`lock_name`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='分布式锁表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='分布式锁表';
 
 -- ==================== 初始化数据 ====================
 

@@ -209,4 +209,4 @@ values ('nacos', '$2a$10$ywhhtc1TPcIU7k1Yf0/aR.vz5LopMcKy4Sa1QSTP3MNn3yjafAX6i',
 insert into roles (username, role)
 values ('nacos', 'ROLE_ADMIN');
 
-commit;
+COMMIT;

@@ -234,4 +234,4 @@ VALUES ('nacos', '$2a$10$ywhhtc1TPcIU7k1Yf0/aR.vz5LopMcKy4Sa1QSTP3MNn3yjafAX6i',
 INSERT INTO roles (username, role)
 VALUES ('nacos', 'ROLE_ADMIN');
 
-commit;
+COMMIT;

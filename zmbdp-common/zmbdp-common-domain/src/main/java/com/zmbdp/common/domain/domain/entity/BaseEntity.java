@@ -5,16 +5,16 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
- * do 基类
+ * Entity 基类
  *
  * @author 稚名不带撇
  */
 @Data
-public class BaseDO {
+public class BaseEntity {
 
     /**
-     * id
+     * 主键ID（雪花算法生成）
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 }

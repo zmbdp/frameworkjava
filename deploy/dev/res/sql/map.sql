@@ -2,7 +2,7 @@ use frameworkjava_dev;
 drop table if exists `sys_region`;
 create table `sys_region`
 (
-    `id`          bigint(20) not null auto_increment comment '主键id',
+    `id`          bigint(20) not null comment '主键ID（雪花算法，由应用生成）',
     `code`        varchar(20)    default null comment '区划编码',
     `parent_id`   bigint(20) default null comment '⽗级id',
     `parent_code` varchar(20)    default null comment '⽗级编码',
@@ -13,7 +13,7 @@ create table `sys_region`
     `longitude`   decimal(10, 7) default null comment '经度',
     `latitude`    decimal(10, 7) default null comment '纬度',
     primary key (`id`)
-) engine=innodb auto_increment=1 default charset=utf8mb4  comment='行政区划表';
+) engine=innodb default charset=utf8mb4  comment='行政区划表';
 
 
 -- 省级数据 (level=1)

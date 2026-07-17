@@ -2,13 +2,13 @@
 -- # 2、创建用户，用户名：zmbdpprd 密码：Hf@173503494
 -- # 3、授予zmbdpprd用户特定权限
 
-CREATE database if NOT EXISTS `frameworkjava_nacos_prd` default character set utf8mb4 collate utf8mb4_general_ci;
-CREATE database if NOT EXISTS `frameworkjava_prd` default character set utf8mb4 collate utf8mb4_general_ci;
-CREATE database if NOT EXISTS `frameworkjava_xxljob_prd` default character set utf8mb4 collate utf8mb4_general_ci;
+CREATE database if NOT EXISTS `frameworkjava_nacos_prd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE database if NOT EXISTS `frameworkjava_prd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE database if NOT EXISTS `frameworkjava_xxljob_prd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 CREATE DATABASE IF NOT EXISTS `frameworkjava_skywalking_prd` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE USER 'zmbdpprd'@'%' IDENTIFIED BY 'Hf@173503494';
-grant replication slave, replication client on *.* to 'zmbdpprd'@'%';
+GRANT replication slave, replication client on *.* to 'zmbdpprd'@'%';
 
 GRANT ALL PRIVILEGES ON frameworkjava_nacos_prd.* TO  'zmbdpprd'@'%';
 GRANT ALL PRIVILEGES ON frameworkjava_prd.* TO  'zmbdpprd'@'%';

@@ -1,7 +1,7 @@
 package com.zmbdp.mstemplate.service.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zmbdp.common.domain.domain.entity.BaseDO;
+import com.zmbdp.common.domain.domain.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Data
 @TableName("test_order")
 @EqualsAndHashCode(callSuper = true)
-public class TestOrder extends BaseDO {
+public class TestOrder extends BaseEntity {
 
     /**
      * 订单号
