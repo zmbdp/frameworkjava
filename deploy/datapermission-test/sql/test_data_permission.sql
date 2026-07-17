@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `test_dept` (
     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测试部门表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '测试部门表';
 
 -- 2. 用户表（用于测试用户权限）
 CREATE TABLE IF NOT EXISTS `test_user` (
@@ -29,11 +29,11 @@ CREATE TABLE IF NOT EXISTS `test_user` (
     PRIMARY KEY (`id`),
     KEY `idx_dept_id` (`dept_id`),
     KEY `idx_create_by` (`create_by`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测试用户表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '测试用户表';
 
 -- 3. 订单表（用于测试数据权限）
 CREATE TABLE IF NOT EXISTS `test_order` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID',
+    `id` BIGINT NOT NULL COMMENT '订单ID（雪花算法，由应用生成）',
     `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
     `user_id` BIGINT NOT NULL COMMENT '用户ID（创建人）',
     `dept_id` BIGINT NOT NULL COMMENT '部门ID',
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `test_order` (
     KEY `idx_user_id` (`user_id`),
     KEY `idx_dept_id` (`dept_id`),
     KEY `idx_tenant_id` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测试订单表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '测试订单表';
 
 -- ========================================
 -- 初始化测试数据

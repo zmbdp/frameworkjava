@@ -56,8 +56,7 @@ CREATE TABLE `xxl_job_log`
     PRIMARY KEY (`id`),
     KEY                         `idx_trigger_time` (`trigger_time`),
     KEY                         `idx_handle_code` (`handle_code`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志表';
 
 -- 任务日志报表（用于首页统计）
 CREATE TABLE `xxl_job_log_report`
@@ -70,8 +69,7 @@ CREATE TABLE `xxl_job_log_report`
     `update_time`   DATETIME DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_trigger_day` (`trigger_day`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志报表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='任务日志报表';
 
 -- GLUE源码版本记录表
 CREATE TABLE `xxl_job_logglue`
@@ -84,8 +82,7 @@ CREATE TABLE `xxl_job_logglue`
     `add_time`    DATETIME    DEFAULT NULL COMMENT '创建时间',
     `update_time` DATETIME    DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='GLUE源码版本记录表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='GLUE源码版本记录表';
 
 -- 执行器注册表
 CREATE TABLE `xxl_job_registry`
@@ -97,8 +94,7 @@ CREATE TABLE `xxl_job_registry`
     `update_time`    DATETIME DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     KEY              `idx_g_k_v` (`registry_group`, `registry_key`, `registry_value`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='执行器注册表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='执行器注册表';
 
 -- 执行器配置表
 CREATE TABLE `xxl_job_group`

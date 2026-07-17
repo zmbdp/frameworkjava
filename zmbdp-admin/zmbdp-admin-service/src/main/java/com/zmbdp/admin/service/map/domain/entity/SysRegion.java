@@ -15,9 +15,9 @@ import lombok.Data;
 public class SysRegion {
 
     /**
-     * id
+     * 主键ID（雪花算法生成）
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
