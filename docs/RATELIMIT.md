@@ -25,7 +25,7 @@
 <dependency>
     <groupId>com.zmbdp</groupId>
     <artifactId>zmbdp-common-ratelimit</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 </dependency>
 ```
 

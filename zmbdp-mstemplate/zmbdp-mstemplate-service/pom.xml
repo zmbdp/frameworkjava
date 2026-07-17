@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.zmbdp</groupId>
         <artifactId>zmbdp-mstemplate</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>com.zmbdp</groupId>
     <artifactId>zmbdp-mstemplate-service</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -85,92 +85,92 @@
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-domain</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-security</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-excel</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-redis</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-cache</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-rabbitmq</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-idempotent</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-file-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-admin-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-ratelimit</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-log</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-monitor</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-datapermission</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
         <!-- XXL-JOB 分布式定时任务 -->
         <dependency>
             <groupId>com.zmbdp</groupId>
             <artifactId>zmbdp-common-xxljob</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
     </dependencies>

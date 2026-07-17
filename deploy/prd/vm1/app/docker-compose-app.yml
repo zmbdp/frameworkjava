@@ -4,7 +4,7 @@ services:
   frameworkjava-admin:
     build:
       context: service/admin
-    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-admin-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-admin-service:1.0
     container_name: frameworkjava-admin-prd
     ports:
       - "18081:18081"
@@ -32,7 +32,7 @@ services:
       context: service/file
     ports:
       - "18082:18082"
-    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-file-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-file-service:1.0
     container_name: frameworkjava-file-prd
     environment:
       RUN_ENV: prd
@@ -58,7 +58,7 @@ services:
       context: service/gateway
     ports:
       - "10030:10030"
-    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-gateway:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-gateway:1.0
     container_name: frameworkjava-gateway-prd
     environment:
       RUN_ENV: prd
@@ -84,7 +84,7 @@ services:
       context: service/portal
     ports:
       - "18083:18083"
-    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-portal-service:1.0-SNAPSHOT
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-service/zmbdp-portal-service:1.0
     container_name: frameworkjava-portal-prd
     environment:
       RUN_ENV: prd
