@@ -55,7 +55,7 @@ mkdir -p zmbdp-{module}/zmbdp-{module}-service
     <parent>
         <groupId>com.zmbdp</groupId>
         <artifactId>frameworkjava</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     
     <artifactId>zmbdp-{module}-api</artifactId>

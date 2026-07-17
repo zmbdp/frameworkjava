@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre
+FROM crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/eclipse-temurin:17-jre
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /workspace

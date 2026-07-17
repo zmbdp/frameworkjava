@@ -157,41 +157,88 @@ echo
 echo "检测结果:"
 echo "当前公网出口区域: $COUNTRY"
 #########################################
-# 选择安装路线
+# 自动选择安装路线
 #########################################
 echo
-echo "请选择Docker安装方案:"
+echo ">>> 自动判断网络区域..."
+COUNTRY_CODE=$(curl -s \
+--connect-timeout 5 \
+https://ipapi.co/country_code || echo "UNKNOWN")
+COUNTRY_NAME=$(curl -s \
+--connect-timeout 5 \
+https://ipapi.co/country_name || echo "未知")
 echo
-echo "1) 国内网络方案"
-echo "   - 使用国内Docker软件源"
-echo "   - 支持配置镜像加速"
-echo
-echo "2) 国际网络方案"
-echo "   - 使用Docker官方软件源"
-echo "   - 不配置镜像加速"
-echo
-while true
-do
-read -p "请输入选择 [1/2]: " choice
-case $choice in
-1)
-REGION="CN"
-break
-;;
-2)
-REGION="GLOBAL"
-break
-;;
-*)
-echo "输入错误，请重新选择"
-;;
-esac
-done
-echo
-if [ "$REGION" = "CN" ]; then
-    echo -e "${GREEN}已选择: 国内网络方案${END}"
+echo "网络检测结果:"
+echo "国家代码: $COUNTRY_CODE"
+echo "国家地区: $COUNTRY_NAME"
+#################################
+# 自动推荐方案
+#################################
+if [[ "$COUNTRY_CODE" == "CN" ]]; then
+    DEFAULT_REGION="CN"
+    echo
+    echo -e "${GREEN}"
+    echo "检测到当前网络位于中国大陆"
+    echo "推荐方案: 国内网络方案"
+    echo " - 使用国内Docker软件源"
+    echo " - 可配置镜像加速"
+    echo -e "${END}"
 else
-    echo -e "${GREEN}已选择: 国际网络方案${END}"
+    DEFAULT_REGION="GLOBAL"
+    echo
+    echo -e "${GREEN}"
+    echo "检测到当前网络位于国际区域"
+    echo "推荐方案: 国际网络方案"
+    echo " - 使用Docker官方源"
+    echo " - 不配置国内镜像"
+    echo -e "${END}"
+fi
+#################################
+# 用户确认
+#################################
+echo
+if [ "$DEFAULT_REGION" = "CN" ]; then
+    DEFAULT_TEXT="国内网络方案"
+else
+    DEFAULT_TEXT="国际网络方案"
+fi
+read -p "是否采用推荐方案 [$DEFAULT_TEXT] ? [Y/n]: " useDefault
+# 用户直接回车，默认采用自动判断结果
+useDefault=${useDefault:-Y}
+if [[ "$useDefault" =~ ^[Yy]$ ]]; then
+    REGION="$DEFAULT_REGION"
+    echo
+    echo "已采用自动推荐方案:"
+    echo "$DEFAULT_TEXT"
+else
+    echo
+    echo "请手动选择Docker安装方案:"
+    echo
+    echo "1) 国内网络方案"
+    echo "   - 使用国内Docker软件源"
+    echo "   - 支持配置镜像加速"
+    echo
+    echo "2) 国际网络方案"
+    echo "   - 使用Docker官方软件源"
+    echo "   - 不配置镜像加速"
+    echo
+    while true
+    do
+    read -p "请输入选择 [1/2]: " choice
+    case $choice in
+    1)
+        REGION="CN"
+        break
+        ;;
+    2)
+        REGION="GLOBAL"
+        break
+        ;;
+    *)
+        echo "输入错误，请重新选择"
+        ;;
+    esac
+    done
 fi
 #########################################
 # 配置Docker软件源
