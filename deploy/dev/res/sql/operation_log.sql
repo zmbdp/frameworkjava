@@ -28,4 +28,4 @@ CREATE TABLE `operation_log`
     KEY               `idx_status` (`status`),
     KEY               `idx_module` (`module`),
     KEY               `idx_trace_id` (`trace_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '操作日志表';

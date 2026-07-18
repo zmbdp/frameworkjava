@@ -1,7 +1,7 @@
 package com.zmbdp.admin.service.user.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zmbdp.common.domain.domain.entity.BaseDO;
+import com.zmbdp.common.domain.domain.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @TableName("sys_user")
 @EqualsAndHashCode(callSuper = true)
-public class SysUser extends BaseDO {
+public class SysUser extends BaseEntity {
 
     /**
      * 用户昵称

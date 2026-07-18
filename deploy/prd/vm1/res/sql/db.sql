@@ -8,7 +8,7 @@ USE `frameworkjava_prd`;
 DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`
 (
-    `id` bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `id`              bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `operation`       varchar(255) NOT NULL COMMENT '操作描述',
     `method`          varchar(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
     `request_path`    varchar(500)  DEFAULT NULL COMMENT '请求路径',
@@ -35,11 +35,12 @@ CREATE TABLE `operation_log`
     KEY               `idx_status` (`status`),
     KEY               `idx_module` (`module`),
     KEY               `idx_trace_id` (`trace_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '操作日志表';
 
+DROP TABLE IF EXISTS `sys_region`;
 CREATE TABLE `sys_region`
 (
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `id`          bigint(20) NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `code`        varchar(20)    DEFAULT NULL COMMENT '区划编码',
     `parent_id`   bigint(20) DEFAULT NULL COMMENT '父级id',
     `parent_code` varchar(20)    DEFAULT NULL COMMENT '父级编码',
@@ -50,7 +51,7 @@ CREATE TABLE `sys_region`
     `longitude`   decimal(10, 7) DEFAULT NULL COMMENT '经度',
     `latitude`    decimal(10, 7) DEFAULT NULL COMMENT '纬度',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3951 DEFAULT CHARSET=utf8mb4 COMMENT='行政区划表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '行政区划表';
 
 INSERT INTO sys_region (id, code, parent_id, parent_code, name, full_name, pinyin, `level`, longitude, latitude)
 VALUES (1, '110000', NULL, NULL, '北京', '北京市', 'beijing', '1', 116.7245020, 39.9050230),
@@ -4564,36 +4565,36 @@ VALUES (3941, '813300', 424, '810000', '屯门区', '屯门区', 'tunmenqu', '3'
 DROP TABLE IF EXISTS `sys_argument`;
 create table `sys_argument`
 (
-    `id`         bigint(20) unsigned not null auto_increment primary key comment '自增主键',
+    `id`         bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
     `name`       varchar(64)   default '' comment '参数名称',
     `config_key` varchar(64)   default '' comment '参数键名',
     `value`      varchar(1024) default '' comment '参数键值',
     `remark`     varchar(64)   default '' comment '备注',
     unique index idx_config_key (`config_key`)
-) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '系统参数表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '系统参数表';
 
-INSERT INTO sys_argument (name, config_key, value)
-VALUES ('热门城市', 'sys_hot_city', '35,108,234,236,289,342');
+INSERT INTO sys_argument (id, name, config_key, value)
+VALUES (10000001, '热门城市', 'sys_hot_city', '35,108,234,236,289,342');
 
 DROP TABLE IF EXISTS `sys_dictionary_type`;
 CREATE TABLE `sys_dictionary_type`
 (
-    `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
+    `id`       bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
     `type_key` varchar(64) default '' comment '字典类型键',
     `value`    varchar(64) default '' comment '字典类型值',
     `remark`   varchar(64) default '' comment '备注',
     `status`   tinyint(1) default 1 comment '字典类型状态 1正常 0停用',
     unique index idx_type_key (`type_key`)
-) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '字典类型表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '字典类型表';
 
-INSERT INTO sys_dictionary_type (type_key, value, remark, status)
-VALUES ('admin', '管理员', 'sit', 1),
-       ('common_status', '公共状态', '', 1);
+INSERT INTO sys_dictionary_type (id, type_key, value, remark, status)
+VALUES (10000001, 'admin', '管理员', 'sit', 1),
+       (10000002, 'common_status', '公共状态', '', 1);
 
 DROP TABLE IF EXISTS `sys_dictionary_data`;
 CREATE TABLE `sys_dictionary_data`
 (
-    `id`       bigint(20) unsigned not null auto_increment primary key comment '自增主键',
+    `id`       bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
     `type_key` varchar(64) default '' comment '字典类型键',
     `data_key` varchar(64) default '' comment '字典数据键',
     `value`    varchar(64) default '' comment '字典数据值',
@@ -4602,33 +4603,35 @@ CREATE TABLE `sys_dictionary_data`
     `status`   tinyint(1) default 1 comment '字典数据状态 1正常 0停用',
     key        idx_type_key (`type_key`),
     unique index ui(`type_key`, `data_key`)
-) engine = innodb auto_increment = 10000001 character set = utf8mb4 comment = '字典数据表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '字典数据表';
 
-INSERT INTO sys_dictionary_data (type_key, data_key, value, remark, sort, status)
-VALUES ('admin', 'super_admin', '超级管理员', 'ipsum', 1, 1),
-       ('admin', 'platform_admin', '平台管理员', 'ipsum', 1, 1),
-       ('common_status', 'enable', '启用', '', 1, 1),
-       ('common_status', 'disable', '停用', '', 1, 1);
+INSERT INTO sys_dictionary_data (id, type_key, data_key, value, remark, sort, status)
+VALUES (10000001, 'admin', 'super_admin', '超级管理员', 'ipsum', 1, 1),
+       (10000002, 'admin', 'platform_admin', '平台管理员', 'ipsum', 1, 1),
+       (10000003, 'common_status', 'enable', '启用', '', 1, 1),
+       (10000004, 'common_status', 'disable', '停用', '', 1, 1);
 
+DROP TABLE IF EXISTS `app_user`;
 CREATE TABLE `app_user`
 (
-    `id`           bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+    `id`           bigint(20) UNSIGNED NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `nick_name`    varchar(64) NULL DEFAULT NULL COMMENT '昵称',
     `phone_number` varchar(64) NULL DEFAULT NULL COMMENT '电话',
     `open_id`      varchar(64) NULL DEFAULT NULL COMMENT '微信openId',
-    `email` varchar(64) NULL DEFAULT NULL COMMENT '用户邮箱',
+    `email`        varchar(64) NULL DEFAULT NULL COMMENT '用户邮箱',
     `avatar`       varchar(255) NULL DEFAULT NULL COMMENT '头像',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `uk_phone`(`phone_number`) USING BTREE,
     UNIQUE INDEX `uk_open_id`(`open_id`) USING BTREE,
     UNIQUE KEY `uk_email` (`email`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='应用端人员表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '应用端人员表';
 
 -- sys_user definition
 
+DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`
 (
-    `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+    `id`           bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
     `nick_name`    varchar(64)  NOT NULL COMMENT '昵称',
     `phone_number` varchar(64)  NOT NULL COMMENT '电话',
     `password`     varchar(255) NOT NULL COMMENT '密码',
@@ -4637,10 +4640,10 @@ CREATE TABLE `sys_user`
     `status`       varchar(10)  NOT NULL COMMENT '状态',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `uk_phone` (`phone_number`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10000001 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='管理端人员表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '管理端人员表';
 
-INSERT INTO `sys_user` (nick_name, phone_number, password, identity, remark, status)
-VALUES ('稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
+INSERT INTO `sys_user` (id, nick_name, phone_number, password, identity, remark, status)
+VALUES (10000001, '稚名不带撇', '62a9bfed8dc2cc6e2c83eb628bd10d3e',
         '78199ef620f359d5a33b91d172d3acfeb13591719c53d3cfa14ade0614fcb1a6', 'super_admin', "超级管理员", 'enable');
 
-commit;
+COMMIT;
