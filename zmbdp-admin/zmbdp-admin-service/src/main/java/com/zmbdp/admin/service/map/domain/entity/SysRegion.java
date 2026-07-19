@@ -1,9 +1,9 @@
 package com.zmbdp.admin.service.map.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zmbdp.common.domain.domain.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * sys_region 表对应的实体类
@@ -11,14 +11,9 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_region")
-public class SysRegion {
-
-    /**
-     * 主键ID（雪花算法生成）
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+public class SysRegion extends BaseEntity {
 
     /**
      * 区域名称

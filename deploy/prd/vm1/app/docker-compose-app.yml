@@ -16,7 +16,7 @@ services:
     volumes:
       - ../../skywalking/skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:18081/actuator/health" ]
       interval: 30s
@@ -42,7 +42,7 @@ services:
     volumes:
       - ../../skywalking/skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:18082/actuator/health" ]
       interval: 30s
@@ -68,7 +68,7 @@ services:
     volumes:
       - ../../skywalking/skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:10030/actuator/health" ]
       interval: 30s
@@ -94,7 +94,7 @@ services:
     volumes:
       - ../../skywalking/skywalking-agent:/skywalking-agent  # 挂载 SkyWalking Agent
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:18083/actuator/health" ]
       interval: 30s
@@ -106,4 +106,4 @@ services:
         max-size: "10m"
         max-file: "3"
 networks:
-  frameworkjava_network_prd:
+  network_prd:

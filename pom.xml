@@ -75,6 +75,7 @@
 
         <!--docker部署配置-->
         <dockerhost.addr>tcp://你的云服务器外网ip/你的虚拟机外网ip:2376</dockerhost.addr>
+        <docker.network.name>frameworkjava_network_${runenv}</docker.network.name>
         <dockerregistry.url>crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com</dockerregistry.url>
         <dockerregistry.namespace>zmbdp-service</dockerregistry.namespace>
         <dockerregistry.username>${env.DOCKER_USERNAME}</dockerregistry.username>

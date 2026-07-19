@@ -21,7 +21,7 @@
 
 ## 实现方案
 
-FrameworkJava 采用 **AOP + Redis** 实现分布式幂等性控制。
+frameworkJava 采用 **AOP + Redis** 实现分布式幂等性控制。
 
 ### 核心组件
 

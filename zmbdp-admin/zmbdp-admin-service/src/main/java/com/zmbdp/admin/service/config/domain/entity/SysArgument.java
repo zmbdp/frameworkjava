@@ -1,9 +1,9 @@
 package com.zmbdp.admin.service.config.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.zmbdp.common.domain.domain.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 系统参数表对应的实体类
@@ -11,14 +11,9 @@ import lombok.Data;
  * @author 稚名不带撇
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_argument")
-public class SysArgument {
-
-    /**
-     * 主键ID（雪花算法生成）
-     */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+public class SysArgument extends BaseEntity {
 
     /**
      * 参数名称
