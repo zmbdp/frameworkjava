@@ -1,6 +1,6 @@
 # Excel 导入导出
 
-frameworkJava 基于 Alibaba EasyExcel 封装了 Excel 导入导出能力，提供同步/异步导入、HTTP 响应/输出流导出、单表/多表模板填充、单元格合并、大数值精度保护、JSR-303 数据校验等特性，开箱即用。
+FrameworkJava 基于 Alibaba EasyExcel 封装了 Excel 导入导出能力，提供同步/异步导入、HTTP 响应/输出流导出、单表/多表模板填充、单元格合并、大数值精度保护、JSR-303 数据校验等特性，开箱即用。
 
 ## 概述
 

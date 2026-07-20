@@ -2,7 +2,7 @@
 
 ## 📖 概述
 
-frameworkJava 提供了两种链路追踪方案：
+network 提供了两种链路追踪方案：
 
 ### 1. 轻量级 TraceId 方案（推荐用于日志追踪）
 
@@ -26,27 +26,6 @@ frameworkJava 提供了两种链路追踪方案：
 ---
 
 ## 🎯 方案一：轻量级 TraceId（推荐）
-
-### 🌟 智能适配：自动兼容 SkyWalking
-
-**重要特性：我们的实现会自动检测并适配 SkyWalking！**
-
-**TraceId 获取优先级：**
-
-```
-1. SkyWalking 的 traceId（如果配置了 Agent）
-   ↓ 如果没有
-2. 请求头中的 traceId（X-Trace-Id）
-   ↓ 如果没有
-3. 生成新的 traceId（32位UUID）
-```
-
-**这意味着：**
-
-- ✅ **配置了 SkyWalking**：自动使用 SkyWalking 的 traceId，获得性能分析 + 统一的 traceId
-- ✅ **未配置 SkyWalking**：自动生成轻量级 traceId，仍然有完整的日志追踪
-- ✅ **跨服务 traceId 始终保持一致**
-- ✅ **无需修改代码，自动适配**
 
 ### 架构说明
 
@@ -96,8 +75,8 @@ File Service [traceId=abc123]
 
 **功能：**
 
-- 优先使用 SkyWalking 的 traceId（如果配置了 Agent）
-- 否则从请求头提取 traceId
+- 从请求头提取 traceId（X-Trace-Id 或 traceId）
+- 如果不存在则生成新的 traceId（32位UUID）
 - 设置到 MDC
 - 请求结束后清理 MDC
 
@@ -107,7 +86,7 @@ File Service [traceId=abc123]
 
 **功能：**
 
-- 从 MDC 获取 traceId（可能是 SkyWalking 的，也可能是轻量级的）
+- 从 MDC 获取 traceId
 - 添加到 Feign 请求头
 - 实现跨服务传递
 
@@ -197,18 +176,7 @@ java -javaagent:/path/to/skywalking-agent.jar \
 
 所有组件已自动注册，无需额外配置。
 
-#### 2. 日志配置（Nacos）
-
-在 `share-monitor-{env}.yaml` 中配置：
-
-```yaml
-logging:
-   pattern:
-      console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
-      file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level [%thread] %logger{36} : %msg%n'
-```
-
-#### 3. 查看日志
+#### 2. 查看日志
 
 **Gateway 日志：**
 
@@ -257,7 +225,7 @@ traceId: "abc123def456"
 
 ```bash
 cd deploy/dev/app
-docker compose -p frameworkJava -f docker-compose-mid.yml up -d frameworkJava-skywalking-oap frameworkJava-skywalking-ui
+docker compose -p network -f docker-compose-mid.yml up -d network-skywalking-oap network-skywalking-ui
 ```
 
 ### 2. 访问 SkyWalking UI
@@ -304,7 +272,7 @@ java -javaagent:/path/to/skywalking-agent/skywalking-agent.jar \
 在 Dockerfile 中添加：
 
 ```dockerfile
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 
 # 复制 SkyWalking Agent
 COPY skywalking-agent /skywalking-agent
@@ -315,7 +283,7 @@ COPY target/app.jar /app.jar
 # 启动参数
 ENV JAVA_OPTS="-javaagent:/skywalking-agent/skywalking-agent.jar"
 ENV SW_AGENT_NAME="zmbdp-admin"
-ENV SW_AGENT_COLLECTOR_BACKEND_SERVICES="frameworkJava-skywalking-oap:11800"
+ENV SW_AGENT_COLLECTOR_BACKEND_SERVICES="network-skywalking-oap:11800"
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"]
 ```
@@ -369,7 +337,7 @@ SkyWalking 会自动追踪以下组件：
 
 ### 4. 日志关联 TraceId
 
-frameworkJava 已集成 SkyWalking Logback 插件，日志会自动关联 TraceId。
+network 已集成 SkyWalking Logback 插件，日志会自动关联 TraceId。
 
 **日志格式：**
 
@@ -418,10 +386,10 @@ public class UserService {
 
 ```properties
 # 服务名称
-agent.service_name=${SW_AGENT_NAME:zmbdp-admin}
+agent.service_name=${SW_AGENT_NAME:Your_ApplicationName}
 
 # OAP 服务地址
-collector.backend_service=${SW_AGENT_COLLECTOR_BACKEND_SERVICES:localhost:11800}
+collector.backend_service=${SW_AGENT_COLLECTOR_BACKEND_SERVICES:127.0.0.1:11800}
 
 # 采样率（0.0 - 1.0，1.0 表示全量采集）
 agent.sample_n_per_3_secs=${SW_AGENT_SAMPLE:-1}
@@ -429,23 +397,19 @@ agent.sample_n_per_3_secs=${SW_AGENT_SAMPLE:-1}
 # 日志级别
 logging.level=${SW_LOGGING_LEVEL:INFO}
 
-# 忽略的端点（正则表达式）
-trace.ignore_path=${SW_IGNORE_PATH:/actuator/**,/health,/metrics}
-
 # 最大 Span 数量
 agent.span_limit_per_segment=${SW_AGENT_SPAN_LIMIT:300}
 ```
 
 ### 常用配置项
 
-| 配置项                            | 说明         | 默认值             |
-|--------------------------------|------------|-----------------|
-| `agent.service_name`           | 服务名称       | -               |
-| `collector.backend_service`    | OAP 服务地址   | localhost:11800 |
-| `agent.sample_n_per_3_secs`    | 采样率        | -1（全量）          |
-| `logging.level`                | 日志级别       | INFO            |
-| `trace.ignore_path`            | 忽略的端点      | -               |
-| `agent.span_limit_per_segment` | 最大 Span 数量 | 300             |
+| 配置项                            | 说明         | 默认值                  |
+|--------------------------------|------------|----------------------|
+| `agent.service_name`           | 服务名称       | Your_ApplicationName |
+| `collector.backend_service`    | OAP 服务地址   | 127.0.0.1:11800     |
+| `agent.sample_n_per_3_secs`    | 采样率        | -1（全量）               |
+| `logging.level`                | 日志级别       | INFO                 |
+| `agent.span_limit_per_segment` | 最大 Span 数量 | 300                  |
 
 ## 🔍 常见问题
 
@@ -457,7 +421,7 @@ agent.span_limit_per_segment=${SW_AGENT_SPAN_LIMIT:300}
 
 ```bash
 # 查看 OAP 日志
-docker logs frameworkJava-skywalking-oap
+docker logs network-skywalking-oap
 
 # 检查 OAP 健康状态
 curl http://localhost:12800/internal/l7check
@@ -535,9 +499,9 @@ agent.sample_n_per_3_secs=1000
 {项目名}-{模块名}
 
 例如：
-- frameworkJava-gateway
-- frameworkJava-admin
-- frameworkJava-portal
+- network-gateway
+- network-admin
+- network-portal
 ```
 
 ### 2. 采样策略
@@ -558,17 +522,12 @@ agent.sample_n_per_3_secs=1000
 
 ### 4. 性能优化
 
-1. **忽略健康检查端点**：
-   ```properties
-   trace.ignore_path=/actuator/**,/health,/metrics
-   ```
-
-2. **限制 Span 数量**：
+1. **限制 Span 数量**：
    ```properties
    agent.span_limit_per_segment=300
    ```
 
-3. **异步上报**：
+2. **异步上报**：
    ```properties
    buffer.channel_size=5000
    buffer.buffer_size=300
@@ -584,4 +543,3 @@ agent.sample_n_per_3_secs=1000
 ---
 
 如有问题，请联系：[JavaFH@163.com](mailto:JavaFH@163.com)
-

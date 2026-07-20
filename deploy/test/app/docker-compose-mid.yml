@@ -123,7 +123,7 @@ services:
       retries: 10
   
   frameworkjava-web-test:
-    image: nginx:1.24.0
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nginx:1.24.0
     container_name: frameworkjava-web-test
     restart: always
     networks:

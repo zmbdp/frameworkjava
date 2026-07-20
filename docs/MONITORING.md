@@ -2,12 +2,12 @@
 
 ## 📖 概述
 
-frameworkJava 集成了 **Prometheus + Grafana + AlertManager** 作为服务监控与告警解决方案，提供：
+FrameworkJava 集成了 **Prometheus + Grafana + AlertManager** 作为服务监控与告警解决方案，提供：
 
 - **全方位监控**：JVM、接口、数据库、缓存、系统资源
 - **可视化大盘**：Grafana 实时监控大盘
 - **智能告警**：多级别告警规则，支持多渠道通知
-- **历史数据**：30 天数据保留，支持趋势分析
+- **历史数据**：7 天数据保留，支持趋势分析
 
 ## 🚀 快速开始
 
@@ -15,7 +15,7 @@ frameworkJava 集成了 **Prometheus + Grafana + AlertManager** 作为服务监�
 
 ```bash
 cd deploy/dev/app
-docker compose -p frameworkJava -f docker-compose-mid.yml up -d frameworkJava-prometheus frameworkJava-grafana frameworkJava-alertmanager
+docker compose -p frameworkjava -f docker-compose-mid.yml up -d frameworkjava-prometheus frameworkjava-grafana frameworkjava-alertmanager
 ```
 
 ### 2. 访问监控界面
@@ -28,7 +28,7 @@ docker compose -p frameworkJava -f docker-compose-mid.yml up -d frameworkJava-pr
 
 ### 3. 查看监控大盘
 
-登录 Grafana 后，在左侧菜单选择 "Dashboards" → "frameworkJava"，可以看到：
+登录 Grafana 后，在左侧菜单选择 "Dashboards" → "frameworkjava"，可以看到：
 
 - **JVM Monitoring**：JVM 内存、GC、线程、CPU 监控
 - **API Monitoring**：接口 QPS、响应时间、错误率监控
@@ -185,9 +185,9 @@ process_cpu_usage * 100
 
 | 级别           | 说明          | 响应时间   | 通知方式         |
 |--------------|-------------|--------|--------------|
-| **critical** | 严重告警，需要立即处理 | 5 分钟内  | 邮件 + 钉钉 + 短信 |
-| **warning**  | 警告告警，需要关注   | 30 分钟内 | 邮件 + 钉钉      |
-| **info**     | 信息告警，仅记录    | -      | 邮件           |
+| **critical** | 严重告警，需要立即处理 | 5 分钟内  | 邮件 |
+| **warning**  | 警告告警，需要关注   | 30 分钟内 | 邮件 |
+| **info**     | 信息告警，仅记录    | -      | 邮件 |
 
 ### 已配置的告警规则
 
@@ -225,7 +225,14 @@ process_cpu_usage * 100
 | DatabaseConnectionPoolHigh     | 连接池使用率 > 80% | warning | 5 分钟 |
 | DatabaseConnectionWaitTimeLong | 等待连接数 > 10   | warning | 2 分钟 |
 
-#### 5. 系统资源告警
+#### 5. Redis 告警
+
+| 告警名称               | 触发条件           | 级别      | 持续时间 |
+|--------------------|----------------|---------|------|
+| RedisMemoryHigh    | 内存使用率 > 80%  | warning | 5 分钟 |
+| RedisConnectionsHigh | 连接数 > 1000  | warning | 5 分钟 |
+
+#### 6. 系统资源告警
 
 | 告警名称               | 触发条件         | 级别      | 持续时间 |
 |--------------------|--------------|---------|------|
@@ -294,16 +301,6 @@ receivers:
           Subject: '【告警】{{ .GroupLabels.alertname }}'
 ```
 
-#### 配置钉钉通知
-
-```yaml
-receivers:
-  - name: 'dingtalk'
-    webhook_configs:
-      - url: 'http://your-webhook-server:5001/webhook/dingtalk'
-        send_resolved: true
-```
-
 ### 4. Grafana 配置
 
 #### 添加数据源
@@ -312,7 +309,7 @@ receivers:
 2. 点击左侧菜单 "Configuration" → "Data Sources"
 3. 点击 "Add data source"
 4. 选择 "Prometheus"
-5. 配置 URL：`http://frameworkJava-prometheus:9090`
+5. 配置 URL：`http://frameworkjava-prometheus:9090`
 6. 点击 "Save & Test"
 
 #### 导入 Dashboard
@@ -359,7 +356,7 @@ management:
 
 ```bash
 # 在 Grafana 容器中测试连接
-docker exec -it frameworkJava-grafana curl http://frameworkJava-prometheus:9090/-/healthy
+docker exec -it frameworkjava-grafana curl http://frameworkjava-prometheus:9090/-/healthy
 ```
 
 ### 3. 告警未触发
@@ -370,7 +367,7 @@ docker exec -it frameworkJava-grafana curl http://frameworkJava-prometheus:9090/
 
 1. 检查 Prometheus 告警规则：访问 `http://localhost:9090/alerts`
 2. 检查 AlertManager 配置：访问 `http://localhost:9093`
-3. 查看 AlertManager 日志：`docker logs frameworkJava-alertmanager`
+3. 查看 AlertManager 日志：`docker logs frameworkjava-alertmanager`
 
 ### 4. 告警通知未收到
 
@@ -386,7 +383,7 @@ docker exec -it frameworkJava-grafana curl http://frameworkJava-prometheus:9090/
 
 2. 查看 AlertManager 日志：
    ```bash
-   docker logs frameworkJava-alertmanager
+   docker logs frameworkjava-alertmanager
    ```
 
 ### 5. 监控数据不准确
@@ -477,12 +474,13 @@ docker exec -it frameworkJava-grafana curl http://frameworkJava-prometheus:9090/
 
 **Prometheus 数据保留：**
 
+数据保留参数通过 `docker-compose-mid.yml` 中 Prometheus 服务的 `command` 字段配置：
+
 ```yaml
-# prometheus.yml
-storage:
-  tsdb:
-    retention.time: 30d  # 保留 30 天
-    retention.size: 50GB  # 最大 50GB
+# docker-compose-mid.yml
+command:
+  - '--storage.tsdb.retention.time=7d'   # 保留 7 天
+  - '--storage.tsdb.retention.size=5GB'  # 最大 5GB
 ```
 
 **长期存储方案：**
@@ -515,4 +513,3 @@ storage:
 ---
 
 如有问题，请联系：[JavaFH@163.com](mailto:JavaFH@163.com)
-
