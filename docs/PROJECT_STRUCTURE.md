@@ -2,10 +2,10 @@
 
 ## 整体架构
 
-FrameworkJava 采用模块化微服务架构，遵循 **API 与 Service 分离**的设计原则。
+frameworkJava 采用模块化微服务架构，遵循 **API 与 Service 分离**的设计原则。
 
 ```
-frameworkjava/
+frameworkJava/
 ├── zmbdp-gateway/                     # 网关服务
 ├── zmbdp-common/                      # 公共基础模块
 │   ├── zmbdp-common-cache/            # 缓存组件

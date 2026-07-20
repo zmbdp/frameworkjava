@@ -27,7 +27,7 @@ services:
     privileged: true
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: mysql --user=root -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
       start_period: 30s
@@ -61,7 +61,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6383", "ping" ]
       start_period: 3s
@@ -87,7 +87,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6384", "ping" ]
       start_period: 3s
@@ -113,7 +113,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6385", "ping" ]
       start_period: 3s
@@ -151,7 +151,7 @@ services:
       - "9859:9859"
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8858/nacos" ]
       start_period: 30s
@@ -167,7 +167,7 @@ services:
     container_name: frameworkjava-web-prd02
     restart: always
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     ports:
       - "8866:8886"
     volumes:
@@ -201,7 +201,7 @@ services:
       - ../data2/frameworkjavadata/rabbitmq02/log:/var/log/rabbitmq
       - ../data2/frameworkjavadata/rabbitmq02/data:/var/lib/rabbitmq
     networks:
-      frameworkjava_network_prd:
+      network_prd:
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
@@ -213,4 +213,4 @@ services:
         max-file: "3"
 
 networks:
-  frameworkjava_network_prd:
+  network_prd:

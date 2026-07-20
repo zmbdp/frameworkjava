@@ -41,13 +41,17 @@ CREATE TABLE IF NOT EXISTS `test_order` (
     `amount` DECIMAL(10,2) DEFAULT 0.00 COMMENT '订单金额',
     `status` CHAR(1) DEFAULT '1' COMMENT '状态（1待支付 2已支付 3已取消）',
     `tenant_id` BIGINT COMMENT '租户ID（多租户场景）',
-    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_by`   BIGINT COMMENT '创建人ID',
+    `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+    `update_by`   BIGINT COMMENT '修改人ID',
+    `update_time` DATETIME DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_order_no` (`order_no`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_dept_id` (`dept_id`),
-    KEY `idx_tenant_id` (`tenant_id`)
+    KEY `idx_tenant_id` (`tenant_id`),
+    KEY `idx_create_time` (`create_time`),
+    KEY `idx_create_by` (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '测试订单表';
 
 -- ========================================
@@ -128,4 +132,3 @@ FROM test_order o
 LEFT JOIN test_user u ON o.user_id = u.id
 LEFT JOIN test_dept d ON o.dept_id = d.id
 ORDER BY o.id;
-

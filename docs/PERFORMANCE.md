@@ -38,7 +38,7 @@ spring:
       
       # 性能优化配置
       leak-detection-threshold: 60000 # 连接泄漏检测（毫秒，生产环境建议开启）
-      pool-name: FrameworkJavaHikariCP # 连接池名称（便于监控和日志追踪）
+      pool-name: frameworkJavaHikariCP # 连接池名称（便于监控和日志追踪）
 ```
 
 **配置建议：**
@@ -281,7 +281,7 @@ if (rows == 0) {
 
 ### 1. 测试方式
 
-FrameworkJava 采用 **多线程并发测试** 的方式验证高并发场景下的功能正确性和性能表现。
+frameworkJava 采用 **多线程并发测试** 的方式验证高并发场景下的功能正确性和性能表现。
 
 #### 实现方式
 

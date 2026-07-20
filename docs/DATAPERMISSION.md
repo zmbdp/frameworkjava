@@ -33,7 +33,7 @@
 
 ## 实现方案
 
-FrameworkJava 采用 **MyBatis 拦截器 + 策略模式** 实现数据权限控制。
+frameworkJava 采用 **MyBatis 拦截器 + 策略模式** 实现数据权限控制。
 
 ### 工作原理
 

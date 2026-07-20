@@ -2,7 +2,7 @@
 
 ## Nacos 配置中心
 
-FrameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理和动态刷新。
+frameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理和动态刷新。
 
 ### 配置命名规范
 
@@ -57,33 +57,32 @@ spring:
 
 ## 环境说明
 
-所有环境的配置文件都位于 `deploy/test/res/sql/nacos_config/DEFAULT_GROUP/` 目录下，通过修改文件名后缀来区分不同环境。
+三个环境的配置文件分别位于各自的部署目录下，每个环境都有独立的配置文件（不需要修改后缀）。
 
 ### dev（开发环境）
-- 配置路径：`deploy/test/res/sql/nacos_config/DEFAULT_GROUP/`
-- 配置文件：将 `-test.yaml` 后缀改为 `-dev.yaml`
-- 导入方式：将目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
+- 配置路径：`deploy/dev/res/sql/DEFAULT_GROUP/`
+- 配置文件后缀：`-dev.yaml`
+- 导入方式：将 `DEFAULT_GROUP` 目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
 - 用途：本地开发调试
 
 ### test（测试环境）
 - 配置路径：`deploy/test/res/sql/nacos_config/DEFAULT_GROUP/`
-- 配置文件：使用 `-test.yaml` 后缀
-- 导入方式：将目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
+- 配置文件后缀：`-test.yaml`
+- 导入方式：将 `DEFAULT_GROUP` 目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
 - 用途：测试环境部署
 
 ### prd（生产环境）
-- 配置路径：`deploy/test/res/sql/nacos_config/DEFAULT_GROUP/`
-- 配置文件：将 `-test.yaml` 后缀改为 `-prd.yaml`
-- 导入方式：将目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
+- 配置路径：`deploy/prd/vm1/res/sql/DEFAULT_GROUP/`
+- 配置文件后缀：`-prd.yaml`
+- 导入方式：将 `DEFAULT_GROUP` 目录打包成 zip，在 Nacos 控制台通过"导入配置"功能导入
 - 用途：生产环境部署
 
 ### 配置导入步骤
 
-1. 进入配置目录：`deploy/test/res/sql/nacos_config/DEFAULT_GROUP/`
-2. 根据环境修改文件名后缀（dev/test/prd）
-3. 将整个 `DEFAULT_GROUP` 目录打包成 zip 文件
-4. 登录 Nacos 控制台，进入"配置管理 > 导入配置"
-5. 选择 zip 文件导入，系统会自动创建对应的配置文件
+1. 进入对应环境的配置目录（如 `deploy/dev/res/sql/DEFAULT_GROUP/`）
+2. 将整个 `DEFAULT_GROUP` 目录打包成 zip 文件
+3. 登录 Nacos 控制台，进入"配置管理 > 导入配置"
+4. 选择 zip 文件导入，系统会自动创建对应的配置文件
 
 ## 本地开发配置
 

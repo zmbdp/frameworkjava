@@ -8,27 +8,27 @@ USE `frameworkjava_dev`;
 DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`
 (
-    `id`              bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
-    `operation`       varchar(255) NOT NULL COMMENT '操作描述',
-    `method`          varchar(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
-    `request_path`    varchar(500)  DEFAULT NULL COMMENT '请求路径',
-    `request_method`  varchar(10)   DEFAULT NULL COMMENT '请求方式（GET/POST/PUT/DELETE等）',
-    `params`          text COMMENT '方法入参（JSON格式）',
-    `result`          text COMMENT '方法返回值（JSON格式）',
-    `exception`       varchar(1000) DEFAULT NULL COMMENT '异常信息',
-    `exception_stack` text COMMENT '异常堆栈',
-    `user_id`         bigint(20) DEFAULT NULL COMMENT '操作者用户ID',
-    `user_name`       varchar(100)  DEFAULT NULL COMMENT '操作者用户名',
-    `client_ip`       varchar(50)   DEFAULT NULL COMMENT '客户端IP地址',
-    `user_agent`      varchar(500)  DEFAULT NULL COMMENT '请求来源（User-Agent）',
-    `operation_time`  datetime     NOT NULL COMMENT '操作时间',
-    `cost_time`       bigint(20) DEFAULT NULL COMMENT '方法执行耗时（毫秒）',
-    `status`          varchar(20)  NOT NULL COMMENT '操作状态（SUCCESS/FAILED）',
-    `module`          varchar(100)  DEFAULT NULL COMMENT '业务模块',
-    `business_type`   varchar(100)  DEFAULT NULL COMMENT '业务类型',
-    `ext_info`        text COMMENT '扩展字段（JSON格式）',
-    `trace_id`        varchar(100)  DEFAULT NULL COMMENT '调用链追踪ID',
-    `span_id`         varchar(100)  DEFAULT NULL COMMENT '调用链跨度ID',
+    `id`              BIGINT(20) UNSIGNED NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `operation`       VARCHAR(255) NOT NULL COMMENT '操作描述',
+    `method`          VARCHAR(500)  DEFAULT NULL COMMENT '方法全限定名（类名#方法名）',
+    `request_path`    VARCHAR(500)  DEFAULT NULL COMMENT '请求路径',
+    `request_method`  VARCHAR(10)   DEFAULT NULL COMMENT '请求方式（GET/POST/PUT/DELETE等）',
+    `params`          TEXT COMMENT '方法入参（JSON格式）',
+    `result`          TEXT COMMENT '方法返回值（JSON格式）',
+    `exception`       VARCHAR(1000) DEFAULT NULL COMMENT '异常信息',
+    `exception_stack` TEXT COMMENT '异常堆栈',
+    `user_id`         BIGINT(20) DEFAULT NULL COMMENT '操作者用户ID',
+    `user_name`       VARCHAR(100)  DEFAULT NULL COMMENT '操作者用户名',
+    `client_ip`       VARCHAR(50)   DEFAULT NULL COMMENT '客户端IP地址',
+    `user_agent`      VARCHAR(500)  DEFAULT NULL COMMENT '请求来源（User-Agent）',
+    `operation_time`  DATETIME     NOT NULL COMMENT '操作时间',
+    `cost_time`       BIGINT(20) DEFAULT NULL COMMENT '方法执行耗时（毫秒）',
+    `status`          VARCHAR(20)  NOT NULL COMMENT '操作状态（SUCCESS/FAILED）',
+    `module`          VARCHAR(100)  DEFAULT NULL COMMENT '业务模块',
+    `business_type`   VARCHAR(100)  DEFAULT NULL COMMENT '业务类型',
+    `ext_info`        TEXT COMMENT '扩展字段（JSON格式）',
+    `trace_id`        VARCHAR(100)  DEFAULT NULL COMMENT '调用链追踪ID',
+    `span_id`         VARCHAR(100)  DEFAULT NULL COMMENT '调用链跨度ID',
     PRIMARY KEY (`id`),
     KEY               `idx_operation_time` (`operation_time`),
     KEY               `idx_user_id` (`user_id`),
@@ -40,17 +40,26 @@ CREATE TABLE `operation_log`
 DROP TABLE IF EXISTS `sys_region`;
 CREATE TABLE `sys_region`
 (
-    `id`          bigint(20) NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
-    `code`        varchar(20)    DEFAULT NULL COMMENT '区划编码',
-    `parent_id`   bigint(20) DEFAULT NULL COMMENT '父级id',
-    `parent_code` varchar(20)    DEFAULT NULL COMMENT '父级编码',
-    `name`        varchar(40)    DEFAULT NULL COMMENT '区划名称',
-    `full_name`   varchar(40)    DEFAULT NULL COMMENT '区划全称',
-    `pinyin`      varchar(50)    DEFAULT NULL COMMENT '城市拼音',
-    `level`       varchar(20)    DEFAULT NULL COMMENT '省-1,市-2,区-3',
-    `longitude`   decimal(10, 7) DEFAULT NULL COMMENT '经度',
-    `latitude`    decimal(10, 7) DEFAULT NULL COMMENT '纬度',
-    PRIMARY KEY (`id`)
+    `id`          BIGINT(20) NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `code`        VARCHAR(20)    DEFAULT NULL COMMENT '区划编码',
+    `parent_id`   BIGINT(20) DEFAULT NULL COMMENT '父级id',
+    `parent_code` VARCHAR(20)    DEFAULT NULL COMMENT '父级编码',
+    `name`        VARCHAR(40)    DEFAULT NULL COMMENT '区划名称',
+    `full_name`   VARCHAR(100)   DEFAULT NULL COMMENT '区划全称',
+    `pinyin`      VARCHAR(100)   DEFAULT NULL COMMENT '城市拼音',
+    `level`       VARCHAR(20)    DEFAULT NULL COMMENT '省-1,市-2,区-3',
+    `longitude`   DECIMAL(10, 7) DEFAULT NULL COMMENT '经度',
+    `latitude`    DECIMAL(10, 7) DEFAULT NULL COMMENT '纬度',
+    `create_by`   BIGINT(20)  DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME       DEFAULT NULL COMMENT '创建时间',
+    `update_by`   BIGINT(20)  DEFAULT NULL COMMENT '修改人ID',
+    `update_time` DATETIME       DEFAULT NULL COMMENT '修改时间',
+    PRIMARY KEY (`id`),
+    KEY           `idx_parent_id` (`parent_id`),
+    KEY           `idx_code` (`code`),
+    KEY           `idx_level` (`level`),
+    KEY           `idx_create_time` (`create_time`),
+    KEY           `idx_create_by` (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '行政区划表';
 
 INSERT INTO sys_region (id, code, parent_id, parent_code, name, full_name, pinyin, `level`, longitude, latitude)
@@ -4565,12 +4574,18 @@ VALUES (3941, '813300', 424, '810000', '屯门区', '屯门区', 'tunmenqu', '3'
 DROP TABLE IF EXISTS `sys_argument`;
 create table `sys_argument`
 (
-    `id`         bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
-    `name`       varchar(64)   default '' comment '参数名称',
-    `config_key` varchar(64)   default '' comment '参数键名',
-    `value`      varchar(1024) default '' comment '参数键值',
-    `remark`     varchar(64)   default '' comment '备注',
-    unique index idx_config_key (`config_key`)
+    `id`          BIGINT(20) UNSIGNED NOT NULL PRIMARY KEY COMMENT '主键ID（雪花算法，由应用生成）',
+    `name`        VARCHAR(64)   DEFAULT '' COMMENT '参数名称',
+    `config_key`  VARCHAR(64)   DEFAULT '' COMMENT '参数键名',
+    `value`       VARCHAR(1024) DEFAULT '' COMMENT '参数键值',
+    `remark`      VARCHAR(64)   DEFAULT '' COMMENT '备注',
+    `create_by`   BIGINT(20)  DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME      DEFAULT NULL COMMENT '创建时间',
+    `update_by`   BIGINT(20)  DEFAULT NULL COMMENT '修改人ID',
+    `update_time` DATETIME      DEFAULT NULL COMMENT '修改时间',
+    UNIQUE INDEX idx_config_key (`config_key`),
+    KEY           idx_create_time (`create_time`),
+    KEY           idx_create_by (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '系统参数表';
 
 INSERT INTO sys_argument (id, name, config_key, value)
@@ -4579,12 +4594,18 @@ VALUES (10000001, '热门城市', 'sys_hot_city', '35,108,234,236,289,342');
 DROP TABLE IF EXISTS `sys_dictionary_type`;
 CREATE TABLE `sys_dictionary_type`
 (
-    `id`       bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
-    `type_key` varchar(64) default '' comment '字典类型键',
-    `value`    varchar(64) default '' comment '字典类型值',
-    `remark`   varchar(64) default '' comment '备注',
-    `status`   tinyint(1) default 1 comment '字典类型状态 1正常 0停用',
-    unique index idx_type_key (`type_key`)
+    `id`          BIGINT(20) UNSIGNED NOT NULL PRIMARY KEY COMMENT '主键ID（雪花算法，由应用生成）',
+    `type_key`    VARCHAR(64) DEFAULT '' COMMENT '字典类型键',
+    `value`       VARCHAR(64) DEFAULT '' COMMENT '字典类型值',
+    `remark`      VARCHAR(64) DEFAULT '' COMMENT '备注',
+    `status`      TINYINT(1) DEFAULT 1 COMMENT '字典类型状态 1正常 0停用',
+    `create_by`   BIGINT(20) DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME    DEFAULT NULL COMMENT '创建时间',
+    `update_by`   BIGINT(20) DEFAULT NULL COMMENT '修改人ID',
+    `update_time` DATETIME    DEFAULT NULL COMMENT '修改时间',
+    UNIQUE INDEX idx_type_key (`type_key`),
+    KEY           idx_create_time (`create_time`),
+    KEY           idx_create_by (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '字典类型表';
 
 INSERT INTO sys_dictionary_type (id, type_key, value, remark, status)
@@ -4594,15 +4615,21 @@ VALUES (10000001, 'admin', '管理员', 'sit', 1),
 DROP TABLE IF EXISTS `sys_dictionary_data`;
 CREATE TABLE `sys_dictionary_data`
 (
-    `id`       bigint(20) unsigned not null primary key comment '主键ID（雪花算法，由应用生成）',
-    `type_key` varchar(64) default '' comment '字典类型键',
-    `data_key` varchar(64) default '' comment '字典数据键',
-    `value`    varchar(64) default '' comment '字典数据值',
-    `remark`   varchar(64) default '' comment '备注',
-    `sort`     int(11) default 1 comment '排序',
-    `status`   tinyint(1) default 1 comment '字典数据状态 1正常 0停用',
-    key        idx_type_key (`type_key`),
-    unique index ui(`type_key`, `data_key`)
+    `id`          BIGINT(20) UNSIGNED NOT NULL PRIMARY KEY COMMENT '主键ID（雪花算法，由应用生成）',
+    `type_key`    VARCHAR(64) DEFAULT '' COMMENT '字典类型键',
+    `data_key`    VARCHAR(64) DEFAULT '' COMMENT '字典数据键',
+    `value`       VARCHAR(64) DEFAULT '' COMMENT '字典数据值',
+    `remark`      VARCHAR(64) DEFAULT '' COMMENT '备注',
+    `sort`        INT(11) DEFAULT 1 COMMENT '排序',
+    `status`      TINYINT(1) DEFAULT 1 COMMENT '字典数据状态 1正常 0停用',
+    `create_by`   BIGINT(20) DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME    DEFAULT NULL COMMENT '创建时间',
+    `update_by`   BIGINT(20) DEFAULT NULL COMMENT '修改人ID',
+    `update_time` DATETIME    DEFAULT NULL COMMENT '修改时间',
+    KEY           idx_type_key (`type_key`),
+    UNIQUE INDEX ui(`type_key`, `data_key`),
+    KEY           idx_create_time (`create_time`),
+    KEY           idx_create_by (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '字典数据表';
 
 INSERT INTO sys_dictionary_data (id, type_key, data_key, value, remark, sort, status)
@@ -4614,16 +4641,22 @@ VALUES (10000001, 'admin', 'super_admin', '超级管理员', 'ipsum', 1, 1),
 DROP TABLE IF EXISTS `app_user`;
 CREATE TABLE `app_user`
 (
-    `id`           bigint(20) UNSIGNED NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
-    `nick_name`    varchar(64) NULL DEFAULT NULL COMMENT '昵称',
-    `phone_number` varchar(64) NULL DEFAULT NULL COMMENT '电话',
-    `open_id`      varchar(64) NULL DEFAULT NULL COMMENT '微信openId',
-    `email`        varchar(64) NULL DEFAULT NULL COMMENT '用户邮箱',
-    `avatar`       varchar(255) NULL DEFAULT NULL COMMENT '头像',
+    `id`           BIGINT(20) UNSIGNED NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `nick_name`    VARCHAR(64) NULL DEFAULT NULL COMMENT '昵称',
+    `phone_number` VARCHAR(64) NULL DEFAULT NULL COMMENT '电话',
+    `open_id`      VARCHAR(64) NULL DEFAULT NULL COMMENT '微信openId',
+    `email`        VARCHAR(64) NULL DEFAULT NULL COMMENT '用户邮箱',
+    `avatar`       VARCHAR(255) NULL DEFAULT NULL COMMENT '头像',
+    `create_by`    BIGINT(20) NULL DEFAULT NULL COMMENT '创建人ID',
+    `create_time`  DATETIME NULL DEFAULT NULL COMMENT '创建时间',
+    `update_by`    BIGINT(20) NULL DEFAULT NULL COMMENT '修改人ID',
+    `update_time`  DATETIME NULL DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `uk_phone`(`phone_number`) USING BTREE,
     UNIQUE INDEX `uk_open_id`(`open_id`) USING BTREE,
-    UNIQUE KEY `uk_email` (`email`) USING BTREE
+    UNIQUE KEY `uk_email` (`email`) USING BTREE,
+    KEY            `idx_create_time` (`create_time`),
+    KEY            `idx_create_by` (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '应用端人员表';
 
 -- sys_user definition
@@ -4631,15 +4664,21 @@ CREATE TABLE `app_user`
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user`
 (
-    `id`           bigint(20) unsigned NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
-    `nick_name`    varchar(64)  NOT NULL COMMENT '昵称',
-    `phone_number` varchar(64)  NOT NULL COMMENT '电话',
-    `password`     varchar(255) NOT NULL COMMENT '密码',
-    `identity`     varchar(16)  NOT NULL COMMENT '身份',
-    `remark`       varchar(50) DEFAULT NULL COMMENT '备注',
-    `status`       varchar(10)  NOT NULL COMMENT '状态',
+    `id`           BIGINT(20) UNSIGNED NOT NULL COMMENT '主键ID（雪花算法，由应用生成）',
+    `nick_name`    VARCHAR(64)  NOT NULL COMMENT '昵称',
+    `phone_number` VARCHAR(64)  NOT NULL COMMENT '电话',
+    `password`     VARCHAR(255) NOT NULL COMMENT '密码',
+    `identity`     VARCHAR(16)  NOT NULL COMMENT '身份',
+    `remark`       VARCHAR(50) DEFAULT NULL COMMENT '备注',
+    `status`       VARCHAR(10)  NOT NULL COMMENT '状态',
+    `create_by`    BIGINT(20)  DEFAULT NULL COMMENT '创建人ID',
+    `create_time`  DATETIME    DEFAULT NULL COMMENT '创建时间',
+    `update_by`    BIGINT(20)  DEFAULT NULL COMMENT '修改人ID',
+    `update_time`  DATETIME    DEFAULT NULL COMMENT '修改时间',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_phone` (`phone_number`) USING BTREE
+    UNIQUE KEY `uk_phone` (`phone_number`) USING BTREE,
+    KEY            `idx_create_time` (`create_time`),
+    KEY            `idx_create_by` (`create_by`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMMENT = '管理端人员表';
 
 INSERT INTO `sys_user` (id, nick_name, phone_number, password, identity, remark, status)
