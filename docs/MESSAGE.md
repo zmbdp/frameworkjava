@@ -1,6 +1,6 @@
 # 消息与验证码服务
 
-frameworkJava 提供统一的验证码发送与校验能力，基于策略模式封装短信、邮件两种发送渠道，并通过 Redis 实现验证码存储、每日发送次数限制与固定验证码机制，业务代码无感知切换开发/生产环境。
+FrameworkJava 提供统一的验证码发送与校验能力，基于策略模式封装短信、邮件两种发送渠道，并通过 Redis 实现验证码存储、每日发送次数限制与固定验证码机制，业务代码无感知切换开发/生产环境。
 
 ## 一、概述
 
@@ -33,7 +33,7 @@ frameworkJava 提供统一的验证码发送与校验能力，基于策略模式
 
 ### 2.1 策略模式分层
 
-frameworkJava 采用**策略模式 + 路由器**实现验证码发送渠道的解耦，调用链如下：
+FrameworkJava 采用**策略模式 + 路由器**实现验证码发送渠道的解耦，调用链如下：
 
 ```
 业务层 (UserService / Controller)
@@ -551,7 +551,7 @@ mail:
 
 ## 十一、扩展点：新增发送渠道
 
-frameworkJava 的策略模式让新增发送渠道（如微信、QQ、企业微信等）变得非常简单，**只需两步**，无需修改 `CaptchaService` 和 `CaptchaSenderRouter` 任何代码。
+FrameworkJava 的策略模式让新增发送渠道（如微信、QQ、企业微信等）变得非常简单，**只需两步**，无需修改 `CaptchaService` 和 `CaptchaSenderRouter` 任何代码。
 
 ### 11.1 实现步骤
 
@@ -622,7 +622,7 @@ public class UserServiceImpl implements IUserService {
 
 ### 12.2 验证码登录场景（校验 + 删除）
 
-来自 frameworkJava 内部 `CodeLoginStrategy` 的实际使用方式：
+来自 FrameworkJava 内部 `CodeLoginStrategy` 的实际使用方式：
 
 ```java
 @Slf4j

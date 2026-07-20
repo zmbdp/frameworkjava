@@ -2,7 +2,7 @@
 
 ## 架构设计
 
-frameworkJava 采用**三级缓存架构**，有效防止缓存穿透，提升系统性能。
+FrameworkJava 采用**三级缓存架构**，有效防止缓存穿透，提升系统性能。
 
 ```
 请求
@@ -107,7 +107,7 @@ frameworkJava 采用**三级缓存架构**，有效防止缓存穿透，提升�
 
 ### 布隆过滤器重置
 
-布隆过滤器只增不减，随着时间推移需要定期重置并重新预热。frameworkJava 提供两种重置机制：
+布隆过滤器只增不减，随着时间推移需要定期重置并重新预热。FrameworkJava 提供两种重置机制：
 
 - **主方案（XXL-JOB）**：由 `ResetBloomFilterJobHandler` 负责，每日凌晨 4 点由 XXL-JOB 调度中心触发。使用 Redisson 分布式锁保证多实例下只有一个节点执行，重置后自动全量预热 C 端用户数据。调度中心配置参考：
   ```
@@ -195,10 +195,10 @@ bloom:
 
 ```yaml
 caffeine:
-  cache:
-    max-size: 10000        # 最大缓存数量
-    expire-after-write: 30 # 写入后过期时间（分钟）
-    expire-after-access: 15 # 访问后过期时间（分钟）
+  build:
+    initial-capacity: 100     # 初始容量
+    maximum-size: 1000        # 最大缓存数量
+    expire: 30                # 写入后过期时间（秒）
 ```
 
 ### Redis 配置

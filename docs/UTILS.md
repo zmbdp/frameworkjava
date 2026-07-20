@@ -1,34 +1,34 @@
 # 工具类使用指南
 
-frameworkJava 提供了 **25 个工具类**，覆盖加密、JSON、Excel、邮件、分页、流处理、脱敏、日志等常用场景，开箱即用，无需重复造轮子。
+FrameworkJava 提供了 **21 个工具类**，覆盖加密、JSON、Excel、邮件、分页、流处理、脱敏、日志等常用场景，开箱即用，无需重复造轮子。
 
 > **注意**：Excel 相关工具类位于 `zmbdp-common-excel` 模块，使用前需要添加该模块依赖。
 
 ## 工具类分类
 
-### 核心工具类（19 个）
+### 核心工具类（17 个）
 
-#### zmbdp-common-core 模块（15 个）
+#### zmbdp-common-core 模块（17 个）
 
 | 工具类                | 功能说明       | 主要方法                                                              |
 |--------------------|------------|-------------------------------------------------------------------|
-| `AESUtil`          | AES 加密/解密  | `encrypt()`, `decrypt()`                                          |
+| `AESUtil`          | AES 加密/解密  | `encryptHex()`, `decryptHex()`                                    |
 | `BeanCopyUtil`     | Bean 属性拷贝  | `copyProperties()`, `copyListProperties()`                        |
-| `ClientIpUtil`     | 客户端 IP 获取  | `getClientIp()`, `getIpFromRequest()`                             |
+| `ClientIpUtil`     | 客户端 IP 获取  | `getClientIp(HttpServletRequest)`                                 |
 | `DesensitizeUtil`  | 敏感字段脱敏     | `desensitizePhone()`, `desensitizeIdCard()`, `desensitizeEmail()` |
-| `FileUtil`         | 文件操作       | `read()`, `write()`, `delete()`                                   |
-| `JsonUtil`         | JSON 处理    | `toJson()`, `parseObject()`, `parseArray()`                       |
+| `FileUtil`         | 文件下载响应头   | `setAttachmentResponseHeader()`, `percentEncode()`                |
+| `JsonUtil`         | JSON 处理    | `classToJson()`, `classToJsonPretty()`, `jsonToClass()`, `jsonToList()`, `jsonToMap()` |
 | `LogExceptionUtil` | 日志异常处理     | `getStackTrace()`, `formatException()`                            |
 | `MailUtil`         | 邮件发送       | `sendText()`, `sendHtml()`                                        |
-| `PageUtil`         | 分页处理       | `startPage()`, `getPage()`                                        |
-| `ServletUtil`      | Servlet 工具 | `getRequest()`, `getResponse()`, `getParameter()`                 |
-| `StreamUtil`       | 流处理        | `toInputStream()`, `toByteArray()`                                |
+| `PageUtil`         | 分页计算       | `getTotalPages()`                                                 |
+| `ServletUtil`      | Servlet 工具 | `getRequest()`, `getRequestAttributes()`, `urlEncode()`, `webFluxResponseWriter()` |
+| `StreamUtil`       | 流处理        | `filter()`, `join()`, `sorted()`, `toList()`, `toSet()`, `toIdentityMap()`, `toMap()`, `groupByKey()`, `groupBy2Key()`, `group2Map()`, `merge()` |
 | `StringUtil`       | 字符串处理      | `isEmpty()`, `isBlank()`, `trim()`                                |
 | `ThreadUtil`       | 线程工具       | `sleep()`, `waitFor()`                                            |
 | `TimestampUtil`    | 时间戳处理      | `getCurrentTimestamp()`, `format()`                               |
 | `TreeUtil`         | 树形结构处理     | `build()`, `toList()`, `findFirst()`, `getSubTree()`              |
 | `ValidatorUtil`    | 数据校验       | `validate()`, `validateObject()`                                  |
-| `VerifyUtil`       | 格式验证       | `checkPhone()`, `checkEmail()`, `checkIdCard()`                   |
+| `VerifyUtil`       | 格式验证       | `checkPhone()`, `checkEmail()`, `generateVerifyCode()`            |
 
 #### 其他模块（4 个）
 
@@ -63,12 +63,12 @@ frameworkJava 提供了 **25 个工具类**，覆盖加密、JSON、Excel、邮�
 - **敏感字段脱敏**：`DesensitizeUtil` - 手机号、身份证、邮箱、银行卡等脱敏
 
 #### 文件操作
-- **文件操作**：`FileUtil` - 文件读写、删除
+- **文件下载**：`FileUtil` - 文件下载响应头设置（中文文件名编码、跨域支持）
 - **Excel 处理**：`ExcelUtil` + Excel 工具类（zmbdp-common-excel 模块）- Excel 导入导出
 
 #### 字符串与验证
 - **字符串处理**：`StringUtil` - 字符串工具方法
-- **格式验证**：`VerifyUtil` - 手机号、邮箱、身份证等格式验证
+- **格式验证**：`VerifyUtil` - 手机号、邮箱格式验证、验证码生成
 - **数据校验**：`ValidatorUtil` - 对象数据校验
 
 #### 加密与安全
@@ -77,7 +77,7 @@ frameworkJava 提供了 **25 个工具类**，覆盖加密、JSON、Excel、邮�
 - **安全工具**：`SecurityUtil` - Token 提取和处理
 
 #### Web 相关
-- **Servlet 工具**：`ServletUtil` - 获取请求、响应等
+- **Servlet 工具**：`ServletUtil` - 获取请求对象、URL 编码、WebFlux 响应写入
 - **分页处理**：`PageUtil` - 分页参数处理
 - **客户端 IP 获取**：`ClientIpUtil` - 获取真实客户端 IP（支持代理、负载均衡）
 
@@ -158,13 +158,13 @@ List<UserDTO> dtoList = BeanCopyUtil.copyListProperties(entityList, UserDTO::new
 
 ```java
 // 对象转 JSON
-String json = JsonUtil.toJson(user);
+String json = JsonUtil.classToJson(user);
 
 // JSON 转对象
-User user = JsonUtil.parseObject(json, User.class);
+User user = JsonUtil.jsonToClass(json, User.class);
 
 // JSON 转 List
-List<User> users = JsonUtil.parseArray(json, User.class);
+List<User> users = JsonUtil.jsonToList(json, User.class);
 ```
 
 ### Excel 导入导出
@@ -195,8 +195,8 @@ boolean isValid = VerifyUtil.checkPhone("13800138000");
 // 验证邮箱
 boolean isValid = VerifyUtil.checkEmail("user@example.com");
 
-// 验证身份证
-boolean isValid = VerifyUtil.checkIdCard("110101199001011234");
+// 生成验证码（6 位纯数字）
+String code = VerifyUtil.generateVerifyCode(6, 1);
 ```
 
 ### JWT 处理
@@ -250,11 +250,11 @@ MailUtil.sendHtml("recipient@example.com", "主题", "<h1>HTML 内容</h1>");
 ### AES 加密
 
 ```java
-// 加密
-String encrypted = AESUtil.encrypt("原始数据", "密钥");
+// 加密（使用内部固定密钥，返回十六进制字符串）
+String encrypted = AESUtil.encryptHex("原始数据");
 
 // 解密
-String decrypted = AESUtil.decrypt(encrypted, "密钥");
+String decrypted = AESUtil.decryptHex(encrypted);
 ```
 
 ### 树形结构处理

@@ -2,7 +2,7 @@
 
 ## Nacos 配置中心
 
-frameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理和动态刷新。
+FrameworkJava 使用 **Nacos** 作为配置中心，实现配置的统一管理和动态刷新。
 
 ### 配置命名规范
 

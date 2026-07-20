@@ -33,7 +33,7 @@
 
 ## 实现方案
 
-frameworkJava 采用 **MyBatis 拦截器 + 策略模式** 实现数据权限控制。
+FrameworkJava 采用 **MyBatis 拦截器 + 策略模式** 实现数据权限控制。
 
 ### 工作原理
 
@@ -331,4 +331,3 @@ A: 使用 JSqlParser 解析 SQL，支持复杂 SQL。建议在主表上添加权
 ### Q: 如何关闭数据权限？
 
 A: 在 Nacos 配置 `datapermission.enabled = false`，或在方法上不添加 `@DataPermission` 注解。
-

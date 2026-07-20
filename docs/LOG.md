@@ -10,7 +10,7 @@
 - `@LogAction`：标记需要记录日志的方法
 - `LogActionAspect`：切面，负责日志收集和处理
 - `ILogStorageService`：日志存储服务接口（可扩展）
-- `DefaultLogStorageService`：默认存储实现（输出到日志文件）
+- `ConsoleLogStorageService`：默认存储实现（输出到日志文件）
 - `DesensitizeUtil`：敏感字段脱敏工具
 
 ## 使用方式
@@ -170,13 +170,22 @@ public Result<String> addProduct(@RequestBody ProductDTO dto) {
 # 日志功能全局配置
 log:
   # 是否启用日志功能（默认：true）
+  # false 时关闭所有 @LogAction 日志记录
   enabled: true
-  
+
   # 是否启用异步处理（默认：true）
+  # true: 异步写入日志，不阻塞业务线程
+  # false: 同步写入日志，可能影响业务性能
   async-enabled: true
-  
+
+  # 是否启用全局默认记录（默认：false）
+  # true: 即使没有 @LogAction 注解的 Controller、Service 方法，也记录基本信息（异常堆栈、方法耗时、traceId 等）
+  # false: 只记录带 @LogAction 注解的方法
+  # 注意：全局默认记录只记录基本信息，不记录参数和返回值
+  global-record-enabled: false
+
   # 全局默认策略（三层策略的兜底配置）
-  # 注意：日志存储方式通过实现 ILogStorageService 接口自定义，当前版本默认实现为输出到日志文件（SLF4J）
+  # 优先级：方法注解 > 类注解 > 全局默认策略
   default:
     # 全局默认是否记录参数（默认：false）
     record-params: false
@@ -211,7 +220,7 @@ log:
 log:
   storage-type: file
   file:
-    path: ./logs/operation.log  # 日志文件路径
+    path: ./logs/operation/  # 日志文件目录（默认：./logs/operation/，实际文件为 {path}{服务名}/{日期}.log）
 ```
 
 #### 3. Redis 存储
@@ -240,14 +249,21 @@ log:
 - 消费者使用匿名队列，应用下线后队列自动删除，无需手动维护
 - 不需要配置队列名称，每个消费者会自动创建自己的临时队列
 
-#### 5. 数据库存储（需要自定义实现）
+#### 5. 数据库存储
 
 ```yaml
 log:
   storage-type: database
 ```
 
-然后实现自定义的数据库存储服务：
+项目已提供 `DatabaseLogStorageService` 实现，会将日志保存到 `operation_log` 表中。使用前需要：
+
+- 引入 MyBatis Plus 依赖
+- 执行建表 SQL 创建 `operation_log` 表
+
+如果 `OperationLogMapper` 未注入（如未配置数据源），存储服务会优雅降级，只记录警告日志，不影响业务逻辑。
+
+如需自定义存储逻辑，可实现 `ILogStorageService` 接口并注册为 Bean：
 
 ```java
 @Service
@@ -279,19 +295,20 @@ public Result<String> addUser(@RequestBody UserDTO dto) {
 
 ## 注解参数说明
 
-| 参数                | 类型      | 必填 | 默认值   | 说明             |
-|-------------------|---------|----|-------|----------------|
-| value             | String  | 是  | -     | 操作描述           |
-| recordParams      | boolean | 否  | false | 是否记录方法入参       |
-| recordResult      | boolean | 否  | false | 是否记录方法返回值      |
-| recordException   | boolean | 否  | true  | 是否记录异常信息       |
-| throwException    | boolean | 否  | true  | 异常时是否抛出异常      |
-| condition         | String  | 否  | ""    | 条件表达式（SpEL）    |
-| paramsExpression  | String  | 否  | ""    | 参数记录表达式（SpEL）  |
-| resultExpression  | String  | 否  | ""    | 返回值记录表达式（SpEL） |
-| module            | String  | 否  | ""    | 业务模块           |
-| businessType      | String  | 否  | ""    | 业务类型           |
-| desensitizeFields | String  | 否  | ""    | 需要脱敏的字段（逗号分隔）  |
+| 参数                | 类型      | 必填 | 默认值   | 说明                          |
+|-------------------|---------|----|-------|-----------------------------|
+| value             | String  | 是  | -     | 操作描述                        |
+| recordParams      | boolean | 否  | false | 是否记录方法入参                    |
+| recordResult      | boolean | 否  | false | 是否记录方法返回值                   |
+| recordException   | boolean | 否  | true  | 是否记录异常信息                    |
+| throwException    | boolean | 否  | true  | 异常时是否抛出异常                   |
+| condition         | String  | 否  | ""    | 条件表达式（SpEL）                 |
+| paramsExpression  | String  | 否  | ""    | 参数记录表达式（SpEL）               |
+| resultExpression  | String  | 否  | ""    | 返回值记录表达式（SpEL）              |
+| module            | String  | 否  | ""    | 业务模块                        |
+| businessType      | String  | 否  | ""    | 业务类型                        |
+| desensitizeFields | String  | 否  | ""    | 需要脱敏的字段（逗号分隔）               |
+| storageType       | String  | 否  | ""    | 日志存储类型（空则使用全局配置，支持 console/database/file/redis/mq） |
 
 ## SpEL 表达式
 
@@ -353,13 +370,13 @@ public Result<String> addUser(@RequestBody UserDTO dto) {
 6. 异步处理默认启用，可通过配置 `log.async-enabled` 控制
 7. 无 HTTP 请求上下文时（如内部调用、单元测试）会跳过部分信息收集（IP、User-Agent 等）
 8. 日志存储失败不会影响业务逻辑，只记录错误日志
-9. 默认实现将日志输出到日志文件（SLF4J），生产环境建议实现数据库存储
+9. 默认实现将日志输出到日志文件（SLF4J），生产环境建议使用数据库存储（将 `log.storage-type` 配置为 `database`）
 
 ## 最佳实践
 
 1. **关键操作必记录**：重要业务操作（如新增、删除、修改）建议记录日志
 2. **合理使用条件记录**：避免记录过多无用日志，使用条件表达式过滤
 3. **敏感字段必脱敏**：涉及用户隐私的字段（如密码、手机号）必须脱敏
-4. **自定义存储方式**：生产环境建议实现数据库存储，便于查询和分析
+4. **存储方式选择**：生产环境建议使用数据库存储（`log.storage-type=database`），便于查询和分析
 5. **异步处理**：高并发场景建议启用异步处理，避免影响业务性能
 6. **合理控制日志量**：避免记录过大对象，使用 SpEL 表达式只记录关键字段
