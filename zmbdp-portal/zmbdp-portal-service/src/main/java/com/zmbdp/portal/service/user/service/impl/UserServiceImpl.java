@@ -108,6 +108,7 @@ public class UserServiceImpl implements IUserService {
      * 编辑 C端用户信息
      *
      * @param userEditReqDTO C端用户编辑 DTO
+     * @throws ServiceException 修改用户失败时抛出异常
      */
     @Override
     public void edit(UserEditReqDTO userEditReqDTO) {
@@ -121,6 +122,7 @@ public class UserServiceImpl implements IUserService {
      * 获取用户登录信息
      *
      * @return 用户信息 DTO
+     * @throws ServiceException 用户令牌有误或查询用户失败时抛出异常
      */
     @Override
     public UserDTO getLoginUser() {

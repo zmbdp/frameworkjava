@@ -69,6 +69,7 @@ public class SysUserServiceImpl implements ISysUserService {
      *
      * @param passwordLoginDTO B端用户信息
      * @return token 信息
+     * @throws ServiceException 手机号格式错误、用户不存在、密码错误或用户被禁用时抛出
      */
     @Override
     public TokenDTO login(PasswordLoginDTO passwordLoginDTO) {
@@ -114,6 +115,7 @@ public class SysUserServiceImpl implements ISysUserService {
      *
      * @param sysUserDTO B端用户信息
      * @return 用户 ID
+     * @throws ServiceException 越权操作、密码校验失败或用户状态非法时抛出
      */
     @Override
     public Long addOrEdit(SysUserDTO sysUserDTO) {
@@ -233,6 +235,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * 获取 B端登录用户信息
      *
      * @return B端用户信息 DTO
+     * @throws ServiceException 令牌无效或用户不存在时抛出
      */
     @Override
     public SysUserLoginDTO getLoginUser() {

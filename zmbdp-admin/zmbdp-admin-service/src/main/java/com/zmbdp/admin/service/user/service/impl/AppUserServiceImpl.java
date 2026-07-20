@@ -114,6 +114,7 @@ public class AppUserServiceImpl implements IAppUserService {
      *
      * @param openId 用户微信 ID
      * @return C端用户 DTO
+     * @throws ServiceException 微信ID为空时抛出
      */
     @Override
     public AppUserDTO registerByOpenId(String openId) {
@@ -174,6 +175,7 @@ public class AppUserServiceImpl implements IAppUserService {
      *
      * @param phoneNumber 手机号
      * @return C端用户 DTO
+     * @throws ServiceException 待注册手机号为空时抛出
      */
     @Override
     public AppUserDTO registerByPhone(String phoneNumber) {
@@ -217,6 +219,7 @@ public class AppUserServiceImpl implements IAppUserService {
      *
      * @param email 邮箱
      * @return C端用户 DTO
+     * @throws ServiceException 待注册邮箱为空时抛出
      */
     @Override
     public AppUserDTO registerByEmail(String email) {
@@ -240,6 +243,7 @@ public class AppUserServiceImpl implements IAppUserService {
      * 编辑 C端用户
      *
      * @param userEditReqDTO C端用户 DTO
+     * @throws ServiceException 用户不存在时抛出
      */
     @Override
     public void edit(UserEditReqDTO userEditReqDTO) {

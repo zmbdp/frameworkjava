@@ -22,6 +22,8 @@ public class Consumer {
     /**
      * 普通消费者（不使用幂等性）
      * 用于对比测试
+     *
+     * @param messageDTO 接收到的消息对象
      */
     @RabbitListener(queuesToDeclare = @Queue("testQueue"))
     public void listenerQueue(MessageDTO messageDTO) {
@@ -31,6 +33,8 @@ public class Consumer {
     /**
      * 幂等性消费者（从消息对象获取Token）
      * 使用SpEL表达式从MessageDTO.idempotentToken获取Token
+     *
+     * @param messageDTO 接收到的消息对象
      */
     @RabbitListener(queuesToDeclare = @Queue("testQueueIdempotent"))
     @Idempotent(
@@ -48,6 +52,9 @@ public class Consumer {
     /**
      * 幂等性消费者 - 测试业务失败场景
      * 业务失败时Token会被删除，允许重试
+     *
+     * @param messageDTO 接收到的消息对象
+     * @throws ServiceException 当消息类型为"测试失败"时抛出，模拟业务失败场景
      */
     @RabbitListener(queuesToDeclare = @Queue("testQueueIdempotentFailure"))
     @Idempotent(
@@ -72,6 +79,9 @@ public class Consumer {
      * 幂等性消费者 - 从消息头获取Token（方式二）
      * 使用消息头方式传递Token
      * 注意：需要添加 org.springframework.amqp.core.Message 参数以便从消息头获取Token
+     *
+     * @param messageDTO 接收到的消息对象
+     * @param message AMQP消息对象，用于从消息头获取幂等性Token
      */
     @RabbitListener(queuesToDeclare = @Queue("testQueueIdempotentHeader"))
     @Idempotent(

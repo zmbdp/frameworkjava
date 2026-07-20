@@ -25,6 +25,9 @@ import java.util.*;
 @RequestMapping("/test/datapermission")
 public class TestDataPermissionController {
 
+    /**
+     * 测试订单 Mapper，用于执行各类数据权限的查询测试
+     */
     @Autowired
     private TestOrderMapper testOrderMapper;
 
@@ -331,6 +334,9 @@ public class TestDataPermissionController {
 
     /**
      * 格式化分组结果
+     *
+     * @param groupMap 按指定字段分组的订单列表映射
+     * @return 每个分组 ID 对应订单数量的映射
      */
     private Map<String, Integer> formatGroupResult(Map<Long, List<TestOrder>> groupMap) {
         Map<String, Integer> result = new LinkedHashMap<>();

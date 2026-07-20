@@ -18,6 +18,9 @@ import java.util.Map;
 @RequestMapping("/test/dictionary")
 public class TestDictionaryController {
 
+    /**
+     * 字典服务 Feign 接口，用于调用字典相关远程服务
+     */
     @Autowired
     private DictionaryServiceApi dictionaryServiceApi;
 

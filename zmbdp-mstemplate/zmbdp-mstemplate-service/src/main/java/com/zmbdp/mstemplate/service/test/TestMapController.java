@@ -24,6 +24,9 @@ import java.util.Map;
 @RequestMapping("/test/map")
 public class TestMapController {
 
+    /**
+     * 地图服务 Feign 接口，用于调用地图相关远程服务
+     */
     @Autowired
     private MapServiceApi mapServiceApi;
 

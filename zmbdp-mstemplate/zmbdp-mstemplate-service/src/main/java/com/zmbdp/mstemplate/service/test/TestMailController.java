@@ -28,6 +28,9 @@ public class TestMailController {
 
     /**
      * 测试1：发送文本邮件（单个收件人）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/text/single")
     public Result<String> sendTextSingle(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -55,6 +58,9 @@ public class TestMailController {
 
     /**
      * 测试2：发送文本邮件（多个收件人 - 逗号分隔）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/text/multiple")
     public Result<String> sendTextMultiple(@RequestParam(required = false, defaultValue = "test1@example.com,test2@example.com") String to) {
@@ -82,6 +88,9 @@ public class TestMailController {
 
     /**
      * 测试3：发送HTML邮件（单个收件人）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/html/single")
     public Result<String> sendHtmlSingle(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -118,6 +127,9 @@ public class TestMailController {
 
     /**
      * 测试4：发送HTML邮件（多个收件人 - 分号分隔）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/html/multiple")
     public Result<String> sendHtmlMultiple(@RequestParam(required = false, defaultValue = "test1@example.com;test2@example.com") String to) {
@@ -152,6 +164,11 @@ public class TestMailController {
 
     /**
      * 测试5：发送邮件（带抄送和密送）
+     *
+     * @param to 收件人邮箱地址
+     * @param cc 抄送邮箱地址
+     * @param bcc 密送邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/ccbcc")
     public Result<String> sendWithCcBcc(
@@ -183,6 +200,9 @@ public class TestMailController {
 
     /**
      * 测试6：发送邮件（带附件）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/attachment")
     public Result<String> sendWithAttachment(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -217,6 +237,9 @@ public class TestMailController {
 
     /**
      * 测试7：发送邮件（带多个附件）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/attachments")
     public Result<String> sendWithAttachments(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -257,6 +280,10 @@ public class TestMailController {
 
     /**
      * 测试8：发送HTML邮件（带内嵌图片 - 自动检测格式）
+     *
+     * @param to 收件人邮箱地址
+     * @param imageFile 内嵌图片文件
+     * @return 邮件发送结果
      */
     @PostMapping(value = "/send/html/image", consumes = "multipart/form-data")
     public Result<String> sendHtmlWithImage(
@@ -314,6 +341,11 @@ public class TestMailController {
 
     /**
      * 测试9：发送HTML邮件（带内嵌图片 - 手动指定格式）
+     *
+     * @param to 收件人邮箱地址
+     * @param logoFile Logo图片文件
+     * @param photoFile Photo图片文件
+     * @return 邮件发送结果
      */
     @PostMapping(value = "/send/html/image/manual", consumes = "multipart/form-data")
     public Result<String> sendHtmlWithImageManual(
@@ -386,6 +418,9 @@ public class TestMailController {
 
     /**
      * 测试10：发送邮件（使用自定义MailAccount）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/custom")
     public Result<String> sendWithCustomAccount(@RequestParam(required = false, defaultValue = "test@example.com") String to) {
@@ -425,6 +460,8 @@ public class TestMailController {
 
     /**
      * 测试11：发送邮件（错误情况 - 空收件人）
+     *
+     * @return 邮件发送结果
      */
     @GetMapping("/send/error/empty")
     public Result<String> sendWithEmptyTo() {
@@ -451,6 +488,9 @@ public class TestMailController {
 
     /**
      * 测试12：发送邮件（错误情况 - 无效邮箱地址）
+     *
+     * @param to 收件人邮箱地址
+     * @return 邮件发送结果
      */
     @GetMapping("/send/error/invalid")
     public Result<String> sendWithInvalidEmail(@RequestParam(required = false, defaultValue = "invalid-email") String to) {
@@ -477,6 +517,8 @@ public class TestMailController {
 
     /**
      * 测试13：获取默认MailAccount
+     *
+     * @return 邮件账户信息
      */
     @GetMapping("/account/default")
     public Result<String> getDefaultAccount() {
@@ -503,6 +545,11 @@ public class TestMailController {
 
     /**
      * 测试14：获取自定义MailAccount（线程安全测试）
+     *
+     * @param from 邮件发送账号
+     * @param user 邮件发送用户名
+     * @param pass 邮件发送密码
+     * @return 邮件账户信息
      */
     @GetMapping("/account/custom")
     public Result<String> getCustomAccount(

@@ -1267,17 +1267,40 @@ public class TestTreeUtilController {
      * 树节点测试类
      * <p>
      * 用于测试 TreeUtil 的菜单节点实体类，包含基本的树节点属性和业务属性
+     *
+     * @author 稚名不带撇
      */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MenuNode {
+        /**
+         * 节点 ID
+         */
         private Long id;
+        /**
+         * 父节点 ID
+         */
         private Long parentId;
+        /**
+         * 节点名称
+         */
         private String name;
+        /**
+         * 排序序号
+         */
         private Integer sort;
+        /**
+         * 是否启用
+         */
         private Boolean enabled;
+        /**
+         * 层级字段
+         */
         private Integer level;  // 新增：层级字段
+        /**
+         * 子节点列表
+         */
         private List<MenuNode> children;
 
         public MenuNode(Long id, Long parentId, String name, Integer sort, Boolean enabled) {

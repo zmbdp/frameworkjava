@@ -1,6 +1,7 @@
 package com.zmbdp.portal.service.user.service;
 
 import com.zmbdp.admin.api.appuser.domain.dto.UserEditReqDTO;
+import com.zmbdp.common.domain.exception.ServiceException;
 import com.zmbdp.common.security.domain.dto.TokenDTO;
 import com.zmbdp.portal.service.user.domain.dto.LoginDTO;
 import com.zmbdp.portal.service.user.domain.dto.UserDTO;
@@ -32,6 +33,7 @@ public interface IUserService {
      * 编辑 C端用户信息
      *
      * @param userEditReqDTO C端用户编辑 DTO
+     * @throws ServiceException 修改用户失败时抛出异常
      */
     void edit(UserEditReqDTO userEditReqDTO);
 
@@ -39,6 +41,7 @@ public interface IUserService {
      * 获取用户登录信息
      *
      * @return 用户信息 DTO
+     * @throws ServiceException 用户令牌有误或查询用户失败时抛出异常
      */
     UserDTO getLoginUser();
 

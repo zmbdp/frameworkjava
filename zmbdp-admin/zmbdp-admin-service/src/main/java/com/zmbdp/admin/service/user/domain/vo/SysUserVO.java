@@ -13,6 +13,9 @@ import java.io.Serializable;
 @Data
 public class SysUserVO implements Serializable {
 
+    /**
+     * 序列化版本号
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
