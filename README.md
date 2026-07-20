@@ -85,8 +85,8 @@ FrameworkJava 本身并不是一个可以直接上线使用的后台系统，这
 
 ### 🚀 一键式环境部署
 
-Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ、SkyWalking、Prometheus、Grafana），支持 dev/test/prd 多环境配置，
-**5 分钟快速搭建完整开发环境**，告别繁琐的环境配置
+Docker Compose 一键部署所有中间件（MySQL、Redis、Nacos、RabbitMQ、SkyWalking、Prometheus、Grafana、AlertManager、XXL-JOB Admin），支持 dev/test/prd 多环境配置，
+**快速搭建完整开发环境**，告别繁琐的环境配置
 
 ### 🔐 统一认证与鉴权能力
 
@@ -94,7 +94,7 @@ JWT 无状态认证，网关统一校验，支持 B 端 / C 端用户体系，**
 
 ### ⚡ 三级缓存体系
 
-布隆过滤器 + Caffeine 本地缓存 + Redis 分布式缓存，**有效防止缓存穿透，性能提升 10 倍+**
+布隆过滤器 + Caffeine 本地缓存 + Redis 分布式缓存，**有效防止缓存穿透，降低数据库压力**
 *（支持 Redis/Fast/Safe 三种布隆过滤器实现，本地缓存支持自定义过期策略，非简单封装）*
 
 ### 🛡️ 分布式幂等性控制
@@ -217,7 +217,7 @@ mvn spring-boot:run
 - **服务监控**：访问 [Grafana](http://localhost:3000)，查看 JVM、接口、系统资源监控大盘
 - **告警测试**：访问 [Prometheus](http://localhost:9090)，查看告警规则和触发状态
 - **定时任务**：在 XXL-JOB 管控台查看执行器注册状态，手动触发布隆过滤器重置任务
-- **快速开发**：使用 `zmbdp-mstemplate` 模块作为模板，10 分钟快速新建一个业务微服务
+- **快速开发**：使用 `zmbdp-mstemplate` 模块作为模板，快速新建一个业务微服务
 - **能力验证**：体验幂等性控制、限流防刷、消息发送等核心能力
 
 ---
