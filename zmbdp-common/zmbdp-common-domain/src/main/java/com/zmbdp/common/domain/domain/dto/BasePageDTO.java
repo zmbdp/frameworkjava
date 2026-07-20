@@ -33,6 +33,7 @@ public class BasePageDTO<T> {
      * @param totals   总数量
      * @param pageSize 页大小
      * @return 页数
+     * @throws IllegalArgumentException 当 pageSize 小于等于 0 时抛出
      */
     public static int calculateTotalPages(long totals, int pageSize) {
         if (pageSize <= 0) {

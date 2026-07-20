@@ -318,18 +318,30 @@ public class TestExcelController {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ExcelTestDTO {
+        /**
+         * 姓名
+         */
         @ExcelProperty("姓名")
         @NotBlank(message = "姓名不能为空")
         private String name;
 
+        /**
+         * 年龄
+         */
         @ExcelProperty("年龄")
         @NotNull(message = "年龄不能为空")
         private Integer age;
 
+        /**
+         * 部门（用于测试单元格合并）
+         */
         @ExcelProperty("部门")
         @CellMerge  // 测试单元格合并
         private String department;
 
+        /**
+         * 大数值 ID（用于测试 Excel 中超过 15 位数值的精度处理）
+         */
         @ExcelProperty("大数值ID")
         private Long bigNumber;  // 测试大数值处理
     }

@@ -66,6 +66,9 @@ import java.util.Map;
 @RequestMapping("/test/log")
 public class TestLogController {
 
+    /**
+     * 日志测试辅助服务，用于调用各种 @LogAction 注解标注的测试方法
+     */
     @Autowired
     private TestLogServiceImpl testLogServiceImpl;
 

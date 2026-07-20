@@ -333,6 +333,8 @@ public class TestRateLimitController {
 
     /**
      * 获取测试说明
+     *
+     * @return 限流测试结果
      */
     @GetMapping("/help")
     public Result<String> getTestHelp() {
@@ -362,6 +364,8 @@ public class TestRateLimitController {
     /**
      * 基础限流测试 - IP维度
      * 测试参数：limit=5, windowSec=60, dimensions=IP, keySuffix="test-basic-ip"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/basic/ip")
     @RateLimit(limit = 5, windowSec = 60, dimensions = RateLimitDimension.IP, keySuffix = "test-basic-ip")
@@ -372,6 +376,8 @@ public class TestRateLimitController {
     /**
      * 基础限流测试 - 账号维度（有userId）
      * 测试参数：limit=3, windowSec=60, dimensions=ACCOUNT, keySuffix="test-basic-account"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/basic/account")
     @RateLimit(limit = 3, windowSec = 60, dimensions = RateLimitDimension.ACCOUNT, keySuffix = "test-basic-account")
@@ -382,6 +388,8 @@ public class TestRateLimitController {
     /**
      * 基础限流测试 - 账号维度（无userId，退化为IP）
      * 测试参数：limit=3, windowSec=60, dimensions=ACCOUNT, keySuffix="test-basic-account-no-user"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/basic/account-no-user")
     @RateLimit(limit = 3, windowSec = 60, dimensions = RateLimitDimension.ACCOUNT, keySuffix = "test-basic-account-no-user")
@@ -392,6 +400,8 @@ public class TestRateLimitController {
     /**
      * 基础限流测试 - 双维度
      * 测试参数：limit=2, windowSec=60, dimensions=BOTH, keySuffix="test-basic-both"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/basic/both")
     @RateLimit(limit = 2, windowSec = 60, dimensions = RateLimitDimension.BOTH, keySuffix = "test-basic-both")
@@ -402,6 +412,8 @@ public class TestRateLimitController {
     /**
      * 自定义limit和windowSec测试
      * 测试参数：limit=10, windowSec=30, keySuffix="test-custom-limit-window"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/custom/limit-window")
     @RateLimit(limit = 10, windowSec = 30, keySuffix = "test-custom-limit-window")
@@ -412,6 +424,8 @@ public class TestRateLimitController {
     /**
      * 自定义message测试
      * 测试参数：limit=3, windowSec=60, message="自定义限流提示信息", keySuffix="test-custom-message"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/custom/message")
     @RateLimit(limit = 3, windowSec = 60, message = "自定义限流提示信息，请稍后重试", keySuffix = "test-custom-message")
@@ -422,6 +436,8 @@ public class TestRateLimitController {
     /**
      * 自定义keySuffix测试
      * 测试参数：limit=5, windowSec=60, keySuffix="test-custom-key-suffix"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/custom/key-suffix")
     @RateLimit(limit = 5, windowSec = 60, keySuffix = "test-custom-key-suffix")
@@ -432,6 +448,8 @@ public class TestRateLimitController {
     /**
      * IP请求头方式测试
      * 测试参数：limit=5, windowSec=60, ipHeaderName="X-Real-IP", keySuffix="test-ip-header"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/ip/header")
     @RateLimit(limit = 5, windowSec = 60, ipHeaderName = "X-Real-IP", keySuffix = "test-ip-header")
@@ -442,6 +460,8 @@ public class TestRateLimitController {
     /**
      * IP请求参数方式测试
      * 测试参数：limit=5, windowSec=60, allowIpParam=true, ipParamName="clientIp", keySuffix="test-ip-param"
+     *
+     * @return 限流测试结果
      */
     @GetMapping("/ip/param")
     @RateLimit(limit = 5, windowSec = 60, allowIpParam = true, ipParamName = "clientIp", keySuffix = "test-ip-param")
@@ -452,6 +472,8 @@ public class TestRateLimitController {
     /**
      * IP优先级测试（请求头优先）
      * 测试参数：limit=5, windowSec=60, ipHeaderName="X-Client-IP", allowIpParam=true, ipParamName="ip", keySuffix="test-ip-priority"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/ip/priority")
     @RateLimit(limit = 5, windowSec = 60, ipHeaderName = "X-Client-IP", allowIpParam = true, ipParamName = "ip", keySuffix = "test-ip-priority")
@@ -462,6 +484,8 @@ public class TestRateLimitController {
     /**
      * 使用全局配置测试
      * 测试参数：limit=0, windowSec=0（使用Nacos全局配置）, keySuffix="test-global-config"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/global/config")
     @RateLimit(limit = 0, windowSec = 0, keySuffix = "test-global-config")
@@ -472,6 +496,8 @@ public class TestRateLimitController {
     /**
      * 异常情况测试 - 负数limit
      * 测试参数：limit=-1（应该使用全局配置或默认值）, keySuffix="test-exception-negative-limit"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/exception/negative-limit")
     @RateLimit(limit = -1, windowSec = 60, keySuffix = "test-exception-negative-limit")
@@ -482,6 +508,8 @@ public class TestRateLimitController {
     /**
      * 异常情况测试 - 负数windowSec
      * 测试参数：windowSec=-1（应该使用全局配置或默认值）, keySuffix="test-exception-negative-window"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/exception/negative-window")
     @RateLimit(limit = 5, windowSec = -1, keySuffix = "test-exception-negative-window")
@@ -492,6 +520,8 @@ public class TestRateLimitController {
     /**
      * 并发测试专用接口
      * 测试参数：limit=10, windowSec=60（较小的限流值，便于测试）, keySuffix="test-concurrent"
+     *
+     * @return 限流测试结果
      */
     @PostMapping("/concurrent/test")
     @RateLimit(limit = 10, windowSec = 60, keySuffix = "test-concurrent")

@@ -14,11 +14,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class Producer {
 
+    /**
+     * RabbitMQ 操作模板，用于向队列发送消息
+     */
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
     /**
      * 发送消息到 testQueue 队列
+     *
      * @param messageDTO 消息 DTO
      */
     public void produceMsg(MessageDTO messageDTO) {
@@ -27,6 +31,7 @@ public class Producer {
 
     /**
      * 发送消息到 testQueueIdempotent 队列（幂等性测试队列）
+     *
      * @param messageDTO 消息 DTO
      */
     public void produceMsgIdempotent(MessageDTO messageDTO) {
@@ -35,6 +40,7 @@ public class Producer {
 
     /**
      * 发送消息到 testQueueIdempotentFailure 队列（幂等性失败测试队列）
+     *
      * @param messageDTO 消息 DTO
      */
     public void produceMsgIdempotentFailure(MessageDTO messageDTO) {
@@ -43,8 +49,10 @@ public class Producer {
 
     /**
      * 发送消息到 testQueueIdempotentHeader 队列（消息头方式幂等性测试队列）
+     * <p>
      * 在消息头中设置 Token
-     * @param messageDTO 消息 DTO
+     *
+     * @param messageDTO     消息 DTO
      * @param idempotentToken 幂等性Token（放入消息头）
      */
     public void produceMsgIdempotentHeader(MessageDTO messageDTO, String idempotentToken) {

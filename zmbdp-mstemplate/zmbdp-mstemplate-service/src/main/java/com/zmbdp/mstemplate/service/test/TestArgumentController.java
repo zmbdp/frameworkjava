@@ -21,6 +21,9 @@ import java.util.List;
 @RequestMapping("/test/argument")
 public class TestArgumentController {
 
+    /**
+     * 参数服务 Feign 接口，用于调用系统参数相关远程服务
+     */
     @Autowired
     private ArgumentServiceApi argumentServiceApi;
 

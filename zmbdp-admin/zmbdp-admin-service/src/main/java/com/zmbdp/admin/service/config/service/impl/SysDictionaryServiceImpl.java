@@ -48,6 +48,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      *
      * @param dictionaryTypeWriteReqDTO 新增字典类型 DTO
      * @return 数据库的 id
+     * @throws ServiceException 字典类型键或值已存在时抛出
      */
     @Override
     public Long addType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
@@ -112,6 +113,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      *
      * @param dictionaryTypeWriteReqDTO 修改字典类型 DTO
      * @return 数据库的 id
+     * @throws ServiceException 字典类型不存在或值已存在时抛出
      */
     @Override
     public Long editType(DictionaryTypeWriteReqDTO dictionaryTypeWriteReqDTO) {
@@ -150,6 +152,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      *
      * @param dictionaryDataAddReqDTO 新增字典数据 DTO
      * @return 数据库的 id
+     * @throws ServiceException 字典类型不存在或字典数据键/值重复时抛出
      */
     @Override
     public Long addData(DictionaryDataAddReqDTO dictionaryDataAddReqDTO) {
@@ -220,6 +223,7 @@ public class SysDictionaryServiceImpl implements ISysDictionaryService {
      *
      * @param dictionaryDataEditReqDTO 编辑字典数据 DTO
      * @return 数据库的 id
+     * @throws ServiceException 字典数据不存在或值已存在时抛出
      */
     @Override
     public Long editData(DictionaryDataEditReqDTO dictionaryDataEditReqDTO) {

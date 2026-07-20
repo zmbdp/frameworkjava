@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test/rabbit")
 public class TestRabbitController {
 
+    /**
+     * RabbitMQ 消息生产者，用于发送测试消息
+     */
     @Autowired
     private Producer producer;
 

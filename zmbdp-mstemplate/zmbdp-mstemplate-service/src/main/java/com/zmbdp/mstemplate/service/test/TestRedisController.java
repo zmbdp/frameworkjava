@@ -30,6 +30,9 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/test/redis")
 public class TestRedisController {
 
+    /**
+     * Redis 服务，用于操作 Redis 缓存
+     */
     @Autowired
     private RedisService redisService;
 

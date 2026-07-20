@@ -20,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/test/file")
 public class TestFileController {
 
+    /**
+     * 文件服务 Feign 接口，用于调用文件相关远程服务
+     */
     @Autowired
     private FileServiceApi fileServiceApi;
 

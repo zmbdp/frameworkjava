@@ -22,8 +22,7 @@ import org.springframework.context.annotation.Configuration;
  *   <li>添加全局标签（应用名称、环境等）</li>
  * </ul>
  *
- * @author zmbdp
- * @since 2026-02-02
+ * @author 稚名不带撇
  */
 @Configuration
 public class PrometheusConfig {

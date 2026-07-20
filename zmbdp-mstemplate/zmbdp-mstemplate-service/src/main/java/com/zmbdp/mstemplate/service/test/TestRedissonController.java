@@ -23,9 +23,15 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/test/redisson")
 public class TestRedissonController {
 
+    /**
+     * Redis 服务，用于操作 Redis 缓存
+     */
     @Autowired
     private RedisService redisService;
 
+    /**
+     * Redisson 分布式锁服务，用于测试分布式锁功能
+     */
     @Autowired
     private RedissonLockService redissonLockService;
 

@@ -16,6 +16,9 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 public class AppUserListReqDTO extends BasePageReqDTO implements Serializable {
 
+    /**
+     * 序列化版本号
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 

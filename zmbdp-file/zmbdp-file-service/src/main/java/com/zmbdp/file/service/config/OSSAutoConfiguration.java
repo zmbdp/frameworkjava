@@ -68,6 +68,8 @@ public class OSSAutoConfiguration {
      * 关闭客户端
      *
      * <p>@PreDestroy: 表示下面的方法 spring 容器销毁时执行
+     *
+     * @throws Exception 关闭 OSSClient 时发生异常时抛出
      */
     @PreDestroy
     public void closeOSSClient() {

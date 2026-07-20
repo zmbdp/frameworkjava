@@ -44,6 +44,7 @@ public class AppUserController implements AppUserApi {
      *
      * @param openId 用户微信 ID
      * @return C端用户 VO
+     * @throws ServiceException 注册失败时抛出
      */
     @Override
     public Result<AppUserVO> registerByOpenId(String openId) {
@@ -89,6 +90,7 @@ public class AppUserController implements AppUserApi {
      *
      * @param phoneNumber 手机号
      * @return C端用户 VO
+     * @throws ServiceException 注册失败时抛出
      */
     @Override
     public Result<AppUserVO> registerByPhone(String phoneNumber) {
@@ -119,6 +121,7 @@ public class AppUserController implements AppUserApi {
      *
      * @param email 邮箱
      * @return C端用户 VO
+     * @throws ServiceException 注册失败时抛出
      */
     @Override
     public Result<AppUserVO> registerByEmail(String email) {

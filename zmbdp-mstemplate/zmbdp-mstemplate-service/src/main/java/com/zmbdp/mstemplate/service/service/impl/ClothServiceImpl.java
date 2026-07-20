@@ -18,9 +18,15 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ClothServiceImpl implements IClothService {
 
+    /**
+     * Redis 服务，用于操作二级缓存中的远程缓存
+     */
     @Autowired
     private RedisService redisService;
 
+    /**
+     * Caffeine 本地缓存，用于操作二级缓存中的本地缓存
+     */
     @Autowired
     private Cache<String, Object> caffeineCache;
 
