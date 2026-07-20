@@ -42,13 +42,13 @@
 xxl:
   job:
     admin:
-      addresses: http://frameworkjava-xxljob-admin:8080/xxl-job-admin
+      addresses: http://frameworkJava-xxljob-admin:8080/xxl-job-admin
     executor:
       appname: ${spring.application.name}-executor
       address:
       ip:
       port: -1
-      accessToken: frameworkjava_dev
+      accessToken: frameworkJava_dev
       logpath: /data/applogs/xxl-job/executor
       logretentiondays: 30
 ```

@@ -135,6 +135,10 @@
                                 <dockerFileDir>${project.basedir}</dockerFileDir>
                             </build>
                             <run>
+                                <network>
+                                    <mode>custom</mode>
+                                    <name>${docker.network.name}</name>
+                                </network>
                                 <ports>
                                     <port>10030:10030</port>
                                 </ports>

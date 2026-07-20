@@ -55,7 +55,7 @@ A: 参考 [分布式幂等性设计](IDEMPOTENT.md) 文档，在方法上添加 
 
 ### Q: 如何使用三级缓存？
 
-A: 参考 [三级缓存架构](CACHE_ARCHITECTURE.md) 文档，使用 `CacheService` 进行缓存操作。
+A: 参考 [三级缓存架构](CACHE_ARCHITECTURE.md) 文档，使用 `CacheUtil` 进行缓存操作。
 
 ### Q: 如何新增业务模块？
 

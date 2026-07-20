@@ -29,7 +29,7 @@ services:
     ]
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: mysql --user=zmbdpprd -h127.0.0.1 --password='Hf@173503494' -e "SELECT 1;"
       start_period: 30s
@@ -60,7 +60,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6380", "ping" ]
       start_period: 3s
@@ -84,7 +84,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6381", "ping" ]
       start_period: 3s
@@ -110,7 +110,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "redis-cli","-p","6382", "ping" ]
       start_period: 3s
@@ -148,7 +148,7 @@ services:
       - "9855:9855"
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       frameworkjava-mysql-master:
         condition: service_healthy
@@ -189,7 +189,7 @@ services:
       - "9857:9857"
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       frameworkjava-mysql-master:
         condition: service_healthy
@@ -228,7 +228,7 @@ services:
       - ../data/frameworkjavadata/rabbitmq01/log:/var/log/rabbitmq
       - ../data/frameworkjavadata/rabbitmq01/data:/var/lib/rabbitmq
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 10s
@@ -243,7 +243,7 @@ services:
     container_name: frameworkjava-web-prd01
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     ports:
       - "8666:80"
     volumes:
@@ -282,7 +282,7 @@ services:
       - ../data/frameworkjavadata/skywalking/oap/logs:/skywalking/logs
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       frameworkjava-mysql-master:
         condition: service_healthy
@@ -308,7 +308,7 @@ services:
       SW_ZIPKIN_ADDRESS: http://frameworkjava-skywalking-oap:9412
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       frameworkjava-skywalking-oap:
         condition: service_healthy
@@ -339,7 +339,7 @@ services:
     restart: always
     # Prd 环境：服务部署在 Docker 容器，使用 Docker 网络通信
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy" ]
       interval: 10s
@@ -368,7 +368,7 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       - frameworkjava-prometheus
     healthcheck:
@@ -395,7 +395,7 @@ services:
       - '--storage.path=/alertmanager'
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     healthcheck:
       test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9093/-/healthy" ]
       interval: 10s
@@ -424,7 +424,7 @@ services:
       - ../data/frameworkjavadata/xxljob/logs:/data/applogs
     restart: always
     networks:
-      - frameworkjava_network_prd
+      - network_prd
     depends_on:
       frameworkjava-mysql-master:
         condition: service_healthy
@@ -440,4 +440,4 @@ services:
         max-file: "3"
 
 networks:
-  frameworkjava_network_prd:
+  network_prd:

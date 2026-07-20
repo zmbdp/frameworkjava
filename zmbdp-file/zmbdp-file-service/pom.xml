@@ -138,6 +138,10 @@
                                 <dockerFileDir>${project.basedir}</dockerFileDir>
                             </build>
                             <run>
+                                <network>
+                                    <mode>custom</mode>
+                                    <name>${docker.network.name}</name>
+                                </network>
                                 <env>
                                     <NACOS_ADDR>${nacos.addr}</NACOS_ADDR>
                                     <RUN_ENV>${runenv}</RUN_ENV>
