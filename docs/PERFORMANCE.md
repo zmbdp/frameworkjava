@@ -28,17 +28,17 @@ spring:
   datasource:
     hikari:
       # 连接池大小配置（根据实际并发量调整）
-      maximum-pool-size: 20          # 最大连接数，建议：CPU核心数 * 2 + 磁盘数
-      minimum-idle: 5                # 最小空闲连接数，建议：maximum-pool-size 的 1/4
+      maximum-pool-size: 20               # 最大连接数，建议：CPU核心数 * 2 + 磁盘数
+      minimum-idle: 5                     # 最小空闲连接数，建议：maximum-pool-size 的 1/4
       
       # 连接超时配置
-      connection-timeout: 30000      # 获取连接超时时间（毫秒）
-      idle-timeout: 600000           # 空闲连接超时时间（毫秒，10分钟）
-      max-lifetime: 1800000          # 连接最大生命周期（毫秒，30分钟）
+      connection-timeout: 30000           # 获取连接超时时间（毫秒）
+      idle-timeout: 600000                # 空闲连接超时时间（毫秒，10分钟）
+      max-lifetime: 1800000               # 连接最大生命周期（毫秒，30分钟）
       
       # 性能优化配置
-      leak-detection-threshold: 60000 # 连接泄漏检测（毫秒，生产环境建议开启）
-      pool-name: frameworkJavaHikariCP # 连接池名称（便于监控和日志追踪）
+      leak-detection-threshold: 60000     # 连接泄漏检测（毫秒，生产环境建议开启）
+      pool-name: FrameworkJavaHikariCP    # 连接池名称（便于监控和日志追踪）
 ```
 
 **配置建议：**
@@ -281,7 +281,7 @@ if (rows == 0) {
 
 ### 1. 测试方式
 
-frameworkJava 采用 **多线程并发测试** 的方式验证高并发场景下的功能正确性和性能表现。
+FrameworkJava 采用 **多线程并发测试** 的方式验证高并发场景下的功能正确性和性能表现。
 
 #### 实现方式
 

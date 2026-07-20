@@ -1,6 +1,6 @@
 # 网关服务
 
-frameworkJava Gateway 基于 Spring Cloud Gateway 实现，作为系统统一入口负责路由转发、链路追踪注入、Token 鉴权、B/C 端隔离以及统一异常处理，自身不依赖数据源、仅依赖 Redis。
+FrameworkJava Gateway 基于 Spring Cloud Gateway 实现，作为系统统一入口负责路由转发、链路追踪注入、Token 鉴权、B/C 端隔离以及统一异常处理，自身不依赖数据源、仅依赖 Redis。
 
 ## 概述
 
@@ -263,7 +263,7 @@ private Mono<Void> unauthorizedResponse(ServerWebExchange exchange, ResultCode r
 
 ## B/C 端隔离机制（核心）
 
-frameworkJava 通过「路径关键字 + Token 中 `user_from`」实现 B 端与 C 端的访问隔离，避免 C 端 Token 被拿到 B 端使用。
+FrameworkJava 通过「路径关键字 + Token 中 `user_from`」实现 B 端与 C 端的访问隔离，避免 C 端 Token 被拿到 B 端使用。
 
 ### 关键常量
 
@@ -520,12 +520,12 @@ spring:
       discovery:
         username: nacos
         password: Hf@173503494
-        namespace: scaffold-ai-assistant-${RUN_ENV}
+        namespace: frameworkjava-${RUN_ENV}
         server-addr: ${NACOS_ADDR}
       config:
         username: nacos
         password: Hf@173503494
-        namespace: scaffold-ai-assistant-${RUN_ENV}
+        namespace: frameworkjava-${RUN_ENV}
         server-addr: ${NACOS_ADDR}
         file-extension: yaml
         shared-configs:

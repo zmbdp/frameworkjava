@@ -21,7 +21,7 @@
 
 ## 实现方案
 
-frameworkJava 采用 **AOP + Redis** 实现分布式幂等性控制。
+FrameworkJava 采用 **AOP + Redis** 实现分布式幂等性控制。
 
 ### 核心组件
 
@@ -60,6 +60,28 @@ frameworkJava 采用 **AOP + Redis** 实现分布式幂等性控制。
 ```
 
 ## 使用方式
+
+### 注解属性
+
+`@Idempotent` 注解提供以下属性：
+
+| 属性名 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `expireTime` | `long` | `300L` | Token 过期时间（秒）。优先级：注解值 > 全局配置 > 默认值（300 秒） |
+| `headerName` | `String` | `"Idempotent-Token"` | HTTP 请求头 / RabbitMQ 消息头中获取 Token 的字段名称 |
+| `message` | `String` | `"请勿重复提交"` | 防重模式下重复请求的错误提示信息 |
+| `allowParam` | `boolean` | `false` | 是否从请求参数中获取 Token（请求头中没有时） |
+| `paramName` | `String` | `"idempotentToken"` | 请求参数名称（`allowParam = true` 时生效） |
+| `tokenExpression` | `String` | `""` | 从方法参数中获取 Token 的 SpEL 表达式，优先级最高 |
+| `returnCachedResult` | `IdempotentMode` | `IdempotentMode.DEFAULT` | 幂等性模式三态：`DEFAULT`（使用全局配置）/ `TRUE`（强制强幂等）/ `FALSE`（强制防重） |
+
+**Token 获取优先级**：`tokenExpression` > HTTP 请求头（`headerName`）> HTTP 请求参数（`paramName`，需 `allowParam = true`）> RabbitMQ 消息头（`headerName`）
+
+**`returnCachedResult` 三态说明**（`IdempotentMode` 枚举）：
+
+- `DEFAULT`：使用全局配置 `idempotent.return-cached-result`
+- `TRUE`：强制开启强幂等模式（即使全局配置为 false）
+- `FALSE`：强制关闭强幂等模式（即使全局配置为 true）
 
 ### HTTP 接口幂等性
 

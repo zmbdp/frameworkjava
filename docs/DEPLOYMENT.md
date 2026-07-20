@@ -1,6 +1,6 @@
 # 部署指南
 
-frameworkJava 提供完整的三环境（dev/test/prd）部署方案，基于 Docker Compose 编排中间件与服务，dev/test 单机部署、prd 采用双 VM 主从架构，覆盖 MySQL、Redis、Nacos、RabbitMQ、SkyWalking、Prometheus、Grafana、Alertmanager、Nginx 等全套基础设施。
+FrameworkJava 提供完整的三环境（dev/test/prd）部署方案，基于 Docker Compose 编排中间件与服务，dev/test 单机部署、prd 采用双 VM 主从架构，覆盖 MySQL、Redis、Nacos、RabbitMQ、SkyWalking、Prometheus、Grafana、Alertmanager、Nginx 等全套基础设施。
 
 ## 一、概述
 
@@ -41,20 +41,20 @@ deploy/
 
 ### 1.2 统一命令格式
 
-所有环境统一使用 `frameworkJava` 作为 docker compose 项目名，容器名前缀为 `frameworkJava-`：
+所有环境统一使用 `frameworkjava` 作为 docker compose 项目名，容器名前缀为 `frameworkjava-`：
 
 ```bash
 # 启动中间件
-docker compose -p frameworkJava -f docker-compose-mid.yml up -d
+docker compose -p frameworkjava -f docker-compose-mid.yml up -d
 
 # 启动应用服务（仅 prd 环境）
-docker compose -p frameworkJava -f docker-compose-app.yml up -d
+docker compose -p frameworkjava -f docker-compose-app.yml up -d
 
 # 查看容器状态
-docker compose -p frameworkJava -f docker-compose-mid.yml ps
+docker compose -p frameworkjava -f docker-compose-mid.yml ps
 
 # 停止并移除容器
-docker compose -p frameworkJava -f docker-compose-mid.yml down
+docker compose -p frameworkjava -f docker-compose-mid.yml down
 ```
 
 ### 1.3 网络
@@ -63,9 +63,9 @@ docker compose -p frameworkJava -f docker-compose-mid.yml down
 
 | 环境 | 网络名 |
 |------|--------|
-| dev  | `frameworkJava_network_dev` |
-| test | `frameworkJava_network_test` |
-| prd  | `frameworkJava_network_prd` |
+| dev  | `frameworkjava_network_dev` |
+| test | `frameworkjava_network_test` |
+| prd  | `frameworkjava_network_prd` |
 
 ## 二、三环境结构对照表
 
@@ -79,7 +79,7 @@ docker compose -p frameworkJava -f docker-compose-mid.yml down
 | Nacos | standalone 模式 | standalone 模式 | cluster 模式（vm1 部署 2 节点，vm2 部署 1 节点） |
 | RabbitMQ | 单节点 | 单节点 | 集群（vm1 rabbitmq01 + vm2 rabbitmq02，共享 Erlang Cookie） |
 | 应用服务 | 通过 docker-maven-plugin 本地运行 | 通过 docker-maven-plugin 本地运行 | docker-compose 构建并部署到双 VM |
-| 数据卷目录 | `../data/frameworkJavadata/` | `../data/frameworkJavadata/` | vm1：`../data/frameworkJavadata/`；vm2：`../data2/frameworkJavadata/` |
+| 数据卷目录 | `../data/frameworkjavadata/` | `../data/frameworkjavadata/` | vm1：`../data/frameworkjavadata/`；vm2：`../data2/frameworkjavadata/` |
 | Nacos 配置路径 | `deploy/dev/res/sql/DEFAULT_GROUP/` | `deploy/test/res/sql/nacos_config/DEFAULT_GROUP/` | `deploy/prd/vm1/res/sql/DEFAULT_GROUP/` |
 | 数据库账号 | `zmbdpdev` | `zmbdptest` | `zmbdpprd` |
 
@@ -97,7 +97,6 @@ docker compose -p frameworkJava -f docker-compose-mid.yml down
 │  ├── SkyWalking OAP + UI                                         │
 │  ├── Prometheus + Grafana + Alertmanager                         │
 │  ├── XXL-JOB Admin                                               │
-│  ├── Milvus + etcd + minio                                       │
 │  └── Web 前端 Nginx（端口 8666）                                  │
 │  应用服务：                                                       │
 │  └── admin / file / gateway / portal                             │
@@ -108,7 +107,7 @@ docker compose -p frameworkJava -f docker-compose-mid.yml down
 │  ├── Redis 04/05/06（端口 6383-6385，集群从节点）                  │
 │  ├── Nacos 03（cluster 模式，端口 8858）                          │
 │  ├── RabbitMQ 02（集群节点，端口 5673/15673）                     │
-│  └── Webnacos Nginx（端口 8866，Nacos 负载均衡代理）              │
+│  └── Web-prd02 Nginx（端口 8866，Nacos 负载均衡代理）              │
 │  应用服务：                                                       │
 │  └── admin / file / gateway / portal                             │
 └──────────────────────────────────────────────────────────────────┘
@@ -119,9 +118,9 @@ docker compose -p frameworkJava -f docker-compose-mid.yml down
 ```bash
 cd deploy/prd/vm1/app
 # 1. 启动中间件
-docker compose -p frameworkJava -f docker-compose-mid.yml up -d
+docker compose -p frameworkjava -f docker-compose-mid.yml up -d
 # 2. 启动应用服务
-docker compose -p frameworkJava -f docker-compose-app.yml up -d
+docker compose -p frameworkjava -f docker-compose-app.yml up -d
 ```
 
 **VM2 启动顺序：**
@@ -129,9 +128,9 @@ docker compose -p frameworkJava -f docker-compose-app.yml up -d
 ```bash
 cd deploy/prd/vm2/app
 # 1. 启动中间件
-docker compose -p frameworkJava -f docker-compose-mid.yml up -d
+docker compose -p frameworkjava -f docker-compose-mid.yml up -d
 # 2. 启动应用服务
-docker compose -p frameworkJava -f docker-compose-app.yml up -d
+docker compose -p frameworkjava -f docker-compose-app.yml up -d
 ```
 
 > **说明**：VM2 的 MySQL 为 slave 节点，需在 VM1 的 MySQL Master 启动并配置好主从复制后再启动；Redis 集群需在 6 个节点全部启动后执行 `redis-cli --cluster create` 完成集群搭建；Nacos 集群需 3 个节点全部启动后才能对外服务。
@@ -143,7 +142,7 @@ docker compose -p frameworkJava -f docker-compose-app.yml up -d
 | MySQL | mysql:8.4.2 | 3306 | 3306 | 3308 / 3308 | 业务数据库 + Nacos + XXL-JOB + SkyWalking 元数据存储 |
 | Redis | rebloom:latest | 6379 | 6379 | 6380-6382 / 6383-6385 | 缓存（带布隆过滤器） |
 | Nacos | nacos-server:v2.2.2 | 8848 | 8848 | 8854、8856 / 8858 | 配置中心 + 服务注册发现 |
-| RabbitMQ | rabbitmq:3.12.6-management | 5672、15672 | 5672、15672 | 5673、15673 / 5673、15673 | 消息队列 |
+| RabbitMQ | rabbitmq:3.12.6-management | 5672、15672 | 5672、15672 | 4369、5673、15673、25673 / 4369、5673、15673、25673 | 消息队列 |
 | Prometheus | prometheus:v2.48.0 | 9090 | 9090 | 9090 / - | 指标采集 |
 | Grafana | grafana:10.2.2 | 3000 | 3000 | 3000 / - | 监控可视化 |
 | Alertmanager | alertmanager:v0.26.0 | 9093 | 9093 | 9093 / - | 告警通知 |
@@ -151,9 +150,6 @@ docker compose -p frameworkJava -f docker-compose-app.yml up -d
 | SkyWalking OAP | skywalking-oap:9.7.0-mysql | 11800、12800 | 11800、12800 | 11800、12800 / - | 链路追踪后端 |
 | SkyWalking UI | skywalking-ui:9.7.0 | 8080 | 8080 | 8080 / - | 链路追踪界面 |
 | XXL-JOB Admin | xxl-job-admin:2.4.2 | 8081 | 8081 | 8081 / - | 定时任务调度中心 |
-| Milvus | milvus:v2.4.5 | 19530、9091 | 19530、9091 | 19530、9091 / - | 向量数据库 |
-| etcd | etcd:v3.5.5 | 2379 | 2379 | 2379 / - | Milvus 元数据存储 |
-| minio | minio:RELEASE.2023-03-20T20-16-18Z | 9000 | 9000 | 9000 / - | Milvus 对象存储 |
 
 **MySQL 启动参数（所有环境一致）：**
 
@@ -176,13 +172,13 @@ command:
 dev 与 test 环境使用单节点 Redis，采用带布隆过滤器的 `rebloom:latest` 镜像：
 
 ```yaml
-frameworkJava-redis:
+frameworkjava-redis:
   image: rebloom:latest              # 带布隆过滤器版本
   ports:
     - "6379:6379"
   volumes:
     - ./redis/conf/redis.conf:/usr/local/etc/redis/redis.conf
-    - ../data/frameworkJavadata/redis/data:/data
+    - ../data/frameworkjavadata/redis/data:/data
   command: redis-server /usr/local/etc/redis/redis.conf
 ```
 
@@ -192,12 +188,12 @@ prd 环境部署 6 个 Redis 节点构成 Cluster 集群，3 主 3 从，跨 VM 
 
 | 节点 | 容器名 | 部署位置 | 端口 | 集群总线端口 |
 |------|--------|---------|------|------------|
-| redis01 | `frameworkJava-redis01` | vm1 | 6380 | 16380 |
-| redis02 | `frameworkJava-redis02` | vm1 | 6381 | 16381 |
-| redis03 | `frameworkJava-redis03` | vm1 | 6382 | 16382 |
-| redis04 | `frameworkJava-redis04` | vm2 | 6383 | 16383 |
-| redis05 | `frameworkJava-redis05` | vm2 | 6384 | 16384 |
-| redis06 | `frameworkJava-redis06` | vm2 | 6385 | 16385 |
+| redis01 | `frameworkjava-redis01` | vm1 | 6380 | 16380 |
+| redis02 | `frameworkjava-redis02` | vm1 | 6381 | 16381 |
+| redis03 | `frameworkjava-redis03` | vm1 | 6382 | 16382 |
+| redis04 | `frameworkjava-redis04` | vm2 | 6383 | 16383 |
+| redis05 | `frameworkjava-redis05` | vm2 | 6384 | 16384 |
+| redis06 | `frameworkjava-redis06` | vm2 | 6385 | 16385 |
 
 每个节点使用独立的配置文件（`redis01.conf` ~ `redis06.conf`）与独立数据卷。6 个节点全部启动后，执行以下命令完成集群创建（3 主 3 从，每个主节点配一个从节点，主从跨机分布）：
 
@@ -213,10 +209,10 @@ redis-cli --cluster create \
 
 ## 六、服务 Dockerfile 模板
 
-所有业务服务（admin、file、gateway、portal）共用同一套 Dockerfile 模板，统一基于 `eclipse-temurin:21-jre` 基础镜像。以 `deploy/prd/vm1/app/service/admin/Dockerfile` 为例：
+所有业务服务（admin、file、gateway、portal）共用同一套 Dockerfile 模板，统一基于 `eclipse-temurin:17-jre` 基础镜像。以 `deploy/prd/vm1/app/service/admin/Dockerfile` 为例：
 
 ```dockerfile
-FROM eclipse-temurin:21-jre
+FROM crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/eclipse-temurin:17-jre
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 WORKDIR /workspace
@@ -227,7 +223,7 @@ ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
 
 **说明：**
 
-- 基础镜像 `eclipse-temurin:21-jre` 提供 Java 21 运行时
+- 基础镜像 `eclipse-temurin:17-jre` 提供 Java 17 运行时
 - 通过 `TZ=Asia/Shanghai` 与 `ln -snf` 设置时区
 - 构建上下文为对应服务模块目录（`service/admin`、`service/file` 等），需包含 Maven 打包生成的 `*.jar`
 - `JAVA_OPTS` 通过环境变量注入，支持运行时配置 JVM 参数（如 SkyWalking Agent、内存限制等）
@@ -251,11 +247,11 @@ mvn clean package -DskipTests
 prd 环境通过 `docker-compose-app.yml` 中的 `build` 字段在部署时本地构建镜像，确保生产环境镜像与代码版本严格一致：
 
 ```yaml
-frameworkJava-admin:
+frameworkjava-admin:
   build:
     context: service/admin          # 构建上下文为 service/admin 目录
   image: <镜像仓库>/zmbdp-admin-service:1.0
-  container_name: frameworkJava-admin-prd
+  container_name: frameworkjava-admin-prd
   ports:
     - "18081:18081"
   environment:
@@ -275,10 +271,10 @@ frameworkJava-admin:
 
 | 服务 | 容器名 | 端口 | SkyWalking service_name |
 |------|--------|------|------------------------|
-| admin | `frameworkJava-admin-prd` | 18081 | zmbdp-admin |
-| file | `frameworkJava-file-prd` | 18082 | zmbdp-file |
-| gateway | `frameworkJava-gateway-prd` | 10030 | zmbdp-gateway |
-| portal | `frameworkJava-portal-prd` | 18083 | zmbdp-portal |
+| admin | `frameworkjava-admin-prd` | 18081 | zmbdp-admin |
+| file | `frameworkjava-file-prd` | 18082 | zmbdp-file |
+| gateway | `frameworkjava-gateway-prd` | 10030 | zmbdp-gateway |
+| portal | `frameworkjava-portal-prd` | 18083 | zmbdp-portal |
 
 > **说明**：vm2 上的应用服务通过 `JAVA_OPTS` 中的 `-Dspring.cloud.nacos.discovery.ip` 指向 vm2 内网 IP，确保服务注册时上报的是 vm2 地址。
 
@@ -301,15 +297,15 @@ source /opt/sql/db.sql;
 |------|------|------|
 | 1 | `init.sql` | 入口脚本，由 MySQL 镜像 `docker-entrypoint-initdb.d` 自动执行 |
 | 2 | `inituser.sql` | 创建业务数据库账号（dev：`zmbdpdev`，test：`zmbdptest`，prd：`zmbdpprd`）并授权 |
-| 3 | `nacos.sql` | 创建 Nacos 配置中心数据库 `frameworkJava_nacos_{env}` 及表结构 |
-| 4 | `xxljob.sql` | 创建 XXL-JOB 调度数据库 `frameworkJava_xxljob_{env}` 及表结构 |
-| 5 | `db.sql` | 创建业务数据库 `frameworkJava_db_{env}` 及业务表结构 |
+| 3 | `nacos.sql` | 创建 Nacos 配置中心数据库 `frameworkjava_nacos_{env}` 及表结构 |
+| 4 | `xxljob.sql` | 创建 XXL-JOB 调度数据库 `frameworkjava_xxljob_{env}` 及表结构 |
+| 5 | `db.sql` | 创建业务数据库 `frameworkjava_{env}` 及业务表结构 |
 
 **SQL 文件位置：**
 
 - dev：`deploy/dev/app/mysql/sql/`（含 `inituser.sql`、`nacos.sql`、`xxljob.sql`、`db.sql`）
-- test：`deploy/test/app/mysql/sql/`（含 `inituser.sql`、`nacos.sql`、`xxljob.sql`），`db.sql` 位于 `deploy/test/res/sql/`
-- prd：`deploy/prd/vm1/app/mysql/sql/`（含 `inituser.sql`、`nacos.sql`、`xxljob.sql`），`db.sql` 位于 `deploy/prd/vm1/res/sql/`
+- test：`deploy/test/app/mysql/sql/`（含 `inituser.sql`、`nacos.sql`、`xxljob.sql`、`db.sql`）
+- prd：`deploy/prd/vm1/app/mysql/sql/`（含 `inituser.sql`、`nacos.sql`、`xxljob.sql`、`db.sql`）
 
 > **说明**：`init.sql` 通过 `source /opt/sql/xxx.sql` 引用其他脚本，对应 compose 中挂载的 `./mysql/sql:/opt/sql` 目录。prd vm2 的 MySQL 为 slave 节点，使用 `init.sh` 而非 `init.sql`，通过主从复制同步数据，不重复执行初始化。
 
@@ -361,9 +357,9 @@ Grafana 通过文件方式自动加载 Dashboard，无需手动导入。配置�
 apiVersion: 1
 
 providers:
-  - name: 'frameworkJava Dashboards'
+  - name: 'FrameworkJava Dashboards'
     orgId: 1
-    folder: 'frameworkJava'              # Dashboard 所属文件夹
+    folder: 'FrameworkJava'              # Dashboard 所属文件夹
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10            # 每 10 秒扫描一次变更
@@ -411,7 +407,7 @@ RUN chmod 644 /skywalking/oap-libs/mysql-connector-j-8.0.33.jar
 各环境 `docker-compose-mid.yml` 中通过 `build` 字段引用该 Dockerfile：
 
 ```yaml
-frameworkJava-skywalking-oap:
+frameworkjava-skywalking-oap:
   build:
     context: ../../skywalking       # dev/test
     # context: ../../skywalking     # prd（路径相对 prd/vm1/app）
@@ -421,7 +417,7 @@ frameworkJava-skywalking-oap:
     - "12800:12800"                 # HTTP 端口（UI 查询数据）
   environment:
     SW_STORAGE: mysql
-    SW_JDBC_URL: jdbc:mysql://frameworkJava-mysql:3306/frameworkJava_skywalking_{env}?...
+    SW_JDBC_URL: jdbc:mysql://frameworkjava-mysql:3306/frameworkjava_skywalking_{env}?...
 ```
 
 ### 11.2 Agent 下载
@@ -464,14 +460,14 @@ environment:
 ### 12.1 test 环境
 
 ```yaml
-frameworkJava-web:
-  image: nginx:1.24.0
-  container_name: frameworkJava-web
+frameworkjava-web-test:
+  image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nginx:1.24.0
+  container_name: frameworkjava-web-test
   ports:
     - "80:80"
   volumes:
     - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-    - ./nginx/web/dist:/data/frameworkJava/web/dist   # 前端静态资源
+    - ./nginx/web/dist:/data/frameworkjava/web/dist   # 前端静态资源
 ```
 
 访问地址：`http://<test服务器ip>/`
@@ -479,14 +475,14 @@ frameworkJava-web:
 ### 12.2 prd 环境（vm1）
 
 ```yaml
-frameworkJava-web-prd01:
-  image: nginx:1.24.0
-  container_name: frameworkJava-web-prd01
+frameworkjava-web-prd01:
+  image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nginx:1.24.0
+  container_name: frameworkjava-web-prd01
   ports:
     - "8666:80"
   volumes:
     - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-    - ./nginx/web/dist:/data/frameworkJava/web/dist   # 前端静态资源，需包含 index.html
+    - ./nginx/web/dist:/data/frameworkjava/web/dist   # 前端静态资源，需包含 index.html
 ```
 
 访问地址：`http://<vm1内网ip>:8666/`
@@ -495,12 +491,12 @@ frameworkJava-web-prd01:
 
 ### 12.3 prd 环境 Nacos 代理（vm2）
 
-vm2 额外部署一个 Nginx 容器 `frameworkJava-webnacos`，用于对 3 节点 Nacos 集群做负载均衡：
+vm2 额外部署一个 Nginx 容器 `frameworkjava-web-prd02`，用于对 3 节点 Nacos 集群做负载均衡：
 
 ```yaml
-frameworkJava-webnacos:
-  image: nginx:1.24.0
-  container_name: frameworkJava-webnacos
+frameworkjava-web-prd02:
+  image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nginx:1.24.0
+  container_name: frameworkjava-web-prd02
   ports:
     - "8866:8886"
   volumes:

@@ -7,7 +7,7 @@
 ## 核心组件
 
 - `@RateLimit`：标记需要限流的方法
-- `RateLimitAspect`：切面，负责流程编排（约 150 行，职责单一）
+- `RateLimitAspect`：切面，负责流程编排（约 499 行，职责单一）
 - `RateLimiterExecutor`：限流执行器接口（可扩展不同算法）
 - `RedisTokenBucketRateLimiter`：令牌桶实现（Hash + Lua，默认算法）
 - `RedisSlidingWindowRateLimiter`：滑动窗口实现（ZSET + Lua，可选算法）
@@ -103,7 +103,7 @@ public Result<?> someApi() { ... }
 | `ratelimit.enabled` | 全局开关 | `true` |
 | `ratelimit.algorithm` | 限流算法<br/>`token-bucket`=令牌桶（默认）<br/>`sliding-window`=滑动窗口 | `token-bucket` |
 | `ratelimit.key-prefix` | Redis Key 前缀 | `ratelimit:` |
-| `ratelimit.default-limit` | 全局默认限流阈值<br/>令牌桶：桶容量（最大令牌数）<br/>滑动窗口：时间窗口内最大请求数 | `60` |
+| `ratelimit.default-limit` | 全局默认限流阈值<br/>令牌桶：桶容量（最大令牌数）<br/>滑动窗口：时间窗口内最大请求数 | 代码默认 `60`，dev/prd Nacos 配置实际为 `30` |
 | `ratelimit.default-window-sec` | 全局默认时间窗口（秒）<br/>令牌桶：用于计算补充速率（refillRate = limit / windowSec）<br/>滑动窗口：滑动窗口的时间范围 | `60` |
 | `ratelimit.default-message` | 全局默认提示文案 | `请求过于频繁，请稍后重试` |
 | `ratelimit.fail-open` | Redis 异常时的降级策略<br/>`true`=失败放行（可用性优先）<br/>`false`=失败拒绝（安全性优先） | `false` |

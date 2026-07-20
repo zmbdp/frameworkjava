@@ -1,6 +1,6 @@
 # 安全认证与异常处理
 
-frameworkJava 采用 **JWT + Redis** 双层机制实现身份认证：JWT 携带用户基础信息作为访问凭证，Redis 存储完整的登录上下文并控制 Token 生命周期，配合全局异常处理器统一对外错误响应，构成完整的安全认证与异常处理体系。
+FrameworkJava 采用 **JWT + Redis** 双层机制实现身份认证：JWT 携带用户基础信息作为访问凭证，Redis 存储完整的登录上下文并控制 Token 生命周期，配合全局异常处理器统一对外错误响应，构成完整的安全认证与异常处理体系。
 
 ## 一、概述
 
@@ -21,6 +21,7 @@ frameworkJava 采用 **JWT + Redis** 双层机制实现身份认证：JWT 携带
 | 登录上下文 | `LoginUserDTO` | 封装 Redis 中存储的登录用户信息 |
 | Token 出参 | `TokenDTO` | 登录成功后返回给前端的 Token 信息 |
 | 全局异常处理 | `GlobalExceptionHandler` | 统一异常拦截与错误码映射 |
+| 审计字段填充 | `AuditMetaObjectHandler` | MyBatis-Plus insert/update 时自动填充 createBy/createTime/updateBy/updateTime |
 
 ### 模块结构
 
@@ -31,7 +32,8 @@ zmbdp-common/zmbdp-common-security
     │   ├── LoginUserDTO.java        # 登录用户上下文
     │   └── TokenDTO.java            # Token 出参
     ├── handler
-    │   └── GlobalExceptionHandler.java
+    │   ├── GlobalExceptionHandler.java
+    │   └── AuditMetaObjectHandler.java
     ├── service
     │   └── TokenService.java
     └── utils
@@ -39,11 +41,12 @@ zmbdp-common/zmbdp-common-security
         └── SecurityUtil.java
 ```
 
-`GlobalExceptionHandler` 与 `TokenService` 通过 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 自动装配，引入 `zmbdp-common-security` 依赖即可生效：
+`GlobalExceptionHandler`、`TokenService` 与 `AuditMetaObjectHandler` 通过 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 自动装配，引入 `zmbdp-common-security` 依赖即可生效：
 
 ```
-com.zmbdp.common.security.handler.GlobalExceptionHandler
 com.zmbdp.common.security.service.TokenService
+com.zmbdp.common.security.handler.GlobalExceptionHandler
+com.zmbdp.common.security.handler.AuditMetaObjectHandler
 ```
 
 ## 二、JWT 工具（JwtUtil）
@@ -307,7 +310,7 @@ public void setLoginUser(LoginUserDTO loginUserDTO) {
 
 ## 五、用户来源机制（userFrom）
 
-`userFrom` 是 frameworkJava 实现 **B 端 / C 端隔离** 的核心字段，存储在 JWT Claims 与 Redis 中的 `LoginUserDTO` 内。
+`userFrom` 是 FrameworkJava 实现 **B 端 / C 端隔离** 的核心字段，存储在 JWT Claims 与 Redis 中的 `LoginUserDTO` 内。
 
 ### 取值约定
 

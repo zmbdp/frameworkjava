@@ -9,9 +9,9 @@
 ## 核心组件
 
 - `XxlJobConfig`：执行器自动配置（`zmbdp-common-xxljob`），读取 Nacos 配置自动注册执行器
-- `ResetBloomFilterJobHandler`：布隆过滤器重置 Handler，每日凌晨 4 点触发，使用 Redisson 分布式锁保证多实例只执行一次
-- `ResetBloomFilterTimedTask`：Spring Scheduled 降级兜底任务，XXL-JOB 不可用时通过配置启用
 - `TestXxlJobController`：`zmbdp-mstemplate` 中的示例 Handler，包含简单任务和分片广播任务两种实现
+
+> `ResetBloomFilterJobHandler` 与 `ResetBloomFilterTimedTask` 位于 `zmbdp-admin-service` 业务模块，是业务侧基于 xxljob 实现的示例（布隆过滤器重置任务），不属于 `zmbdp-common-xxljob` 公共模块。详见「内置任务说明」一节。
 
 ## 使用方式
 
@@ -42,13 +42,13 @@
 xxl:
   job:
     admin:
-      addresses: http://frameworkJava-xxljob-admin:8080/xxl-job-admin
+      addresses: http://frameworkjava-xxljob-admin:8080/xxl-job-admin
     executor:
       appname: ${spring.application.name}-executor
       address:
       ip:
       port: -1
-      accessToken: frameworkJava_dev
+      accessToken: frameworkjava_dev
       logpath: /data/applogs/xxl-job/executor
       logretentiondays: 30
 ```

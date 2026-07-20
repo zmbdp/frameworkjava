@@ -1,6 +1,6 @@
 # 新增业务模块指南
 
-本文档说明如何在 frameworkJava 中新增一个业务模块。
+本文档说明如何在 FrameworkJava 中新增一个业务模块。
 
 ## 模块结构
 
@@ -47,19 +47,24 @@ mkdir -p zmbdp-{module}/zmbdp-{module}-service
 
 #### 2.1 创建 pom.xml
 
-参考 `zmbdp-portal/zmbdp-portal-api/pom.xml`：
+参考 `zmbdp-mstemplate/zmbdp-mstemplate-api/pom.xml`：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <parent>
         <groupId>com.zmbdp</groupId>
-        <artifactId>frameworkJava</artifactId>
+        <artifactId>zmbdp-{module}</artifactId>
         <version>1.0</version>
     </parent>
     
     <artifactId>zmbdp-{module}-api</artifactId>
-    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     
     <dependencies>
         <dependency>
@@ -81,7 +86,7 @@ mkdir -p zmbdp-{module}/zmbdp-{module}-service
 
 #### 3.1 创建 pom.xml
 
-参考 `zmbdp-portal/zmbdp-portal-service/pom.xml`，主要依赖：
+参考 `zmbdp-mstemplate/zmbdp-mstemplate-service/pom.xml`，主要依赖：
 
 ```xml
 <dependencies>

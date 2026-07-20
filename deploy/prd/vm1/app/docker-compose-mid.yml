@@ -239,7 +239,7 @@ services:
         max-size: "10m"
         max-file: "3"
   frameworkjava-web-prd01:
-    image: nginx:1.24.0
+    image: crpi-otuh3k08p4yxr3tv.cn-shanghai.personal.cr.aliyuncs.com/zmbdp-infra/nginx:1.24.0
     container_name: frameworkjava-web-prd01
     restart: always
     networks:

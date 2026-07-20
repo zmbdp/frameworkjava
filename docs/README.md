@@ -1,4 +1,4 @@
-# frameworkJava 文档中心
+# FrameworkJava 文档中心
 
 本文档用于补充 README 中未展开的工程细节。
 
