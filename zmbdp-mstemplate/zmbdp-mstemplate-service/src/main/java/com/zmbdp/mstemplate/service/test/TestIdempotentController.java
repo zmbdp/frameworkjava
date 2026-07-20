@@ -345,6 +345,8 @@ public class TestIdempotentController {
 
     /**
      * 获取测试说明
+     *
+     * @return 幂等性测试结果
      */
     @GetMapping("/help")
     public Result<String> getTestHelp() {
@@ -600,6 +602,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP基础功能测试 - 请求头方式
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/basic/header")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, message = "请勿重复提交")
@@ -609,6 +613,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP基础功能测试 - 请求参数方式
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/basic/param")
     @Idempotent(allowParam = true, paramName = "idempotentToken", expireTime = 300, message = "请勿重复提交")
@@ -618,6 +624,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP基础功能测试 - 优先级测试（请求头优先）
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/basic/priority")
     @Idempotent(headerName = "Idempotent-Token", paramName = "idempotentToken", expireTime = 300, message = "请勿重复提交")
@@ -627,6 +635,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP高级功能测试 - 强幂等模式
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/advanced/strong")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, returnCachedResult = IdempotentMode.TRUE, message = "请勿重复提交")
@@ -636,6 +646,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP高级功能测试 - 三态设计 DEFAULT
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/advanced/mode/default")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, returnCachedResult = IdempotentMode.DEFAULT, message = "请勿重复提交")
@@ -645,6 +657,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP高级功能测试 - 三态设计 TRUE
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/advanced/mode/true")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, returnCachedResult = IdempotentMode.TRUE, message = "请勿重复提交")
@@ -654,6 +668,8 @@ public class TestIdempotentController {
 
     /**
      * HTTP高级功能测试 - 三态设计 FALSE
+     *
+     * @return 幂等性测试结果
      */
     @PostMapping("/http/advanced/mode/false")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, returnCachedResult = IdempotentMode.FALSE, message = "请勿重复提交")
@@ -663,6 +679,10 @@ public class TestIdempotentController {
 
     /**
      * HTTP高级功能测试 - 业务失败重试
+     *
+     * @param shouldFail 是否模拟业务失败
+     * @return 幂等性测试结果
+     * @throws ServiceException 模拟业务失败时抛出异常
      */
     @PostMapping("/http/advanced/failure")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, message = "请勿重复提交")
@@ -676,6 +696,10 @@ public class TestIdempotentController {
     /**
      * 重试次数测试专用接口
      * 用于测试重试次数的递增、查询、删除等功能
+     *
+     * @param shouldFail 是否模拟业务失败
+     * @return 幂等性测试结果
+     * @throws ServiceException 模拟业务失败时抛出异常
      */
     @PostMapping("/http/advanced/retry-count")
     @Idempotent(headerName = "Idempotent-Token", expireTime = 300, message = "请勿重复提交")

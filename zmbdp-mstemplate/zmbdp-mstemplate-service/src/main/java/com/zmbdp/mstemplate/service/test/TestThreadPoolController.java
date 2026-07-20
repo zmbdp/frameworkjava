@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test/thread")
 public class TestThreadPoolController {
 
+    /**
+     * 线程池服务，用于打印线程池信息以验证异步线程池配置
+     */
     @Autowired
     private ThreadPoolService threadPoolService;
 

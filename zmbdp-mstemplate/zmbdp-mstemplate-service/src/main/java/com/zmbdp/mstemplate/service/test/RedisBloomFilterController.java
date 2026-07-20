@@ -25,19 +25,24 @@ import java.util.concurrent.Executors;
  * 2. 元素添加与查询是否正确<p>
  * 3. 批量操作、清空等是否线程与分布式安全
  *
- * @author 稚名
+ * @author 稚名不带撇
  */
 @Slf4j
 @RestController
 @RequestMapping("/test/bloom")
 public class RedisBloomFilterController {
 
+    /**
+     * 布隆过滤器服务，用于测试布隆过滤器的添加、查询、清空等功能
+     */
     @Autowired
     private BloomFilterService bloomFilterService;
 
     /**
      * 1 一键全流程测试（基础测试）<p>
      * 包含：重置 -> 批量插入 -> 校验存在/不存在 -> 打印状态与计数
+     *
+     * @return 测试执行结果，成功返回 success，异常返回 fail 及错误信息
      */
     @PostMapping("/fullCheck")
     public Result<Void> fullCheck() {
@@ -96,6 +101,8 @@ public class RedisBloomFilterController {
      *
      * @param totalOps 总操作数
      * @param threads  线程数
+     * @return 测试执行结果，成功返回 success
+     * @throws InterruptedException 线程执行被中断时抛出
      */
     @PostMapping("/concurrentWriteTest")
     public Result<Void> concurrentWriteTest(@RequestParam(defaultValue = "1000") int totalOps,
@@ -145,6 +152,8 @@ public class RedisBloomFilterController {
 
     /**
      * 3 清空验证
+     *
+     * @return 测试执行结果，成功返回 success
      */
     @PostMapping("/clearTest")
     public Result<Void> clearTest() {
@@ -162,6 +171,8 @@ public class RedisBloomFilterController {
      *
      * @param ops     操作数
      * @param threads 线程数
+     * @return 测试执行结果，成功返回 success
+     * @throws InterruptedException 线程执行被中断时抛出
      */
     @PostMapping("/performanceTest")
     public Result<Void> performanceTest(@RequestParam(defaultValue = "10000") int ops,
@@ -202,6 +213,8 @@ public class RedisBloomFilterController {
      *
      * @param ops     操作数
      * @param threads 线程数
+     * @return 测试执行结果，成功返回 success
+     * @throws InterruptedException 线程执行被中断时抛出
      */
     @PostMapping("/compareRedisBloomPutAndQuery")
     public Result<Void> compareRedisBloomPutAndQuery(@RequestParam(defaultValue = "10000") int ops,
@@ -281,6 +294,8 @@ public class RedisBloomFilterController {
 
     /**
      * 6 全面测试（包含边界情况、并发安全、误判率等）
+     *
+     * @return 测试执行结果，成功返回 success，异常返回 fail 及错误信息
      */
     @PostMapping("/comprehensiveTest")
     public Result<Void> comprehensiveTest() {

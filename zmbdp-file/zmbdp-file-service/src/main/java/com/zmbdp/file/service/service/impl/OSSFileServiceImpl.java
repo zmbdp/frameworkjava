@@ -58,6 +58,7 @@ public class OSSFileServiceImpl implements IFileService {
      * @param key  文件存储路径信息
      * @param data 文件内容
      * @return 签名
+     * @throws ServiceException 生成签名过程中发生异常时抛出
      */
     public static byte[] hmacSha256(byte[] key, String data) {
         try {
@@ -82,6 +83,7 @@ public class OSSFileServiceImpl implements IFileService {
      *
      * @param file 用户上传的文件
      * @return 文件上传后返回的DTO
+     * @throws ServiceException 上传 OSS 失败时抛出
      */
     @Override
     public FileReqDTO upload(MultipartFile file) {
@@ -122,6 +124,7 @@ public class OSSFileServiceImpl implements IFileService {
      * 获取签名
      *
      * @return 获取到的签名信息
+     * @throws ServiceException 生成直传签名失败时抛出
      */
     @Override
     public SignReqDTO getSign() {

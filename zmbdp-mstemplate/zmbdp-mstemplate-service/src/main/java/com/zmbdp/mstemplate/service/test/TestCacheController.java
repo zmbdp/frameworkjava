@@ -33,15 +33,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/test/cache")
 public class TestCacheController {
 
+    /**
+     * Redis 缓存服务，用于操作 Redis 中的缓存数据
+     */
     @Autowired
     private RedisService redisService;
 
+    /**
+     * Caffeine 本地缓存，作为二级缓存的一级缓存使用
+     */
     @Autowired
     private Cache<String, Object> caffeineCache;
 
+    /**
+     * 服装业务服务，用于测试业务缓存功能
+     */
     @Autowired
     private IClothService clothService;
 
+    /**
+     * 布隆过滤器服务，用于测试布隆过滤器的添加、查询、清空等功能
+     */
     @Autowired
     private BloomFilterService bloomFilterService;
 

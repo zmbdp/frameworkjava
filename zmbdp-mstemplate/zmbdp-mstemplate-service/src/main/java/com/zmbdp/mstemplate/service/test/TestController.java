@@ -70,6 +70,7 @@ public class TestController {
      *
      * @param id ID参数
      * @return 结果
+     * @throws ServiceException 当 id 为负数、1 或 1000 时抛出对应的业务异常
      */
     @GetMapping("/exception")
     public Result<Void> exception(int id) {
@@ -171,6 +172,8 @@ public class TestController {
     /**
      * 测试所有深拷贝方法
      * 深拷贝支持复杂泛型嵌套（对象嵌套 List、对象嵌套对象等）
+     *
+     * @return 各深拷贝方法的拷贝结果
      */
     @GetMapping("/testDeepCopy")
     public Result<Map<String, Object>> testCopy() {
@@ -233,6 +236,8 @@ public class TestController {
     /**
      * 测试所有浅拷贝方法
      * 包括：普通对象（无嵌套）和复杂对象（有嵌套，用浅拷贝看区别）两种场景
+     *
+     * @return 各浅拷贝方法的拷贝结果
      */
     @GetMapping("/testShallowCopy")
     public Result<Map<String, Object>> testShallowCopy() {
@@ -339,6 +344,8 @@ public class TestController {
      * MappingSource.nickName（String）→ MappingTarget.displayName（String）<br>
      * MappingSource.score（Integer）→ MappingTarget.point（Integer）<br>
      * 其余同名字段（id、parentId、children）走普通拷贝。
+     *
+     * @return 各字段映射拷贝方法的拷贝结果
      */
     @GetMapping("/testFieldMapping")
     public Result<Map<String, Object>> testFieldMapping() {
@@ -991,91 +998,216 @@ public class TestController {
     }
 
     /**
-     * 字段映射测试用源对象
-     * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     * 字段映射测试用源对象节点
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MappingSourceNode {
+        /**
+         * 年龄
+         */
         private Integer age;
+        /**
+         * 名称
+         */
         private String name;
     }
 
+    /**
+     * 字段映射测试用源对象子节点（递归嵌套结构）
+     *
+     * @author 稚名不带撇
+     */
     @Data
     public static class MappingSourceChildren {
+        /**
+         * 年龄
+         */
         private Integer age;
+        /**
+         * 名称
+         */
         private String name;
+        /**
+         * 单个嵌套子节点
+         */
         private MappingSourceChildren childrenNode;
+        /**
+         * 子节点列表
+         */
         private List<MappingSourceChildren> children;
     }
 
     /**
      * 字段映射测试用源对象
      * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MappingSource {
+        /**
+         * 主键 ID
+         */
         private Long id;
+        /**
+         * 昵称（对应 MappingTarget.displayName）
+         */
         private String nickName; // 对应 MappingTarget.displayName
+        /**
+         * 分数（对应 MappingTarget.point）
+         */
         private Integer score; // 对应 MappingTarget.point
+        /**
+         * 父节点 ID
+         */
         private Long parentId;
+        /**
+         * 单个嵌套节点
+         */
         private MappingSourceNode sourceNode;
+        /**
+         * 子节点列表
+         */
         private List<MappingSourceChildren> children;
+        /**
+         * 另一组子节点列表（用于测试不同泛型嵌套）
+         */
         private List<MappingSource> children1;
     }
 
     /**
-     * 字段映射测试用源对象
-     * nickName、score 与目标对象字段名不一致，用于验证 mapping 映射
+     * 字段映射测试用目标对象节点
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MappingTargetNode {
+        /**
+         * 年龄
+         */
         private Integer age;
+        /**
+         * 名称
+         */
         private String name;
     }
 
+    /**
+     * 字段映射测试用目标对象子节点（递归嵌套结构）
+     *
+     * @author 稚名不带撇
+     */
     @Data
     public static class MappingTargetChildren {
+        /**
+         * 年龄
+         */
         private Integer age;
+        /**
+         * 名称
+         */
         private String name;
+        /**
+         * 单个嵌套子节点
+         */
         private MappingTargetChildren childrenNode;
+        /**
+         * 子节点列表
+         */
         private List<MappingTargetChildren> children;
     }
 
     /**
      * 字段映射测试用目标对象
      * displayName、point 与源对象字段名不一致，用于验证 mapping 映射
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MappingTarget {
+        /**
+         * 主键 ID
+         */
         private Long id;
+        /**
+         * 显示名（来自 MappingSource.nickName）
+         */
         private String displayName;
+        /**
+         * 积分（来自 MappingSource.score）
+         */
         private Integer point;
+        /**
+         * 父节点 ID
+         */
         private Long parentId;
+        /**
+         * 单个嵌套节点
+         */
         private MappingTargetNode targetNode;
+        /**
+         * 子节点列表
+         */
         private List<MappingTargetChildren> children;
+        /**
+         * 另一组子节点列表（用于测试不同泛型嵌套）
+         */
         private List<MappingTarget> children2;
     }
 
     /**
      * 测试用的菜单节点对象（包含嵌套 List）
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MenuNode {
+        /**
+         * 菜单 ID
+         */
         private Long id;
+        /**
+         * 菜单名称
+         */
         private String name;
+        /**
+         * 父菜单 ID
+         */
         private Long parentId;
+        /**
+         * 子菜单列表
+         */
         private List<MenuNode> children;
     }
 
     /**
-     * 测试用的菜单节点对象（包含嵌套 List）
+     * 测试用的菜单节点 DTO 对象（包含嵌套 List）
+     *
+     * @author 稚名不带撇
      */
     @Data
     public static class MenuNodeDTO {
+        /**
+         * 扩展字段（用于验证不同字段名拷贝）
+         */
         private Long aaa;
+        /**
+         * 菜单 ID
+         */
         private Long id;
+        /**
+         * 菜单名称
+         */
         private String name;
+        /**
+         * 父菜单 ID
+         */
         private Long parentId;
+        /**
+         * 子菜单列表
+         */
         private List<MenuNodeDTO> children;
     }
 }

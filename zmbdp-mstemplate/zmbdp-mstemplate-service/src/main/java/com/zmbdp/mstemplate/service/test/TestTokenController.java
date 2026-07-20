@@ -21,9 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/test/token")
 public class TestTokenController {
 
+    /**
+     * 令牌服务，用于生成和校验 JWT 令牌
+     */
     @Autowired
     private TokenService tokenService;
 
+    /**
+     * JWT 令牌密钥，从配置文件读取
+     */
     @Value("${jwt.token.secret}")
     private String secret;
 

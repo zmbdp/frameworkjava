@@ -53,6 +53,7 @@ public class QQMapServiceImpl implements IMapProvider {
      *
      * @param suggestSearchDTO 搜索条件
      * @return 搜索结果
+     * @throws ServiceException 调用腾讯位置服务失败时抛出
      */
     @Override
     public PoiListDTO searchQQMapPlaceByRegion(SuggestSearchDTO suggestSearchDTO) {
@@ -80,6 +81,7 @@ public class QQMapServiceImpl implements IMapProvider {
      *
      * @param locationDTO 经纬度
      * @return 区域信息
+     * @throws ServiceException 调用腾讯位置服务失败时抛出
      */
     @Override
     public GeoResultDTO getQQMapDistrictByLonLat(LocationDTO locationDTO) {

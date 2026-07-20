@@ -43,6 +43,7 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
      *
      * @param argumentAddReqDTO 新增参数请求 DTO
      * @return 数据库的 id
+     * @throws ServiceException 参数业务主键或参数名称重复时抛出
      */
     @Override
     public Long addArgument(ArgumentAddReqDTO argumentAddReqDTO) {
@@ -100,6 +101,7 @@ public class SysSysArgumentServiceImpl implements ISysArgumentService {
      *
      * @param argumentEditReqDTO 编辑参数 DTO
      * @return 数据库 id
+     * @throws ServiceException 参数业务主键不存在或参数名称已存在时抛出
      */
     @Override
     public Long editArgument(ArgumentEditReqDTO argumentEditReqDTO) {
