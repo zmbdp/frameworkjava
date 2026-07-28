@@ -116,8 +116,8 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
      * 但作用域不同。<br>
      * 此配置仅控制邮件发送，不影响短信发送。
      */
-    @Value("${captcha.send-message:false}")
-    private boolean sendMessage;
+    @Value("${mail.send-message:false}")
+    private boolean sendMailMessage;
 
     /**
      * 是否支持当前账号类型
@@ -179,7 +179,7 @@ public class EmailCodeServiceStrategy implements ICaptchaSenderStrategy {
     public boolean sendCode(String email, String code) {
         log.info("开始发送邮件验证码, 账号: {}", email);
         // 把是否发送邮件交给 nacos 管理
-        if (!sendMessage) {
+        if (!sendMailMessage) {
             log.error("邮件发送通道关闭, {}", email);
             return false;
         }
