@@ -1,3 +1,7 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
 # 操作日志配置（支持 Nacos 热更新）
 log:
   # 全局开关，false 时关闭所有 @LogAction 日志记录
