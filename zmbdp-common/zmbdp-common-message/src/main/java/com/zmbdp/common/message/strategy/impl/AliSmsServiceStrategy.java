@@ -110,7 +110,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
      * 此配置用于控制是否实际调用阿里云短信服务 API。
      */
     @Value("${sms.send-message:false}")
-    private boolean sendMessage;
+    private boolean sendSmsMessage;
 
     /**
      * 是否支持当前账号类型
@@ -205,7 +205,7 @@ public class AliSmsServiceStrategy implements ICaptchaSenderStrategy {
      */
     private boolean sendTemMessage(String phone, String templateCode, Map<String, String> params) {
         // 把是否发送线上短信交给 nacos 管理
-        if (!sendMessage) {
+        if (!sendSmsMessage) {
             log.error("短信发送通道关闭, {}", phone);
             return false;
         }
