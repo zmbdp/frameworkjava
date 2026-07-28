@@ -112,8 +112,8 @@ public class CaptchaService {
      *     <li>false：不发送验证码，使用固定验证码</li>
      * </ul>
      */
-    @Value("${captcha.send-message:true}")
-    private boolean sendMessage;
+    @Value("${captcha.random.enabled:true}")
+    private boolean captchaRandomEnabled;
 
     /**
      * 判断生成什么难度的验证码
@@ -132,13 +132,13 @@ public class CaptchaService {
      * 此配置对应 AliSmsServiceStrategy 的 sendMessage 配置。
      */
     @Value("${sms.send-message:false}")
-    private boolean smsSendMessage;
+    private boolean sendSmsMessage;
 
     /**
      * 邮件服务是否发送邮件（EmailCodeServiceStrategy 的 sendMessage 配置）
      */
     @Value("${mail.send-message:false}")
-    private boolean mailSendMessage;
+    private boolean sendMailMessage;
 
     /**
      * 验证码发送器路由器
@@ -205,12 +205,10 @@ public class CaptchaService {
                 : VerifyUtil.generateVerifyCode(MessageConstants.DEFAULT_CAPTCHA_LENGTH, captChaType);
 
         // 发送线上短信/邮件（根据账号格式自动选择发送器）
-        if (sendMessage) {
-            boolean result = captchaSenderRouter.sendCode(account, verifyCode);
-            // 发送失败时，如果使用了固定验证码，则不抛异常（允许失败）
-            if (!result && !shouldIgnoreSendFailure(account)) {
-                throw new ServiceException(ResultCode.SEND_MSG_FAILED);
-            }
+        boolean result = captchaSenderRouter.sendCode(account, verifyCode);
+        // 发送失败时，如果使用了固定验证码，则不抛异常（允许失败）
+        if (!result && !shouldIgnoreSendFailure(account)) {
+            throw new ServiceException(ResultCode.SEND_MSG_FAILED);
         }
         // 设置验证码的缓存
         redisService.setCacheObject(codeKey, verifyCode, accountCodeExpiration, TimeUnit.MINUTES);
@@ -334,15 +332,15 @@ public class CaptchaService {
      */
     private boolean shouldUseFixedCode(String account) {
         // 总开关关闭，使用固定验证码
-        if (!sendMessage) {
+        if (!captchaRandomEnabled) {
             return true;
         }
         // 用户输入的是手机号且短信通道关闭，使用固定验证码
-        if (VerifyUtil.checkPhone(account) && !smsSendMessage) {
+        if (VerifyUtil.checkPhone(account) && !sendSmsMessage) {
             return true;
         }
         // 用户输入的是邮箱且邮件通道关闭，使用固定验证码
-        return VerifyUtil.checkEmail(account) && !mailSendMessage;
+        return VerifyUtil.checkEmail(account) && !sendMailMessage;
     }
 
     /**
